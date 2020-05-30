@@ -1,0 +1,47 @@
+<?php
+$GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
+
+// if an handler is after the page tag in the wiki parameter variable, get only the tag
+$currentPage =  isset($_GET['wiki']) ?
+  strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] :
+  '';
+?>
+<?php foreach ($modules as $module) :?>
+<div class="panel-group panel-group-menu-lms" role="tablist">
+    <div class="panel panel-primary panel-menu-lms">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a href="<?php echo $GLOBALS['wiki']->href('', $module['id_fiche']) . "&parcours=" . $parcoursTag; ?>"><?php echo $module['bf_titre']; ?></a>
+            </h4>
+        </div>
+        <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche']) :?>
+        <div class="panel-collapse">
+            <ul class="list-group">
+                <?php
+                foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]) as $activiteTag) {
+                    $activite = baz_valeurs_fiche($activiteTag);
+                    if ($activite && $activite['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['activite_form_id']) {
+                        echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? ' active' : '') . '">';
+                        echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '?parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
+                        echo '</li>';
+                    }
+                }
+                ?>
+            </ul>
+        </div>
+        <?php endif ?>
+    </div>
+</div>
+<?php endforeach; ?>
+
+<!-- old display in collapsible panels
+$headingID = uniqid('heading');
+$collapseID = uniqid('collapse');
+
+<div class="panel-heading" id="<?php echo $headingID; ?>" role="tab" data-toggle="collapse" href="#<?php echo $collapseID; ?>" aria-expanded="true" aria-controls="<?php echo $collapseID; ?>">
+
+<div id="<?php echo $collapseID; ?>" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="<?php echo $headingID; ?>">
+
+echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? 'active' : '') . '">';
+echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '?parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
+echo '</li>' -->

@@ -1,0 +1,31 @@
+.id5001 {
+    padding-top: 0;
+}
+
+.panel-menu-lms .list-group-item a, .panel-menu-lms .list-group-item a:visited, .panel-menu-lms .list-group-item a:active {
+    color:inherit;
+}
+
+.pager-lms li.center {
+    text-align: center;
+    display: inline-block;
+}
+
+.pager-lms li.noaccess {
+    text-align: center;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #959595;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pager-lms li.square>a {
+    border-radius: 0;
+    margin-left: 5px;
+}
+
+.bazar-list .lms-container div.lms-menu {
+    display: none
+}

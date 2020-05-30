@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<plugin name="wklms" version="0.2" active="1">
+  <author>Adrien Cheype <adrien.cheype@gmail.com></author>
+  <label>YesWiki devient une plateforme d'apprentissage</label>
+  <desc>Permet d'utiliser YesWiki comme une plateforme d'apprentissage (LMS : Learning Management System)</desc>
+</plugin>
