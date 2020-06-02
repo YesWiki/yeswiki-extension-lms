@@ -70,14 +70,14 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
                     $nextModuleTag = $allModules[array_search($currentModule['id_fiche'], $allModules) + 1];
                     $output .= '<li class="next"><a href="' . $GLOBALS['wiki']->href('', $nextModuleTag)
                         . '&parcours=' . $parcoursEntry['id_fiche']
-                        . '">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
+                        . '" class="bazar-entry modalbox">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
                 }
             } else {
-                // otherwise, the next link is to the next module
+                // otherwise, the next link is to the next activity
                 $nextActivityTag = $allActivities[array_search($currentPageTag, $allActivities) + 1];
                 $output .= '<li class="next"><a href="' . $GLOBALS['wiki']->href('', $nextActivityTag)
                     . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentModule['id_fiche']
-                    . '" class="bazar-entry modalbox">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
+                    . '">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
             }
 
             $output .= '</ul>
