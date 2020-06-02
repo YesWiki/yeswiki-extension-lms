@@ -11,7 +11,7 @@ $currentPage =  isset($_GET['wiki']) ?
     <div class="panel panel-primary panel-menu-lms">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a href="<?php echo $GLOBALS['wiki']->href('', $module['id_fiche']) . "&parcours=" . $parcoursTag; ?>"><?php echo $module['bf_titre']; ?></a>
+                <a href="<?php echo $GLOBALS['wiki']->href('', $module['id_fiche']) . "&parcours=" . $parcoursTag; ?>" class="bazar-entry modalbox"><?php echo $module['bf_titre']; ?></a>
             </h4>
         </div>
         <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche']) :?>

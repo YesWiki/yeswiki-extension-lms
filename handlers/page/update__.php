@@ -16,6 +16,11 @@ if (!defined("WIKINI_VERSION")) {
 }
 
 /**
+ * Constants to define the OuiNon Lms list
+ */
+define('OUINON_LIST_JSON', '{"label":{"oui":"Oui","non":"Non"},"titre_liste":"OuiNon Lms"}');
+
+/**
  * Constants to define the contents of the LMS forms
  */
 define('ACTIVITE_FORM_NOM', 'Activité LMS');
@@ -33,9 +38,9 @@ define('MODULE_FORM_DESCRIPTION', 'Module (enchaînement d\'activités) utilisé
 define('MODULE_FORM_TEMPLATE', 'texte***bf_titre***Titre du module***255***255*** *** ***text***1*** *** *** *** *** *** ***
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 image***bf_image***Image***300***300***600***600***left***0*** ***
-texte***bf_duree***Durée*** *** *** *** ***text***0*** *** *** *** *** *** ***
+texte***bf_duree***Durée estimée*** *** *** *** ***text***0*** *** *** *** *** *** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** ***1*** *** ***0*** *** *** *** *** *** ***
-liste***ListeOuinonlms***Actif*** *** ***oui***bf_actif*** ***0*** *** ***@admins*** *** *** ***
+liste***ListeOuinonlms***Activé*** *** ***oui***bf_active*** ***0*** *** ***@admins*** *** *** ***
 checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
@@ -87,6 +92,20 @@ if ($this->UserIsAdmin()) {
     $plugin_output_new = preg_match($pattern, $plugin_output_new, $matches) ? $matches[1] : $plugin_output_new;
 
     $plugin_output_new .= '<strong>Extension LMS</strong><br/>';
+
+    // if the OuiNon Lms list doesn't exist, create it
+    if (!$this->LoadPage('ListeOuinonlms')){
+        $plugin_output_new .= 'ℹ️Adding the <em>OuiNon Lms</em> list<br />';
+        // save the page with the list value
+        $this->SavePage('ListeOuinonlms', OUINON_LIST_JSON);
+        // in case, there is already some triples for 'ListOuinonlms', delete them
+        $this->DeleteTriple('ListeOuinonlms', 'http://outils-reseaux.org/_vocabulary/type', null);
+        // create the triple to specify this page is a list
+        $this->InsertTriple('ListeOuinonlms', 'http://outils-reseaux.org/_vocabulary/type', 'liste', '', '');
+        $plugin_output_new .= '✅Done !<br />';
+    } else {
+        $plugin_output_new .= '✅The <em>Ouinon Lms</em> list already exists.<br />';
+    }
 
     // test if the activite form exists, if not, install it
     checkAndAddForm($plugin_output_new, $GLOBALS['wiki']->config['lms_config']['activite_form_id'], ACTIVITE_FORM_NOM, ACTIVITE_FORM_DESCRIPTION, ACTIVITE_FORM_TEMPLATE);

@@ -53,7 +53,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
                 // if first activity of a module, the previous link is to the current module entry
                 $output .= '<li class="previous"><a href="' . $GLOBALS['wiki']->href('', $currentModule['id_fiche'])
                     . '&parcours=' . $parcoursEntry['id_fiche']
-                    . '"><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
+                    . '" class="bazar-entry modalbox"><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
             } else {
                 // otherwise, the previous link is to the previous activity
                 $previousActivityTag = $allActivities[array_search($currentPageTag, $allActivities) - 1];
@@ -73,11 +73,11 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
                         . '">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
                 }
             } else {
-                // otherwise, the next link is to the next activity
+                // otherwise, the next link is to the next module
                 $nextActivityTag = $allActivities[array_search($currentPageTag, $allActivities) + 1];
                 $output .= '<li class="next"><a href="' . $GLOBALS['wiki']->href('', $nextActivityTag)
                     . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentModule['id_fiche']
-                    . '">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
+                    . '" class="bazar-entry modalbox">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
             }
 
             $output .= '</ul>
@@ -88,7 +88,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
 }
 
 /**
- * Display the different options to navigate into a module according to module field 'Actif' and the navigation of the learner.
+ * Display the different options to navigate into a module according to module field 'Activé' and the navigation of the learner.
  * Must be declare in the bazar form definition as followed :
  *    'navigationmodule**bf_navigation*** *** *** *** *** *** *** *** ***'
  * No other parameters are needed.
@@ -123,7 +123,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             <ul class="pager pager-lms">';
 
         // check the access to the module
-        if (empty($allActivities) || empty($fiche['listeListeOuinonlmsbf_actif']) || $fiche['listeListeOuinonlmsbf_actif'] == 'non') {
+        if (empty($allActivities) || empty($fiche['listeListeOuinonlmsbf_active']) || $fiche['listeListeOuinonlmsbf_active'] == 'non') {
             // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
             $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
         } else {
@@ -140,7 +140,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             $nextModuleTag = $allModules[array_search($currentPageTag, $allModules) + 1];
             $output .= '<li class="next square" title="' . _t('LMS_MODULE_NEXT')
                 . '"><a href="' . $GLOBALS['wiki']->href('', $nextModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
-                . '" "aria-label="' . _t('LMS_NEXT') . '">' . '<i class="fa fa-caret-right" aria-hidden="true"></i></a></li>';
+                . '" "aria-label="' . _t('LMS_NEXT') . '" class="bazar-entry modalbox">' . '<i class="fa fa-caret-right" aria-hidden="true"></i></a></li>';
         }
         // display the previous button
         if ($currentPageTag != reset($allModules)) {
@@ -148,7 +148,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             // if not the first module of the parcours, a link to the previous module is displayed
             $output .= '<li class="next square" title="' . _t('LMS_MODULE_PREVIOUS')
                 . '"><a href="' . $GLOBALS['wiki']->href('', $previousModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
-                . '" "aria-label="' . _t('LMS_PREVIOUS') . '">' . '<i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';
+                . '" "aria-label="' . _t('LMS_PREVIOUS') . '" class="bazar-entry modalbox">' . '<i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';
         }
 
         $output .= '</ul>
