@@ -123,7 +123,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             <ul class="pager pager-lms">';
 
         // check the access to the module
-        if (empty($allActivities) || empty($fiche['listeListeOuinonlmsbf_active']) || $fiche['listeListeOuinonlmsbf_active'] == 'non') {
+        if (empty($allActivities) || empty($fiche['listeListeOuinonLmsbf_active']) || $fiche['listeListeOuinonLmsbf_active'] == 'non') {
             // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
             $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
         } else {
