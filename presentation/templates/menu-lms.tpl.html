@@ -33,15 +33,3 @@ $currentPage =  isset($_GET['wiki']) ?
     </div>
 </div>
 <?php endforeach; ?>
-
-<!-- old display in collapsible panels
-$headingID = uniqid('heading');
-$collapseID = uniqid('collapse');
-
-<div class="panel-heading" id="<?php echo $headingID; ?>" role="tab" data-toggle="collapse" href="#<?php echo $collapseID; ?>" aria-expanded="true" aria-controls="<?php echo $collapseID; ?>">
-
-<div id="<?php echo $collapseID; ?>" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="<?php echo $headingID; ?>">
-
-echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? 'active' : '') . '">';
-echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '?parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
-echo '</li>' -->
