@@ -26,10 +26,10 @@ define('OUINON_LIST_JSON', '{"label":{"oui":"Oui","non":"Non"},"titre_liste":"Ou
 define('ACTIVITE_FORM_NOM', 'Activité LMS');
 define('ACTIVITE_FORM_DESCRIPTION', 'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne');
 define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
-texte***bf_autrices***Auteur·ice·s*** *** *** *** ***text***0*** *** *** *** *** *** ***
+tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
 textelong***bf_contenu***Contenu***80***100*** *** ***wiki***1*** *** *** *** *** *** ***
-tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***
+tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
