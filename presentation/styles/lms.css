@@ -29,3 +29,7 @@
 .bazar-list .lms-container div.lms-menu {
     display: none
 }
+
+.embed-responsive.pdf {
+    padding-bottom:138%
+}
