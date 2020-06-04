@@ -21,7 +21,9 @@ $this->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
 $url = $this->GetParameter("url");
 
 if (empty($url) || parse_url($url, PHP_URL_HOST) != $_SERVER['SERVER_NAME'] ||
-    parse_url($url, PHP_URL_PORT) != $_SERVER['SERVER_PORT'] ||
+    (parse_url($url, PHP_URL_PORT) ==  '' && $_SERVER['SERVER_PORT'] != '' &&  $_SERVER['SERVER_PORT'] != '80'
+        && $_SERVER['SERVER_PORT'] != '443')  ||
+    (parse_url($url, PHP_URL_PORT) != '' && parse_url($url, PHP_URL_PORT) != $_SERVER['SERVER_PORT']) ||
     parse_url($url, PHP_URL_SCHEME) != $_SERVER['REQUEST_SCHEME']){
     echo '<div class="alert alert-danger">' . _t('LMS_PDF_PARAM_ERROR') . '</div>' . "\n";
 } else {
