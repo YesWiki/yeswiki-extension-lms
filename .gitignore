@@ -20,5 +20,5 @@
 .phpintel/
 
 TODO
-vendor
+/vendor
 composer.lock
