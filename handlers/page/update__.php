@@ -40,7 +40,7 @@ textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** 
 image***bf_image***Image***300***300***600***600***left***0*** ***
 texte***bf_duree***Durée estimée*** *** *** *** ***text***0*** *** *** *** *** *** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** ***1*** *** ***0*** *** *** *** *** *** ***
-liste***ListeOuinonlms***Activé*** *** ***oui***bf_active*** ***0*** *** ***@admins*** *** *** ***
+liste***ListeOuinonLms***Activé*** *** ***oui***bf_active*** ***0*** *** ***@admins*** *** *** ***
 checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
@@ -49,8 +49,8 @@ define('PARCOURS_FORM_NOM', 'Parcours LMS');
 define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
 checkboxfiche***5002***Modules*** *** *** *** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
-liste***ListeOuinonlms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module***@admins*** *** *** ***
-liste***ListeOuinonlms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant***@admins*** *** *** ***
+liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module***@admins*** *** *** ***
+liste***ListeOuinonLms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant***@admins*** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
 /**
@@ -94,14 +94,14 @@ if ($this->UserIsAdmin()) {
     $plugin_output_new .= '<strong>Extension LMS</strong><br/>';
 
     // if the OuiNon Lms list doesn't exist, create it
-    if (!$this->LoadPage('ListeOuinonlms')){
+    if (!$this->LoadPage('ListeOuinonLms')){
         $plugin_output_new .= 'ℹ️Adding the <em>OuiNon Lms</em> list<br />';
         // save the page with the list value
-        $this->SavePage('ListeOuinonlms', OUINON_LIST_JSON);
-        // in case, there is already some triples for 'ListOuinonlms', delete them
-        $this->DeleteTriple('ListeOuinonlms', 'http://outils-reseaux.org/_vocabulary/type', null);
+        $this->SavePage('ListeOuinonLms', OUINON_LIST_JSON);
+        // in case, there is already some triples for 'ListOuinonLms', delete them
+        $this->DeleteTriple('ListeOuinonLms', 'http://outils-reseaux.org/_vocabulary/type', null);
         // create the triple to specify this page is a list
-        $this->InsertTriple('ListeOuinonlms', 'http://outils-reseaux.org/_vocabulary/type', 'liste', '', '');
+        $this->InsertTriple('ListeOuinonLms', 'http://outils-reseaux.org/_vocabulary/type', 'liste', '', '');
         $plugin_output_new .= '✅Done !<br />';
     } else {
         $plugin_output_new .= '✅The <em>Ouinon Lms</em> list already exists.<br />';
