@@ -28,5 +28,5 @@ if (empty($url) || parse_url($url, PHP_URL_HOST) != $_SERVER['SERVER_NAME'] ||
     echo '<div class="alert alert-danger">' . _t('LMS_PDF_PARAM_ERROR') . '</div>' . "\n";
 } else {
     echo '<div class="embed-responsive pdf"><iframe src="' . LMS_PATH . 'libs/vendor/pdfjs-dist/web/viewer.html?file='
-        . urlencode($url) . '" class="embed-responsive-item" frameborder="0"></iframe></div>';
+        . urlencode($url) . '" class="embed-responsive-item" frameborder="0" allowfullscreen></iframe></div>';
 }

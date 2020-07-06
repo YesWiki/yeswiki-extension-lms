@@ -37,10 +37,10 @@ if (empty($id) || empty($serveur) || !in_array(strtolower($serveur), ALLOWED_SER
         echo '<div class="embed-responsive ' . $ratioCss . '"><iframe src="https://player.vimeo.com/video/' . $id
             . '?color=ffffff&title=0&byline=0&portrait=0" class="embed-responsive-item" frameborder="0"'
             . 'allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" '
-            . 'webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+            . 'allowfullscreen></iframe></div>';
     else
         echo '<div class="embed-responsive ' . $ratioCss . '"><iframe src="https://www.youtube-nocookie.com/embed/' . $id
             . '?cc_load_policy=1&iv_load_policy=3&modestbranding=1" class="embed-responsive-item" frameborder="0"'
             . 'allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" '
-            . 'webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+            . 'allowfullscreen></iframe></div>';
 }
