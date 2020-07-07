@@ -1,0 +1,53 @@
+<?php
+/**
+ * Bazar template to render an Module entry.
+ * This files is copied at installation (cf handlers/page/update__.php) to custom/templates/themes/bazar/templates/
+ * directory of the yeswiki root.
+ * The filename is fiche-X.tpl.html with X defined by $GLOBALS['wiki']->config['lms_config']['module_form_id']
+ * (by default 5002). If the module ID change, the installation must be performed again.
+ */
+
+if (!defined('FIELDS_TO_HIDE')) define('FIELDS_TO_HIDE', ['5001']);
+
+// add LMS extension css style
+$this->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
+
+// does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
+$moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+?>
+<?php if (!$moduleModal) :?>
+<div class="container lms-container">
+  <div class="row">
+    <div class="col-md-3 lms-menu">
+      <?php
+      // display the PageMenuLms page if it exists
+      if ($this->LoadPage('PageMenuLms')) {
+        echo $this->Format('{{include page="PageMenuLms"}}');
+      }
+      ?>
+    </div>
+    <div class="col-md-9 lms-module-content">
+<?php endif ?>
+      <?php
+      $res = '';
+      $formtemplate = [];
+      for ($i = 0; $i < count($form['template']); ++$i) {
+        if (isset($form['template'][$i][1]) && !in_array($form['template'][$i][1], FIELDS_TO_HIDE) && (!isset($form['template'][$i][11]) || $form['template'][$i][11] == '' ||
+            $this->CheckACL($form['template'][$i][11]))){
+          if (function_exists($form['template'][$i][0])) {
+            $res .= $form['template'][$i][0](
+              $formtemplate,
+              $form['template'][$i],
+              'html',
+              $fiche
+            );
+          }
+        }
+      }
+      echo $res;
+      ?>
+<?php if (!$moduleModal) :?>
+    </div>
+  </div><!-- /.row -->
+</div> <!-- /.container -->
+<?php endif ?>

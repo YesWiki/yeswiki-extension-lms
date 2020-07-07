@@ -14,7 +14,7 @@ if (!defined("WIKINI_VERSION")) {
 }
 
 // Constants
-define('LMS_PATH', 'tools/lms/');
+!defined('LMS_PATH') && define('LMS_PATH', 'tools/lms/');
 
 // Includes
 require_once LMS_PATH . 'libs/bazarlms.fonct.inc.php';

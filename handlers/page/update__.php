@@ -18,14 +18,14 @@ if (!defined("WIKINI_VERSION")) {
 /**
  * Constants to define the OuiNon Lms list
  */
-define('OUINON_LIST_JSON', '{"label":{"oui":"Oui","non":"Non"},"titre_liste":"OuiNon Lms"}');
+!defined('OUINON_LIST_JSON') && define('OUINON_LIST_JSON', '{"label":{"oui":"Oui","non":"Non"},"titre_liste":"OuiNon Lms"}');
 
 /**
  * Constants to define the contents of the LMS forms
  */
-define('ACTIVITE_FORM_NOM', 'Activité LMS');
-define('ACTIVITE_FORM_DESCRIPTION', 'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne');
-define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
+!defined('ACTIVITE_FORM_NOM') && defined('ACTIVITE_FORM_NOM', 'Activité LMS');
+!defined('ACTIVITE_FORM_DESCRIPTION') && define('ACTIVITE_FORM_DESCRIPTION', 'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne');
+!defined('ACTIVITE_FORM_TEMPLATE') && define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
 tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
 textelong***bf_contenu***Contenu***80***100*** *** ***wiki***1*** *** *** *** *** *** ***
@@ -33,22 +33,22 @@ tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur l
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
-define('MODULE_FORM_NOM', 'Module LMS');
-define('MODULE_FORM_DESCRIPTION', 'Module (enchaînement d\'activités) utilisé pour le module d\'apprentissage en ligne');
-define('MODULE_FORM_TEMPLATE', 'texte***bf_titre***Titre du module***255***255*** *** ***text***1*** *** *** *** *** *** ***
+!defined('ACTIVITE_FORM_NOM') && define('MODULE_FORM_NOM', 'Module LMS');
+!defined('MODULE_FORM_DESCRIPTION') && define('MODULE_FORM_DESCRIPTION', 'Module (enchaînement d\'activités) utilisé pour le module d\'apprentissage en ligne');
+!defined('MODULE_FORM_TEMPLATE') && define('MODULE_FORM_TEMPLATE', 'texte***bf_titre***Titre du module***255***255*** *** ***text***1*** *** *** *** *** *** ***
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 image***bf_image***Image***300***300***600***600***left***0*** ***
 texte***bf_duree***Durée estimée*** *** *** *** ***text***0*** *** *** *** *** *** ***
-jour***bf_date_ouverture***Date d\'ouverture*** *** ***1*** *** ***0*** *** *** *** *** *** ***
+jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
 liste***ListeOuinonLms***Activé*** *** ***oui***bf_active*** ***0*** *** ***@admins*** *** *** ***
-checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
+checkboxfiche***5001***Activités*** *** *** ***bf_activites***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
-define('PARCOURS_FORM_NOM', 'Parcours LMS');
-define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
-define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
-checkboxfiche***5002***Modules*** *** *** *** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
+!defined('ACTIVITE_FORM_NOM') && define('PARCOURS_FORM_NOM', 'Parcours LMS');
+!defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
+!defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
+checkboxfiche***5002***Modules*** *** *** ***bf_modules***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module***@admins*** *** *** ***
 liste***ListeOuinonLms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant***@admins*** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
@@ -126,11 +126,21 @@ if ($this->UserIsAdmin()) {
     $destFile = 'custom/themes/tools/bazar/templates/fiche-' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '.tpl.html';
     if (!file_exists($destFile)){
         $plugin_output_new .= "ℹ️Copying the <em>Activité</em> bazar template to <em>$destFile</em>. Don't forget to launch "
-            . "again this update page if this form ID change !<br/>";
+            . "again this update page if this form ID has changed !<br/>";
         copy('tools/lms/libs/bazar-templates/fiche-5001.tpl.html', $destFile);
         $plugin_output_new .= '✅Done !<br />';
     } else {
         $plugin_output_new .= "✅The <em>Activité</em> bazar template (<em>$destFile</em>)  already exists.<br />";
+    }
+
+    $destFile = 'custom/themes/tools/bazar/templates/fiche-' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '.tpl.html';
+    if (!file_exists($destFile)){
+        $plugin_output_new .= "ℹ️Copying the <em>Module</em> bazar template to <em>$destFile</em>. Don't forget to launch "
+            . "again this update page if this form ID has changed !<br/>";
+        copy('tools/lms/libs/bazar-templates/fiche-5002.tpl.html', $destFile);
+        $plugin_output_new .= '✅Done !<br />';
+    } else {
+        $plugin_output_new .= "✅The <em>Module</em> bazar template (<em>$destFile</em>)  already exists.<br />";
     }
 
     $plugin_output_new .= '<hr />';

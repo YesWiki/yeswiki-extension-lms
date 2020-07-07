@@ -10,7 +10,7 @@
  */
 
 /**
- * Display the buttons 'Précédent', 'Suivant' and 'Fait !' which permits to a learner to navigate in an activity page
+ * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
  * Must be declare in the bazar form definition as followed :
  *    'navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***'
  * The second position value is the name of the entry field.
@@ -36,8 +36,9 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
     $output = '';
     if ($mode == 'html' && $currentPageTag) {
 
-        // the tag of the current activity page
-        $currentPageTag =  !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
+        // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
+        // thus, to associate this tab page to its parent one, we remove the number from the page tag
+        $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
         // the consulted parcours entry
         $parcoursEntry = getContextualParcours();
         // the consulted module entry to display the current activity
@@ -114,9 +115,6 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
     // the tag of the current module page
     $currentEntryTag =  !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
 
-    // true if the module links are opened in a modal box
-    //$moduleModal = $tableau_template[2] == 'module_modal';
-
     // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
     $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 
@@ -149,29 +147,68 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
                 . '">' . _t('LMS_BEGIN') . '</a></li>';
         }
 
-        // display the next button
-        if ($currentEntryTag != end($allModules)) {
-            // if not the last module of the parcours, a link to the next module is displayed
-            $nextModuleTag = $allModules[array_search($currentEntryTag, $allModules) + 1];
-            $output .= '<li class="next square" title="' . _t('LMS_MODULE_NEXT')
-                . '"><a href="' . $GLOBALS['wiki']->href('', $nextModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
-                . '" "aria-label="' . _t('LMS_NEXT')
-                . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
-                . '>' . '<i class="fa fa-caret-right" aria-hidden="true"></i></a></li>';
-        }
-        // display the previous button
-        if ($currentEntryTag != reset($allModules)) {
-            $previousModuleTag = $allModules[array_search($currentEntryTag, $allModules) - 1];
-            // if not the first module of the parcours, a link to the previous module is displayed
-            $output .= '<li class="next square" title="' . _t('LMS_MODULE_PREVIOUS')
-                . '"><a href="' . $GLOBALS['wiki']->href('', $previousModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
-                . '" "aria-label="' . _t('LMS_PREVIOUS')
-                . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
-                . '><i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';
+        // we show the previous and next button only if it's in a modal
+        if ($moduleModal) {
+            // display the next button
+            if ($currentEntryTag != end($allModules)) {
+                // if not the last module of the parcours, a link to the next module is displayed
+                $moduleIndex = array_search($currentEntryTag, $allModules);
+                if ($moduleIndex) {
+                    $nextModuleTag = $allModules[$moduleIndex + 1];
+                    $output .= '<li class="next square" title="' . _t('LMS_MODULE_NEXT')
+                        . '"><a href="' . $GLOBALS['wiki']->href('', $nextModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
+                        . '" "aria-label="' . _t('LMS_NEXT')
+                        . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
+                        . '>' . '<i class="fa fa-caret-right" aria-hidden="true"></i></a></li>';
+                }
+            }
+            // display the previous button
+            if ($currentEntryTag != reset($allModules)) {
+                // if not the first module of the parcours, a link to the previous module is displayed
+                $moduleIndex = array_search($currentEntryTag, $allModules);
+                if ($moduleIndex) {
+                    $previousModuleTag = $allModules[$moduleIndex - 1];
+                    $output .= '<li class="next square" title="' . _t('LMS_MODULE_PREVIOUS')
+                        . '"><a href="' . $GLOBALS['wiki']->href('', $previousModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
+                        . '" "aria-label="' . _t('LMS_PREVIOUS')
+                        . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
+                        . '><i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';
+                }
+            }
         }
 
         $output .= '</ul>
             </nav>';
     }
     return $output;
+}
+
+/**
+ * Display the 'Return' button which permit to come back to the calling page (history back). The button is displayed only
+ * in 'view' mode and if the entry is not opened from a modal.
+ * Must be declare in the bazar form definition as followed :
+ *    'boutonretour*** *** *** *** *** *** *** *** *** ***'
+ *
+ * cf. formulaire.fonct.inc.php of the bazar extension to see the other field definitions
+ *
+ * @param array   $formtemplate
+ * @param array   $tableau_template The bazar field definition inside the form definition
+ * @param string  $mode  Action type for the form : 'saisie', 'requete', 'html', ...
+ * @param array   $fiche  The entry which is displayed or modified
+ * @return string Return the generated html to include
+ */
+function boutonretour(&$formtemplate, $tableau_template, $mode, $fiche){
+
+    // the tag of the current entry
+    $currentEntryTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
+
+    if ($mode == 'html' && $currentEntryTag) {
+        // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
+        $entryModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
+        // display the button if it's not inside a modal box
+        if (!$entryModal)
+            return '<div class="BAZ_boutonretour" style="margin-top: 30px;"><a class="btn btn-xs btn-secondary-1" href="javascript:history.back()">'
+                . '<i class="fas fa-arrow-left"></i>&nbsp;' . _t('LMS_RETURN_BUTTON') . '</a></div>';
+    }
 }

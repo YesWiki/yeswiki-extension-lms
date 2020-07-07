@@ -26,10 +26,26 @@
     margin-left: 5px;
 }
 
+/* don't display the lms-menu inside entries generated from bazarliste action */
 .bazar-list .lms-container div.lms-menu {
     display: none
+}
+/* don't display the boutonretour bazar field inside entries generated from bazarliste action */
+.bazar-list div.BAZ_cadre_fiche > div.BAZ_boutonretour {
+    display : none;
 }
 
 .embed-responsive.pdf {
     padding-bottom:138%
+}
+
+/* hack for displaying activity entries */
+
+/* remove the alert div inside the entry */
+.lms-activity-content .alert{
+    display: none;
+}
+/* remove the info bar below the entry */
+.lms-container ~ .BAZ_fiche_info{
+    display: none;
 }

@@ -1,35 +1,48 @@
 <?php
-$GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
 
 // if an handler is after the page tag in the wiki parameter variable, get only the tag
 $currentPage =  isset($_GET['wiki']) ?
-  strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] :
-  '';
+  strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] : '';
+
+if ($currentPage != $currentModule['id_fiche']) {
+  // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
+  // thus, to associate this tab page to its parent one, we remove the number from the page tag
+  $currentPage = preg_replace('/[0-9]*$/', '', $currentPage);
+}
+
+// display the modules only if the current module is in the modules displayed
+$currentModuleInModules = !empty(array_filter(
+          $modulesDisplayed,
+          function ($item) use ($currentModule) {
+            return isset($item) && isset($currentModule) && $item['id_fiche'] == $currentModule['id_fiche'];
+          }));
 ?>
-<?php foreach ($modules as $module) :?>
-<div class="panel-group panel-group-menu-lms" role="tablist">
-    <div class="panel panel-primary panel-menu-lms">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a href="<?php echo $GLOBALS['wiki']->href('', $module['id_fiche']) . "&parcours=" . $parcoursTag; ?>" class="bazar-entry modalbox"><?php echo $module['bf_titre']; ?></a>
-            </h4>
-        </div>
-        <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche']) :?>
-        <div class="panel-collapse">
-            <ul class="list-group">
-                <?php
-                foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]) as $activiteTag) {
-                    $activite = baz_valeurs_fiche($activiteTag);
-                    if ($activite && $activite['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['activite_form_id']) {
-                        echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? ' active' : '') . '">';
-                        echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '?parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
-                        echo '</li>';
-                    }
-                }
-                ?>
-            </ul>
-        </div>
-        <?php endif ?>
+<?php if ($currentModule && $currentModuleInModules) :?>
+  <?php foreach ($modulesDisplayed as $module) :?>
+    <div class="panel-group panel-group-menu-lms" role="tablist">
+      <div class="panel panel-primary panel-menu-lms">
+          <div class="panel-heading<?php echo ($currentPage == $module['id_fiche'])? ' active' : ''; ?>">
+              <h4 class="panel-title">
+                  <a href="<?php echo $GLOBALS['wiki']->href('', $module['id_fiche']) . "&parcours=" . $parcoursTag; ?>" class="bazar-entry"><?php echo $module['bf_titre']; ?></a>
+              </h4>
+          </div>
+          <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche']) :?>
+          <div class="panel-collapse">
+              <ul class="list-group">
+                  <?php
+                  foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]) as $activiteTag) {
+                      $activite = baz_valeurs_fiche($activiteTag);
+                      if ($activite && $activite['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['activite_form_id']) {
+                          echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? ' active' : '') . '">';
+                          echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '&parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
+                          echo '</li>';
+                      }
+                  }
+                  ?>
+              </ul>
+          </div>
+          <?php endif ?>
+      </div>
     </div>
-</div>
-<?php endforeach; ?>
+  <?php endforeach; ?>
+<?php endif ?>

@@ -88,7 +88,7 @@ $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
                 array(
                     "parcoursTag" => $parcoursEntry['id_fiche'],
                     "currentModule" => $currentModule,
-                    "modules" => $modulesDisplayed,
+                    "modulesDisplayed" => $modulesDisplayed,
                 )
             );
         } catch (Exception $e) {
