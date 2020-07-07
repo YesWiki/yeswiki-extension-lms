@@ -23,7 +23,7 @@ if (!defined("WIKINI_VERSION")) {
 /**
  * Constants to define the contents of the LMS forms
  */
-!defined('ACTIVITE_FORM_NOM') && defined('ACTIVITE_FORM_NOM', 'Activité LMS');
+!defined('ACTIVITE_FORM_NOM') && define('ACTIVITE_FORM_NOM', 'Activité LMS');
 !defined('ACTIVITE_FORM_DESCRIPTION') && define('ACTIVITE_FORM_DESCRIPTION', 'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne');
 !defined('ACTIVITE_FORM_TEMPLATE') && define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
 tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
@@ -33,7 +33,7 @@ tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur l
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
-!defined('ACTIVITE_FORM_NOM') && define('MODULE_FORM_NOM', 'Module LMS');
+!defined('MODULE_FORM_NOM') && define('MODULE_FORM_NOM', 'Module LMS');
 !defined('MODULE_FORM_DESCRIPTION') && define('MODULE_FORM_DESCRIPTION', 'Module (enchaînement d\'activités) utilisé pour le module d\'apprentissage en ligne');
 !defined('MODULE_FORM_TEMPLATE') && define('MODULE_FORM_TEMPLATE', 'texte***bf_titre***Titre du module***255***255*** *** ***text***1*** *** *** *** *** *** ***
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
@@ -45,7 +45,7 @@ checkboxfiche***5001***Activités*** *** *** ***bf_activites***tags***0*** ***L\
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
-!defined('ACTIVITE_FORM_NOM') && define('PARCOURS_FORM_NOM', 'Parcours LMS');
+!defined('PARCOURS_FORM_NOM') && define('PARCOURS_FORM_NOM', 'Parcours LMS');
 !defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 !defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
 checkboxfiche***5002***Modules*** *** *** ***bf_modules***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
