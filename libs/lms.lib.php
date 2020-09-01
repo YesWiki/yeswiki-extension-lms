@@ -21,8 +21,6 @@
  */
 function getContextualParcours(){
     $parcoursTag = $_REQUEST['parcours'];
-    // why doesn't work ? parameter array in wiki object is empty...
-    //$parcoursTag = $GLOBALS['wiki']->GetParameter('parcours');
     if (!empty($parcoursTag)) {
         $parcoursEntry = baz_valeurs_fiche($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
