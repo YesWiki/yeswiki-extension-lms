@@ -51,9 +51,18 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
             $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                 . '"' : '') .  '>
             <ul class="pager pager-lms">';
+            
+            $activityId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'];
+            $allActivities = [];
+            if (isset($currentModule[$activityId])) {    
+                $allActivities = explode(',', $currentModule[$activityId]);
+            }
 
-            $allModules = explode(',', $parcoursEntry["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id']]);
-            $allActivities = explode(',', $currentModule["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]);
+            $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
+            $allModules = [];
+            if (isset($parcoursEntry[$modulesId])) {
+                $allModules = explode(',', $parcoursEntry[$modulesId]);
+            }
 
             // display the previous button
             if ($currentPageTag == reset($allActivities)) {
@@ -127,9 +136,17 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // the consulted parcours entry
         $parcoursEntry = getContextualParcours();
+        $activityId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'];
+        $allActivities = [];
+        if (isset($fiche[$activityId])) {    
+            $allActivities = explode(',', $fiche[$activityId]);
+        }
 
-        $allActivities = explode(',', $fiche["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]);
-        $allModules = explode(',', $parcoursEntry["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id']]);
+        $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
+        $allModules = [];
+        if (isset($fiche[$modulesId])) {
+            $allModules = explode(',', $parcoursEntry[$modulesId]);
+        }
 
         $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                 . '"' : '') .  '> 
@@ -137,6 +154,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // check the access to the module
         if (empty($allActivities) || empty($fiche['listeListeOuinonLmsbf_active']) || $fiche['listeListeOuinonLmsbf_active'] == 'non') {
+            var_dump(empty($allActivities));
             // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
             $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
         } else {
