@@ -2,12 +2,15 @@
 
 // if an handler is after the page tag in the wiki parameter variable, get only the tag
 $currentPage =  isset($_GET['wiki']) ?
-  strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] : '';
+strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] :
+'';
 
-if ($currentPage != $currentModule['id_fiche']) {
-  // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
-  // thus, to associate this tab page to its parent one, we remove the number from the page tag
-  $currentPage = preg_replace('/[0-9]*$/', '', $currentPage);
+if ($GLOBALS['wiki']->config['lms_config']['use_tabs']) {
+  if ($currentPage != $currentModule['id_fiche']) {
+    // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
+    // thus, to associate this tab page to its parent one, we remove the number from the page tag
+    $currentPage = preg_replace('/[0-9]*$/', '', $currentPage);
+  }
 }
 
 // display the modules only if the current module is in the modules displayed

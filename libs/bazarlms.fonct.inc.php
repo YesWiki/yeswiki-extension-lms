@@ -9,6 +9,22 @@
  * @link     https://yeswiki.net
  */
 
+ /**
+  * Helper to get previous value
+  *
+  * @param string $key
+  * @param array $hash
+  * @return void
+  */
+function getPrevValue($key, $hash = array())
+{
+    $found_index = array_search($key, $hash);
+    if ($found_index === false || $found_index === 0) {
+        return false;
+    }
+    return $hash[$found_index-1];
+}
+
 /**
  * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
  * Must be declare in the bazar form definition as followed :
@@ -35,10 +51,12 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
 
     $output = '';
     if ($mode == 'html' && $currentPageTag) {
+        if ($GLOBALS['wiki']->config['lms_config']['use_tabs']) {
+            // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
+            // thus, to associate this tab page to its parent one, we remove the number from the page tag
+            $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
+        }
 
-        // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
-        // thus, to associate this tab page to its parent one, we remove the number from the page tag
-        $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
         // the consulted parcours entry
         $parcoursEntry = getContextualParcours();
         // the consulted module entry to display the current activity
@@ -71,9 +89,8 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
                     . '&parcours=' . $parcoursEntry['id_fiche']
                     . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                     . '><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
-            } else {
+            } elseif ($previousActivityTag = getPrevValue($currentPageTag, $allActivities)) {
                 // otherwise, the previous link is to the previous activity
-                $previousActivityTag = $allActivities[array_search($currentPageTag, $allActivities) - 1];
                 $output .= '<li class="previous"><a href="' . $GLOBALS['wiki']->href('', $previousActivityTag)
                     . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentModule['id_fiche']
                     . '"><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
@@ -154,7 +171,6 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // check the access to the module
         if (empty($allActivities) || empty($fiche['listeListeOuinonLmsbf_active']) || $fiche['listeListeOuinonLmsbf_active'] == 'non') {
-            var_dump(empty($allActivities));
             // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
             $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
         } else {
