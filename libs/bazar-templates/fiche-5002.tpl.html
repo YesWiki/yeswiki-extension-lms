@@ -7,7 +7,8 @@
  * (by default 5002). If the module ID change, the installation must be performed again.
  */
 
-if (!defined('FIELDS_TO_HIDE')) define('FIELDS_TO_HIDE', ['5001']);
+// hide list of activities and settings 
+if (!defined('FIELDS_TO_HIDE')) define('FIELDS_TO_HIDE', ['checkboxfiche5001', 'listeListeOuinonLmsbf_active']);
 
 // add LMS extension css style
 $this->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
@@ -32,15 +33,25 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
       $res = '';
       $formtemplate = [];
       for ($i = 0; $i < count($form['template']); ++$i) {
-        if (isset($form['template'][$i][1]) && !in_array($form['template'][$i][1], FIELDS_TO_HIDE) && (!isset($form['template'][$i][11]) || $form['template'][$i][11] == '' ||
+        if (isset($form['template'][$i][1]) && !in_array($form['template'][$i][0].$form['template'][$i][1].$form['template'][$i][6], FIELDS_TO_HIDE) && (!isset($form['template'][$i][11]) || $form['template'][$i][11] == '' ||
             $this->CheckACL($form['template'][$i][11]))){
           if (function_exists($form['template'][$i][0])) {
-            $res .= $form['template'][$i][0](
-              $formtemplate,
-              $form['template'][$i],
-              'html',
-              $fiche
-            );
+            if ($form['template'][$i][1] == 'bf_titre') {
+              $titre = $form['template'][$i][0](
+                $formtemplate,
+                $form['template'][$i],
+                'html',
+                $fiche
+              );
+              $res .= str_replace('BAZ_fiche_titre', 'activity-title', $titre);
+            } else {
+              $res .= $form['template'][$i][0](
+                $formtemplate,
+                $form['template'][$i],
+                'html',
+                $fiche
+              );
+            }
           }
         }
       }

@@ -80,6 +80,7 @@ $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
         if (empty($template) || !file_exists(LMS_PATH . 'presentation/templates/' . $template)) {
             $template = "menu-lms.tpl.html";
         }
+
         // display the menu with the template
         include_once 'includes/squelettephp.class.php';
         try {

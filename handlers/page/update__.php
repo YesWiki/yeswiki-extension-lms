@@ -28,7 +28,7 @@ if (!defined("WIKINI_VERSION")) {
 !defined('ACTIVITE_FORM_TEMPLATE') && define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
 tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
-textelong***bf_contenu***Contenu***80***100*** *** ***wiki***1*** *** *** *** *** *** ***
+textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
@@ -41,14 +41,14 @@ image***bf_image***Image***300***300***600***600***left***0*** ***
 texte***bf_duree***Durée estimée*** *** *** *** ***text***0*** *** *** *** *** *** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
 liste***ListeOuinonLms***Activé*** *** ***oui***bf_active*** ***0*** *** ***@admins*** *** *** ***
-checkboxfiche***5001***Activités*** *** *** ***bf_activites***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
+checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
 !defined('PARCOURS_FORM_NOM') && define('PARCOURS_FORM_NOM', 'Parcours LMS');
 !defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 !defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
-checkboxfiche***5002***Modules*** *** *** ***bf_modules***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
+checkboxfiche***5002***Modules*** *** *** *** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module***@admins*** *** *** ***
 liste***ListeOuinonLms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant***@admins*** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
@@ -116,14 +116,26 @@ if ($this->UserIsAdmin()) {
 
     // if the PageMenuLms page doesn't exist, create it with a default version
     if (!$this->LoadPage('PageMenuLms')) {
-        $plugin_output_new .= 'ℹ️Adding the <em>PageMenuUser</em> page<br />';
+        $plugin_output_new .= 'ℹ️Adding the <em>PageMenuLms</em> page<br />';
         $this->SavePage('PageMenuLms', '{{menuparcours}}');
         $plugin_output_new .= '✅Done !<br />';
     } else {
-        $plugin_output_new .= '✅The <em>PageMenuUser</em> page already exists.<br />';
+        $plugin_output_new .= '✅The <em>PageMenuLms</em> page already exists.<br />';
     }
 
-    $destFile = 'custom/themes/tools/bazar/templates/fiche-' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '.tpl.html';
+    // Structure de répertoire désirée
+    $customBazarTemplateDir = 'templates/bazar/templates/';
+    if (!is_dir($customBazarTemplateDir)) {
+        if (!mkdir($customBazarTemplateDir, 0777, true)) {
+            die('Echec lors de la création des répertoires...');
+        } else {
+            $plugin_output_new .= "ℹ️Creating the folder <em>$customBazarTemplateDir</em> for bazar templates<br/>✅Done !<br />";
+        }
+    } else {
+        $plugin_output_new .= "✅The folder <em>$customBazarTemplateDir</em> for bazar templates exists.<br />";
+    }
+
+    $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '.tpl.html';
     if (!file_exists($destFile)){
         $plugin_output_new .= "ℹ️Copying the <em>Activité</em> bazar template to <em>$destFile</em>. Don't forget to launch "
             . "again this update page if this form ID has changed !<br/>";
@@ -133,7 +145,7 @@ if ($this->UserIsAdmin()) {
         $plugin_output_new .= "✅The <em>Activité</em> bazar template (<em>$destFile</em>)  already exists.<br />";
     }
 
-    $destFile = 'custom/themes/tools/bazar/templates/fiche-' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '.tpl.html';
+    $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '.tpl.html';
     if (!file_exists($destFile)){
         $plugin_output_new .= "ℹ️Copying the <em>Module</em> bazar template to <em>$destFile</em>. Don't forget to launch "
             . "again this update page if this form ID has changed !<br/>";

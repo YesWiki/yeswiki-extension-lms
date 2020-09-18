@@ -20,7 +20,9 @@ if (!defined("WIKINI_VERSION")) {
 require_once LMS_PATH . 'libs/bazarlms.fonct.inc.php';
 
 if (empty($wakkaConfig['lms_config'])) {
-    $wakkaConfig['lms_config'] = [
+    $wakkaConfig['lms_config'] = [   
+        'use_tabs' => true,
+        'display_activity_title' => false,
         'activite_form_id' => 5001,
         'module_form_id' => 5002,
         'parcours_form_id' => 5003,

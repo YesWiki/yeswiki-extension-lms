@@ -2,6 +2,23 @@
     padding-top: 0;
 }
 
+/* Activity title styling */
+h1.activity-title {
+    display: flex;
+    align-items: center;
+    font-size: 2.5rem;
+    text-align: left;
+}
+  
+h1.activity-title:after {
+    background-color: var(--primary-color);
+    content: "";
+    flex: 1;
+    height: 12px;
+    border-radius: 12px;
+    margin-left: 2rem;
+}
+
 .panel-menu-lms .list-group-item a, .panel-menu-lms .list-group-item a:visited, .panel-menu-lms .list-group-item a:active {
     color:inherit;
 }

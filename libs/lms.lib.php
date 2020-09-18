@@ -20,7 +20,7 @@
  * @return array The parcours entry
  */
 function getContextualParcours(){
-    $parcoursTag = $_REQUEST['parcours'];
+    $parcoursTag = empty($_REQUEST['parcours']) ? '' : $_REQUEST['parcours'];
     if (!empty($parcoursTag)) {
         $parcoursEntry = baz_valeurs_fiche($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
@@ -53,21 +53,26 @@ function getContextualModule($parcours){
 
     // if an handler is after the page tag in the wiki parameter variable, get only the tag
     $currentPage =  isset($_GET['wiki']) ?
-        strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] :
-        '';
+    strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] :
+    '';
 
     $currentPageModule = $currentPage;
-    // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
-    // thus, to associate this tab page to its parent one, we remove the number from the page tag
-    $currentPage = preg_replace('/[0-9]*$/', '', $currentPage);
-
+    if ($GLOBALS['wiki']->config['lms_config']['use_tabs']) {
+        // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
+        // thus, to associate this tab page to its parent one, we remove the number from the page tag
+        $currentPage = preg_replace('/[0-9]*$/', '', $currentPage);
+    }
     $moduleTag = isset($_GET['module']) ? $_GET['module'] : '';
 
     if (!empty($moduleTag)) {
         $moduleEntry = baz_valeurs_fiche($moduleTag);
-        if ($moduleEntry && $moduleEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['module_form_id']
-                && in_array($currentPage, explode(',', $moduleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']])))
-            return $moduleEntry;
+
+        if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $GLOBALS['wiki']->config['lms_config']['module_form_id']
+                && in_array($currentPage, explode(',', $moduleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]))) {
+                    return $moduleEntry;
+                } else {
+                    return false;
+                }
     } else {
         $currentPageEntry = baz_valeurs_fiche($currentPageModule);
         if ($currentPageEntry && $currentPageEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['module_form_id']
