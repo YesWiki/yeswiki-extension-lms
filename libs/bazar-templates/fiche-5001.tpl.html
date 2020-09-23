@@ -11,7 +11,7 @@
 $GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
 ?>
 
-<div class="container lms-container">
+<div class="container lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : ''?>">
   <div class="row">
     <div class="col-md-3 lms-menu">
       <?php
@@ -33,7 +33,7 @@ $GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
           $content = str_replace('BAZ_fiche_titre', 'activity-title', $html['bf_titre'])."\n".$content;
         }
         echo $content;
-
+        echo $html['reactions'];
         $navigation = $html['bf_navigation'];
         echo $navigation;
       ?>

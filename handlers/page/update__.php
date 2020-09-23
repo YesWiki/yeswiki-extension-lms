@@ -27,11 +27,13 @@ if (!defined("WIKINI_VERSION")) {
 !defined('ACTIVITE_FORM_DESCRIPTION') && define('ACTIVITE_FORM_DESCRIPTION', 'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne');
 !defined('ACTIVITE_FORM_TEMPLATE') && define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
 tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
+texte***bf_duree***Durée estimée de l\'activité en minutes*** *** *** *** ***text***0*** *** *** *** *** *** ***
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
 textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
-acls***+***@admins***@admins*** *** *** *** *** *** ***');
+acls*** * ***@admins***@admins*** *** *** *** *** *** ***
+reactions***reactions*** *** *** *** *** *** *** *** ***');
 
 !defined('MODULE_FORM_NOM') && define('MODULE_FORM_NOM', 'Module LMS');
 !defined('MODULE_FORM_DESCRIPTION') && define('MODULE_FORM_DESCRIPTION', 'Module (enchaînement d\'activités) utilisé pour le module d\'apprentissage en ligne');
