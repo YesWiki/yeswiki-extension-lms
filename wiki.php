@@ -26,5 +26,12 @@ if (empty($wakkaConfig['lms_config'])) {
         'activite_form_id' => 5001,
         'module_form_id' => 5002,
         'parcours_form_id' => 5003,
+        'use_yeswiki_comments' => false,
     ];
 }
+
+// add LMS extension css style TODO: fix custom path
+$GLOBALS['wiki']->AddCSSFile('tools/lms/presentation/styles/lms.css');
+
+// add LMS extension js TODO: fix custom path
+$GLOBALS['wiki']->AddJavascriptFile('tools/lms/libs/lms.js');

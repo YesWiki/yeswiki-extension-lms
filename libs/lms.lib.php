@@ -87,3 +87,54 @@ function getContextualModule($parcours){
     }
     return false;
 }
+
+ /**
+  * Helper to get previous value
+  *
+  * @param string $key
+  * @param array $hash
+  * @return void
+  */
+  function getPrevValue($key, $hash = array())
+  {
+      $found_index = array_search($key, $hash);
+      if ($found_index === false || $found_index === 0) {
+          return false;
+      }
+      return $hash[$found_index-1];
+  }
+  
+  function getAllReactions($pageTag, $ids, $user) {
+    $res = ['reactions' => [], 'userReaction' => ''];
+    // initialise empty reactions
+    foreach ($ids as $id) {
+          $res['reactions'][$id]= 0;
+    }
+    // get reactions in db
+    $val = $GLOBALS['wiki']->getAllTriplesValues($pageTag, 'https://yeswiki.net/vocabulary/reaction', '', '');
+    foreach ($val as $v) {
+        $v = json_decode($v['value'], true);
+        if (count($v)>0) {
+            if ($v['user'] == $user ) {
+                $res['userReaction'] = $v['id'];
+            }
+            // check for existance of reaction
+            if (isset($res['reactions'][$v['id']])) {
+                $res['reactions'][$v['id']]++;
+            }
+        }
+    }
+    return $res;
+  }
+  function getUserReactionOnPage($pageTag, $user) {
+    $res = '';
+    // get reactions in db
+    $val = $GLOBALS['wiki']->getAllTriplesValues($pageTag, 'https://yeswiki.net/vocabulary/reaction', '', '');
+    foreach ($val as $v) {
+        $v = json_decode($v['value'], true);
+        if (!empty($v)) {
+            $res = $v;
+        }
+    }
+    return $res;
+  }

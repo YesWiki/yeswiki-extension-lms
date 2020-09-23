@@ -62,7 +62,264 @@ h1.activity-title:after {
 .lms-activity-content .alert{
     display: none;
 }
-/* remove the info bar below the entry */
+
+/* the lms container takes the full width, and adds minimum padding left and right*/
+.lms-container {
+    width: 100vw !important;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding: 0 1em;
+}
+/* remove the info bar below the entry, but keep for admins */
 .lms-container ~ .BAZ_fiche_info{
     display: none;
+}
+.lms-container.admin-user ~ .BAZ_fiche_info{
+    display: block;
+}
+
+/* reactions */
+.reactions-flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.reaction-img {
+	width: 80%;
+}
+.reaction-content {
+    width: 7em;
+    text-align: center;
+    margin-bottom: 1em;
+    font-size: .9em;
+}
+.reaction-title {
+    color:#333;
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-top: 1em;
+    align-items: center;
+}
+.reaction-numbers {
+    color:#333;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+  .add-reaction {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-between;
+    height: 100%;
+    border:1px solid rgba(0,0,0,.2);
+    border-radius: .5em;
+    padding:1em .5em;
+    transition: all 200ms ease-in ;
+    box-shadow: none;
+  }
+
+  .add-reaction:hover {
+    border:1px solid rgba(0,0,0,.5);
+	box-shadow: 0 0 3px rgba(0,0,0,.3) ;
+	text-decoration: none;
+  }
+  .add-reaction:focus, .add-reaction:active, .add-reaction:visited {
+  	text-decoration: none;
+  }
+  .disabled, .disabled:hover {
+	  cursor: not-allowed !important;
+  }
+  .user-reaction {
+	border:1px solid var(--primary-color);
+  }
+  .comments-list:before {
+	content: '';
+	width: 2px;
+	height: 100%;
+    background: var(--primary-color);
+    left: 0;
+	position: absolute;
+	top: 0;
+}
+
+/* .comments-list:after {
+	content: '';
+	position: absolute;
+	background: #c7cacb;
+	bottom: 0;
+	left: 27px;
+	width: 7px;
+	height: 7px;
+	border: 3px solid #dee1e3;
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	border-radius: 50%;
+} */
+
+.reply-list:before, .reply-list:after {display: none;}
+.reply-list li:before {
+	content: '';
+	height: 2px;
+	position: absolute;
+    width: 30px;
+    background: var(--primary-color);
+    top: 19px;
+    left: 1px;
+}
+
+
+.comments-list li {
+	margin-bottom: 15px;
+	display: block;
+	position: relative;
+}
+
+.comments-list li:after {
+	content: '';
+	display: block;
+	clear: both;
+	height: 0;
+	width: 0;
+}
+
+.reply-list {
+	padding-left: 88px;
+	clear: both;
+	margin-top: 15px;
+}
+/**
+ * Avatar
+ ---------------------------*/
+.comments-list .comment-avatar {
+	width: 45px;
+	height: 45px;
+	position: relative;
+	z-index: 99;
+	float: left;
+	border: 3px solid #FFF;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	overflow: hidden;
+}
+
+.comments-list .comment-avatar img {
+	width: 100%;
+	height: 100%;
+}
+
+.reply-list .comment-avatar {
+	width: 30px;
+	height: 30px;
+}
+
+.comment-main-level:after {
+	content: '';
+	width: 0;
+	height: 0;
+	display: block;
+	clear: both;
+}
+/**
+ * les cards commentaires
+ ---------------------------*/
+ .comments-list {
+	margin-top: 30px;
+    margin-left: 0;
+    position: relative;
+    padding: 0;
+}
+
+.comments-list .comment-box {
+	width: calc(100% - 12px);
+	float: right;
+	position: relative;
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+}
+
+.comments-list .comment-box:before, .comments-list .comment-box:after {
+	content: '';
+	height: 0;
+	width: 0;
+	position: absolute;
+	display: block;
+	border-width: 10px 12px 10px 0;
+	border-style: solid;
+	top: 8px;
+    border-color: transparent var(--primary-color);
+    left: -12px;
+}
+
+.comments-list .comment-box:before {
+	border-width: 11px 13px 11px 0;
+	border-color: transparent rgba(0,0,0,0.05);
+	left: -13px;
+}
+
+.reply-list .comment-box {
+	width: calc(100% - 40px);
+}
+.comment-box .comment-head {
+	background: #FCFCFC;
+	padding: 10px 12px;
+	border-bottom: 1px solid #E5E5E5;
+	overflow: hidden;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
+}
+
+.comment-box .comment-head i {
+	float: right;
+	margin-left: 14px;
+	position: relative;
+	top: 2px;
+	color: #A6A6A6;
+	cursor: pointer;
+	-webkit-transition: color 0.3s ease;
+	-o-transition: color 0.3s ease;
+	transition: color 0.3s ease;
+}
+
+.comment-box .comment-head i:hover {
+	color: #03658c;
+}
+
+.comment-box .comment-name {
+	color: #283035;
+	font-size: 14px;
+	font-weight: 700;
+	float: left;
+	margin-right: 10px;
+}
+
+.comment-box .comment-name a {
+	color: #283035;
+}
+
+.comment-box .comment-head span {
+	float: left;
+	color: #999;
+	font-size: 13px;
+	position: relative;
+	top: 5px;
+}
+
+.comment-box .comment-content {
+	background: #FFF;
+	padding: 12px;
+	font-size: 15px;
+	color: #595959;
+	-webkit-border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	border-radius: 0 0 4px 4px;
 }
