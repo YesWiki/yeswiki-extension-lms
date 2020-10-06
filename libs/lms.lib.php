@@ -88,23 +88,22 @@ function getContextualModule($parcours){
     return false;
 }
 
- /**
-  * Helper to get previous value
-  *
-  * @param string $key
-  * @param array $hash
-  * @return void
-  */
-  function getPrevValue($key, $hash = array())
-  {
-      $found_index = array_search($key, $hash);
-      if ($found_index === false || $found_index === 0) {
-          return false;
-      }
-      return $hash[$found_index-1];
-  }
+/**
+ * Helper to get previous value of an array
+ *
+ * @param string $needle The key to search
+ * @param array $haystack The array
+ * @return mixed The previous value or false if there is no previous value
+ */
+function getPrevValue($needle, $haystack = array()){
+    $found_index = array_search($needle, $haystack);
+    if ($found_index === false || $found_index === 0) {
+        return false;
+    }
+    return $haystack[$found_index-1];
+}
   
-  function getAllReactions($pageTag, $ids, $user) {
+function getAllReactions($pageTag, $ids, $user){
     $res = ['reactions' => [], 'userReaction' => ''];
     // initialise empty reactions
     foreach ($ids as $id) {
@@ -125,8 +124,9 @@ function getContextualModule($parcours){
         }
     }
     return $res;
-  }
-  function getUserReactionOnPage($pageTag, $user) {
+}
+
+function getUserReactionOnPage($pageTag, $user){
     $res = '';
     // get reactions in db
     $val = $GLOBALS['wiki']->getAllTriplesValues($pageTag, 'https://yeswiki.net/vocabulary/reaction', '', '');
@@ -137,4 +137,4 @@ function getContextualModule($parcours){
         }
     }
     return $res;
-  }
+}

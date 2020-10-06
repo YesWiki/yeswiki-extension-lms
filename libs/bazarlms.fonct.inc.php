@@ -10,6 +10,36 @@
  */
 
 /**
+ * Get the activities of the current module
+ * @param array $currentModule The current module entry
+ * @return array The activites
+ */
+function getActivities($currentModule)
+{
+    $activityId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'];
+    $allActivities = [];
+    if (isset($currentModule[$activityId])) {
+        $allActivities = explode(',', $currentModule[$activityId]);
+    }
+    return $allActivities;
+}
+
+/**
+ * Get the modules of the current parcours
+ * @param array $parcoursEntry The current parcours entry
+ * @return array The modules
+ */
+function getModules(array $parcoursEntry)
+{
+    $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
+    $allModules = [];
+    if (isset($parcoursEntry[$modulesId])) {
+        $allModules = explode(',', $parcoursEntry[$modulesId]);
+    }
+    return array($allModules, $parcoursEntry);
+}
+
+/**
  * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
  * Must be declare in the bazar form definition as followed :
  *    'navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***'
@@ -53,18 +83,9 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
             $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                 . '"' : '') .  '>
             <ul class="pager pager-lms">';
-            
-            $activityId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'];
-            $allActivities = [];
-            if (isset($currentModule[$activityId])) {    
-                $allActivities = explode(',', $currentModule[$activityId]);
-            }
 
-            $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
-            $allModules = [];
-            if (isset($parcoursEntry[$modulesId])) {
-                $allModules = explode(',', $parcoursEntry[$modulesId]);
-            }
+            $allActivities = getActivities($currentModule);
+            $allModules = getModules($parcoursEntry);
 
             // display the previous button
             if ($currentPageTag == reset($allActivities)) {
@@ -137,17 +158,9 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // the consulted parcours entry
         $parcoursEntry = getContextualParcours();
-        $activityId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'];
-        $allActivities = [];
-        if (isset($fiche[$activityId])) {    
-            $allActivities = explode(',', $fiche[$activityId]);
-        }
 
-        $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
-        $allModules = [];
-        if (isset($fiche[$modulesId])) {
-            $allModules = explode(',', $parcoursEntry[$modulesId]);
-        }
+        $allActivities = getActivities($fiche);
+        $allModules = getModules($parcoursEntry);
 
         $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                 . '"' : '') .  '> 
