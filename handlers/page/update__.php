@@ -119,7 +119,8 @@ if ($this->UserIsAdmin()) {
     // if the PageMenuLms page doesn't exist, create it with a default version
     if (!$this->LoadPage('PageMenuLms')) {
         $plugin_output_new .= 'ℹ️Adding the <em>PageMenuLms</em> page<br />';
-        $this->SavePage('PageMenuLms', '{{menuparcours}}');
+        $this->SavePage('PageMenuLms', '""<div><span>""{{button link="PagePrincipale" nobtn="1" icon="fas fa-home"}}""</span><span style="float: right;">""{{button link="UserEntries" nobtn="1" text="Accès à mes fiches" icon="far fa-clone"></i>"}}""</span></div>""'
+            . "\n\n" . '{{menuparcours}}');
         $plugin_output_new .= '✅Done !<br />';
     } else {
         $plugin_output_new .= '✅The <em>PageMenuLms</em> page already exists.<br />';
