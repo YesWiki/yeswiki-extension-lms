@@ -173,7 +173,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
         } else {
             // otherwise display the button 'Commencer'
             $firstActivity = reset($allActivities);
-            $output .= '<li class="center"><a href="' . $GLOBALS['wiki']->href('', $firstActivity)
+            $output .= '<li class="center lms-begin"><a href="' . $GLOBALS['wiki']->href('', $firstActivity)
                 . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentEntryTag
                 . '">' . _t('LMS_BEGIN') . '</a></li>';
         }
