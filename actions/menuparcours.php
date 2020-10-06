@@ -43,10 +43,10 @@ $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
         if (empty($moduleDebutTag)) {
             $moduleDebutTag = reset($allModules);
         }
-        $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : baz_valeurs_fiche($moduleDebutTag);
+        $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : $GLOBALS['bazarFiche']->getOne($moduleDebutTag);
         if (!$moduleDebutEntry || $moduleDebutEntry['id_typeannonce'] != $this->config['lms_config']['module_form_id']) {
             $moduleDebutTag = reset($allModules);
-            $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : baz_valeurs_fiche($moduleDebutTag);
+            $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : $GLOBALS['bazarFiche']->getOne($moduleDebutTag);
         }
 
         // last module to display
@@ -56,10 +56,10 @@ $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
         if (empty($moduleFinTag)) {
             $moduleFinTag = end($allModules);
         }
-        $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : baz_valeurs_fiche($moduleFinTag);
+        $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : $GLOBALS['bazarFiche']->getOne($moduleFinTag);
         if (!$moduleFinEntry || $moduleFinEntry['id_typeannonce'] != $this->config['lms_config']['module_form_id']) {
             $moduleFinTag = $moduleFinTag = end($allModules);
-            $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : baz_valeurs_fiche($moduleFinTag);
+            $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : $GLOBALS['bazarFiche']->getOne($moduleFinTag);
         }
 
         // set the subarray of modules between moduledebut and modulefin
@@ -72,7 +72,7 @@ $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
             else if ($i == $moduleFinInd)
                 $modulesDisplayed[] = $moduleFinEntry;
             else
-                $modulesDisplayed[] = baz_valeurs_fiche($allModules[$i]);
+                $modulesDisplayed[] = $GLOBALS['bazarFiche']->getOne($allModules[$i]);
         }
 
         // find the menu template
