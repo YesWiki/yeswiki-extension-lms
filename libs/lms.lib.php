@@ -22,11 +22,11 @@
 function getContextualParcours(){
     $parcoursTag = empty($_REQUEST['parcours']) ? '' : $_REQUEST['parcours'];
     if (!empty($parcoursTag)) {
-        $parcoursEntry = baz_valeurs_fiche($parcoursTag);
+        $parcoursEntry = $GLOBALS['bazarFiche']->getOne($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
             return $parcoursEntry;
     } else {
-        $entries = baz_requete_recherche_fiches('', '', $GLOBALS['wiki']->config['lms_config']['parcours_form_id'], '', 1, '');
+        $entries = $GLOBALS['bazarFiche']->search(['formsIds' => [$GLOBALS['wiki']->config['lms_config']['parcours_form_id']]]);
         if (!empty($entries)) {
             return json_decode($entries[0]['body'], true);
         }
@@ -65,7 +65,7 @@ function getContextualModule($parcours){
     $moduleTag = isset($_GET['module']) ? $_GET['module'] : '';
 
     if (!empty($moduleTag)) {
-        $moduleEntry = baz_valeurs_fiche($moduleTag);
+        $moduleEntry = $GLOBALS['bazarFiche']->getOne($moduleTag);
 
         if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $GLOBALS['wiki']->config['lms_config']['module_form_id']
                 && in_array($currentPage, explode(',', $moduleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]))) {
@@ -74,13 +74,13 @@ function getContextualModule($parcours){
                     return false;
                 }
     } else {
-        $currentPageEntry = baz_valeurs_fiche($currentPageModule);
+        $currentPageEntry = $GLOBALS['bazarFiche']->getOne($currentPageModule);
         if ($currentPageEntry && $currentPageEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['module_form_id']
                 && in_array($currentPageModule, explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']])))
             return $currentPageEntry;
 
         foreach (explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']]) as $currentModuleTag){
-            $currentModuleEntry = baz_valeurs_fiche($currentModuleTag);
+            $currentModuleEntry = $GLOBALS['bazarFiche']->getOne($currentModuleTag);
             if (in_array($currentPage, explode(',', $currentModuleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']])))
                 return $currentModuleEntry;
         }
