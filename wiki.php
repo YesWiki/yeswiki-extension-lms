@@ -29,9 +29,3 @@ if (empty($wakkaConfig['lms_config'])) {
         'use_yeswiki_comments' => false,
     ];
 }
-
-// add LMS extension css style TODO: fix custom path
-$GLOBALS['wiki']->AddCSSFile('tools/lms/presentation/styles/lms.css');
-
-// add LMS extension js TODO: fix custom path
-$GLOBALS['wiki']->AddJavascriptFile('tools/lms/libs/lms.js');

@@ -69,7 +69,7 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
     $result = $GLOBALS['wiki']->Query('SELECT 1 FROM ' . $GLOBALS['wiki']->config['table_prefix'] . 'nature WHERE bn_id_nature = '
         . $formId . ' LIMIT 1');
     if (mysqli_num_rows($result) == 0) {
-        $plugin_output_new .= 'ℹ️Adding <em>' . $formName . '</em> form into <em>' . $GLOBALS['wiki']->config['table_prefix']
+        $plugin_output_new .= 'ℹ️ Adding <em>' . $formName . '</em> form into <em>' . $GLOBALS['wiki']->config['table_prefix']
             . 'nature</em> table.<br />';
 
         $GLOBALS['wiki']->Query('INSERT INTO ' . $GLOBALS['wiki']->config['table_prefix'] . 'nature (`bn_id_nature` ,`bn_ce_i18n` ,'
@@ -79,9 +79,9 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
             . mysqli_real_escape_string($GLOBALS['wiki']->dblink, $formTemplate) . '\', \''
             . mysqli_real_escape_string($GLOBALS['wiki']->dblink, $formeDescription) . '\', \'\', \'\', 1, \'\')');
 
-        $plugin_output_new .= '✅Done !<br />';
+        $plugin_output_new .= '✅ Done !<br />';
     } else {
-        $plugin_output_new .= '✅The <em>' . $formName . '</em> form already exists in the <em>' .
+        $plugin_output_new .= '✅ The <em>' . $formName . '</em> form already exists in the <em>' .
             $GLOBALS['wiki']->config['table_prefix'] . 'nature</em> table.<br />';
     }
 }
@@ -97,16 +97,16 @@ if ($this->UserIsAdmin()) {
 
     // if the OuiNon Lms list doesn't exist, create it
     if (!$this->LoadPage('ListeOuinonLms')){
-        $plugin_output_new .= 'ℹ️Adding the <em>OuiNon Lms</em> list<br />';
+        $plugin_output_new .= 'ℹ️ Adding the <em>OuiNon Lms</em> list<br />';
         // save the page with the list value
         $this->SavePage('ListeOuinonLms', OUINON_LIST_JSON);
         // in case, there is already some triples for 'ListOuinonLms', delete them
         $this->DeleteTriple('ListeOuinonLms', 'http://outils-reseaux.org/_vocabulary/type', null);
         // create the triple to specify this page is a list
         $this->InsertTriple('ListeOuinonLms', 'http://outils-reseaux.org/_vocabulary/type', 'liste', '', '');
-        $plugin_output_new .= '✅Done !<br />';
+        $plugin_output_new .= '✅ Done !<br />';
     } else {
-        $plugin_output_new .= '✅The <em>Ouinon Lms</em> list already exists.<br />';
+        $plugin_output_new .= '✅ The <em>Ouinon Lms</em> list already exists.<br />';
     }
 
     // test if the activite form exists, if not, install it
@@ -118,12 +118,12 @@ if ($this->UserIsAdmin()) {
 
     // if the PageMenuLms page doesn't exist, create it with a default version
     if (!$this->LoadPage('PageMenuLms')) {
-        $plugin_output_new .= 'ℹ️Adding the <em>PageMenuLms</em> page<br />';
+        $plugin_output_new .= 'ℹ️ Adding the <em>PageMenuLms</em> page<br />';
         $this->SavePage('PageMenuLms', '""<div><span>""{{button link="PagePrincipale" nobtn="1" icon="fas fa-home"}}""</span><span style="float: right;">""{{button link="UserEntries" nobtn="1" text="Accès à mes fiches" icon="far fa-clone"></i>"}}""</span></div>""'
             . "\n\n" . '{{menuparcours}}');
-        $plugin_output_new .= '✅Done !<br />';
+        $plugin_output_new .= '✅ Done !<br />';
     } else {
-        $plugin_output_new .= '✅The <em>PageMenuLms</em> page already exists.<br />';
+        $plugin_output_new .= '✅ The <em>PageMenuLms</em> page already exists.<br />';
     }
 
     // Structure de répertoire désirée
@@ -132,30 +132,30 @@ if ($this->UserIsAdmin()) {
         if (!mkdir($customBazarTemplateDir, 0777, true)) {
             die('Echec lors de la création des répertoires...');
         } else {
-            $plugin_output_new .= "ℹ️Creating the folder <em>$customBazarTemplateDir</em> for bazar templates<br/>✅Done !<br />";
+            $plugin_output_new .= "ℹ ️Creating the folder <em>$customBazarTemplateDir</em> for bazar templates<br/>✅Done !<br />";
         }
     } else {
-        $plugin_output_new .= "✅The folder <em>$customBazarTemplateDir</em> for bazar templates exists.<br />";
+        $plugin_output_new .= "✅ The folder <em>$customBazarTemplateDir</em> for bazar templates exists.<br />";
     }
 
     $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '.tpl.html';
     if (!file_exists($destFile)){
-        $plugin_output_new .= "ℹ️Copying the <em>Activité</em> bazar template to <em>$destFile</em>. Don't forget to launch "
+        $plugin_output_new .= "ℹ ️Copying the <em>Activité</em> bazar template to <em>$destFile</em>. Don't forget to launch "
             . "again this update page if this form ID has changed !<br/>";
         copy('tools/lms/libs/bazar-templates/fiche-5001.tpl.html', $destFile);
-        $plugin_output_new .= '✅Done !<br />';
+        $plugin_output_new .= '✅ Done !<br />';
     } else {
-        $plugin_output_new .= "✅The <em>Activité</em> bazar template (<em>$destFile</em>)  already exists.<br />";
+        $plugin_output_new .= "✅ The <em>Activité</em> bazar template (<em>$destFile</em>)  already exists.<br />";
     }
 
     $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '.tpl.html';
     if (!file_exists($destFile)){
-        $plugin_output_new .= "ℹ️Copying the <em>Module</em> bazar template to <em>$destFile</em>. Don't forget to launch "
+        $plugin_output_new .= "ℹ️ Copying the <em>Module</em> bazar template to <em>$destFile</em>. Don't forget to launch "
             . "again this update page if this form ID has changed !<br/>";
         copy('tools/lms/libs/bazar-templates/fiche-5002.tpl.html', $destFile);
-        $plugin_output_new .= '✅Done !<br />';
+        $plugin_output_new .= '✅ Done !<br />';
     } else {
-        $plugin_output_new .= "✅The <em>Module</em> bazar template (<em>$destFile</em>)  already exists.<br />";
+        $plugin_output_new .= "✅ The <em>Module</em> bazar template (<em>$destFile</em>)  already exists.<br />";
     }
 
     $plugin_output_new .= '<hr />';
