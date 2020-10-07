@@ -6,9 +6,6 @@
  * The filename is fiche-X.tpl.html with X defined by $GLOBALS['wiki']->config['lms_config']['activite_form_id']
  * (by default 5001). If the activity ID change, the installation must be performed again.
  */
-
-// add LMS extension css style
-$GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
 ?>
 
 <div class="container lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : ''?>">
@@ -33,9 +30,10 @@ $GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
           $content = str_replace('BAZ_fiche_titre', 'activity-title', $html['bf_titre'])."\n".$content;
         }
         echo $content;
-        echo $html['reactions'];
-        $navigation = $html['bf_navigation'];
-        echo $navigation;
+        if (!empty($html['reactions']))
+          echo $html['reactions'];
+        if (!empty($html['bf_navigation']))
+          echo $html['bf_navigation'];
       ?>
     </div>
   </div><!-- /.row -->

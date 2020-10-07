@@ -42,8 +42,8 @@ textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** 
 image***bf_image***Image***300***300***600***600***left***0*** ***
 texte***bf_duree***Durée estimée*** *** *** *** ***text***0*** *** *** *** *** *** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
-liste***ListeOuinonLms***Activé*** *** ***oui***bf_active*** ***0*** *** ***@admins*** *** *** ***
-checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module***@admins*** *** *** ***
+liste***ListeOuinonLms***Activé*** *** ***oui***bf_active*** ***0*** *** *** *** *** *** ***
+checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
@@ -51,8 +51,8 @@ acls***+***@admins***@admins*** *** *** *** *** *** ***');
 !defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 !defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
 checkboxfiche***5002***Modules*** *** *** *** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
-liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module***@admins*** *** *** ***
-liste***ListeOuinonLms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant***@admins*** *** *** ***
+liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
+liste***ListeOuinonLms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
 acls***+***@admins***@admins*** *** *** *** *** *** ***');
 
 /**

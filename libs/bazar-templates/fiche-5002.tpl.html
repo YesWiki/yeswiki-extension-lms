@@ -7,11 +7,8 @@
  * (by default 5002). If the module ID change, the installation must be performed again.
  */
 
-// hide list of activities and settings 
+// fields which will be hidden (the names used to identified the fields are given)
 if (!defined('FIELDS_TO_HIDE')) define('FIELDS_TO_HIDE', ['checkboxfiche5001', 'listeListeOuinonLmsbf_active']);
-
-// add LMS extension css style
-$this->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
 
 // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
 $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
@@ -29,34 +26,31 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
     </div>
     <div class="col-md-9 lms-module-content">
 <?php endif ?>
-      <?php
-      $res = '';
-      $formtemplate = [];
-      for ($i = 0; $i < count($form['template']); ++$i) {
-        if (isset($form['template'][$i][1]) && !in_array($form['template'][$i][0].$form['template'][$i][1].$form['template'][$i][6], FIELDS_TO_HIDE) && (!isset($form['template'][$i][11]) || $form['template'][$i][11] == '' ||
-            $this->CheckACL($form['template'][$i][11]))){
-          if (function_exists($form['template'][$i][0])) {
-            if ($form['template'][$i][1] == 'bf_titre') {
-              $titre = $form['template'][$i][0](
-                $formtemplate,
-                $form['template'][$i],
-                'html',
-                $fiche
-              );
-              $res .= str_replace('BAZ_fiche_titre', 'activity-title', $titre);
-            } else {
-              $res .= $form['template'][$i][0](
-                $formtemplate,
-                $form['template'][$i],
-                'html',
-                $fiche
-              );
-            }
-          }
-        }
-      }
-      echo $res;
-      ?>
+<?php
+$res = '';
+$formtemplate = [];
+for ($i = 0; $i < count($form['template']); ++$i) {
+  // if the field type is in the $INDEX_CHELOUS, the name used to identified the field is a concatenation of the index 0, 1 and 6
+  $INDEX_CHELOUS = ['radio', 'liste', 'checkbox', 'listefiche', 'checkboxfiche'];
+
+  // call the corresponding function to write the field if the field is not to hide and if the user have the read acls (index 11) on this field
+  if (isset($form['template'][$i][0]) && isset($form['template'][$i][1]) &&
+    ((!in_array($form['template'][$i][0], $INDEX_CHELOUS) && !in_array($form['template'][$i][1], FIELDS_TO_HIDE))
+      || (in_array($form['template'][$i][0], $INDEX_CHELOUS) && !in_array($form['template'][$i][0] . $form['template'][$i][1] . $form['template'][$i][6], FIELDS_TO_HIDE))
+    )
+    && (!isset($form['template'][$i][11]) || $form['template'][$i][11] == '' || $this->CheckACL($form['template'][$i][11]))){
+    if (function_exists($form['template'][$i][0])) {
+      $field = $form['template'][$i][0](
+        $formtemplate,
+        $form['template'][$i],
+        'html',
+        $fiche);
+      $res .= ($form['template'][$i][1] == 'bf_titre') ? str_replace('BAZ_fiche_titre', 'activity-title', $field) : $field;
+    }
+  }
+}
+echo $res;
+?>
 <?php if (!$moduleModal) :?>
     </div>
   </div><!-- /.row -->
