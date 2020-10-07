@@ -265,6 +265,9 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche) {
     $currentEntryTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
 
     if ($mode == 'html' && $currentEntryTag) {
+        // load the lms lib
+        require_once LMS_PATH . 'libs/lms.lib.php';
+
         $ids = explode(',', $tableau_template[2]);
         $ids = array_map('trim', $ids);
         // if empty, we use default values
