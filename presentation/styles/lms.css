@@ -89,7 +89,7 @@ h1.activity-title:after {
 .reactions-flex {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 .reaction-img {
 	width: 80%;
