@@ -35,7 +35,7 @@ $currentModuleInModules = !empty(array_filter(
               <ul class="list-group">
                   <?php
                   foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]) as $activiteTag) {
-                      $activite = $GLOBALS['bazarFiche']->getOne($activiteTag);
+                      $activite = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->getOne($activiteTag);
                       if ($activite && $activite['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['activite_form_id']) {
                           echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? ' active' : '') . '">';
                           echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '&parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
