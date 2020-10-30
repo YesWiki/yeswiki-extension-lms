@@ -24,11 +24,11 @@ function getContextualParcours(){
     if (!empty($parcoursTag)) {
         $parcoursEntry = $GLOBALS['bazarFiche']->getOne($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
-            return $parcoursEntry;
+            return [ $parcoursEntry['id_fiche'] => $parcoursEntry];
     } else {
         $entries = $GLOBALS['bazarFiche']->search(['formsIds' => [$GLOBALS['wiki']->config['lms_config']['parcours_form_id']]]);
         if (!empty($entries)) {
-            return json_decode($entries[0]['body'], true);
+            return $entries;
         }
     }
     return false;
@@ -78,12 +78,14 @@ function getContextualModule($parcours){
         if ($currentPageEntry && $currentPageEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['module_form_id']
                 && in_array($currentPageModule, explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']])))
             return $currentPageEntry;
-
-        foreach (explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']]) as $currentModuleTag){
-            $currentModuleEntry = $GLOBALS['bazarFiche']->getOne($currentModuleTag);
-            if (in_array($currentPage, explode(',', $currentModuleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']])))
-                return $currentModuleEntry;
-        }
+        if (!empty($parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']]))  {
+            $modules = explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']]);
+            foreach ($modules as $currentModuleTag) {
+                $currentModuleEntry = $GLOBALS['bazarFiche']->getOne($currentModuleTag);
+                if (in_array($currentPage, explode(',', $currentModuleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']])))
+                    return $currentModuleEntry;
+            }
+        }  
     }
     return false;
 }

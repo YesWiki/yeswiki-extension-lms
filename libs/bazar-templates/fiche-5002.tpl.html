@@ -14,14 +14,14 @@ if (!defined('FIELDS_TO_HIDE')) define('FIELDS_TO_HIDE', ['checkboxfiche5001', '
 $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 ?>
 <?php if (!$moduleModal) :?>
-<div class="container lms-container">
+<div class="lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : ''?>">
   <div class="row">
     <div class="col-md-3 lms-menu">
       <?php
-      // display the PageMenuLms page if it exists
-      if ($this->LoadPage('PageMenuLms')) {
-        echo $this->Format('{{include page="PageMenuLms"}}');
-      }
+        // display the PageMenuLms page if it exists
+        if ($this->getPageTag() == $fiche['id_fiche'] && $this->LoadPage('PageMenuLms')) {
+          echo $this->Format('{{include page="PageMenuLms"}}');
+        }
       ?>
     </div>
     <div class="col-md-9 lms-module-content">

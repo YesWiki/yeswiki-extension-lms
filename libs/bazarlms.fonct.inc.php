@@ -73,6 +73,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // the consulted parcours entry
         $parcoursEntry = getContextualParcours();
+        $parcoursEntry = array_values($parcoursEntry)[0];
         // the consulted module entry to display the current activity
         $currentModule = getContextualModule($parcoursEntry);
 
@@ -91,7 +92,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
             if ($currentPageTag == reset($allActivities)) {
                 // if first activity of a module, the previous link is to the current module entry
                 $output .= '<li class="previous"><a href="' . $GLOBALS['wiki']->href('', $currentModule['id_fiche'])
-                    . '&parcours=' . $parcoursEntry['id_fiche']
+                    . (empty($parcoursEntry['id_fiche']) ?  '' : '&parcours=' . $parcoursEntry['id_fiche'])
                     . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                     . '><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
             } elseif ($previousActivityTag = getPrevValue($currentPageTag, $allActivities)) {
@@ -108,7 +109,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
                     // (no next button is showed at the last activity of the last module)
                     $nextModuleTag = $allModules[array_search($currentModule['id_fiche'], $allModules) + 1];
                     $output .= '<li class="next"><a href="' . $GLOBALS['wiki']->href('', $nextModuleTag)
-                        . '&parcours=' . $parcoursEntry['id_fiche']
+                        . (empty($parcoursEntry['id_fiche']) ?  '' : '&parcours=' . $parcoursEntry['id_fiche'])
                         . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                         . '>' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
                 }
@@ -116,7 +117,8 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
                 // otherwise, the next link is to the next activity
                 $nextActivityTag = $allActivities[array_search($currentPageTag, $allActivities) + 1];
                 $output .= '<li class="next"><a href="' . $GLOBALS['wiki']->href('', $nextActivityTag)
-                    . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentModule['id_fiche']
+                    . (empty($parcoursEntry['id_fiche']) ?  '' : '&parcours=' . $parcoursEntry['id_fiche'])
+                    . '&module=' . $currentModule['id_fiche']
                     . '">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
             }
 
@@ -174,7 +176,8 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             // otherwise display the button 'Commencer'
             $firstActivity = reset($allActivities);
             $output .= '<li class="center lms-begin"><a href="' . $GLOBALS['wiki']->href('', $firstActivity)
-                . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentEntryTag
+                . (empty($parcoursEntry['id_fiche']) ?  '' : '&parcours=' . $parcoursEntry['id_fiche'])
+                . '&module=' . $currentEntryTag
                 . '">' . _t('LMS_BEGIN') . '</a></li>';
         }
 

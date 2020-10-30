@@ -18,10 +18,20 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
-!defined('ALLOWED_SERVERS') && define('ALLOWED_SERVERS', array('vimeo', 'youtube'));
+!defined('ALLOWED_SERVERS') && define('ALLOWED_SERVERS', array('vimeo', 'youtube', 'peertube'));
 
 $id = $this->GetParameter("id");
 $serveur = $this->GetParameter("serveur");
+if (empty($serveur)) { 
+    $serveur = $this->config['lms_config']['default_video_service'];
+}
+if ($serveur == 'peertube') {
+    $peertubeinstance = $this->GetParameter("peertubeinstance");
+    if (empty($peertubeinstance)) { 
+        $peertubeinstance = $this->config['lms_config']['default_peertube_instance'];
+    }
+
+}
 
 if (empty($id) || empty($serveur) || !in_array(strtolower($serveur), ALLOWED_SERVERS)){
     echo '<div class="alert alert-danger">' . _t('LMS_VIDEO_PARAM_ERROR') . '</div>'."\n";
@@ -33,14 +43,19 @@ if (empty($id) || empty($serveur) || !in_array(strtolower($serveur), ALLOWED_SER
     else
         $ratioCss = 'embed-responsive-16by9';
 
-    if ($serveur == 'vimeo')
+    if ($serveur == 'vimeo') {
         echo '<div class="embed-responsive ' . $ratioCss . '"><iframe src="https://player.vimeo.com/video/' . $id
             . '?color=ffffff&title=0&byline=0&portrait=0" class="embed-responsive-item" frameborder="0"'
             . 'allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" '
             . 'allowfullscreen></iframe></div>';
-    else
+    } elseif ($serveur == 'youtube') {
         echo '<div class="embed-responsive ' . $ratioCss . '"><iframe src="https://www.youtube-nocookie.com/embed/' . $id
             . '?cc_load_policy=1&iv_load_policy=3&modestbranding=1" class="embed-responsive-item" frameborder="0"'
             . 'allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" '
             . 'allowfullscreen></iframe></div>';
+    } elseif ($serveur == 'peertube') {
+        echo '<div class="embed-responsive ' . $ratioCss . '">'
+          .'<iframe class="embed-responsive-item" width="560" height="315" sandbox="allow-same-origin allow-scripts allow-popups" src="'.$peertubeinstance.'/videos/embed/'.$id.'?title=0&warningTitle=0" frameborder="0" allowfullscreen></iframe>'
+          . '</div>';
+    }
 }

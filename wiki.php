@@ -17,15 +17,21 @@ if (!defined("WIKINI_VERSION")) {
 !defined('LMS_PATH') && define('LMS_PATH', 'tools/lms/');
 
 // Includes
+require_once LMS_PATH . 'vendor/autoload.php';
 require_once LMS_PATH . 'libs/bazarlms.fonct.inc.php';
-
-if (empty($wakkaConfig['lms_config'])) {
-    $wakkaConfig['lms_config'] = [   
-        'use_tabs' => true,
-        'display_activity_title' => false,
-        'activite_form_id' => 5001,
-        'module_form_id' => 5002,
-        'parcours_form_id' => 5003,
-        'use_yeswiki_comments' => false,
-    ];
+require_once LMS_PATH . 'libs/LmsActivity.class.php';
+require_once LMS_PATH . 'libs/LmsModule.class.php';
+if (!isset($wakkaConfig['lms_config'])) {
+    $wakkaConfig['lms_config'] = [];
 }
+$wakkaConfig['lms_config']['use_tabs'] = empty($wakkaConfig['lms_config']['use_tabs']) ? true : $wakkaConfig['lms_config']['use_tabs'];
+$wakkaConfig['lms_config']['display_activity_title'] = empty($wakkaConfig['lms_config']['display_activity_title']) ? true : $wakkaConfig['lms_config']['display_activity_title'];
+$wakkaConfig['lms_config']['activite_form_id'] = empty($wakkaConfig['lms_config']['activite_form_id']) ? 5001 : $wakkaConfig['lms_config']['activite_form_id'];
+$wakkaConfig['lms_config']['module_form_id'] = empty($wakkaConfig['lms_config']['module_form_id']) ? 5002 : $wakkaConfig['lms_config']['module_form_id'];
+$wakkaConfig['lms_config']['parcours_form_id'] = empty($wakkaConfig['lms_config']['parcours_form_id']) ? 5003 : $wakkaConfig['lms_config']['parcours_form_id'];
+$wakkaConfig['lms_config']['use_yeswiki_comments'] = empty($wakkaConfig['lms_config']['use_yeswiki_comments']) ? false : $wakkaConfig['lms_config']['use_yeswiki_comments'];
+$wakkaConfig['lms_config']['default_video_service'] = empty($wakkaConfig['lms_config']['default_video_service']) ? 'peertube' : $wakkaConfig['lms_config']['default_video_service'];
+$wakkaConfig['lms_config']['default_peertube_instance'] = empty($wakkaConfig['lms_config']['default_peertube_instance']) ? 'https://video.colibris-outilslibres.org' : $wakkaConfig['lms_config']['default_peertube_instance'];
+
+$GLOBALS['lmsActivity'] = new YesWiki\LmsActivity($this);
+$GLOBALS['lmsModule'] = new YesWiki\LmsModule($this);

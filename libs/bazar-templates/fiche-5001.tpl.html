@@ -8,12 +8,12 @@
  */
 ?>
 
-<div class="container lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : ''?>">
+<div class="lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : ''?>">
   <div class="row">
     <div class="col-md-3 lms-menu">
       <?php
         // display the PageMenuLms page if it exists
-        if ($this->LoadPage('PageMenuLms')) {
+        if ($this->getPageTag() == $fiche['id_fiche'] && $this->LoadPage('PageMenuLms')) {
           echo $this->Format('{{include page="PageMenuLms"}}');
         }
       ?>
@@ -37,4 +37,4 @@
       ?>
     </div>
   </div><!-- /.row -->
-</div> <!-- /.container -->
+</div> <!-- /.lms-container -->
