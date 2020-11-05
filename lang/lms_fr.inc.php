@@ -19,8 +19,6 @@ $GLOBALS['translations'] = array_merge(
         'LMS_PREVIOUS' => 'Précédent',
         'LMS_NEXT' => 'Suivant',
         'LMS_BEGIN' => 'Commencer',
-        'LMS_VIDEO_PARAM_ERROR' => 'L\'action video doit être appelée avec les paramètres « id » et « serveur ». Pour « serveur », seules les valeurs « vimeo » ou « youtube » sont acceptées.',
-        'LMS_PDF_PARAM_ERROR' => 'L\'action pdf doit être appelée avec le paramètre « url » et l\'url renseignée doit provenir de la même origine que le wiki : c\'est à dire du même sous-domaine du serveur (par exemple \'xxx.yyy.com\'), du même schéma (par exemple \'https\') et du même port s\'il est spécifié (par exemple \'8080\').',
         'LMS_RETURN_BUTTON' => 'Retour',
     )
 );
