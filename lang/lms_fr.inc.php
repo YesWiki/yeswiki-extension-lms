@@ -19,6 +19,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_PREVIOUS' => 'Précédent',
         'LMS_NEXT' => 'Suivant',
         'LMS_BEGIN' => 'Commencer',
+        'LMS_RESUME' => 'Reprendre',
         'LMS_VIDEO_PARAM_ERROR' => 'L\'action video doit être appelée avec les paramètres « id » et « serveur ». Pour « serveur », seules les valeurs « vimeo » ou « youtube » sont acceptées.',
         'LMS_PDF_PARAM_ERROR' => 'L\'action pdf doit être appelée avec le paramètre « url » et l\'url renseignée doit provenir de la même origine que le wiki : c\'est à dire du même sous-domaine du serveur (par exemple \'xxx.yyy.com\'), du même schéma (par exemple \'https\') et du même port s\'il est spécifié (par exemple \'8080\').',
         'LMS_RETURN_BUTTON' => 'Retour',
@@ -30,5 +31,10 @@ $GLOBALS['translations'] = array_merge(
         'LMS_MODULE_WILL_OPEN' => 'Ce module sera publié dans',
         'LMS_SINCE' => 'depuis',
         'LMS_CLOSED_MODULE' => 'Ce module est fermé',
+        'LMS_MODULE_NOT_ACCESSIBLE' => 'Ce module n\'est pas accessible sans finir les modules précédents',
+        'LMS_UNKNOWN_STATUS_MODULE' => 'Ce module n\'est pas dans un parcours',
+        'RESERVED_FOR_ADMINS' => 'Informations pour les administrateurs',
+        'LMS_ACTIVITY' => 'Activité',
+        'LMS_TIME' => 'Temps estimé',
     )
 );

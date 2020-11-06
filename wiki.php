@@ -19,8 +19,10 @@ if (!defined("WIKINI_VERSION")) {
 // Includes
 require_once LMS_PATH . 'vendor/autoload.php';
 require_once LMS_PATH . 'libs/bazarlms.fonct.inc.php';
-require_once LMS_PATH . 'libs/LmsActivity.class.php';
-require_once LMS_PATH . 'libs/LmsModule.class.php';
+// require_once LMS_PATH . 'libs/LmsActivity.class.php';
+// require_once LMS_PATH . 'libs/LmsModule.class.php';
+// require_once LMS_PATH . 'libs/LmsLearner.class.php';
+
 if (!isset($wakkaConfig['lms_config'])) {
     $wakkaConfig['lms_config'] = [];
 }
@@ -33,5 +35,6 @@ $wakkaConfig['lms_config']['use_yeswiki_comments'] = empty($wakkaConfig['lms_con
 $wakkaConfig['lms_config']['default_video_service'] = empty($wakkaConfig['lms_config']['default_video_service']) ? 'peertube' : $wakkaConfig['lms_config']['default_video_service'];
 $wakkaConfig['lms_config']['default_peertube_instance'] = empty($wakkaConfig['lms_config']['default_peertube_instance']) ? 'https://video.colibris-outilslibres.org' : $wakkaConfig['lms_config']['default_peertube_instance'];
 
-$GLOBALS['lmsActivity'] = new YesWiki\LmsActivity($this);
-$GLOBALS['lmsModule'] = new YesWiki\LmsModule($this);
+// $GLOBALS['lmsActivity'] = new YesWiki\LmsActivity($this);
+// $GLOBALS['lmsModule'] = new YesWiki\LmsModule($this);
+// $GLOBALS['lmsLearner'] = new YesWiki\LmsLearner($this);

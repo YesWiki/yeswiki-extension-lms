@@ -4,8 +4,10 @@
  * This files is copied at installation (cf handlers/page/update__.php) to custom/templates/themes/bazar/templates/
  * directory of the yeswiki root.
  * The filename is fiche-X.tpl.html with X defined by $GLOBALS['wiki']->config['lms_config']['parcours_form_id']
- * (by default 5001). If the parcours ID change, the installation must be performed again.
+ * (by default 5003). If the parcours ID change, the installation must be performed again.
  */
+
+require_once LMS_PATH . 'libs/LmsModule.class.php';
 ?>
 
 <div class="parcours-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : ''?>">
@@ -30,13 +32,16 @@
       echo '<div class="module-list">'."\n";
       $modules = explode(',', $fiche['checkboxfiche5002']);
       foreach($modules as $id) {
-        echo $GLOBALS['lmsModule']->displayCard($id);
+        $currentModule = new YesWiki\LmsModule($id, $GLOBALS['wiki']);
+        echo $currentModule->displayCard();
       }
       echo '</div> <!-- end .module-list -->'."\n";
     }
-    if ($GLOBALS['wiki']->userIsAdmin()) {
-      echo '<hr /><strong>'._t('ACTIVITY_SCENARISATION').'</strong> : '.$html['listeListeOuinonLmsbf_scenarisation_activites'];
-      echo '<hr /><strong>'._t('MODULE_SCENARISATION').'</strong> : '.$html['listeListeOuinonLmsbf_scenarisation_modules_libres'];
-    }
-  ?>
+    if ($GLOBALS['wiki']->userIsAdmin()) : ?>
+      <div class="admin-infos well">
+        <h3><?php echo _t('RESERVED_FOR_ADMINS'); ?></h3>
+        <p><strong><?php echo _t('ACTIVITY_SCENARISATION'); ?></strong> : <?php echo $html['listeListeOuinonLmsbf_scenarisation_activites']; ?></p>
+        <p><strong><?php echo _t('MODULE_SCENARISATION'); ?></strong> : <?php echo $html['listeListeOuinonLmsbf_scenarisation_modules_libres']; ?></p>
+      </div>
+    <?php endif; ?>
 </div> <!-- /.parcours-container -->

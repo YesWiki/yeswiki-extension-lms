@@ -87,12 +87,12 @@ h1.activity-title:after {
   display: block;
 }
 .lms-container .row {
-	position:relative;
+  position: relative;
 }
 .lms-menu {
-	position: -webkit-sticky;
-	position:sticky;
-	top:1rem;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 1rem;
 }
 .bazar-list .lms-container {
   width: 100% !important;
@@ -401,7 +401,9 @@ h1.activity-title:after {
 .activities-infos {
   flex: 1;
 }
-
+.activities-action {
+  text-align: right;
+}
 .activities-action .btn-xs {
   font-size: 0.8em;
 }
@@ -419,4 +421,10 @@ h1.activity-title:after {
   background-color: transparent;
   border-color: transparent;
   font-weight: bold;
+}
+.status-closed,
+.status-to_be_open,
+.status-not_accessible,
+.status-unknown {
+  opacity: 0.7;
 }

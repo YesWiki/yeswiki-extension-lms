@@ -13,8 +13,7 @@
  * Get the contextual parcours according to the Get parameter 'parcours' and the existing parcours. By order :
  *
  *   - if the Get parameter 'parcours' refers to a tag associated to a parcours entry, return it
- *   - if not, return false
- *   - if there is at least one parcours in the database, return the first created one
+ *   - else, if there is at least one parcours in the database, return them
  *   - if not, return false
  *
  * @return array The parcours entry
@@ -140,3 +139,19 @@ function getUserReactionOnPage($pageTag, $user){
     }
     return $res;
 }
+
+function getUserProgress($userName, $tag = '') {
+    $res = [];
+    // get all progresses in db for user
+    $val = $GLOBALS['wiki']->getAllTriplesValues($userName, 'https://yeswiki.net/vocabulary/progress', '', '');
+    foreach ($val as $v) {
+        $v = json_decode($v['value'], true);
+        if (!empty($v) && empty($tag)) { // no tag specified, get them all
+            $res[] = $v;
+        } elseif (!empty($v) && ($v['module'] == $tag || $v['activity'] == $tag)) {
+            return [0 => $v]; // if tag found, return it
+        }
+    }
+    return $res;
+}
+
