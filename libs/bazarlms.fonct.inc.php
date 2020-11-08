@@ -36,7 +36,7 @@ function getModules(array $parcoursEntry)
     if (isset($parcoursEntry[$modulesId])) {
         $allModules = explode(',', $parcoursEntry[$modulesId]);
     }
-    return array($allModules, $parcoursEntry);
+    return $allModules;
 }
 
 /**
@@ -184,7 +184,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             if ($currentEntryTag != end($allModules)) {
                 // if not the last module of the parcours, a link to the next module is displayed
                 $moduleIndex = array_search($currentEntryTag, $allModules);
-                if ($moduleIndex) {
+                if ($moduleIndex !== false) {
                     $nextModuleTag = $allModules[$moduleIndex + 1];
                     $output .= '<li class="next square" title="' . _t('LMS_MODULE_NEXT')
                         . '"><a href="' . $GLOBALS['wiki']->href('', $nextModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
@@ -197,7 +197,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             if ($currentEntryTag != reset($allModules)) {
                 // if not the first module of the parcours, a link to the previous module is displayed
                 $moduleIndex = array_search($currentEntryTag, $allModules);
-                if ($moduleIndex) {
+                if ($moduleIndex !== false) {
                     $previousModuleTag = $allModules[$moduleIndex - 1];
                     $output .= '<li class="next square" title="' . _t('LMS_MODULE_PREVIOUS')
                         . '"><a href="' . $GLOBALS['wiki']->href('', $previousModuleTag) . '&parcours=' . $parcoursEntry['id_fiche']
