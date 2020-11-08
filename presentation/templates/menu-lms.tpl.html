@@ -29,7 +29,7 @@ $currentModuleInModules = !empty(array_filter(
                   <a href="<?php echo $GLOBALS['wiki']->href('', $module['id_fiche']) . "&parcours=" . $parcoursTag; ?>" class="bazar-entry"><?php echo $module['bf_titre']; ?></a>
               </h4>
           </div>
-          <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche']) :?>
+          <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche'] && $currentModule['listeListeOuinonLmsbf_active'] == 'oui') :?>
           <div class="panel-collapse">
               <ul class="list-group">
                   <?php
