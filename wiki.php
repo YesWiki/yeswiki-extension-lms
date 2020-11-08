@@ -32,8 +32,6 @@ $wakkaConfig['lms_config']['activite_form_id'] = empty($wakkaConfig['lms_config'
 $wakkaConfig['lms_config']['module_form_id'] = empty($wakkaConfig['lms_config']['module_form_id']) ? 5002 : $wakkaConfig['lms_config']['module_form_id'];
 $wakkaConfig['lms_config']['parcours_form_id'] = empty($wakkaConfig['lms_config']['parcours_form_id']) ? 5003 : $wakkaConfig['lms_config']['parcours_form_id'];
 $wakkaConfig['lms_config']['use_yeswiki_comments'] = empty($wakkaConfig['lms_config']['use_yeswiki_comments']) ? false : $wakkaConfig['lms_config']['use_yeswiki_comments'];
-$wakkaConfig['lms_config']['default_video_service'] = empty($wakkaConfig['lms_config']['default_video_service']) ? 'peertube' : $wakkaConfig['lms_config']['default_video_service'];
-$wakkaConfig['lms_config']['default_peertube_instance'] = empty($wakkaConfig['lms_config']['default_peertube_instance']) ? 'https://video.colibris-outilslibres.org' : $wakkaConfig['lms_config']['default_peertube_instance'];
 
 // $GLOBALS['lmsActivity'] = new YesWiki\LmsActivity($this);
 // $GLOBALS['lmsModule'] = new YesWiki\LmsModule($this);
