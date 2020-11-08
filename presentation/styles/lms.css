@@ -31,7 +31,10 @@ h1.activity-title:after {
     background-color: var(--primary-color);
     color: white;
 }
-
+.pager-lms li.square>a {
+	border-radius: 0;
+	margin-left: 5px;
+}
 .pager-lms li.noaccess {
     text-align: center;
     display: inline-block;
@@ -41,10 +44,13 @@ h1.activity-title:after {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
-.pager-lms li.square>a {
-    border-radius: 0;
-    margin-left: 5px;
+.pager-lms li.noaccess div.admin-access>a {
+	margin-top: 10px;
+	display: inline-block;
+	padding: 5px 14px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 15px;
 }
 
 /* don't display the lms-menu inside entries generated from bazarliste action */

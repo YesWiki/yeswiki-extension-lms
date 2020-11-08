@@ -168,8 +168,17 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // check the access to the module
         if (empty($allActivities) || empty($fiche['listeListeOuinonLmsbf_active']) || $fiche['listeListeOuinonLmsbf_active'] == 'non') {
-            // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
-            $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
+            if (!$GLOBALS['wiki']->userIsAdmin()) {
+                // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
+                $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
+            } else {
+                // for an admin, inform him and let a button to access to the first activity
+                $firstActivity = reset($allActivities);
+                $output .= '<li class="noaccess"><div>' . _t('LMS_MODULE_NOACCESS_ADMIN') . '</div>'
+                    . '<div class="admin-access"><a href="' . $GLOBALS['wiki']->href('', $firstActivity)
+                    . '&parcours=' . $parcoursEntry['id_fiche'] . '&module=' . $currentEntryTag
+                    . '">' . _t('LMS_BEGIN_NOACCESS_ADMIN') . '</a></div></li>';
+                }
         } else {
             // otherwise display the button 'Commencer'
             $firstActivity = reset($allActivities);
