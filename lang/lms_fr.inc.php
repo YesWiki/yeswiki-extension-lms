@@ -14,11 +14,13 @@ $GLOBALS['translations'] = array_merge(
     array(
         'LMS_MENUPARCOURS_ERROR' => 'Erreur détectée dans l\'action menuparcours du module LMS : ',
         'LMS_MODULE_NOACCESS' => 'Vous n\'avez pas accès pour l\'instant à ce module',
+        'LMS_MODULE_NOACCESS_ADMIN' => 'Les apprenants n\'ont pas accès à ce module',
         'LMS_MODULE_PREVIOUS' => 'Module précédent',
         'LMS_MODULE_NEXT' => 'Module suivant',
         'LMS_PREVIOUS' => 'Précédent',
         'LMS_NEXT' => 'Suivant',
         'LMS_BEGIN' => 'Commencer',
+        'LMS_BEGIN_NOACCESS_ADMIN' => 'Accès administrateur',
         'LMS_RESUME' => 'Reprendre',
         'LMS_RETURN_BUTTON' => 'Retour',
         'LMS_ADMIN_NO_MODULES' => 'Pas encore de modules associés à ce parcours, créez d\'abord des activités, puis des modules avec des activités dedans, puis associez les modules au parcours en l\'éditant à nouveau',
