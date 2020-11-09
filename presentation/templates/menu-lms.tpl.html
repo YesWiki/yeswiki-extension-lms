@@ -17,7 +17,7 @@ if ($GLOBALS['wiki']->config['lms_config']['use_tabs']) {
 $currentModuleInModules = !empty(array_filter(
           $modulesDisplayed,
           function ($item) use ($currentModule) {
-            return isset($item) && isset($currentModule) && $item['id_fiche'] == $currentModule['id_fiche'];
+            return isset($item['id_fiche']) && isset($currentModule['id_fiche']) && $item['id_fiche'] == $currentModule['id_fiche'];
           }));
 ?>
 <?php if ($currentModule && $currentModuleInModules) :?>

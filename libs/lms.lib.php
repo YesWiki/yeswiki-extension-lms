@@ -23,11 +23,11 @@ function getContextualParcours(){
     if (!empty($parcoursTag)) {
         $parcoursEntry = $GLOBALS['bazarFiche']->getOne($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
-            return [ $parcoursEntry['id_fiche'] => $parcoursEntry];
+            return $parcoursEntry;
     } else {
         $entries = $GLOBALS['bazarFiche']->search(['formsIds' => [$GLOBALS['wiki']->config['lms_config']['parcours_form_id']]]);
         if (!empty($entries)) {
-            return $entries;
+            return json_decode($entries[0]['body'], true);
         }
     }
     return false;
@@ -84,7 +84,7 @@ function getContextualModule($parcours){
                 if (in_array($currentPage, explode(',', $currentModuleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']])))
                     return $currentModuleEntry;
             }
-        }  
+        }
     }
     return false;
 }

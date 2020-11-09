@@ -29,8 +29,7 @@ function getActivities($currentModule)
  * @param array $parcoursEntry The current parcours entry
  * @return array The modules
  */
-function getModules(array $parcoursEntry)
-{
+function getModules(array $parcoursEntry) {
     $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
     $allModules = [];
     if (isset($parcoursEntry[$modulesId])) {
@@ -73,7 +72,6 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche){
 
         // the consulted parcours entry
         $parcoursEntry = getContextualParcours();
-        $parcoursEntry = array_values($parcoursEntry)[0];
         // the consulted module entry to display the current activity
         $currentModule = getContextualModule($parcoursEntry);
 

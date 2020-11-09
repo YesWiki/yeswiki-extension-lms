@@ -5,7 +5,6 @@ if ($user = $this->GetUser()) {
     if ($fiche['id_typeannonce'] == $this->config['lms_config']['module_form_id']
       || $fiche['id_typeannonce'] == $this->config['lms_config']['activite_form_id']) {
       $parcours = getContextualParcours();
-      $parcours = array_values($parcours)[0];
       $progress = getUserProgress($user['name'], $this->getPageTag());
       if (empty($progress)) { // save current progress
         if ($fiche['id_typeannonce'] == $this->config['lms_config']['module_form_id']) {

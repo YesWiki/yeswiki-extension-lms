@@ -180,7 +180,6 @@ class LmsModule
         );
         // the consulted parcours entry
         $parcoursEntry = $this->getRelatedParcours();
-        $parcoursEntry = array_values($parcoursEntry)[0];
         $idactivity = $this->getNextActivity($this->wiki->getUserName());
         if ($parcoursEntry['listeListeOuinonLmsbf_scenarisation_modules_libres'] == 'oui') {
           $link = $this->wiki->href(
