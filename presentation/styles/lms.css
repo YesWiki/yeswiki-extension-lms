@@ -58,10 +58,6 @@ h1.activity-title:after {
   display: none;
 }
 
-.embed-responsive.pdf {
-  padding-bottom: 138%;
-}
-
 /* hack for displaying activity entries */
 
 /* remove the alert div inside the entry */
