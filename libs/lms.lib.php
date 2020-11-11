@@ -8,6 +8,8 @@
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
  */
+namespace YesWiki;
+use YesWiki\Bazar\Service\FicheManager;
 
 /**
  * Get the contextual parcours according to the Get parameter 'parcours' and the existing parcours. By order :
@@ -22,11 +24,11 @@
 function getContextualParcours(){
     $parcoursTag = empty($_REQUEST['parcours']) ? '' : $_REQUEST['parcours'];
     if (!empty($parcoursTag)) {
-        $parcoursEntry = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->getOne($parcoursTag);
+        $parcoursEntry = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
             return $parcoursEntry;
     } else {
-        $entries = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->search(['formsIds' => [$GLOBALS['wiki']->config['lms_config']['parcours_form_id']]]);
+        $entries = $GLOBALS['wiki']->services->get(FicheManager::class)->search(['formsIds' => [$GLOBALS['wiki']->config['lms_config']['parcours_form_id']]]);
         if (!empty($entries)) {
             return json_decode($entries[0]['body'], true);
         }
@@ -65,7 +67,7 @@ function getContextualModule($parcours){
     $moduleTag = isset($_GET['module']) ? $_GET['module'] : '';
 
     if (!empty($moduleTag)) {
-        $moduleEntry = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->getOne($moduleTag);
+        $moduleEntry = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($moduleTag);
 
         if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $GLOBALS['wiki']->config['lms_config']['module_form_id']
                 && in_array($currentPage, explode(',', $moduleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]))) {
@@ -74,13 +76,13 @@ function getContextualModule($parcours){
                     return false;
                 }
     } else {
-        $currentPageEntry = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->getOne($currentPageModule);
+        $currentPageEntry = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($currentPageModule);
         if ($currentPageEntry && $currentPageEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['module_form_id']
                 && in_array($currentPageModule, explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']])))
             return $currentPageEntry;
 
         foreach (explode(',', $parcours['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id']]) as $currentModuleTag){
-            $currentModuleEntry = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->getOne($currentModuleTag);
+            $currentModuleEntry = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($currentModuleTag);
             if (in_array($currentPage, explode(',', $currentModuleEntry['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id']])))
                 return $currentModuleEntry;
         }

@@ -1,4 +1,7 @@
 <?php
+namespace YesWiki;
+use YesWiki\Bazar\Service\FicheManager;
+
 /**
  * menuparcours : action which displays the menu of a specific course (parcours)
  *
@@ -18,7 +21,7 @@ require_once LMS_PATH . 'libs/lms.lib.php';
 // js lib
 $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
 
-$ficheManager = $this->services->get('bazar.fiche.manager');
+$ficheManager = $this->services->get(FicheManager::class);
 
 //$user = $this->GetUser();
 // the action only works if a user is logged in
