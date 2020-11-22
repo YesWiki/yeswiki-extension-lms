@@ -1,5 +1,4 @@
 <?php
-namespace YesWiki;
 use YesWiki\Bazar\Service\FicheManager;
 
 /**
@@ -82,7 +81,7 @@ $ficheManager = $this->services->get(FicheManager::class);
 
         // find the menu template
         $template = $this->GetParameter("template");
-        if (empty($template) || !file_exists(LMS_PATH . 'presentation/templates/' . $template)) {
+        if (empty($template) || !file_exists(LMS_PATH . '/templates/' . $template)) {
             $template = "menu-lms.tpl.html";
         }
 

@@ -1,9 +1,7 @@
 <?php
-namespace YesWiki;
-
-// if an handler is after the page tag in the wiki parameter variable, get only the tag
 use YesWiki\Bazar\Service\FicheManager;
 
+// if an handler is after the page tag in the wiki parameter variable, get only the tag
 $currentPage =  isset($_GET['wiki']) ?
 strpos($_GET['wiki'], '/') ? substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/')) : $_GET['wiki'] :
 '';

@@ -1,0 +1,69 @@
+<?php
+/**
+ * Bazar template to render an Module entry.
+ * This files is copied at installation (cf handlers/page/update__.php) to custom/templates/themes/bazar/templates/
+ * directory of the yeswiki root.
+ * The filename is fiche-X.tpl.html with X defined by $GLOBALS['wiki']->config['lms_config']['module_form_id']
+ * (by default 5002). If the module ID change, the installation must be performed again.
+ */
+
+// fields which will be hidden (the names used to identified the fields are given)
+if (!defined('FIELDS_TO_HIDE')) {
+    define('FIELDS_TO_HIDE', ['checkboxfiche5001', 'listeListeOuinonLmsbf_active']);
+}
+
+// does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
+$moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+?>
+<?php if (!$moduleModal) : ?>
+<div class="container lms-container">
+    <div class="row">
+        <div class="col-md-3 lms-menu">
+            <?php
+            // display the PageMenuLms page if it exists
+            if ($GLOBALS['wiki']->LoadPage('PageMenuLms')) {
+                echo $GLOBALS['wiki']->Format('{{include page="PageMenuLms"}}');
+            }
+            ?>
+        </div>
+        <div class="col-md-9 lms-module-content">
+            <?php endif ?>
+            <?php
+            $res = '';
+            $formtemplate = [];
+            for ($i = 0; $i < count($form['template']); ++$i) {
+                // if the field type is in the $INDEX_CHELOUS, the name used to identified the field is a concatenation of the index 0, 1 and 6
+                $INDEX_CHELOUS = ['radio', 'liste', 'checkbox', 'listefiche', 'checkboxfiche'];
+
+                // call the corresponding function to write the field if the field is not to hide and if the user have the read acls (index 11) on this field
+                if (isset($form['template'][$i][0])
+                    && isset($form['template'][$i][1])
+                    && ((!in_array($form['template'][$i][0], $INDEX_CHELOUS)
+                            && !in_array($form['template'][$i][1], FIELDS_TO_HIDE))
+                        || (in_array($form['template'][$i][0], $INDEX_CHELOUS)
+                            && !in_array($form['template'][$i][0] . $form['template'][$i][1] . $form['template'][$i][6],
+                                FIELDS_TO_HIDE))
+                    )
+                    && (!isset($form['template'][$i][11])
+                        || $form['template'][$i][11] == ''
+                        || $GLOBALS['wiki']->CheckACL($form['template'][$i][11])
+                    )
+                ) {
+                    if (function_exists($form['template'][$i][0])) {
+                        $field = $form['template'][$i][0](
+                            $formtemplate,
+                            $form['template'][$i],
+                            'html',
+                            $fiche);
+                        $res .= ($form['template'][$i][1] == 'bf_titre') ? str_replace('BAZ_fiche_titre',
+                            'activity-title', $field) : $field;
+                    }
+                }
+            }
+            echo $res;
+            ?>
+            <?php if (!$moduleModal) : ?>
+        </div>
+    </div><!-- /.row -->
+</div> <!-- /.container -->
+<?php endif ?>

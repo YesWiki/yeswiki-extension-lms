@@ -8,7 +8,6 @@
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
  */
-namespace YesWiki;
 use YesWiki\Bazar\Service\FicheManager;
 
 /**
@@ -22,7 +21,7 @@ use YesWiki\Bazar\Service\FicheManager;
  * @return array The parcours entry
  */
 function getContextualParcours(){
-    $parcoursTag = empty($_REQUEST['parcours']) ? '' : $_REQUEST['parcours'];
+    $parcoursTag = empty($_GET['parcours']) ? '' : $_GET['parcours'];
     if (!empty($parcoursTag)) {
         $parcoursEntry = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($parcoursTag);
         if ($parcoursEntry && $parcoursEntry['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['parcours_form_id'])
