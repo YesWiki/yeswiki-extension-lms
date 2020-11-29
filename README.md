@@ -13,9 +13,9 @@ _Exemple : `https://www.example.com/?GererMisesAJour/update`_
 ### Utilisation
 
   1) Rendez-vous sur la page `Bazar` de votre YesWiki
-  2) Ajoutez des activités LMS en ajoutant des fiches au formulaire ID = 5001.
-  3) Ajoutez ensuite des modules LMS en ajoutant des fiches au formulaire ID = 5002.
-  4) Ajoutez ensuite un parcours LMS en ajoutant un fiche au formulaire ID = 5003.
+  2) Ajoutez des activités LMS en ajoutant des fiches au formulaire ID = 1201.
+  3) Ajoutez ensuite des modules LMS en ajoutant des fiches au formulaire ID = 1202.
+  4) Ajoutez ensuite un parcours LMS en ajoutant un fiche au formulaire ID = 1203.
   5) Notez l'url de ce parcours. Vous pouvez l'indiquer sur votre liste de parcours.
   
 _Documentation sur le site [https://yeswiki.net](https://yeswiki.net/?DocumentationExtensionLMS)_

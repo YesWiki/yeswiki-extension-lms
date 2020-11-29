@@ -32,8 +32,8 @@ texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** *
 textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
-acls*** * ***@admins***@admins*** *** *** *** *** *** ***
-reactions***reactions*** *** *** *** *** *** *** *** ***');
+reactions***reactions*** *** *** *** *** *** *** *** ***
+acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
 !defined('MODULE_FORM_NOM') && define('MODULE_FORM_NOM', 'Module LMS');
 !defined('MODULE_FORM_DESCRIPTION') && define('MODULE_FORM_DESCRIPTION', 'Module (enchaînement d\'activités) utilisé pour le module d\'apprentissage en ligne');
@@ -41,18 +41,18 @@ reactions***reactions*** *** *** *** *** *** *** *** ***');
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 image***bf_image***Image***300***300***600***600***left***0*** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
-liste***ListeOuinonLms***Activé*** *** ***oui***bf_active*** ***0*** *** *** *** *** *** ***
-checkboxfiche***5001***Activités*** *** *** *** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
+liste***ListeOuinonLms***Activé*** *** ***oui***bf_actif*** ***0*** *** *** *** *** *** ***
+checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '***Activités*** *** ***bf_activites*** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
-acls***+***@admins***@admins*** *** *** *** *** *** ***');
+acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
 !defined('PARCOURS_FORM_NOM') && define('PARCOURS_FORM_NOM', 'Parcours LMS');
 !defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 !defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
-checkboxfiche***5002***Modules*** *** *** *** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
-liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module  un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
-liste***ListeOuinonLms***Accès libre aux modules*** *** ***non***bf_modules_libres*** ***1*** ***Si oui  les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
-acls***+***@admins***@admins*** *** *** *** *** *** ***');
+checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** ***bf_modules*** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
+liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module, un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
+liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si désactivé, les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
+acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
 /**
  * Check if a form exists and if not, add it to the nature table
@@ -119,51 +119,6 @@ if ($this->UserIsAdmin()) {
     } else {
         $output .= '✅ The <em>PageMenuLms</em> page already exists.<br />';
     }
-
-    // Structure de répertoire désirée
-    $customBazarTemplateDir = 'templates/bazar/templates/';
-    if (!is_dir($customBazarTemplateDir)) {
-        if (!mkdir($customBazarTemplateDir, 0777, true)) {
-            die('Echec lors de la création des répertoires...');
-        } else {
-            $output .= "ℹ ️Creating the folder <em>$customBazarTemplateDir</em> for bazar templates<br/>✅Done !<br />";
-        }
-    } else {
-        $output .= "✅ The folder <em>$customBazarTemplateDir</em> for bazar templates exists.<br />";
-    }
-
-    $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '.tpl.html';
-    if (!file_exists($destFile)){
-        $output .= "ℹ ️Copying the <em>Activité</em> bazar template to <em>$destFile</em>. Don't forget to launch "
-            . "again this update page if this form ID has changed !<br/>";
-    } else {
-        $output .= "ℹ️ The <em>Activité</em> bazar template (<em>$destFile</em>)  already exists, replacing it.<br />";
-        unlink($destFile);
-    }
-    copy('tools/lms/libs/bazar-templates/fiche-' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '.tpl.html', $destFile);
-    $output .= '✅ Done !<br />';
-
-    $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '.tpl.html';
-    if (!file_exists($destFile)){
-        $output .= "ℹ️ Copying the <em>Module</em> bazar template to <em>$destFile</em>. Don't forget to launch "
-        . "again this update page if this form ID has changed !<br/>";
-    } else {
-        $output .= "ℹ️ The <em>Module</em> bazar template (<em>$destFile</em>)  already exists, replacing it.<br />";
-        unlink($destFile);
-    }
-    copy('tools/lms/libs/bazar-templates/fiche-' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '.tpl.html', $destFile);
-    $output .= '✅ Done !<br />';
-
-    $destFile = $customBazarTemplateDir.'fiche-' . $GLOBALS['wiki']->config['lms_config']['parcours_form_id'] . '.tpl.html';
-    if (!file_exists($destFile)){
-        $output .= "ℹ️ Copying the <em>Parcours</em> bazar template to <em>$destFile</em>. Don't forget to launch "
-        . "again this update page if this form ID has changed !<br/>";
-    } else {
-        $output .= "ℹ️ The <em>Parcours</em> bazar template (<em>$destFile</em>)  already exists, replacing it.<br />";
-        unlink($destFile);
-    }
-    copy('tools/lms/libs/bazar-templates/fiche-'. $GLOBALS['wiki']->config['lms_config']['parcours_form_id'] .'.tpl.html', $destFile);
-    $output .= '✅ Done !<br />';
 
     $output .= '<hr />';
 }

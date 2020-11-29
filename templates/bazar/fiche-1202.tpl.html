@@ -4,12 +4,12 @@
  * This files is copied at installation (cf handlers/page/update__.php) to custom/templates/themes/bazar/templates/
  * directory of the yeswiki root.
  * The filename is fiche-X.tpl.html with X defined by $GLOBALS['wiki']->config['lms_config']['module_form_id']
- * (by default 5002). If the module ID change, the installation must be performed again.
+ * (by default 1202). If the module ID change, the installation must be performed again.
  */
 
 // fields which will be hidden (the names used to identified the fields are given)
 if (!defined('FIELDS_TO_HIDE')) {
-    define('FIELDS_TO_HIDE', ['checkboxfiche5001', 'listeListeOuinonLmsbf_active']);
+    define('FIELDS_TO_HIDE', ['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . 'bf_activites', 'listeListeOuinonLmsbf_actif']);
 }
 
 // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax

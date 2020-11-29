@@ -16,7 +16,7 @@
  */
 function getActivities($currentModule)
 {
-    $activityId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'];
+    $activityId = 'checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . 'bf_activites';
     $allActivities = [];
     if (isset($currentModule[$activityId])) {
         $allActivities = explode(',', $currentModule[$activityId]);
@@ -30,7 +30,7 @@ function getActivities($currentModule)
  * @return array The modules
  */
 function getModules(array $parcoursEntry) {
-    $modulesId = "checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['module_form_id'];
+    $modulesId = 'checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . 'bf_modules';
     $allModules = [];
     if (isset($parcoursEntry[$modulesId])) {
         $allModules = explode(',', $parcoursEntry[$modulesId]);
@@ -167,7 +167,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
             <ul class="pager pager-lms">';
 
         // check the access to the module
-        if (empty($allActivities) || empty($fiche['listeListeOuinonLmsbf_active']) || $fiche['listeListeOuinonLmsbf_active'] == 'non') {
+        if (empty($allActivities) || empty($fiche['listeListeOuinonLmsbf_actif']) || $fiche['listeListeOuinonLmsbf_actif'] == 'non') {
             if (!$GLOBALS['wiki']->userIsAdmin()) {
                 // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
                 $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';

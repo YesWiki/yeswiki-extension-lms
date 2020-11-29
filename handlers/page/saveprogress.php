@@ -1,7 +1,9 @@
 <?php
 require_once LMS_PATH . 'libs/lms.lib.php';
+$ficheManager = $this->services->get(FicheManager::class);
+
 if ($user = $this->GetUser()) {
-    $fiche = $GLOBALS['bazarFiche']->getOne($this->getPageTag());
+    $fiche = $ficheManager->getOne($this->getPageTag());
     if ($fiche['id_typeannonce'] == $this->config['lms_config']['module_form_id']
       || $fiche['id_typeannonce'] == $this->config['lms_config']['activite_form_id']) {
       $parcours = getContextualParcours();

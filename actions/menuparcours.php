@@ -38,7 +38,8 @@ $ficheManager = $this->services->get(FicheManager::class);
 
     // display the menu only if a contextual parcours is found
     if ($parcoursEntry) {
-        $allModules = explode(',', $parcoursEntry["checkboxfiche" . $this->config['lms_config']['module_form_id']]);
+        $allModules = explode(',', $parcoursEntry['checkboxfiche' . $this->config['lms_config']['module_form_id']
+            . 'bf_modules']);
 
         // first module to display
         // if not defined, or the one defined doesn't exist or isn't a module entry, the first module is by default

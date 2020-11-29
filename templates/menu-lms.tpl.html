@@ -31,11 +31,11 @@ $currentModuleInModules = !empty(array_filter(
               </h4>
           </div>
           <?php if ($currentModule && $currentModule['id_fiche'] == $module['id_fiche'] &&
-                      ($GLOBALS['wiki']->UserIsAdmin() || $currentModule['listeListeOuinonLmsbf_active'] == 'oui')) :?>
+                      ($GLOBALS['wiki']->UserIsAdmin() || $currentModule['listeListeOuinonLmsbf_actif'] == 'oui')) :?>
           <div class="panel-collapse">
               <ul class="list-group">
                   <?php
-                  foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id']]) as $activiteTag) {
+                  foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . 'bf_activites']) as $activiteTag) {
                       $activite = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($activiteTag);
                       if ($activite && $activite['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['activite_form_id']) {
                           echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? ' active' : '') . '">';
