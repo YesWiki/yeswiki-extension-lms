@@ -9,6 +9,11 @@
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
  */
+ 
+namespace YesWiki;
+
+use YesWiki\Core\Service\Performer;
+
 
 // Verification de securite
 if (!defined("WIKINI_VERSION")) {
@@ -122,6 +127,14 @@ if ($this->UserIsAdmin()) {
 
     $output .= '<hr />';
 }
+
+// Add button to return to previous page
+$tag = $GLOBALS['wiki']->getPageTag() ;
+$vars['link'] = $tag ;
+$vars['text'] = 'Retourner à la page '.$tag ;
+$vars['title'] = 'Retourner à la page '.$tag ;
+$vars['class'] = 'btn-success' ;
+$output .= $GLOBALS['wiki']->services->get(Performer::class)->run('button', 'action', $vars) ;
 
 // add the content before footer
 $plugin_output_new = str_replace(
