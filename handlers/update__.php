@@ -42,14 +42,14 @@ textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** 
 image***bf_image***Image***300***300***600***600***left***0*** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
 liste***ListeOuinonLms***Activé*** *** ***oui***bf_actif*** ***0*** *** *** *** *** *** ***
-checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '***Activités*** *** ***bf_activites*** ***tags***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
+checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '***Activités*** *** *** ***bf_activites***dragndrop***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
 !defined('PARCOURS_FORM_NOM') && define('PARCOURS_FORM_NOM', 'Parcours LMS');
 !defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION', 'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 !defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
-checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** ***bf_modules*** ***tags***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
+checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module, un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si désactivé, les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
