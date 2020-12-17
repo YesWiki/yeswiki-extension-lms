@@ -160,7 +160,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche){
         $parcoursEntry = getContextualParcours();
 
         $allActivities = getActivities($fiche);
-        $allModules = getModules($parcoursEntry);
+        $allModules = ($parcoursEntry) ? getModules($parcoursEntry) : false ;
 
         $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                 . '"' : '') .  '> 
