@@ -73,12 +73,12 @@ h1.activity-title:after {
 
 /* the lms container takes the full width, and adds minimum padding left and right*/
 .lms-container {
-  width: 100vw !important;
+  width: 100% !important;
   position: relative;
   left: 50%;
   right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  margin-left: -50%;
+  margin-right: -50%;
   padding: 0 1em;
 }
 /* remove the info bar below the entry, but keep for admins */
