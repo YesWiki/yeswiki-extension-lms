@@ -71,16 +71,29 @@ h1.activity-title:after {
   display: none;
 }
 
-/* the lms container takes the full width, and adds minimum padding left and right*/
+/* the lms container takes the full width, and adds minimum padding left and right */
 .lms-container {
-  width: 100% !important;
+  width: 100vw !important;
   position: relative;
   left: 50%;
   right: 50%;
-  margin-left: -50%;
-  margin-right: -50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   padding: 0 1em;
 }
+
+/* specific rendering when a user preview a lms in a modal */
+/* for width */
+#YesWikiModal .lms-container {
+  width: 100% !important;
+  margin-left: -50%;
+  margin-right: -50%;
+}
+/* to hide the navigation menu */
+#YesWikiModal .lms-container .lms-menu {
+  display: none;
+}
+
 /* remove the info bar below the entry, but keep for admins */
 .lms-container ~ .BAZ_fiche_info {
   display: none;
