@@ -38,8 +38,10 @@ texte***bf_duree***Durée estimée de l\'activité en minutes*** *** *** *** ***
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
 textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
-navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
+liste***ListeOuinonLms***Activer les commentaires ?*** *** ***oui***bf_commentaires*** ***0*** *** *** * *** * *** *** ***
+liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** ***
 reactions***reactions*** *** *** *** *** *** *** *** ***
+navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
 !defined('MODULE_FORM_NOM') && define('MODULE_FORM_NOM', 'Module LMS');
@@ -58,6 +60,7 @@ acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 !defined('PARCOURS_FORM_DESCRIPTION') && define('PARCOURS_FORM_DESCRIPTION',
     'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne');
 !defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
+textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module, un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si désactivé, les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***

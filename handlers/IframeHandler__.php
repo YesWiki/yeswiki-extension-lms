@@ -12,8 +12,9 @@ class IframeHandler__ extends YesWikiHandler
             $output = $this->output;
 
             $pageBody = $this->wiki->page['body'];
-//
-//            'body class="yeswiki-iframe-body"';
+
+            // WIP for ListOuinonLmsbf_commentaires and external comments
+            // need before to finish Iframe handler refactoring in the core
         }
     }
 }
