@@ -7,6 +7,8 @@
  * (by default 1202). If the module ID change, the installation must be performed again.
  */
 
+use YesWiki\Bazar\Field\BazarField;
+
 // fields which will be hidden (the names used to identified the fields are given)
 if (!defined('FIELDS_TO_HIDE')) {
     define('FIELDS_TO_HIDE', ['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . 'bf_activites', 'listeListeOuinonLmsbf_actif']);
@@ -32,10 +34,12 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
             $res = '';
             $formtemplate = [];
             for ($i = 0; $i < count($form['template']); ++$i) {
-                // if the field type is in the $INDEX_CHELOUS, the name used to identified the field is a concatenation of the index 0, 1 and 6
+                // if the field type is in the $INDEX_CHELOUS, the name used to identified the field is a concatenation
+                // of the index 0, 1 and 6
                 $INDEX_CHELOUS = ['radio', 'liste', 'checkbox', 'listefiche', 'checkboxfiche'];
 
-                // call the corresponding function to write the field if the field is not to hide and if the user have the read acls (index 11) on this field
+                // call the corresponding function to display the field if the field is not to hide and if the user have
+                // the read acls (index 11) on this field
                 if (isset($form['template'][$i][0])
                     && isset($form['template'][$i][1])
                     && ((!in_array($form['template'][$i][0], $INDEX_CHELOUS)
@@ -49,14 +53,16 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
                         || $GLOBALS['wiki']->CheckACL($form['template'][$i][11])
                     )
                 ) {
-                    if (function_exists($form['template'][$i][0])) {
-                        $field = $form['template'][$i][0](
-                            $formtemplate,
-                            $form['template'][$i],
-                            'html',
-                            $fiche);
-                        $res .= ($form['template'][$i][1] == 'bf_titre') ? str_replace('BAZ_fiche_titre',
-                            'activity-title', $field) : $field;
+                    if ($form['prepared'][$i] instanceof BazarField) {
+                        $res .= $form['prepared'][$i]->renderStatic($fiche);
+                    } else {
+                        if (function_exists($form['template'][$i][0])) {
+                            $res .= $form['template'][$i][0](
+                                        $formtemplate,
+                                        $form['template'][$i],
+                                        'html',
+                                        $fiche);
+                        }
                     }
                 }
             }

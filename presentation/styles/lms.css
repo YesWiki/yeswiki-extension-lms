@@ -2,29 +2,11 @@
   padding-top: 0;
 }
 
-/* Activity title styling */
-h1.activity-title {
-  display: flex;
-  align-items: center;
-  font-size: 2.5rem;
-  text-align: left;
-}
-
-h1.activity-title:after {
-  background-color: var(--primary-color);
-  content: "";
-  flex: 1;
-  height: 12px;
-  border-radius: 12px;
-  margin-left: 2rem;
-}
-
 .panel-menu-lms .list-group-item a,
 .panel-menu-lms .list-group-item a:visited,
 .panel-menu-lms .list-group-item a:active {
   color: inherit;
 }
-
 .pager-lms li.center {
   text-align: center;
   display: inline-block;
@@ -120,6 +102,7 @@ h1.activity-title:after {
 .bazar-list .lms-activity-content {
   width: 100%;
 }
+
 /* reactions */
 .reactions-flex {
   display: flex;
@@ -147,7 +130,6 @@ h1.activity-title:after {
   font-size: 1.1em;
   font-weight: bold;
 }
-
 .add-reaction {
   display: flex;
   align-items: center;
@@ -161,7 +143,6 @@ h1.activity-title:after {
   transition: all 200ms ease-in;
   box-shadow: none;
 }
-
 .add-reaction:hover {
   border: 1px solid rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
@@ -179,6 +160,10 @@ h1.activity-title:after {
 .user-reaction {
   border: 1px solid var(--primary-color);
 }
+
+/**
+ * Comments
+ ---------------------------*/
 .comments-list:before {
   content: "";
   width: 2px;
@@ -188,7 +173,6 @@ h1.activity-title:after {
   position: absolute;
   top: 0;
 }
-
 /* .comments-list:after {
 	content: '';
 	position: absolute;
@@ -202,7 +186,6 @@ h1.activity-title:after {
 	-moz-border-radius: 50%;
 	border-radius: 50%;
 } */
-
 .reply-list:before,
 .reply-list:after {
   display: none;
@@ -216,13 +199,11 @@ h1.activity-title:after {
   top: 19px;
   left: 1px;
 }
-
 .comments-list li {
   margin-bottom: 15px;
   display: block;
   position: relative;
 }
-
 .comments-list li:after {
   content: "";
   display: block;
@@ -230,15 +211,12 @@ h1.activity-title:after {
   height: 0;
   width: 0;
 }
-
 .reply-list {
   padding-left: 88px;
   clear: both;
   margin-top: 15px;
 }
-/**
- * Avatar
- ---------------------------*/
+/* avatar */
 .comments-list .comment-avatar {
   width: 45px;
   height: 45px;
@@ -254,17 +232,14 @@ h1.activity-title:after {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
-
 .comments-list .comment-avatar img {
   width: 100%;
   height: 100%;
 }
-
 .reply-list .comment-avatar {
   width: 30px;
   height: 30px;
 }
-
 .comment-main-level:after {
   content: "";
   width: 0;
@@ -272,16 +247,13 @@ h1.activity-title:after {
   display: block;
   clear: both;
 }
-/**
- * les cards commentaires
- ---------------------------*/
+/* comments - cards */
 .comments-list {
   margin-top: 30px;
   margin-left: 0;
   position: relative;
   padding: 0;
 }
-
 .comments-list .comment-box {
   width: calc(100% - 12px);
   float: right;
@@ -289,7 +261,6 @@ h1.activity-title:after {
   border: 2px solid var(--primary-color);
   border-radius: 5px;
 }
-
 .comments-list .comment-box:before,
 .comments-list .comment-box:after {
   content: "";
@@ -303,13 +274,11 @@ h1.activity-title:after {
   border-color: transparent var(--primary-color);
   left: -12px;
 }
-
 .comments-list .comment-box:before {
   border-width: 11px 13px 11px 0;
   border-color: transparent rgba(0, 0, 0, 0.05);
   left: -13px;
 }
-
 .reply-list .comment-box {
   width: calc(100% - 40px);
 }
@@ -322,7 +291,6 @@ h1.activity-title:after {
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
 }
-
 .comment-box .comment-head i {
   float: right;
   margin-left: 14px;
@@ -334,11 +302,9 @@ h1.activity-title:after {
   -o-transition: color 0.3s ease;
   transition: color 0.3s ease;
 }
-
 .comment-box .comment-head i:hover {
   color: #03658c;
 }
-
 .comment-box .comment-name {
   color: #283035;
   font-size: 14px;
@@ -346,11 +312,9 @@ h1.activity-title:after {
   float: left;
   margin-right: 10px;
 }
-
 .comment-box .comment-name a {
   color: #283035;
 }
-
 .comment-box .comment-head span {
   float: left;
   color: #999;
@@ -358,7 +322,6 @@ h1.activity-title:after {
   position: relative;
   top: 5px;
 }
-
 .comment-box .comment-content {
   background: #fff;
   padding: 12px;
@@ -368,6 +331,8 @@ h1.activity-title:after {
   -moz-border-radius: 0 0 4px 4px;
   border-radius: 0 0 4px 4px;
 }
+
+/* parcours display */
 .module-list {
   margin: 1em 0;
 }
@@ -422,13 +387,11 @@ h1.activity-title:after {
 .activities-action .btn-xs {
   font-size: 0.8em;
 }
-
 /* todo : only available for margot theme */
 .panel-title a:hover {
   color: #fffd;
   text-decoration: none;
 }
-
 .list-group-item.active,
 .list-group-item.active:focus,
 .list-group-item.active:hover {

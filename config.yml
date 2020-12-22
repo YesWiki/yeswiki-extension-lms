@@ -1,10 +1,11 @@
 parameters:
   lms_config:
     use_tabs: true
-    display_activity_title: false
+    # if true, the activity title is automatically added at the begin of the entry page
+    display_activity_title: true
+    # if you change activitie_form_id, module_form_id or parcours_form_id, you have also to rename the corresponding
+    # bazar template : tools/lms/templates/bazar/fiche-XXXX.tpl.html
     activite_form_id: 1201
     module_form_id: 1202
     parcours_form_id: 1203
-    # if you change activitie_form_id, module_form_id or parcours_form_id, you have also to rename the corresponding
-    # bazar template : tools/lms/templates/bazar/fiche-XXXX.tpl.html
     use_yeswiki_comments: false
