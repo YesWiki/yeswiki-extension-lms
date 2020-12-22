@@ -1,5 +1,5 @@
 <?php
-use YesWiki\Bazar\Service\FicheManager;
+use YesWiki\Bazar\Service\EntryManager;
 
 /**
  * menuparcours : action which displays the menu of a specific course (parcours)
@@ -20,7 +20,7 @@ require_once LMS_PATH . 'libs/lms.lib.php';
 // js lib
 $this->AddJavascriptFile('tools/bazar/libs/bazar.js');
 
-$ficheManager = $this->services->get(FicheManager::class);
+$entryManager = $this->services->get(EntryManager::class);
 
 //$user = $this->GetUser();
 // the action only works if a user is logged in
@@ -48,10 +48,10 @@ $ficheManager = $this->services->get(FicheManager::class);
         if (empty($moduleDebutTag)) {
             $moduleDebutTag = reset($allModules);
         }
-        $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : $ficheManager->getOne($moduleDebutTag);
+        $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : $entryManager->getOne($moduleDebutTag);
         if (!$moduleDebutEntry || $moduleDebutEntry['id_typeannonce'] != $this->config['lms_config']['module_form_id']) {
             $moduleDebutTag = reset($allModules);
-            $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : $ficheManager->getOne($moduleDebutTag);
+            $moduleDebutEntry = ($moduleDebutTag == $currentModule['id_fiche']) ? $currentModule : $entryManager->getOne($moduleDebutTag);
         }
 
         // last module to display
@@ -61,10 +61,10 @@ $ficheManager = $this->services->get(FicheManager::class);
         if (empty($moduleFinTag)) {
             $moduleFinTag = end($allModules);
         }
-        $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : $ficheManager->getOne($moduleFinTag);
+        $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : $entryManager->getOne($moduleFinTag);
         if (!$moduleFinEntry || $moduleFinEntry['id_typeannonce'] != $this->config['lms_config']['module_form_id']) {
             $moduleFinTag = $moduleFinTag = end($allModules);
-            $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : $ficheManager->getOne($moduleFinTag);
+            $moduleFinEntry = ($moduleFinTag == $currentModule['id_fiche']) ? $currentModule : $entryManager->getOne($moduleFinTag);
         }
 
         // set the subarray of modules between moduledebut and modulefin
@@ -77,7 +77,7 @@ $ficheManager = $this->services->get(FicheManager::class);
             else if ($i == $moduleFinInd)
                 $modulesDisplayed[] = $moduleFinEntry;
             else
-                $modulesDisplayed[] = $ficheManager->getOne($allModules[$i]);
+                $modulesDisplayed[] = $entryManager->getOne($allModules[$i]);
         }
 
         // find the menu template

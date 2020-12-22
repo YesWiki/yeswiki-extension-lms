@@ -7,7 +7,7 @@ namespace YesWiki;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use YesWiki\Bazar\Service\FicheManager;
+use YesWiki\Bazar\Service\EntryManager;
 
 class LmsModule
 {
@@ -28,7 +28,7 @@ class LmsModule
     public function __construct($moduleId, $wiki)
     {
         $this->wiki = $wiki;
-        $this->entryManager =  $this->wiki->services->get(FicheManager::class);
+        $this->entryManager =  $this->wiki->services->get(EntryManager::class);
         $this->fields = $this->loadFields($moduleId);
     }
 
