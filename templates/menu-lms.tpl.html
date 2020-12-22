@@ -1,5 +1,5 @@
 <?php
-use YesWiki\Bazar\Service\FicheManager;
+use YesWiki\Bazar\Service\EntryManager;
 
 // if an handler is after the page tag in the wiki parameter variable, get only the tag
 $currentPage =  isset($_GET['wiki']) ?
@@ -36,7 +36,7 @@ $currentModuleInModules = !empty(array_filter(
               <ul class="list-group">
                   <?php
                   foreach (explode(',', $module["checkboxfiche" . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . 'bf_activites']) as $activiteTag) {
-                      $activite = $GLOBALS['wiki']->services->get(FicheManager::class)->getOne($activiteTag);
+                      $activite = $GLOBALS['wiki']->services->get(EntryManager::class)->getOne($activiteTag);
                       if ($activite && $activite['id_typeannonce'] == $GLOBALS['wiki']->config['lms_config']['activite_form_id']) {
                           echo '<li class="list-group-item' . (($currentPage == $activite['id_fiche']) ? ' active' : '') . '">';
                           echo '<a href="' . $GLOBALS['wiki']->href('', $activite['id_fiche']) . '&parcours=' . $parcoursTag . '&module=' . $module['id_fiche'] . '">' . $activite["bf_titre"] . '</a>';
