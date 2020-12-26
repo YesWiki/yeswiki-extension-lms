@@ -19,13 +19,20 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
+// save the parcours and module GET parameter
+$savedParameters = (!empty($_GET['parcours']) ? 'parcours=' . $_GET['parcours'] : '')
+    . (!empty($_GET['parcours']) & !empty($_GET['module']) ? '&' : '')
+    . (!empty($_GET['module']) ? 'module=' . $_GET['module'] : '');
+
 if (!endsWith($this->GetPageTag(), RESULT_SUFFIX)){
     $exercise = $this->GetPageTag();
-    $results = $this->GetPageTag() . RESULT_SUFFIX;
+    $results = $this->GetPageTag() . RESULT_SUFFIX ;
 } else {
     $exercise = preg_replace('/' . RESULT_SUFFIX . '$/', '', $this->GetPageTag());
     $results = $this->GetPageTag();
 }
+$exercise .= (!empty($savedParameters)) ? '?' . $savedParameters : '';
+$results .= (!empty($savedParameters)) ? '?' . $savedParameters : '';
 
 $nav = '{{nav id="ongletsexo" links="' . $exercise . ',' . $results . '" titles="' . ADD_ENTRY_TEXT . ',' . SEE_RESULTS_TEXT .
     '" icons="edit,bars" class="nav nav-tabs"}}';
