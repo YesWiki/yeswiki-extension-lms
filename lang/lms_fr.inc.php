@@ -12,7 +12,7 @@
 $GLOBALS['translations'] = array_merge(
     $GLOBALS['translations'],
     array(
-        'LMS_MENUPARCOURS_ERROR' => 'Erreur détectée dans l\'action menuparcours du module LMS : ',
+        'LMS_COURSEMENU_ERROR' => 'Erreur détectée dans l\'action {{coursemenu ...}} du module LMS : ',
         'LMS_MODULE_NOACCESS' => 'Vous n\'avez pas accès pour l\'instant à ce module',
         'LMS_MODULE_NOACCESS_ADMIN' => 'Les apprenants n\'ont pas accès à ce module',
         'LMS_MODULE_PREVIOUS' => 'Module précédent',

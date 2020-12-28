@@ -2,9 +2,9 @@
 
 namespace YesWiki;
 
-class LmsLearner
+class Learner
 {
-    protected $wiki = ''; // give access to the main wiki object
+    protected $wiki; // give access to the main wiki object
 
     public function __construct($wiki)
     {
@@ -18,4 +18,10 @@ class LmsLearner
             return $user;
         }
     }
+
+    // saved from Module
+    /*public function getNextActivity($user)
+    {
+        return !empty($this->getActivities()) ? $this->getActivities()[0] : false;
+    }*/
 }

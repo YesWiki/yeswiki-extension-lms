@@ -52,7 +52,7 @@ textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** 
 image***bf_image***Image***300***300***600***600***left***0*** ***
 jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
 liste***ListeOuinonLms***Activé*** *** ***oui***bf_actif*** ***0*** *** *** *** *** *** ***
-checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . '***Activités*** *** *** ***bf_activites***dragndrop***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
+checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . '***Activités*** *** *** ***bf_activites***dragndrop***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
@@ -117,13 +117,13 @@ if ($this->UserIsAdmin()) {
     }
 
     // test if the activite form exists, if not, install it
-    checkAndAddForm($output, $GLOBALS['wiki']->config['lms_config']['activite_form_id'], ACTIVITE_FORM_NOM,
+    checkAndAddForm($output, $GLOBALS['wiki']->config['lms_config']['activity_form_id'], ACTIVITE_FORM_NOM,
         ACTIVITE_FORM_DESCRIPTION, ACTIVITE_FORM_TEMPLATE);
     // test if the module form exists, if not, install it
     checkAndAddForm($output, $GLOBALS['wiki']->config['lms_config']['module_form_id'], MODULE_FORM_NOM,
         MODULE_FORM_DESCRIPTION, MODULE_FORM_TEMPLATE);
-    // test if the parcours form exists, if not, install it
-    checkAndAddForm($output, $GLOBALS['wiki']->config['lms_config']['parcours_form_id'], PARCOURS_FORM_NOM,
+    // test if the course form exists, if not, install it
+    checkAndAddForm($output, $GLOBALS['wiki']->config['lms_config']['course_form_id'], PARCOURS_FORM_NOM,
         PARCOURS_FORM_DESCRIPTION, PARCOURS_FORM_TEMPLATE);
 
     // if the PageMenuLms page doesn't exist, create it with a default version
@@ -133,7 +133,7 @@ if ($this->UserIsAdmin()) {
             '""<div><span>""{{button link="config/root_page" nobtn="1" icon="fas fa-home"}}""'
             . '</span><span style="float: right;">""'
             . '{{button link="UserEntries" nobtn="1" text="Accès à mes fiches" icon="far fa-clone"></i>"}}""</span></div>""'
-            . "\n\n" . '{{menuparcours}}');
+            . "\n\n" . '{{coursemenu}}');
         $output .= '✅ Done !<br />';
     } else {
         $output .= '✅ The <em>PageMenuLms</em> page already exists.<br />';

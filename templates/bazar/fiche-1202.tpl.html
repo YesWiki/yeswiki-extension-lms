@@ -11,7 +11,7 @@ use YesWiki\Bazar\Field\BazarField;
 
 // fields which will be hidden (the names used to identified the fields are given)
 if (!defined('FIELDS_TO_HIDE')) {
-    define('FIELDS_TO_HIDE', ['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activite_form_id'] . 'bf_activites', 'listeListeOuinonLmsbf_actif']);
+    define('FIELDS_TO_HIDE', ['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . 'bf_activites', 'listeListeOuinonLmsbf_actif']);
 }
 
 // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax

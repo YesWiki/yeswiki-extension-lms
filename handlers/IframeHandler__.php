@@ -1,17 +1,20 @@
 <?php
+
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiHandler;
-use YesWiki\Bazar\Service\FicheManager;
 
 class IframeHandler__ extends YesWikiHandler
 {
     function run()
     {
-        $ficheManager = $this->wiki->services->get(FicheManager::class);
+        $entryManager = $this->wiki->services->get(EntryManager::class);
 
-        if ($ficheManager->isFiche($this->wiki->GetPageTag())) {
+        if ($entryManager->isEntry($this->wiki->GetPageTag())) {
             $output = $this->output;
 
             $pageBody = $this->wiki->page['body'];
+
+            // 'body class="yeswiki-iframe-body"';
 
             // WIP for ListOuinonLmsbf_commentaires and external comments
             // need before to finish Iframe handler refactoring in the core
