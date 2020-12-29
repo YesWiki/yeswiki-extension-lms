@@ -22,7 +22,7 @@ class CourseMenuAction extends YesWikiAction
         $class = !empty($this->arguments['class']) ? $this->arguments['class'] : null;
 
         // display the menu only if a contextual course is found
-        if ($course) {
+        if ($course && $module) {
             // first module to display
             // if not defined, or the one defined doesn't exist or isn't a module entry, the first module is by default
             // the first of the course

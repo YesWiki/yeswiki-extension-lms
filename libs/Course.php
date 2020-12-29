@@ -103,7 +103,7 @@ class Course
     public function hasModule($moduleTag): bool
     {
         foreach ($this->getModules() as $module) {
-            if ($module->getActivityTag() == $moduleTag) {
+            if ($module->getTag() == $moduleTag) {
                 return true;
             }
         }
