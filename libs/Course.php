@@ -4,74 +4,13 @@ namespace YesWiki\Lms;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Lms\LmsObject;
 use YesWiki\Wiki;
 
-class Course
+class Course extends LmsObject
 {
-    // the course tag
-    protected $tag;
-
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
-    protected $fields; // entry fields of the course
     protected $modules; // modules of the course
-
-    // the configuration parameters of YesWiki
-    protected $config;
-    // manager used to get course entries
-    protected $entryManager;
-
-    /**
-     * Activity constructor
-     * @param ParameterBagInterface $config the configuration parameters of YesWiki
-     * @param EntryManager $entryManager the manager used to get course entries
-     * @param string $courseTag the course tag
-     * @param array|null $courseFields the course fields if needed to populate directly the object
-     */
-    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, string $courseTag, array $courseFields = null)
-    {
-        $this->tag = $courseTag;
-
-        if ($courseFields !== null) {
-            $this->fields = $courseFields;
-        }
-
-        $this->config = $config;
-        $this->entryManager = $entryManager;
-    }
-
-    /**
-     * Get the course tag
-     * @return string the course tag
-     */
-    public function getTag(): string
-    {
-        return $this->tag;
-    }
-
-    /**
-     * get the entry fields of the activity
-     *
-     * @return array the activity fields
-     */
-    public function getFields()
-    {
-        // lazy loading
-        if (is_null($this->fields)) {
-            $this->fields = $this->entryManager->getOne($this->getTag());
-        }
-        return $this->fields;
-    }
-
-    /**
-     * Get a specific field of the activity
-     * this is shortcut for ->getFields()[key]
-     *
-     * @return the field
-     */
-    public function getField(string $key)
-    {
-        return key_exists($key, $this->getFields()) ? $this->getFields()[$key] : null;
-    }
 
     /**
      * Get the modules of the course

@@ -1,14 +1,30 @@
 <?php
 
-namespace YesWiki;
+namespace YesWiki\lms;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class Learner
 {
-    protected $wiki; // give access to the main wiki object
+    // the configuration parameters of YesWiki
+    protected $config;
+    // userName of the Learner
+    protected $userName ;
 
-    public function __construct($wiki)
+    
+    /**
+     * Module constructor
+     * @param ParameterBagInterface $config the configuration parameters of YesWiki
+     * @param string $userName the name of the learner
+     */
+    public function __construct(ParameterBagInterface $config, string $userName)
     {
-        $this->wiki = $wiki;
+        $this->config = $config;
+        $this->userName = $userName;
+    }
+
+    public function getName()
+    {
+        return $this->userName ;
     }
 
     public function getProgress($user) {

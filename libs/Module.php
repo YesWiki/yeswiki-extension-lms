@@ -8,75 +8,16 @@ namespace YesWiki\Lms;
 use Carbon\Carbon;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Lms\LmsObject;
 use YesWiki\Wiki;
 
-class Module
+class Module extends LmsObject
 {
-    // the module tag
-    protected $tag;
 
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
-    protected $fields; // entry fields of the module
     protected $activities; // activities of the module
     protected $duration; // time in hour necessary for completing the module
     protected $status; // can be open | to_be_open | closed | not_accessible | unknown
-
-    // the configuration parameters of YesWiki
-    protected $config;
-    // manager used to get module entries
-    protected $entryManager;
-
-    /**
-     * Module constructor
-     * @param ParameterBagInterface $config the configuration parameters of YesWiki
-     * @param EntryManager $entryManager the manager used to get module entries
-     * @param string $moduleTag the module tag
-     * @param array|null $moduleFields the module fields if needed to populate directly the object
-     */
-    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, string $moduleTag, array $moduleFields = null)
-    {
-        $this->tag = $moduleTag;
-
-        if ($moduleFields !== null) {
-            $this->fields = $moduleFields;
-        }
-
-        $this->config = $config;
-        $this->entryManager = $entryManager;
-    }
-
-    /**
-     * get the module tag
-     * @return string the module tag
-     */
-    public function getTag(): string
-    {
-        return $this->tag;
-    }
-
-    /**
-     * get the entry fields of the module
-     * @return array|null the module fields
-     */
-    public function getFields(): ?array
-    {
-        // lazy loading
-        if (is_null($this->fields)) {
-            $this->fields = $this->entryManager->getOne($this->getTag());
-        }
-        return $this->fields;
-    }
-
-    /**
-     * get a specific field of the module
-     * this is shortcut for ->getFields()[key]
-     *
-     * @return mixed the field
-     */
-    public function getField(string $key)
-    {
-        return key_exists($key, $this->getFields()) ? $this->getFields()[$key] : null;
-    }
 
     /**
      * get the activities of the module
@@ -92,7 +33,7 @@ class Module
                 [] :
                 array_map(
                     function ($activityTag) {
-                        return new Activity($this->entryManager, $activityTag);
+                        return new Activity($this->config,$this->entryManager, $activityTag);
                     },
                     explode(',', $this->getField($activitiesTagsId))
                 );
