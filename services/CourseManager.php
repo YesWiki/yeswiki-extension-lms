@@ -5,24 +5,35 @@ namespace YesWiki\Lms\Service;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiService;
+use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
+use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
 
 class CourseManager
 {
     protected $config;
     protected $entryManager;
+    protected $userManager;
+    protected $activityFormId;
+    protected $moduleFormId;
+    protected $courseFormId;
 
     /**
      * CourseManager constructor
      * @param ParameterBagInterface $config the injected configuration instance
      * @param EntryManager $entryManager the injected EntryManager instance
+     * @param UserManager $userManager the injected UserManager instance
      */
-    public function __construct(ParameterBagInterface $config, EntryManager $entryManager)
+    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, UserManager $userManager)
     {
         $this->config = $config;
         $this->entryManager = $entryManager;
+        $this->userManager = $userManager;
+        $this->activityFormId = $this->config->get('lms_config')['activity_form_id'];
+        $this->moduleFormId = $this->config->get('lms_config')['module_form_id'];
+        $this->courseFormId = $this->config->get('lms_config')['course_form_id'];
     }
 
     /**
@@ -34,7 +45,7 @@ class CourseManager
     public function getActivity(string $entryTag, array $activityFields = null): ?Activity
     {
         $activityEntry = $this->entryManager->getOne($entryTag);
-        if ($activityEntry && intval($activityEntry['id_typeannonce']) == $this->config->get('lms_config')['activity_form_id']) {
+        if ($activityEntry && intval($activityEntry['id_typeannonce']) == $this->activityFormId) {
             return new Course($this->config, $this->entryManager, $activityEntry['id_fiche'], $activityEntry);
         } else {
             return null;
@@ -50,7 +61,7 @@ class CourseManager
     public function getModule(string $entryTag, array $moduleFields = null): ?Module
     {
         $moduleEntry = $this->entryManager->getOne($entryTag);
-        if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $this->config->get('lms_config')['module_form_id']) {
+        if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $this->moduleFormId) {
             return new Module($this->config, $this->entryManager, $moduleEntry['id_fiche'], $moduleEntry);
         } else {
             return null;
@@ -66,7 +77,7 @@ class CourseManager
     public function getCourse(string $entryTag, array $courseFields = null): ?Course
     {
         $courseEntry = $this->entryManager->getOne($entryTag);
-        if ($courseEntry && intval($courseEntry['id_typeannonce']) == $this->config->get('lms_config')['course_form_id']) {
+        if ($courseEntry && intval($courseEntry['id_typeannonce']) == $this->courseFormId) {
             return new Course($this->config, $this->entryManager, $courseEntry['id_fiche'], $courseEntry);
         } else {
             return null;
@@ -79,7 +90,7 @@ class CourseManager
      */
     public function getAllCourses(): array
     {
-        $entries = $this->entryManager->search(['formsIds' => [$this->config->get('lms_config')['course_form_id']]]);
+        $entries = $this->entryManager->search(['formsIds' => [$this->courseFormId]]);
 
         return empty($entries) ?
             [] :
@@ -89,5 +100,28 @@ class CourseManager
                 },
                 $entries
             );
+    }
+
+    /**
+     * Load a Learner from 'username' or connected user.
+     * if empty('username') gives the current logged user
+     * if not existing username or nto logged : return null
+     *
+     * @param string $username the username for a specific learner
+     * @return Learner|null the Learner or null if not connected or not existing
+     */
+    public function getLearner(string $username = ''): ?Learner
+    {
+        if (empty($username)) {
+            $user = $this->userManager->getLoggedUser() ;
+            if ($user === '') {
+                // not connected
+                return null ;
+            } else {
+                return new Learner($this->config,$user['name']) ;
+            }
+        } else {
+            return new Learner($this->config,$username) ;
+        }
     }
 }
