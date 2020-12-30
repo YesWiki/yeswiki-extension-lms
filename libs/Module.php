@@ -8,10 +8,10 @@ namespace YesWiki\Lms;
 use Carbon\Carbon;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Lms\LmsObject;
+use YesWiki\Lms\LmsStructure;
 use YesWiki\Wiki;
 
-class Module extends LmsObject
+class Module extends LmsStructure
 {
 
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
@@ -33,7 +33,7 @@ class Module extends LmsObject
                 [] :
                 array_map(
                     function ($activityTag) {
-                        return new Activity($this->config,$this->entryManager, $activityTag);
+                        return new Activity($this->config, $this->entryManager, $activityTag);
                     },
                     explode(',', $this->getField($activitiesTagsId))
                 );

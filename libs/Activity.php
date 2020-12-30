@@ -2,9 +2,9 @@
 
 namespace YesWiki\Lms;
 
-use YesWiki\Lms\LmsObject;
+use YesWiki\Lms\LmsStructure;
 
-class Activity extends LmsObject
+class Activity extends LmsStructure
 {
     
 }

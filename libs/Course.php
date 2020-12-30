@@ -4,10 +4,10 @@ namespace YesWiki\Lms;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Lms\LmsObject;
+use YesWiki\Lms\LmsStructure;
 use YesWiki\Wiki;
 
-class Course extends LmsObject
+class Course extends LmsStructure
 {
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
     protected $modules; // modules of the course

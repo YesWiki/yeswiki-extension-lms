@@ -10,7 +10,6 @@ class Learner
     // userName of the Learner
     protected $userName ;
 
-    
     /**
      * Module constructor
      * @param ParameterBagInterface $config the configuration parameters of YesWiki
@@ -22,22 +21,17 @@ class Learner
         $this->userName = $userName;
     }
 
-    public function getName()
+    public function getUserName(): string
     {
-        return $this->userName ;
+        return $this->userName;
     }
 
-    public function getProgress($user) {
-        if (empty($user)) {
-            return false;
+    public function getProgress(): ?array
+    {
+        if (empty($userName)) {
+            return null;
         } else {
-            return $user;
+            return ['temp' => 'temporary return'];
         }
     }
-
-    // saved from Module
-    /*public function getNextActivity($user)
-    {
-        return !empty($this->getActivities()) ? $this->getActivities()[0] : false;
-    }*/
 }

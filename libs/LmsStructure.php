@@ -5,7 +5,7 @@ namespace YesWiki\Lms;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 
-abstract class LmsObject
+abstract class LmsStructure
 {
     // the object tag
     protected $tag;
@@ -19,7 +19,7 @@ abstract class LmsObject
     protected $entryManager;
 
     /**
-     * object constructor
+     * LmsStructure constructor
      * @param ParameterBagInterface $config the configuration parameters of YesWiki
      * @param EntryManager $entryManager the manager used to get object entries
      * @param string $objectTag the object tag
