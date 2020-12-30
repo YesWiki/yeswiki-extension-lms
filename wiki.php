@@ -18,7 +18,7 @@ if (!defined("WIKINI_VERSION")) {
 
 // Includes
 require_once LMS_PATH . 'libs/bazarlms.fonct.inc.php';
-require_once LMS_PATH . 'libs/LmsStructure.php';
+require_once LMS_PATH . 'libs/CourseStructure.php';
 require_once LMS_PATH . 'libs/Activity.php';
 require_once LMS_PATH . 'libs/Module.php';
 require_once LMS_PATH . 'libs/Course.php';

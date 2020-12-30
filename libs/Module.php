@@ -8,10 +8,10 @@ namespace YesWiki\Lms;
 use Carbon\Carbon;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Lms\LmsStructure;
+use YesWiki\Lms\CourseStructure;
 use YesWiki\Wiki;
 
-class Module extends LmsStructure
+class Module extends CourseStructure
 {
 
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
