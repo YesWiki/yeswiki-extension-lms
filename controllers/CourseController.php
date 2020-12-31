@@ -9,6 +9,7 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
+use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Wiki;
 
@@ -76,35 +77,35 @@ class CourseController extends YesWikiController
             strpos($_GET['wiki'], '/') ?
                 substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/'))
                 : $_GET['wiki']
-            : '';
+            : null;
 
-        $currentPageModuleTag = $currentPageTag;
-        if ($this->wiki->config['lms_config']['use_tabs']) {
-            // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
-            // to associate this tab page to its parent one, we remove the number from the page tag
-            $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
-        }
-        $moduleTag = isset($_GET['module']) ? $_GET['module'] : '';
-
-        if (!empty($moduleTag)) {
-            // if the module is specified in the GET parameter, return it if the tag corresponds
-            $module = $this->courseManager->getModule($moduleTag);
-
-            return ($module && $module->hasActivity($currentPageTag)) ?
-                $module
-                : null;
-        } else {
-
-            $currentModule = $this->courseManager->getModule($currentPageModuleTag);
-            if ($currentModule && $course->hasModule($currentPageModuleTag)) {
-                // if the current page refers to a module, return it
-                return $currentModule;
+        if (!empty($currentPageTag)) {
+            if ($this->wiki->config['lms_config']['use_tabs']) {
+                // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
+                // to associate this tab page to its parent one, we remove the number from the page tag
+                $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
             }
+            $moduleTag = isset($_GET['module']) ? $_GET['module'] : null;
 
-            // find in the course modules, the first module which contains the activity
-            foreach ($course->getModules() as $currentModule){
-                if ($currentModule->hasActivity($currentPageTag)){
+            if ($moduleTag) {
+                // if the module is specified in the GET parameter, return it if the tag corresponds
+                $module = $this->courseManager->getModule($moduleTag);
+
+                return ($module && $module->hasActivity($currentPageTag)) ?
+                    $module
+                    : null;
+            } else {
+                // if the current page refers to a module of the course, return it
+                $currentModule = $this->courseManager->getModule($currentPageTag);
+                if ($currentModule && $course->hasModule($currentPageTag)) {
                     return $currentModule;
+                }
+
+                // find in the course modules, the first module which contains the activity
+                foreach ($course->getModules() as $currentModule) {
+                    if ($currentModule->hasActivity($currentPageTag)) {
+                        return $currentModule;
+                    }
                 }
             }
         }
@@ -155,16 +156,23 @@ class CourseController extends YesWikiController
                 ['parcours' => $course->getTag(), 'module' => $module->getTag()]
             );
         }
-        $status = $module->getModuleStatus($course);
+        $status = $module->getStatus($course);
         $date = empty($module->getField('bf_date_ouverture')) ? '' : Carbon::parse($module->getField('bf_date_ouverture'));
         switch ($status) {
-            case 'unknown':
+            case ModuleStatus::UNKNOWN:
                 $active = _t('LMS_UNKNOWN_STATUS_MODULE');
                 break;
-            case 'closed':
+            case ModuleStatus::CLOSED:
                 $active = _t('LMS_CLOSED_MODULE');
                 break;
-            case 'open':
+            case ModuleStatus::TO_BE_OPEN:
+                $active = _t('LMS_MODULE_WILL_OPEN') . ' '
+                    . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans($date,
+                        CarbonInterface::DIFF_ABSOLUTE)
+                    . ' (' . str_replace(' 00:00', '',
+                        $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')) . ')';
+                break;
+            case ModuleStatus::OPEN:
                 $active = _t('LMS_OPEN_MODULE');
                 if (!empty($date)) {
                     $active .= ' ' . _t('LMS_SINCE')
@@ -174,14 +182,7 @@ class CourseController extends YesWikiController
                             $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')) . ')';
                 }
                 break;
-            case 'to_be_open':
-                $active = _t('LMS_MODULE_WILL_OPEN') . ' '
-                    . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans($date,
-                        CarbonInterface::DIFF_ABSOLUTE)
-                    . ' (' . str_replace(' 00:00', '',
-                        $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')) . ')';
-                break;
-            case 'not_accessible':
+            case ModuleStatus::NOT_ACCESSIBLE:
                 $active = _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }

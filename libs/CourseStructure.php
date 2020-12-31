@@ -25,7 +25,7 @@ abstract class CourseStructure
      * @param string $objectTag the object tag
      * @param array|null $objectFields the object fields if needed to populate directly the object
      */
-    public function __construct(ParameterBagInterface $config,EntryManager $entryManager, string $objectTag, array $objectFields = null)
+    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, string $objectTag, array $objectFields = null)
     {
         $this->tag = $objectTag;
 
@@ -47,7 +47,7 @@ abstract class CourseStructure
     }
 
     /**
-     * get the entry fields of the object
+     * Get the entry fields of the object
      *
      * @return array|null the object fields
      */
@@ -61,8 +61,8 @@ abstract class CourseStructure
     }
 
     /**
-     * get a specific field of the object
-     * this is shortcut for ->getFields()[key]
+     * Get a specific field of the object.
+     * This is shortcut for ->getFields()[key].
      *
      * @return mixed the field
      */

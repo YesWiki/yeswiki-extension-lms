@@ -11,13 +11,22 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\CourseStructure;
 use YesWiki\Wiki;
 
+class ModuleStatus
+{
+    const UNKNOWN = 0;
+    const CLOSED = 1;
+    const TO_BE_OPEN = 2;
+    const OPEN = 3;
+    const NOT_ACCESSIBLE = 4;
+}
+
 class Module extends CourseStructure
 {
 
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
     protected $activities; // activities of the module
     protected $duration; // time in hour necessary for completing the module
-    protected $status; // can be open | to_be_open | closed | not_accessible | unknown
+    protected $status; // see ModuleStatus constants for the different states
 
     /**
      * get the activities of the module
@@ -144,32 +153,33 @@ class Module extends CourseStructure
      * Admins may navigate throught closed modules.
      *
      * @param Course $course the course for which the status is calculated
-     * @return string status of this module in the related course
+     * @return int status of this module in the related course
+     * @see ModuleStatus for the different states of the return value
      */
-    public function getModuleStatus(Course $course): string
+    public function getStatus(Course $course): int
     {
         // lazy loading
         if (is_null($this->status)) {
             if (empty($course)) {
-                $this->status = 'unknown'; // if no course associated, we cannot check..
+                $this->status = ModuleStatus::UNKNOWN; // if no course associated, we cannot check..
             } else {
                 if ($this->getField('listeListeOuinonLmsbf_actif') == 'non') {
-                    $this->status = 'closed';
+                    $this->status = ModuleStatus::CLOSED;
                 } else {
                     $d = empty($this->getField('bf_date_ouverture')) ? '' : Carbon::parse($this->getField('bf_date_ouverture'));
                     if (!empty($d) && Carbon::now()->lte($d)) {
-                        $this->status = 'to_be_open';
+                        $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
                         if ($course->getField('listeListeOuinonLmsbf_scenarisation_modules') == 'non') {
-                            $this->status = 'open';
+                            $this->status = ModuleStatus::OPEN;
                         } else {
                             // TODO finish the scenarisation
                             // if it's the first module, it is open
                             if (!empty($course->getModules()) && $course->getModules()[0] == $this->getTag()) {
-                                $this->status = 'open';
+                                $this->status = ModuleStatus::OPEN;
                             } else {
                                 // todo : check user progress
-                                $this->status = 'not_accessible';
+                                $this->status = ModuleStatus::NOT_ACCESSIBLE;
                             }
                         }
                     }

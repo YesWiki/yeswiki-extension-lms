@@ -1,9 +1,12 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Activity;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
+use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Wiki;
 
 class CourseMenuAction extends YesWikiAction
 {
@@ -11,15 +14,14 @@ class CourseMenuAction extends YesWikiAction
     function run()
     {
         $courseController = $this->getService(CourseController::class);
+        $courseManager = $this->getService(CourseManager::class);
+        $config = $this->getService(ParameterBagInterface::class);
+        $wiki = $this->getService(Wiki::class);
 
         // the course to display
         $course = $courseController->getContextualCourse();
         // the consulted module to display the current activity
         $module = $courseController->getContextualModule($course);
-
-        // Read the action parameters
-        // css class for the action
-        $class = !empty($this->arguments['class']) ? $this->arguments['class'] : null;
 
         // display the menu only if a contextual course and module are found
         if ($course && $module) {
@@ -38,28 +40,50 @@ class CourseMenuAction extends YesWikiAction
 
             $modulesDisplayed = $course->getModulesBetween($moduleDebutTag, $moduleFinTag);
 
-            // find the menu template
-            $template = !empty($this->arguments['template']) ? $this->arguments['template'] : null;
-            if (empty($template) || !file_exists(LMS_PATH . '/templates/' . $template)) {
-                $template = "menu-lms.tpl.html";
-            }
+            // if an handler is after the page tag in the wiki parameter variable, get only the tag
+            $pageTag =  isset($_GET['wiki']) ?
+                strpos($_GET['wiki'], '/') ?
+                    substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/'))
+                    : $_GET['wiki']
+                : null;
 
-            // display the menu with the template
-            include_once 'includes/squelettephp.class.php';
-            try {
-                $squel = new SquelettePhp($template, 'lms');
-                $content = $squel->render(
-                    array(
+            if (!empty($pageTag)) {
+                // if the current page is an activity, get its menu reference tag
+                if ($activity = $courseManager->getActivity($pageTag)){
+                    $pageTag = $activity->getMenuReferenceTag();
+                }
+
+                // display the modules only if the current module is in the modules displayed
+                $currentModuleInModules = !empty(array_filter(
+                    $modulesDisplayed,
+                    function ($item) use ($module) {
+                        return $item->getTag() == $module->getTag();
+                    }
+                ));
+
+                if ($currentModuleInModules) {
+                    //  display only the activities for the modules opened (or all of them for admin users)
+                    /*foreach ($modulesDisplayed as $currentModule){
+                        if ($wiki->UserIsAdmin() || $currentModule->getField('listeListeOuinonLmsbf_actif') == 'oui'){
+
+                        }
+                    }
+                    $modulesDisplayed = array_filter(
+                        $modulesDisplayed,
+                        function ($item) use ($wiki) {
+                            return $wiki->UserIsAdmin() || $item->getField('listeListeOuinonLmsbf_actif') == 'oui';
+                        }
+                    );*/
+
+                    return $this->render('@lms/course-menu.twig',[
+                        "pageTag" => $pageTag,
                         "course" => $course,
-                        "currentModule" => $module,
+                        "module" => $module,
                         "modulesDisplayed" => $modulesDisplayed,
-                    )
-                );
-            } catch (Exception $e) {
-                $content = '<div class="alert alert-danger">' . _t('LMS_COURSEMENU_ERROR') . $e->getMessage() . '</div>' . "\n";
+                        "isAdmin" => $wiki->UserIsAdmin(),
+                    ]);
+                }
             }
-
-            return (!empty($class)) ? '<div class="' . $class . '">' . "\n" . $content . "\n" . '</div>' . "\n" : $content;
         }
     }
 }
