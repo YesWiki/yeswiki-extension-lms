@@ -64,14 +64,14 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
             // display the previous button
             if ($currentActivityTag == $module->getFirstActivityTag()) {
                 // if first activity of a module, the previous link is to the current module entry
-                $handler = ($course->isModuleScripted()) ? 'saveprogress' : '' ;
+                $handler = ''; //($course->isModuleScripted()) ? 'saveprogress' : '' ;
                 $output .= '<li class="previous"><a href="'
                     . $GLOBALS['wiki']->href($handler, $module->getTag(), ['parcours' => $course->getTag()])
                     . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                     . '><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
             } elseif ($previousActivity = $module->getPreviousActivity($currentActivityTag)) {
                 // otherwise, the previous link is to the previous activity
-                $handler = ($course->isActivityScripted()) ? 'saveprogress' : '' ;
+                $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
                 $output .= '<li class="previous"><a href="'
                     . $GLOBALS['wiki']->href(
                         $handler,
@@ -88,7 +88,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
                     // if the current page is the last activity of the module and the module is not the last one,
                     // the next link is to the next module entry
                     // (no next button is showed for the last activity of the last module)
-                    $handler = ($course->isModuleScripted()) ? 'saveprogress' : '' ;
+                    $handler = '';($course->isModuleScripted()) ? 'saveprogress' : '' ;
                     $output .= '<li class="next"><a href="'
                         . $GLOBALS['wiki']->href($handler, $nextModule->getTag(), ['parcours' => $course->getTag()])
                         . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
@@ -97,7 +97,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
             } else {
                 // otherwise, the current activity is not the last of the module and the next link is set to the next activity
                 if ($nextActivity = $module->getNextActivity($currentActivityTag)) {
-                    $handler = ($course->isActivityScripted()) ? 'saveprogress' : '' ;
+                    $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
                     $output .= '<li class="next"><a href="'
                         . $GLOBALS['wiki']->href(
                             $handler,
@@ -176,7 +176,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
         } else {
             // otherwise display the button 'Commencer'
             $firstActivityTag = $module->getFirstActivityTag();
-            $handler = ($course->isActivityScripted()) ? 'saveprogress' : '' ;
+            $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
             $output .= '<li class="center lms-begin"><a class="launch-module" href="'
                 . $GLOBALS['wiki']->href(
                     $handler,
@@ -207,7 +207,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
 function displayNextModuleButtons(string $currentModuleTag, Course $course, bool $moduleModal): string
 {
     $output = '';
-    $handler = ($course->isModuleScripted()) ? 'saveprogress' : '' ;
+    $handler = ''; //($course->isModuleScripted()) ? 'saveprogress' : '' ;
     // display the module next button
     if ($currentModuleTag != $course->getLastModuleTag()) {
         // if not the last module of the course, a link to the next module is displayed
