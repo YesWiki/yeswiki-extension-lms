@@ -170,7 +170,7 @@ class Module extends CourseStructure
                     if (!empty($d) && Carbon::now()->lte($d)) {
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
-                        if (!$course->isModulesScenario()) {
+                        if (!$course->isModuleScripted()) {
                             $this->status = 'open';
                         } else {
                             // TODO finish the scenarisation

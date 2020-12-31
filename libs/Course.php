@@ -131,19 +131,19 @@ class Course extends CourseStructure
     }
 
     /**
-     * Check if modules are in scenario
-     * @return boolean is Modules Scenario
+     * Check if modules are scripted
+     * @return boolean are Modules scripted ?
      */
-    public function isModulesScenario(): ?bool
+    public function isModuleScripted(): ?bool
     {
         return ($this->getField('listeListeOuinonLmsbf_scenarisation_modules') == 'oui');
     }
 
     /**
-     * Check if activities are in scenario
-     * @return boolean is activty Scenario
+     * Check if activities are scripted
+     * @return boolean are activties scripted ?
      */
-    public function isActivitiesScenario(): ?bool
+    public function isActivityScripted(): ?bool
     {
         return ($this->getField('listeListeOuinonLmsbf_scenarisation_activites') == 'oui');
     }

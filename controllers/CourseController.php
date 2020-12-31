@@ -142,7 +142,7 @@ class CourseController extends YesWikiController
         $course = $this->getContextualCourse();
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         $activityTag = $module->getFirstActivityTag();
-        if ($course->isModulesScenario()) {
+        if ($course->isModuleScripted()) {
             // TODO include saveprogress to the bazar template entry
             $link = $this->wiki->href(
                 'saveprogress',

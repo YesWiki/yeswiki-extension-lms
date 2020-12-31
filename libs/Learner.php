@@ -21,7 +21,7 @@ class Learner
      * Module constructor
      * @param ParameterBagInterface $config the configuration parameters of YesWiki
      * @param string $userName the name of the learner
-     * @param TripleStore $tripleStore the TrepleStore Service
+     * @param TripleStore $tripleStore the TripleStore Service
      */
     public function __construct(ParameterBagInterface $config, string $userName, TripleStore $tripleStore)
     {
