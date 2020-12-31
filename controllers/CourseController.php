@@ -42,7 +42,7 @@ class CourseController extends YesWikiController
      *
      * @return Course|null the course entry or null if not found
      */
-    function getContextualCourse(): ?Course
+    public function getContextualCourse(): ?Course
     {
         $courseTag = empty($_GET['parcours']) ? '' : $_GET['parcours'];
         if (!empty($courseTag)) {
@@ -70,7 +70,7 @@ class CourseController extends YesWikiController
      * @param $course Course the given course entry
      * @return Module|null the module entry or null if not found
      */
-    function getContextualModule(Course $course): ?Module
+    public function getContextualModule(Course $course): ?Module
     {
         // if an handler is after the page tag in the wiki parameter variable, get only the tag
         $currentPageTag =  isset($_GET['wiki']) ?
@@ -142,7 +142,7 @@ class CourseController extends YesWikiController
         $course = $this->getContextualCourse();
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         $activityTag = $module->getFirstActivityTag();
-        if ($course->getField('listeListeOuinonLmsbf_scenarisation_modules') == 'oui') {
+        if ($course->isModulesScenario()) {
             // TODO include saveprogress to the bazar template entry
             $link = $this->wiki->href(
                 'saveprogress',
@@ -176,10 +176,15 @@ class CourseController extends YesWikiController
                 $active = _t('LMS_OPEN_MODULE');
                 if (!empty($date)) {
                     $active .= ' ' . _t('LMS_SINCE')
-                        . ' ' . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans($date,
-                            CarbonInterface::DIFF_ABSOLUTE)
-                        . ' (' . str_replace(' 00:00', '',
-                            $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')) . ')';
+                        . ' ' . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans(
+                            $date,
+                            CarbonInterface::DIFF_ABSOLUTE
+                        )
+                        . ' (' . str_replace(
+                            ' 00:00',
+                            '',
+                            $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')
+                        ) . ')';
                 }
                 break;
             case ModuleStatus::NOT_ACCESSIBLE:
@@ -189,15 +194,21 @@ class CourseController extends YesWikiController
         $nbActivities = count($module->getActivities());
         $duration = $module->getDuration();
         $adminLinks = $this->wiki->UserIsAdmin() ?
-            '<a href="' . $this->wiki->href('edit',
-                $module->getTag()) . '" class="btn btn-default btn-xs"><i class="fa fa-pencil-alt"></i> ' . _t('BAZ_MODIFIER') . '</a>
-           <a href="' . $this->wiki->href('deletepage',
-                $module->getTag()) . '" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>' :
+            '<a href="' . $this->wiki->href(
+                'edit',
+                $module->getTag()
+            ) . '" class="btn btn-default btn-xs"><i class="fa fa-pencil-alt"></i> ' . _t('BAZ_MODIFIER') . '</a>
+           <a href="' . $this->wiki->href(
+                    'deletepage',
+                    $module->getTag()
+                ) . '" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>' :
             '';
         $labelActivity = _t('LMS_ACTIVITY') . (($nbActivities > 1) ? 's' : '');
         $labelTime = _t('LMS_TIME');
-        $classLink = !$this->wiki->UserIsAdmin() && in_array($status,
-            ['closed', 'to_be_open', 'not_accessible', 'unknown']) ? 'disabled' : ' ';
+        $classLink = !$this->wiki->UserIsAdmin() && in_array(
+            $status,
+            ['closed', 'to_be_open', 'not_accessible', 'unknown']
+        ) ? 'disabled' : ' ';
         $labelStart = _t('LMS_BEGIN');
         // TODO use twig template
         return "<div class=\"module-card status-$status\">
