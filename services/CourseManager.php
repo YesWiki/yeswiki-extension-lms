@@ -5,6 +5,7 @@ namespace YesWiki\Lms\Service;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiService;
+use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
@@ -19,6 +20,8 @@ class CourseManager
     protected $activityFormId;
     protected $moduleFormId;
     protected $courseFormId;
+    // TripleStore
+    protected TripleStore $tripleStore;
 
     /**
      * CourseManager constructor
@@ -26,7 +29,7 @@ class CourseManager
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param UserManager $userManager the injected UserManager instance
      */
-    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, UserManager $userManager)
+    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, UserManager $userManager, TripleStore $tripleStore)
     {
         $this->config = $config;
         $this->entryManager = $entryManager;
@@ -34,6 +37,7 @@ class CourseManager
         $this->activityFormId = $this->config->get('lms_config')['activity_form_id'];
         $this->moduleFormId = $this->config->get('lms_config')['module_form_id'];
         $this->courseFormId = $this->config->get('lms_config')['course_form_id'];
+        $this->tripleStore = $tripleStore;
     }
 
     /**
@@ -118,10 +122,10 @@ class CourseManager
                 // not connected
                 return null ;
             } else {
-                return new Learner($this->config, $user['name']) ;
+                return new Learner($this->config, $user['name'], $this->tripleStore) ;
             }
         } else {
-            return new Learner($this->config, $username) ;
+            return new Learner($this->config, $username, $this->tripleStore) ;
         }
     }
 }

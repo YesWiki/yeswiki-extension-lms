@@ -74,8 +74,8 @@ class Module extends CourseStructure
     public function getPreviousActivity($activityTag): ?Activity
     {
         $foundIndex = false;
-        foreach($this->getActivities() as $index => $activity){
-            if ($activity->getTag() == $activityTag){
+        foreach ($this->getActivities() as $index => $activity) {
+            if ($activity->getTag() == $activityTag) {
                 $foundIndex = $index;
             }
         }
@@ -93,8 +93,8 @@ class Module extends CourseStructure
     public function getNextActivity($activityTag): ?Activity
     {
         $foundIndex = false;
-        foreach($this->getActivities() as $index => $activity){
-            if ($activity->getTag() == $activityTag){
+        foreach ($this->getActivities() as $index => $activity) {
+            if ($activity->getTag() == $activityTag) {
                 $foundIndex = $index;
             }
         }
@@ -170,8 +170,8 @@ class Module extends CourseStructure
                     if (!empty($d) && Carbon::now()->lte($d)) {
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
-                        if ($course->getField('listeListeOuinonLmsbf_scenarisation_modules') == 'non') {
-                            $this->status = ModuleStatus::OPEN;
+                        if (!$course->isModuleScripted()) {
+                            $this->status = 'open';
                         } else {
                             // TODO finish the scenarisation
                             // if it's the first module, it is open

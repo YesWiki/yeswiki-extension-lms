@@ -58,8 +58,8 @@ class Course extends CourseStructure
     public function getPreviousModule($moduleTag): ?Module
     {
         $foundIndex = false;
-        foreach($this->getModules() as $index => $module){
-            if ($module->getTag() == $moduleTag){
+        foreach ($this->getModules() as $index => $module) {
+            if ($module->getTag() == $moduleTag) {
                 $foundIndex = $index;
             }
         }
@@ -77,8 +77,8 @@ class Course extends CourseStructure
     public function getNextModule($moduleTag): ?Module
     {
         $foundIndex = false;
-        foreach($this->getModules() as $index => $module){
-            if ($module->getTag() == $moduleTag){
+        foreach ($this->getModules() as $index => $module) {
+            if ($module->getTag() == $moduleTag) {
                 $foundIndex = $index;
             }
         }
@@ -116,16 +116,35 @@ class Course extends CourseStructure
      * @return array the subset array. If $fromModuleTag is not found, the array will be empty and if $toModuleTag is not
      * found, the last element will be the last module
      */
-    public function getModulesBetween(string $fromModuleTag, string $toModuleTag){
+    public function getModulesBetween(string $fromModuleTag, string $toModuleTag)
+    {
         $subset = [];
-        foreach ($this->getModules() as $module){
-            if ($module->getTag() == $fromModuleTag || !empty($subset)){
+        foreach ($this->getModules() as $module) {
+            if ($module->getTag() == $fromModuleTag || !empty($subset)) {
                 $subset[] = $module;
             }
-            if ($module->getTag() == $toModuleTag){
+            if ($module->getTag() == $toModuleTag) {
                 return $subset;
             }
         }
         return $subset;
+    }
+
+    /**
+     * Check if modules are scripted
+     * @return boolean are Modules scripted ?
+     */
+    public function isModuleScripted(): ?bool
+    {
+        return ($this->getField('listeListeOuinonLmsbf_scenarisation_modules') == 'oui');
+    }
+
+    /**
+     * Check if activities are scripted
+     * @return boolean are activties scripted ?
+     */
+    public function isActivityScripted(): ?bool
+    {
+        return ($this->getField('listeListeOuinonLmsbf_scenarisation_activites') == 'oui');
     }
 }
