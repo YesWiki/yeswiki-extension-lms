@@ -46,7 +46,7 @@ class CourseManager
     {
         $activityEntry = $this->entryManager->getOne($entryTag);
         if ($activityEntry && intval($activityEntry['id_typeannonce']) == $this->activityFormId) {
-            return new Course($this->config, $this->entryManager, $activityEntry['id_fiche'], $activityEntry);
+            return new Activity($this->config, $this->entryManager, $activityEntry['id_fiche'], $activityEntry);
         } else {
             return null;
         }
@@ -118,10 +118,10 @@ class CourseManager
                 // not connected
                 return null ;
             } else {
-                return new Learner($this->config,$user['name']) ;
+                return new Learner($this->config, $user['name']) ;
             }
         } else {
-            return new Learner($this->config,$username) ;
+            return new Learner($this->config, $username) ;
         }
     }
 }
