@@ -70,7 +70,7 @@ class CourseController extends YesWikiController
      * @param $course Course the given course entry
      * @return Module|null the module entry or null if not found
      */
-    public function getContextualModule(Course $course): ?Module
+    public function getContextualModule(?Course $course): ?Module
     {
         // if an handler is after the page tag in the wiki parameter variable, get only the tag
         $currentPageTag =  isset($_GET['wiki']) ?
@@ -102,9 +102,11 @@ class CourseController extends YesWikiController
                 }
 
                 // find in the course modules, the first module which contains the activity
-                foreach ($course->getModules() as $currentModule) {
-                    if ($currentModule->hasActivity($currentPageTag)) {
-                        return $currentModule;
+                if ($course) {
+                    foreach ($course->getModules() as $currentModule) {
+                        if ($currentModule->hasActivity($currentPageTag)) {
+                            return $currentModule;
+                        }
                     }
                 }
             }

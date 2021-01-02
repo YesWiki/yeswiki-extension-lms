@@ -56,7 +56,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
         // true if the module links are opened in a modal box
         $moduleModal = $tableau_template[2] == 'module_modal';
 
-        if ($currentActivityTag && $course && $module && !empty($module->getActivities())) {
+        if ($course && $module && !empty($module->getActivities())) {
             $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                     . '"' : '') . '>
             <ul class="pager pager-lms">';
@@ -149,50 +149,53 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
 
         // the consulted course entry
         $course = $courseController->getContextualCourse();
-
+        // the consulted module entry to display the current activity
         $module = $courseManager->getModule($currentModuleTag, $fiche);
 
-        $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
-                . '"' : '') . '> 
-            <ul class="pager pager-lms">';
-
-        // check the access to the module
-        if (empty($module->getActivities()) ||
-            (!empty($module->getField('listeListeOuinonLmsbf_actif')) && $module->getField('listeListeOuinonLmsbf_actif') == 'non')) {
-            if (!$GLOBALS['wiki']->userIsAdmin()) {
-                // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
-                $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
+        if ($course && $module) {
+            // check the access to the module
+            if (empty($module->getActivities()) ||
+                    (!empty($module->getField('listeListeOuinonLmsbf_actif'))
+                        && $module->getField('listeListeOuinonLmsbf_actif') == 'non')
+                ) {
+                $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
+                        . '"' : '') . '> 
+                <ul class="pager pager-lms">';
+                if (!$GLOBALS['wiki']->userIsAdmin()) {
+                    // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
+                    $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
+                } else {
+                    // for an admin, inform him and let a button to access to the first activity
+                    $output .= '<li class="noaccess"><div>' . _t('LMS_MODULE_NOACCESS_ADMIN') . '</div>'
+                        . '<div class="admin-access"><a href="'
+                        . $GLOBALS['wiki']->href(
+                            '',
+                            $module->getFirstActivityTag(),
+                            ['parcours' => $course->getTag(), 'module' => $currentModuleTag]
+                        )
+                        . '">' . _t('LMS_BEGIN_NOACCESS_ADMIN') . '</a></div></li>';
+                }
             } else {
-                // for an admin, inform him and let a button to access to the first activity
-                $output .= '<li class="noaccess"><div>' . _t('LMS_MODULE_NOACCESS_ADMIN') . '</div>'
-                    . '<div class="admin-access"><a href="'
+                // otherwise display the button 'Commencer'
+                $firstActivityTag = $module->getFirstActivityTag();
+                $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
+                $output .= '<li class="center lms-begin"><a class="launch-module" href="'
                     . $GLOBALS['wiki']->href(
-                        '',
+                        $handler,
                         $module->getFirstActivityTag(),
                         ['parcours' => $course->getTag(), 'module' => $currentModuleTag]
                     )
-                    . '">' . _t('LMS_BEGIN_NOACCESS_ADMIN') . '</a></div></li>';
+                    . '">' . _t('LMS_BEGIN') . '</a></li>';
             }
-        } else {
-            // otherwise display the button 'Commencer'
-            $firstActivityTag = $module->getFirstActivityTag();
-            $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
-            $output .= '<li class="center lms-begin"><a class="launch-module" href="'
-                . $GLOBALS['wiki']->href(
-                    $handler,
-                    $module->getFirstActivityTag(),
-                    ['parcours' => $course->getTag(), 'module' => $currentModuleTag]
-                )
-                . '">' . _t('LMS_BEGIN') . '</a></li>';
-        }
 
-        // we show the previous and next module's buttons only if it's in a modal
-        if ($moduleModal) {
-            $output .= displayNextModuleButtons($currentModuleTag, $course, $moduleModal);
-        }
+            // we show the previous and next module's buttons only if it's in a modal
+            if ($moduleModal) {
+                $output .= displayNextModuleButtons($currentModuleTag, $course, $moduleModal);
+            }
 
-        $output .= '</ul>
-            </nav>';
+            $output .= '</ul>
+                </nav>';
+        }
     }
     return $output;
 }
