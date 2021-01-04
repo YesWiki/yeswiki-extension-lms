@@ -30,4 +30,15 @@ class Activity extends CourseStructure
             preg_replace('/[0-9]*$/', '', $this->getTag())
             : $this->getTag();
     }
+
+    /**
+     * Get estimated duration
+     *
+     * @return string estimated duration in minutes
+     */
+    public function getEstimatedDuration() : string
+    {
+        $estimatedDuration = $this->getField('bf_duree') ;
+        return ($estimatedDuration) ? $estimatedDuration : '';
+    }
 }

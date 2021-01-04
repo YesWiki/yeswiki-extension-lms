@@ -56,12 +56,12 @@ class Learner
                 return json_decode($result_value, true);
             }, $results_values);
             // filter according course, module and activity
-            return array_filter($results_values, function ($value) use ($courseTag, $moduleTag, $activityTag) {
+            return array_values(array_filter($results_values, function ($value) use ($courseTag, $moduleTag, $activityTag) {
                 return ($value['course'] == $courseTag &&
                             $value['module'] == $moduleTag &&
                             $value['activity'] == $activityTag
                         );
-            });
+            }));
         }
         
         if (empty($userName)) {

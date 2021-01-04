@@ -1,0 +1,53 @@
+<h2>{{ _t('LMS_DASHBOARD') }}{{ userName }}</h2>
+
+<div class="table-responsive">
+  <table class="table table-striped table-condensed table-lms-dashboard">
+    <thead>
+      <tr>
+        <th scope="col" class="col-md-2">{{ _t('LMS_DASHBOARD_TYPE') }}</th>
+        <th scope="col" class="col-md-5">{{ _t('LMS_DASHBOARD_NAME') }}</th>
+        <th scope="col" class="col-md-1">{{ _t('LMS_DASHBOARD_PROGRESS') }}</th>
+        <th scope="col" class="col-md-2">{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}</th>
+        <th scope="col" class="col-md-2">{{ _t('LMS_DASHBOARD_LASTACTIVITY') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in courses %}
+        {{- _self.insertLine(course, 'LMS_DASHBOARD_COURSE', '','',loop.index,true) }}
+        {% for module in course.modules %}
+          {{ _self.insertLine(module, 'LMS_DASHBOARD_MODULE', 'fa-caret-right',' ',loop.index,true) }}
+          {% for activity in module.activities %}
+            {{ _self.insertLine(activity, 'LMS_ACTIVITY', 'fa-caret-right','  ',loop.index) }}
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{# {{ include_javascript('tools/templates/libs/vendor/datatables/jquery.dataTables.min.js') }} #}
+{{ include_javascript('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.js') }}
+{{ include_css('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.css') }}
+{{ include_css('tools/lms/presentation/styles/lmsLearnerDashBoard.css') }}
+
+{% macro insertLine(item,typeName,typeIcon,typeIconPrefix,itemIndex,link) %}
+  <tr>
+    <td><span>{{ typeIconPrefix }}</span>
+        {%- if typeIcon -%}
+          <i class="fas {{ typeIcon }}"> </i>
+        {%- endif -%}
+        {{- _t(typeName)  ~ ' ' ~ itemIndex -}}</td>
+    <td class="lms-learner-dash-board-name">
+    {% if link -%}
+    <a class="pull-right btn btn-default btn-xs view-page-item" title="{{ _t('LMS_DASHBOARD_GO_ITEM') ~ " " ~ item.name|e }}" 
+      href="{{ url({tag:item.id}) }}"><i class="fas fa-arrow-circle-right"></i></a>
+    <a class="pull-right btn btn-default btn-xs view-page-item modalbox" data-size="modal-lg" 
+      title="{{ _t('LMS_DASHBOARD_SEE_ITEM') ~ " " ~ item.name|e }}" 
+      href="{{ url({tag:item.id}) }}"><i class="fas fa-eye"></i></a>
+    {%- endif %}
+    <span>{{ item.name -}}</span></td>
+    <td>{{ item.progress }}</td>
+    <td>{{ item.elapsedTime }}</td>
+    <td>{{ item.lastActivity }}</td>
+  </tr>
+{% endmacro %}

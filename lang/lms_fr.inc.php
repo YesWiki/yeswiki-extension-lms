@@ -36,5 +36,20 @@ $GLOBALS['translations'] = array_merge(
         'RESERVED_FOR_ADMINS' => 'Informations pour les administrateurs',
         'LMS_ACTIVITY' => 'Activité',
         'LMS_TIME' => 'Temps estimé',
+        
+        // For User Dash Board
+        'LMS_DASHBOARD' => 'Tableau de bord de ',
+        'LMS_DASHBOARD_TYPE' => 'Type',
+        'LMS_DASHBOARD_NAME' => 'Nom',
+        'LMS_DASHBOARD_PROGRESS' => 'Avancement',
+        'LMS_DASHBOARD_ELAPSEDTIME' => 'Temps passé',
+        'LMS_DASHBOARD_LASTACTIVITY' => 'Dernière activité',
+        'LMS_DASHBOARD_COURSE' => 'Parcours',
+        'LMS_DASHBOARD_MODULE' => 'Module',
+        'LMS_DASHBOARD_SEE_ITEM' => 'Voir l\'&eacute;l&eacute;ment',
+        'LMS_DASHBOARD_GO_ITEM' => 'Se rendre vers l\'&eacute;l&eacute;ment',
+        'LMS_DASHBOARD_FINISHED' => 'Terminé',
+        'LMS_DASHBOARD_FINISHED_F' => 'Terminée',
+        'LMS_DASHBOARD_IN_COURSE' => 'En cours',
     )
 );
