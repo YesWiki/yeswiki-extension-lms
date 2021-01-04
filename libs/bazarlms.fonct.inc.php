@@ -390,7 +390,7 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
         }
         $output = '<hr /><div class="reactions-container"><h5>' . $msg . '</h5><div class="reactions-flex">' . $outputreactions . '</div>';
         if ($GLOBALS['wiki']->getUser()) {
-            $output .= '<em>Et n\'hésitez pas à faire un commentaire pour approndir la réflexion!</em>';
+            $output .= '<em>Et n\'hésitez pas à faire un commentaire pour approndir la réflexion !</em>';
         }
         $output .= '</div>' . "\n";
         return $output;
