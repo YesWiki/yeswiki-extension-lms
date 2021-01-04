@@ -162,7 +162,7 @@ class LearnerDashBoardAction extends YesWikiAction
         return $preparedActivities ;
     }
 
-    private function lastActivityTime(Array $progress): string
+    private function lastActivityTime(?Array $progress): string
     {
         if ($progress) {
             $lastTime = 0 ;
