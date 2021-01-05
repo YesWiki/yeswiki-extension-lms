@@ -21,7 +21,9 @@ class IframeHandler__ extends YesWikiHandler
             $activity = $courseManager->getActivity($this->wiki->GetPageTag());
 
             if ($activity && $activity->isCommentsEnabled()){
-                return str_replace('<body', '<body data-external-comments="1"', $this->output);
+                $this->output = str_replace('<body class="yeswiki-iframe-body"',
+                    '<body class="yeswiki-iframe-body" data-external-comments="1"',
+                    $this->output);
             }
         }
     }
