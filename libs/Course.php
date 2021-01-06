@@ -132,7 +132,7 @@ class Course extends CourseStructure
 
     /**
      * Check if modules are scripted
-     * @return boolean are Modules scripted ?
+     * @return boolean are modules scripted ?
      */
     public function isModuleScripted(): ?bool
     {

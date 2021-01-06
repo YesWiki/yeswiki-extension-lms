@@ -9,9 +9,13 @@
  * @link     https://yeswiki.net
  */
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\LearnerManager;
 
 /**
  * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
@@ -35,18 +39,21 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
     // load the lms lib
     require_once LMS_PATH . 'libs/lms.lib.php';
 
+    $config = $GLOBALS['wiki']->services->get(ParameterBagInterface::class);
     $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
+    $entryManager = $GLOBALS['wiki']->services->get(EntryManager::class);
+    $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 
     // the tag of the current activity page
-    $currentActivityTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
+    $currentActivityTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : null;
+
+    // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
+    $activity = new Activity($config, $entryManager, $currentActivityTag);
 
     $output = '';
     if ($mode == 'html' && $currentActivityTag) {
-        if ($GLOBALS['wiki']->config['lms_config']['use_tabs']) {
-            // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
-            // thus, to associate this tab page to its parent one, we remove the number from the page tag
-            $currentActivityTag = preg_replace('/[0-9]*$/', '', $currentActivityTag);
-        }
+        // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the parent tab activity
+        $activity = $courseController->getParentTabActivity($activity);
 
         // the consulted course entry
         $course = $courseController->getContextualCourse();
@@ -57,24 +64,25 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
         $moduleModal = $tableau_template[2] == 'module_modal';
 
         if ($course && $module && !empty($module->getActivities())) {
+            // save the activity progress if not already exists for this user and activity
+            $learnerManager->saveActivityProgress($course, $module, $activity);
+
             $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
                     . '"' : '') . '>
             <ul class="pager pager-lms">';
 
             // display the previous button
-            if ($currentActivityTag == $module->getFirstActivityTag()) {
+            if ($activity->getTag() == $module->getFirstActivityTag()) {
                 // if first activity of a module, the previous link is to the current module entry
-                $handler = ''; //($course->isModuleScripted()) ? 'saveprogress' : '' ;
                 $output .= '<li class="previous"><a href="'
-                    . $GLOBALS['wiki']->href($handler, $module->getTag(), ['parcours' => $course->getTag()])
+                    . $GLOBALS['wiki']->href('', $module->getTag(), ['parcours' => $course->getTag()])
                     . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                     . '><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
-            } elseif ($previousActivity = $module->getPreviousActivity($currentActivityTag)) {
+            } elseif ($previousActivity = $module->getPreviousActivity($activity->getTag())) {
                 // otherwise, the previous link is to the previous activity
-                $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
                 $output .= '<li class="previous"><a href="'
                     . $GLOBALS['wiki']->href(
-                        $handler,
+                        '',
                         $previousActivity->getTag(),
                         ['parcours' => $course->getTag(), 'module' => $module->getTag()]
                     )
@@ -82,25 +90,23 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
             }
 
             // display the next button
-            if ($currentActivityTag == $module->getLastActivityTag()) {
+            if ($activity->getTag() == $module->getLastActivityTag()) {
                 if ($module->getTag() != $course->getLastModuleTag()
                     && $nextModule = $course->getNextModule($module->getTag())) {
                     // if the current page is the last activity of the module and the module is not the last one,
                     // the next link is to the next module entry
                     // (no next button is showed for the last activity of the last module)
-                    $handler = '';($course->isModuleScripted()) ? 'saveprogress' : '' ;
                     $output .= '<li class="next"><a href="'
-                        . $GLOBALS['wiki']->href($handler, $nextModule->getTag(), ['parcours' => $course->getTag()])
+                        . $GLOBALS['wiki']->href('', $nextModule->getTag(), ['parcours' => $course->getTag()])
                         . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                         . '>' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
                 }
             } else {
                 // otherwise, the current activity is not the last of the module and the next link is set to the next activity
-                if ($nextActivity = $module->getNextActivity($currentActivityTag)) {
-                    $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
+                if ($nextActivity = $module->getNextActivity($activity->getTag())) {
                     $output .= '<li class="next"><a href="'
                         . $GLOBALS['wiki']->href(
-                            $handler,
+                            '',
                             $nextActivity->getTag(),
                             ['parcours' => $course->getTag(), 'module' => $module->getTag()]
                         )
@@ -133,6 +139,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
 {
     $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
     $courseManager = $GLOBALS['wiki']->services->get(CourseManager::class);
+    $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 
     // the tag of the current module page
     $currentModuleTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
@@ -144,8 +151,6 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
     if ($mode == 'html' && $currentModuleTag) {
         // load the lms lib
         require_once LMS_PATH . 'libs/lms.lib.php';
-        // add LMS extension css style
-        $GLOBALS['wiki']->AddCSSFile(LMS_PATH . 'presentation/styles/lms.css');
 
         // the consulted course entry
         $course = $courseController->getContextualCourse();
@@ -153,14 +158,15 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
         $module = $courseManager->getModule($currentModuleTag, $fiche);
 
         if ($course && $module) {
-            // check the access to the module
-            if (empty($module->getActivities()) ||
-                    (!empty($module->getField('listeListeOuinonLmsbf_actif'))
-                        && $module->getField('listeListeOuinonLmsbf_actif') == 'non')
-                ) {
-                $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
-                        . '"' : '') . '> 
+            // save the activity progress if not already exists for this user and activity
+            $learnerManager->saveModuleProgress($course, $module);
+
+            $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
+                    . '"' : '') . '> 
                 <ul class="pager pager-lms">';
+
+            // check the access to the module
+            if (empty($module->getActivities()) || !$module->isEnabled()){
                 if (!$GLOBALS['wiki']->userIsAdmin()) {
                     // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
                     $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
@@ -178,10 +184,9 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
             } else {
                 // otherwise display the button 'Commencer'
                 $firstActivityTag = $module->getFirstActivityTag();
-                $handler = ''; //($course->isActivityScripted()) ? 'saveprogress' : '' ;
                 $output .= '<li class="center lms-begin"><a class="launch-module" href="'
                     . $GLOBALS['wiki']->href(
-                        $handler,
+                        '',
                         $module->getFirstActivityTag(),
                         ['parcours' => $course->getTag(), 'module' => $currentModuleTag]
                     )
@@ -210,14 +215,13 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
 function displayNextModuleButtons(string $currentModuleTag, Course $course, bool $moduleModal): string
 {
     $output = '';
-    $handler = ''; //($course->isModuleScripted()) ? 'saveprogress' : '' ;
     // display the module next button
     if ($currentModuleTag != $course->getLastModuleTag()) {
         // if not the last module of the course, a link to the next module is displayed
         if ($nextModule = $course->getNextModule($currentModuleTag)) {
             $output .= '<li class="next square" title="' . _t('LMS_MODULE_NEXT')
                 . '"><a href="'
-                . $GLOBALS['wiki']->href($handler, $nextModule->getTag(), ['parcours' => $course->getTag()])
+                . $GLOBALS['wiki']->href('', $nextModule->getTag(), ['parcours' => $course->getTag()])
                 . '" "aria-label="' . _t('LMS_NEXT')
                 . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                 . '>' . '<i class="fa fa-caret-right" aria-hidden="true"></i></a></li>';
@@ -229,7 +233,7 @@ function displayNextModuleButtons(string $currentModuleTag, Course $course, bool
         if ($previousModule = $course->getPreviousModule($currentModuleTag)) {
             $output .= '<li class="next square" title="' . _t('LMS_MODULE_PREVIOUS')
                 . '"><a href="'
-                . $GLOBALS['wiki']->href($handler, $previousModule->getTag(), ['parcours' => $course->getTag()])
+                . $GLOBALS['wiki']->href('', $previousModule->getTag(), ['parcours' => $course->getTag()])
                 . '" "aria-label="' . _t('LMS_PREVIOUS')
                 . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                 . '><i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';
@@ -254,7 +258,6 @@ function displayNextModuleButtons(string $currentModuleTag, Course $course, bool
  */
 function boutonretour(&$formtemplate, $tableau_template, $mode, $fiche)
 {
-
     // the tag of the current entry
     $currentEntryTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
 
@@ -309,7 +312,7 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
         // $images = array_map('realpath', $images);
         $outputreactions = '';
         // get reactions numbers for templating later
-        $r = getAllReactions($fiche['id_fiche'], $ids, $GLOBALS['wiki']->getUserName());
+        $r = getAllReactions($fiche['id_fiche'], $ids, $GLOBALS['wiki']->getUsername());
 
         foreach ($ids as $k => $id) {
             if (empty($titles[$k])) { // if ids are default ones, we have some titles
@@ -374,10 +377,10 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
             if ($GLOBALS['wiki']->getUser()) {
                 $extraClass = (!empty($r['userReaction']) && $id == $r['userReaction']) ? ' user-reaction' : '';
                 $outputreactions .= '<a href="' . $GLOBALS['wiki']->href(
-                    'reaction',
-                    '',
-                    'id=' . $id
-                ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
+                        'reaction',
+                        '',
+                        'id=' . $id
+                    ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
             } else {
                 $outputreactions .= '<a href="#" onclick="return false;" title="Pour réagir, identifiez-vous!" class="disabled add-reaction">' . $reaction . '</a>';
             }

@@ -41,16 +41,18 @@ class CourseMenuAction extends YesWikiAction
             $modulesDisplayed = $course->getModulesBetween($moduleDebutTag, $moduleFinTag);
 
             // if an handler is after the page tag in the wiki parameter variable, get only the tag
-            $pageTag =  isset($_GET['wiki']) ?
+            $pageTag = isset($_GET['wiki']) ?
                 strpos($_GET['wiki'], '/') ?
                     substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/'))
                     : $_GET['wiki']
                 : null;
 
             if (!empty($pageTag)) {
-                // if the current page is an activity, get its menu reference tag
+                // if the current page is an activity, get its parent tab activity
                 if ($activity = $courseManager->getActivity($pageTag)){
-                    $pageTag = $activity->getMenuReferenceTag();
+                    // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the
+                    // parent tab activity
+                    $pageTag = $courseController->getParentTabActivity($activity);
                 }
 
                 // display the modules only if the current module is in the modules displayed

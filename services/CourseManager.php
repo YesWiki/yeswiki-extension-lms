@@ -20,8 +20,6 @@ class CourseManager
     protected $activityFormId;
     protected $moduleFormId;
     protected $courseFormId;
-    // TripleStore
-    protected TripleStore $tripleStore;
 
     /**
      * CourseManager constructor
@@ -37,7 +35,6 @@ class CourseManager
         $this->activityFormId = $this->config->get('lms_config')['activity_form_id'];
         $this->moduleFormId = $this->config->get('lms_config')['module_form_id'];
         $this->courseFormId = $this->config->get('lms_config')['course_form_id'];
-        $this->tripleStore = $tripleStore;
     }
 
     /**
@@ -104,28 +101,5 @@ class CourseManager
                 },
                 $entries
             );
-    }
-
-    /**
-     * Load a Learner from 'username' or connected user.
-     * if empty('username') gives the current logged user
-     * if not existing username or nto logged : return null
-     *
-     * @param string $username the username for a specific learner
-     * @return Learner|null the Learner or null if not connected or not existing
-     */
-    public function getLearner(string $username = ''): ?Learner
-    {
-        if (empty($username)) {
-            $user = $this->userManager->getLoggedUser() ;
-            if ($user === '') {
-                // not connected
-                return null ;
-            } else {
-                return new Learner($this->config, $user['name'], $this->tripleStore) ;
-            }
-        } else {
-            return new Learner($this->config, $username, $this->tripleStore) ;
-        }
     }
 }

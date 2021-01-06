@@ -188,4 +188,14 @@ class Module extends CourseStructure
         }
         return $this->status;
     }
+
+    /**
+     * Check if the module is enable
+     * @return boolean is the module enabled ?
+     */
+    public function isEnabled(): ?bool
+    {
+        // if no value, return true by defaut
+        return ($this->getField('listeListeOuinonLmsbf_actif') != 'non');
+    }
 }

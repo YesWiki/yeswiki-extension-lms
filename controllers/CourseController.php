@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiController;
+use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
@@ -17,6 +18,7 @@ class CourseController extends YesWikiController
 {
     protected $entryManager;
     protected $courseManager;
+    protected $config;
     protected $wiki;
 
     /**
@@ -25,10 +27,11 @@ class CourseController extends YesWikiController
      * @param CourseManager $courseManager the injected CourseManager instancz
      * @param Wiki $wiki the injected Wiki instance
      */
-    public function __construct(EntryManager $entryManager, CourseManager $courseManager, Wiki $wiki)
+    public function __construct(EntryManager $entryManager, CourseManager $courseManager, ParameterBagInterface $config, Wiki $wiki)
     {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
+        $this->config = $config;
         $this->wiki = $wiki;
     }
 
@@ -112,6 +115,27 @@ class CourseController extends YesWikiController
             }
         }
         return null;
+    }
+
+    /**
+     * Get the parent tab activity of the given activity if it's an activity tab
+     *
+     * Indeed, if the Lms module is configurated for nav tabs, the activity tabs have the tags 'MyTagX' with X >= 2 and
+     * it's always 'MyTag' which are referenced by the Lms modules.
+     *
+     * @param Activity $activity the given activity
+     * @return Activity if the tabs are configurated and there is a parent tab activity return it, otherwise return the
+     * same activity
+     */
+    public function getParentTabActivity(Activity $activity) : Activity
+    {
+        if ($this->config->get('lms_config')['use_tabs']){
+            $parentActivityTag = preg_replace('/[0-9]*$/', '', $activity->getTag());
+            $parentActivity = $this->courseManager->getActivity($parentActivityTag);
+            return $parentActivity ? $parentActivity : $activity;
+        } else {
+            return $activity;
+        }
     }
 
     /**

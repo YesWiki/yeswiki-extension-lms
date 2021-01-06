@@ -4,83 +4,87 @@ namespace YesWiki\lms;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Core\Service\TripleStore;
-use YesWiki\Lms\Activity;
-use YesWiki\Lms\Course;
-use YesWiki\Lms\Module;
+use Carbon\Carbon;
 
 class Learner
 {
+    // username of the Learner
+    protected $username;
+    // the progresses array for all activities/modules and courses
+    protected $allProgresses;
+
     // the configuration parameters of YesWiki
-    protected ParameterBagInterface $config;
-    // userName of the Learner
-    protected string $userName;
-    // TripleStore
-    protected TripleStore $tripleStore;
+    protected $config;
+    // the tripleStore to get the progress information
+    protected $tripleStore;
+
 
     /**
      * Module constructor
+     * @param string $username the name of the learner
      * @param ParameterBagInterface $config the configuration parameters of YesWiki
-     * @param string $userName the name of the learner
      * @param TripleStore $tripleStore the TripleStore Service
      */
-    public function __construct(ParameterBagInterface $config, string $userName, TripleStore $tripleStore)
+    public function __construct(string $username, ParameterBagInterface $config, TripleStore $tripleStore)
     {
+        $this->username = $username;
         $this->config = $config;
-        $this->userName = $userName;
         $this->tripleStore = $tripleStore;
     }
 
-    public function getUserName(): string
+    public function getUsername(): string
     {
-        return $this->userName;
+        return $this->username;
     }
 
-    public function getProgress(Course $course, Module $module, ?Activity $activity): ?array
+    public function getAllProgresses(): array
     {
-        if (!$course && !$module && !$activity) {
-            return null ;
-        }
-        $results = $this->tripleStore->getAll($this->userName, 'https://yeswiki.net/vocabulary/progress', '', '') ;
-        if (!$results || count($results) == 0) {
-            return null ;
-        } else {
-            // extract Tags
-            $courseTag = ($course) ? $course->getTag() : '';
-            $moduleTag = ($module) ? $module->getTag() : '';
-            $activityTag = ($activity) ? $activity->getTag() : '';
-            $results_values = array_map(function ($result) {
-                return $result['value'];
-            }, $results);
+        // lazy loading
+        if (is_null($this->allProgresses)) {
+            $results = $this->tripleStore->getAll($this->username, 'https://yeswiki.net/vocabulary/progress',
+                '', '');
             // json decode
-            $results_values = array_map(function ($result_value) {
-                return json_decode($result_value, true);
-            }, $results_values);
-            // filter according course, module and activity
-            return array_filter($results_values, function ($value) use ($courseTag, $moduleTag, $activityTag) {
-                return ($value['course'] == $courseTag &&
-                            $value['module'] == $moduleTag &&
-                            $value['activity'] == $activityTag
-                        );
-            });
-        }
-        
-        if (empty($userName)) {
-            return null;
+            $this->allProgresses = array_map(function ($result) {
+                return json_decode($result['value'], true);
+            }, $results);
         } else {
-            return ['temp' => 'temporary return'];
+            return $this->allProgresses;
         }
     }
-    public function setProgress(Course $course, Module $module, ?Activity $activity): ?bool
+
+    public function getProgressesForActivityOrModule(Course $course, Module $module, ?Activity $activity): array
     {
-        if ($course) {
-            return $this->tripleStore->create($this->userName, 'https://yeswiki.net/vocabulary/progress', json_encode([
-                'course' => $course->getTag(),
-                'module' => ($module) ? $module->getTag() : '',
-                'activity' => ($activity) ? $activity->getTag() : '',
-                'time' => time()
-                ]), '', '') == 0 ;
-        } else {
-            return false;
+        return array_filter($this->getAllProgresses(), function ($value) use ($course, $module, $activity) {
+            return ($value['course'] == $course->getTag()
+                && $value['module'] == $module->getTag()
+                && (!$activity || $value['activity'] == $activity->getTag())
+            );
+        });
+    }
+
+    public function findOneProgress(Course $course, Module $module, ?Activity $activity): ?array
+    {
+        $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() .
+            ($activity ?
+                '","activity":"' . $activity->getTag() . '"%'
+                : '","time":"%'); // if no activity, we are looking for the time attribute just after the module one
+        $results = $this->tripleStore->getMatching($this->username, 'https://yeswiki.net/vocabulary/progress',
+            $like, '=', '=', 'LIKE');
+        if ($results) {
+            return json_decode($results[0]['value'], true);
         }
+        return null;
+    }
+
+    public function addProgress(Course $course, Module $module, ?Activity $activity): bool
+    {
+        $progress = ['course' => $course->getTag(),
+                'module' => $module->getTag()]
+            + ($activity ?
+                ['activity' => $activity->getTag()]
+                : [])
+            + ['time' => Carbon::now()->toIso8601String()];
+        return $this->tripleStore->create($this->username, 'https://yeswiki.net/vocabulary/progress',
+                json_encode($progress), '', '') == 0;
     }
 }
