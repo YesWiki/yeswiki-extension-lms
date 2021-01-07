@@ -171,7 +171,7 @@ class Module extends CourseStructure
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
                         if (!$course->isModuleScripted()) {
-                            $this->status = 'open';
+                            $this->status = ModuleStatus::OPEN;
                         } else {
                             // TODO finish the scenarisation
                             // if it's the first module, it is open
