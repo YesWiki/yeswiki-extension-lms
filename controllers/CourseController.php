@@ -168,7 +168,8 @@ class CourseController extends YesWikiController
         $activityLink = $this->wiki->href(
             '',
             $module->getFirstActivityTag(),
-            ['parcours' => $course->getTag(), 'module' => $module->getTag()]
+            ['parcours' => $course->getTag(), 'module' => $module->getTag()],
+            false
         );
         // TODO manage different buttons label : Start / Resume / Admin Acces only
         $labelStart = _t('LMS_BEGIN');

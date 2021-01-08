@@ -2,7 +2,7 @@
     <div class="module-card status-$status">
     <div class="module-image">
         <a class="launch-module{{ classLink }}" href="{{ activityLink }}">
-            {% if image is not null %}<img src="{{ image }}" alt="Image du module {{ module.title|e }}" />{% endif %}
+            {% if image is not null %}<img src="{{ image|e }}" alt="Image du module {{ module.title }}" />{% endif %}
         </a>
     </div>
     <div class="module-content">
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="activities-action">
-            <a href="$activityLink" class="btn btn-primary btn-block launch-module{{ classLink }}">
+            <a href="{{ activityLink }}" class="btn btn-primary btn-block launch-module{{ classLink }}">
                 <i class="fas fa-play fa-fw"></i>{{ labelStart }}
             </a>
             {% if isAdmin %}
