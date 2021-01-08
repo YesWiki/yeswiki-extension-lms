@@ -168,20 +168,11 @@ class CourseController extends YesWikiController
         $course = $this->getContextualCourse();
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         $activityTag = $module->getFirstActivityTag();
-        if ($course->isModuleScripted()) {
-            // TODO include saveprogress to the bazar template entry
-            $link = $this->wiki->href(
-                'saveprogress',
-                $activityTag,
-                ['parcours' => $course->getTag(), 'module' => $module->getTag()]
-            );
-        } else {
-            $link = $this->wiki->href(
-                '',
-                $activityTag,
-                ['parcours' => $course->getTag(), 'module' => $module->getTag()]
-            );
-        }
+        $link = $this->wiki->href(
+            '',
+            $activityTag,
+            ['parcours' => $course->getTag(), 'module' => $module->getTag()]
+        );
         $status = $module->getStatus($course);
         $date = empty($module->getField('bf_date_ouverture')) ? '' : Carbon::parse($module->getField('bf_date_ouverture'));
         switch ($status) {
