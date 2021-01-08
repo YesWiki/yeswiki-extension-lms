@@ -1,0 +1,39 @@
+{% block module_card %}
+    <div class="module-card status-$status">
+    <div class="module-image">
+        <a class="launch-module{{ classLink }}" href="{{ activityLink }}">
+            {% if image is not null %}<img src="{{ image }}" alt="Image du module {{ module.title|e }}" />{% endif %}
+        </a>
+    </div>
+    <div class="module-content">
+        <h3 class="module-title"><a class="launch-module{{ classLink }}" href="{{ activityLink }}">{{ module.title }}</a></h3>
+        {% if module.description is not null %}<div class="description-module">{{ format(module.description) | raw }}</div>{% endif %}
+        <small class="module-date"><em>{{ statusMsg }}.</em></small>
+    </div>
+    <div class="module-activities">
+        <div class="activities-infos">
+            <div class="activities-numbers">
+                {%  set nbActivities = module.activities|length %}
+                <strong><i class="fas fa-chalkboard-teacher fa-fw"></i> {{ _t('LMS_ACTIVITY') ~ (nbActivities > 1 ? 's' : '') }}</strong>
+                : {{ nbActivities }}
+            </div>
+            <div class="activities-duration"><strong><i class="fas fa-hourglass-half fa-fw"></i> {{ _t('LMS_TIME') }}</strong>
+                : {{ module.duration }}
+            </div>
+        </div>
+        <div class="activities-action">
+            <a href="$activityLink" class="btn btn-primary btn-block launch-module{{ classLink }}">
+                <i class="fas fa-play fa-fw"></i>{{ labelStart }}
+            </a>
+            {% if isAdmin %}
+                <a href="{{ url({tag: module.tag, handler: 'edit'}) }}" class="btn btn-default btn-xs">
+                    <i class="fa fa-pencil-alt"></i> {{ _t('BAZ_MODIFIER')}}
+                </a>
+                <a href="{{ url({tag : module.tag, handler: 'deletepage'}) }}" class="btn btn-danger btn-xs">
+                    <i class="fa fa-trash"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+{% endblock %}

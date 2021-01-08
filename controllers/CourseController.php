@@ -27,8 +27,12 @@ class CourseController extends YesWikiController
      * @param CourseManager $courseManager the injected CourseManager instancz
      * @param Wiki $wiki the injected Wiki instance
      */
-    public function __construct(EntryManager $entryManager, CourseManager $courseManager, ParameterBagInterface $config, Wiki $wiki)
-    {
+    public function __construct(
+        EntryManager $entryManager,
+        CourseManager $courseManager,
+        ParameterBagInterface $config,
+        Wiki $wiki
+    ) {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
         $this->config = $config;
@@ -76,7 +80,7 @@ class CourseController extends YesWikiController
     public function getContextualModule(?Course $course): ?Module
     {
         // if an handler is after the page tag in the wiki parameter variable, get only the tag
-        $currentPageTag =  isset($_GET['wiki']) ?
+        $currentPageTag = isset($_GET['wiki']) ?
             strpos($_GET['wiki'], '/') ?
                 substr($_GET['wiki'], 0, strpos($_GET['wiki'], '/'))
                 : $_GET['wiki']
@@ -127,9 +131,9 @@ class CourseController extends YesWikiController
      * @return Activity if the tabs are configurated and there is a parent tab activity return it, otherwise return the
      * same activity
      */
-    public function getParentTabActivity(Activity $activity) : Activity
+    public function getParentTabActivity(Activity $activity): Activity
     {
-        if ($this->config->get('lms_config')['use_tabs']){
+        if ($this->config->get('lms_config')['use_tabs']) {
             $parentActivityTag = preg_replace('/[0-9]*$/', '', $activity->getTag());
             $parentActivity = $this->courseManager->getActivity($parentActivityTag);
             return $parentActivity ? $parentActivity : $activity;
@@ -140,59 +144,80 @@ class CourseController extends YesWikiController
 
     /**
      * Display the given module as an information card
-     *
+     * @param Course $course the course to wich the module belongs
      * @param Module $module the module to display
      * @return string the generated output
      */
-    public function renderModuleCard(Module $module): string
+    public function renderModuleCard(Course $course, Module $module): string
     {
-        $title = $module->getField('bf_titre');
-        $escapedTitle = htmlspecialchars($title);
-        $description = empty($module->getField('bf_description')) ?
-            '' :
-            '<div class="description-module">' . $this->wiki->format($module->getField('bf_description')) . '</div>';
-        $largeur = '400';
-        // TODO $hauteur must fit the image ratio + vertical centered when the text is higher
-        $hauteur = '300';
+        $imageSize = is_int($this->config->get('lms_config')['module_image_size_in_course']) ?
+            $this->config->get('lms_config')['module_image_size_in_course']
+            : 400;
         $image = empty($module->getField('imagebf_image')) || !is_file('files/' . $module->getField('imagebf_image')) ?
-            '' :
+            null :
+            // the resizing keep the orginal ratio with maximum width and height defined at $imageSize
             redimensionner_image(
                 'files/' . $module->getField('imagebf_image'),
-                'cache/' . $largeur . 'x' . $hauteur . '-' . $module->getField('imagebf_image'),
-                $largeur,
-                $hauteur,
-                'crop'
+                'cache/' . $imageSize . 'x' . $imageSize . $module->getField('imagebf_image'),
+                $imageSize,
+                $imageSize,
+                'fit'
             );
 
-        // the consulted course entry
-        $course = $this->getContextualCourse();
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-        $activityTag = $module->getFirstActivityTag();
-        $link = $this->wiki->href(
+        $activityLink = $this->wiki->href(
             '',
-            $activityTag,
+            $module->getFirstActivityTag(),
             ['parcours' => $course->getTag(), 'module' => $module->getTag()]
         );
+        // TODO manage different buttons label : Start / Resume / Admin Acces only
+        $labelStart = _t('LMS_BEGIN');
+        $statusMsg = $this->calculateModuleStatusMessage($course, $module);
+
+        $classLink = !$this->wiki->UserIsAdmin() && in_array(
+            $module->getStatus($course),
+            [ModuleStatus::UNKNOWN, ModuleStatus::CLOSED, ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::TO_BE_OPEN]
+        ) ? ' disabled' : null;
+
+        return $this->render('@lms/module-card.twig', [
+            "module" => $module,
+            "image" => $image,
+            "activityLink" => $activityLink,
+            "labelStart" => $labelStart,
+            "statusMsg" => $statusMsg,
+            "classLink" => $classLink,
+            "isAdmin" => $this->wiki->UserIsAdmin(),
+        ]);
+    }
+
+    /**
+     * Calculate the message to display to the user the module status
+     * @param Course $course the course to wich the module belongs
+     * @param Module $module the module concerned
+     * @return string this presentation string
+     */
+    public function calculateModuleStatusMessage(Course $course, Module $module): string
+    {
         $status = $module->getStatus($course);
         $date = empty($module->getField('bf_date_ouverture')) ? '' : Carbon::parse($module->getField('bf_date_ouverture'));
         switch ($status) {
             case ModuleStatus::UNKNOWN:
-                $active = _t('LMS_UNKNOWN_STATUS_MODULE');
+                return _t('LMS_UNKNOWN_STATUS_MODULE');
                 break;
             case ModuleStatus::CLOSED:
-                $active = _t('LMS_CLOSED_MODULE');
+                return _t('LMS_CLOSED_MODULE');
                 break;
             case ModuleStatus::TO_BE_OPEN:
-                $active = _t('LMS_MODULE_WILL_OPEN') . ' '
+                return _t('LMS_MODULE_WILL_OPEN') . ' '
                     . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans($date,
                         CarbonInterface::DIFF_ABSOLUTE)
                     . ' (' . str_replace(' 00:00', '',
                         $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')) . ')';
                 break;
             case ModuleStatus::OPEN:
-                $active = _t('LMS_OPEN_MODULE');
+                $msg = _t('LMS_OPEN_MODULE');
                 if (!empty($date)) {
-                    $active .= ' ' . _t('LMS_SINCE')
+                    $msg .= ' ' . _t('LMS_SINCE')
                         . ' ' . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans(
                             $date,
                             CarbonInterface::DIFF_ABSOLUTE
@@ -203,53 +228,11 @@ class CourseController extends YesWikiController
                             $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')
                         ) . ')';
                 }
+                return $msg;
                 break;
             case ModuleStatus::NOT_ACCESSIBLE:
-                $active = _t('LMS_MODULE_NOT_ACCESSIBLE');
+                return _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }
-        $nbActivities = count($module->getActivities());
-        $duration = $module->getDuration();
-        $adminLinks = $this->wiki->UserIsAdmin() ?
-            '<a href="' . $this->wiki->href(
-                'edit',
-                $module->getTag()
-            ) . '" class="btn btn-default btn-xs"><i class="fa fa-pencil-alt"></i> ' . _t('BAZ_MODIFIER') . '</a>
-           <a href="' . $this->wiki->href(
-                    'deletepage',
-                    $module->getTag()
-                ) . '" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>' :
-            '';
-        $labelActivity = _t('LMS_ACTIVITY') . (($nbActivities > 1) ? 's' : '');
-        $labelTime = _t('LMS_TIME');
-        $classLink = !$this->wiki->UserIsAdmin() && in_array(
-            $status,
-            ['closed', 'to_be_open', 'not_accessible', 'unknown']
-        ) ? 'disabled' : ' ';
-        $labelStart = _t('LMS_BEGIN');
-        // TODO use twig template
-        return "<div class=\"module-card status-$status\">
-    <div class=\"module-image\">
-      <a class=\"launch-module $classLink\" href=\"$link\">
-        " . (!empty($image) ? "<img src=\"$image\" alt=\"Image du module $escapedTitle\" />" : '') . "
-      </a>
-    </div>
-    <div class=\"module-content\">
-      <h3 class=\"module-title\"><a class=\"launch-module $classLink\" href=\"$link\">$title</a></h3>
-      $description
-      <small class=\"module-date\"><em>$active.</em></small>
-    </div>
-    <div class=\"module-activities\">
-      <div class=\"activities-infos\">
-          <div class=\"activities-numbers\"><strong><i class=\"fas fa-chalkboard-teacher fa-fw\"></i> $labelActivity</strong> : $nbActivities</div>
-          <div class=\"activities-duration\"><strong><i class=\"fas fa-hourglass-half fa-fw\"></i> $labelTime</strong> : {$duration}</div>
-      </div>
-      <div class=\"activities-action\">
-        <a href=\"$link\" class=\"btn btn-primary btn-block launch-module $classLink\"><i class=\"fas fa-play fa-fw\"></i> $labelStart</a>
-        $adminLinks
-      </div>
-    </div>
-  </div>
-";
     }
 }

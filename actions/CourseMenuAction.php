@@ -65,18 +65,12 @@ class CourseMenuAction extends YesWikiAction
 
                 if ($currentModuleInModules) {
                     //  display only the activities for the modules opened (or all of them for admin users)
-                    /*foreach ($modulesDisplayed as $currentModule){
-                        if ($wiki->UserIsAdmin() || $currentModule->getField('listeListeOuinonLmsbf_actif') == 'oui'){
-
-                        }
-                    }
-                    $modulesDisplayed = array_filter(
+                    /*$modulesDisplayed = array_filter(
                         $modulesDisplayed,
                         function ($item) use ($wiki) {
                             return $wiki->UserIsAdmin() || $item->getField('listeListeOuinonLmsbf_actif') == 'oui';
                         }
                     );*/
-
                     return $this->render('@lms/course-menu.twig',[
                         "pageTag" => $pageTag,
                         "course" => $course,

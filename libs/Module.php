@@ -126,6 +126,15 @@ class Module extends CourseStructure
     }
 
     /**
+     * Get the module description
+     * @return string the module description
+     */
+    public function getDescription(): string
+    {
+        return $this->getField('bf_description');
+    }
+
+    /**
      * calculate duration of the module, in hours, based on inside activities
      *
      * @return string duration in hours

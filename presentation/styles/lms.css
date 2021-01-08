@@ -356,6 +356,9 @@
 }
 .module-image {
     margin: -1em 1em -1em -1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .module-image img {
     border-top-left-radius: 0.5em;
@@ -373,6 +376,9 @@
 .module-content > h3 {
     margin-top: 0;
     font-size: 1.3rem;
+}
+.module-date {
+    margin-top: 0.5em;
 }
 .description-module {
     flex: 1;

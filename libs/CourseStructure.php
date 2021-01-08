@@ -70,4 +70,13 @@ abstract class CourseStructure
     {
         return key_exists($key, $this->getFields()) ? $this->getFields()[$key] : null;
     }
+
+    /**
+     * Get the object title
+     * @return string the object title
+     */
+    public function getTitle(): string
+    {
+        return $this->getField('bf_titre');
+    }
 }

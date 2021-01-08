@@ -43,7 +43,7 @@ use YesWiki\Lms\Service\CourseManager;
     } else { // Show modules list
       echo '<div class="module-list">'."\n";
       foreach($course->getModules() as $module) {
-        echo $courseController->renderModuleCard($module);
+        echo $courseController->renderModuleCard($course, $module);
       }
       echo '</div> <!-- end .module-list -->'."\n";
     }

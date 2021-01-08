@@ -131,6 +131,15 @@ class Course extends CourseStructure
     }
 
     /**
+     * Get the course description
+     * @return string the course description
+     */
+    public function getDescription(): string
+    {
+        return $this->getField('bf_description');
+    }
+
+    /**
      * Check if modules are scripted
      * @return boolean are modules scripted ?
      */
