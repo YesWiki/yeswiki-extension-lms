@@ -47,11 +47,11 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
     // the tag of the current activity page
     $currentActivityTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : null;
 
-    // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
-    $activity = new Activity($config, $entryManager, $currentActivityTag);
-
     $output = '';
     if ($mode == 'html' && $currentActivityTag) {
+        // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
+        $activity = new Activity($config, $entryManager, $currentActivityTag);
+
         // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the parent tab activity
         $activity = $courseController->getParentTabActivity($activity);
 
