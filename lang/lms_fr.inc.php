@@ -35,6 +35,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_UNKNOWN_STATUS_MODULE' => 'Ce module n\'est pas dans un parcours',
         'RESERVED_FOR_ADMINS' => 'Informations pour les administrateurs',
         'LMS_ACTIVITY' => 'Activité',
-        'LMS_TIME' => 'Temps estimé',
+        'LMS_ESTIMATED_TIME' => 'Temps estimé',
+        'LMSADMIN_DASHBOARD_TITLE' => 'Tableau de bord des progressions '
     )
 );

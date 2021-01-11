@@ -12,6 +12,7 @@ use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
 use YesWiki\lms\Learner;
 use YesWiki\Lms\Module;
+use YesWiki\Lms\Progresses;
 
 
 class LearnerManager
@@ -57,7 +58,8 @@ class LearnerManager
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool
     {
-        if (!$course || !$module) {
+        if (!$course || !$module || !$module->hasActivity($activity->getTag())
+            || !$course->hasModule($module->getTag())) {
             return false;
         }
         return $this->saveActivityOrModuleProgress($course, $module, $activity);
@@ -65,7 +67,7 @@ class LearnerManager
 
     public function saveModuleProgress(Course $course, Module $module): bool
     {
-        if (!$course) {
+        if (!$course || !$course->hasModule($module->getTag())) {
             return false;
         }
         return $this->saveActivityOrModuleProgress($course, $module, null);
@@ -78,11 +80,50 @@ class LearnerManager
         if (!$learner) {
             return false;
         }
-        $progress = $learner->findOneProgress($course, $module, $activity);
+        $progress = $this->getOneProgressForLearner($learner, $course, $module, $activity);
         if (empty($progress)) {
             // save the current progress
-            return $learner->addProgress($course, $module, $activity);
+            return $learner->saveProgress($course, $module, $activity);
         }
         return false;
+    }
+
+    public function getOneProgressForLearner(Learner $learner, Course $course, Module $module, ?Activity $activity): ?array
+    {
+        $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() .
+            ($activity ?
+                '","activity":"' . $activity->getTag() . '"%'
+                : '","log_time"%'); // if no activity, we are looking for the time attribute just after the module one
+        $results = $this->tripleStore->getMatching($learner->getUsername(), 'https://yeswiki.net/vocabulary/progress',
+            $like, '=', '=', 'LIKE');
+        if ($results) {
+            // decode the json which have the progress information
+            $progress = json_decode($results[0]['value'], true);
+            // keep the learner username in the progress
+            $progress['username'] = $results[0]['resource'];
+            return $progress;
+        }
+        return null;
+    }
+
+    public function getProgressesForAllLearners(Course $course): Progresses
+    {
+        $like = '%"course":"' . $course->getTag() . '"%';
+        $results = $this->tripleStore->getMatching(null, 'https://yeswiki.net/vocabulary/progress',
+            $like, 'LIKE', '=', 'LIKE');
+        if ($results) {
+            // json decode
+            $results = new Progresses(
+                array_map(function ($res) {
+                    // decode the json which have the progress information
+                    $progress = json_decode($res['value'], true);
+                    // keep the learner username in the progress
+                    $progress = ['username' => $res['resource']] + $progress;
+                    return $progress;
+                }, $results)
+            );
+            return $results;
+        }
+        return new Progresses([]);
     }
 }

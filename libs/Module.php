@@ -135,11 +135,10 @@ class Module extends CourseStructure
     }
 
     /**
-     * calculate duration of the module, in hours, based on inside activities
-     *
+     * Calculate duration of the module, in hours, based on inside activities
      * @return string duration in hours
      */
-    public function getDuration()
+    public function getEstimatedTime()
     {
         // lazy loading
         if (is_null($this->duration)) {

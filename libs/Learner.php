@@ -10,7 +10,7 @@ class Learner
 {
     // username of the Learner
     protected $username;
-    // the progresses array for all activities/modules and courses
+    // the Progresses object for all activities/modules and courses
     protected $allProgresses;
 
     // the configuration parameters of YesWiki
@@ -37,53 +37,34 @@ class Learner
         return $this->username;
     }
 
-    public function getAllProgresses(): array
+    public function getAllProgresses(): Progresses
     {
         // lazy loading
         if (is_null($this->allProgresses)) {
             $results = $this->tripleStore->getAll($this->username, 'https://yeswiki.net/vocabulary/progress',
                 '', '');
-            // json decode
-            $this->allProgresses = array_map(function ($result) {
-                return json_decode($result['value'], true);
-            }, $results);
+            $this->allProgresses = new Progresses(
+                array_map(function ($result) {
+                    // decode the json which have the progress information
+                    $progress = json_decode($result['value'], true);
+                    // keep the learner username in the progress
+                    $progress['username'] = $result['resource'];
+                    return progress;
+                }, $results)
+            );
         } else {
             return $this->allProgresses;
         }
     }
 
-    public function getProgressesForActivityOrModule(Course $course, Module $module, ?Activity $activity): array
-    {
-        return array_filter($this->getAllProgresses(), function ($value) use ($course, $module, $activity) {
-            return ($value['course'] == $course->getTag()
-                && $value['module'] == $module->getTag()
-                && (!$activity || $value['activity'] == $activity->getTag())
-            );
-        });
-    }
-
-    public function findOneProgress(Course $course, Module $module, ?Activity $activity): ?array
-    {
-        $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() .
-            ($activity ?
-                '","activity":"' . $activity->getTag() . '"%'
-                : '","time":"%'); // if no activity, we are looking for the time attribute just after the module one
-        $results = $this->tripleStore->getMatching($this->username, 'https://yeswiki.net/vocabulary/progress',
-            $like, '=', '=', 'LIKE');
-        if ($results) {
-            return json_decode($results[0]['value'], true);
-        }
-        return null;
-    }
-
-    public function addProgress(Course $course, Module $module, ?Activity $activity): bool
+    public function saveProgress(Course $course, Module $module, ?Activity $activity): bool
     {
         $progress = ['course' => $course->getTag(),
                 'module' => $module->getTag()]
             + ($activity ?
                 ['activity' => $activity->getTag()]
                 : [])
-            + ['time' => Carbon::now()->toIso8601String()];
+            + ['log_time' => date('Y-m-d H:i:s', time())];
         return $this->tripleStore->create($this->username, 'https://yeswiki.net/vocabulary/progress',
                 json_encode($progress), '', '') == 0;
     }
