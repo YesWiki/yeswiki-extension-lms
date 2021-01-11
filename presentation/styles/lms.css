@@ -415,9 +415,50 @@
     border-color: transparent;
     font-weight: bold;
 }
-.status-closed,
-.status-to_be_open,
-.status-not_accessible,
-.status-unknown {
+
+.status-0, /* UNKNOWN */
+.status-1, /* CLOSED */
+.status-2 /* TO_BE_OPEN */
+.status-not_accessible { /* NOT_ACCESSIBLE */
     opacity: 0.7;
+}
+
+/* lms admin dashboard */
+.learners-groups {
+    display: flex;
+    flex-wrap: wrap;
+}
+.learners-groups .learners-group {
+    flex: 1 1 300px;
+}
+.learners-groups .fieldset-group {
+    position: relative;
+    box-shadow: 0 7px 20px -10px rgba(150, 170, 180, 0.75);
+    padding: 1em;
+    margin: 1em 10px 2em 10px;
+    border-radius: 0.5em;
+    border: 1px solid var(--primary-color, #444);
+    display: flex;
+}
+.learners-groups .fieldset-group label {
+    position: absolute;
+    z-index: 5;
+    height: 1.3em;
+    left: 1.7rem;
+    background-color: var(--neutral-light-color);
+    bottom: calc(100% - 15px);
+    padding: 0 10px;
+    font-size: 1.8em;
+    margin: 0;
+}
+.learners-groups .fieldset-group label i.fa-check-circle{
+    color: #8dc63f;
+}
+.learners-groups .fieldset-group label i.fa-times-circle{
+    color: red;
+}
+.learners-groups .learner-details {
+    display: flex;
+    margin-top: 10px;
+    list-style: none;
 }

@@ -6,7 +6,7 @@ class Progresses
 {
     // an array which have a value for the following keys : 'username', 'course', 'module', 'activity', 'log_time'
     // the 'activity' key can be unset, on this case the progress relates to the module
-    // 'elapsed_time' can also is filled out for only for module ('activity' is then unset)
+    // 'elapsed_time' can also be filled out for 'module' only ('activity' is then unset)
     protected $values;
 
     /**

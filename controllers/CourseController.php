@@ -135,8 +135,11 @@ class CourseController extends YesWikiController
     {
         if ($this->config->get('lms_config')['use_tabs']) {
             $parentActivityTag = preg_replace('/[0-9]*$/', '', $activity->getTag());
-            $parentActivity = $this->courseManager->getActivity($parentActivityTag);
-            return $parentActivity ? $parentActivity : $activity;
+            if ($parentActivityTag != $activity->getTag()) {
+                return $this->courseManager->getActivity($parentActivityTag);
+            } else {
+                return $activity;
+            }
         } else {
             return $activity;
         }
@@ -181,6 +184,7 @@ class CourseController extends YesWikiController
         ) ? ' disabled' : null;
 
         return $this->render('@lms/module-card.twig', [
+            "course" => $course,
             "module" => $module,
             "image" => $image,
             "activityLink" => $activityLink,

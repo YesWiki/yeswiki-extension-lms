@@ -1,5 +1,5 @@
 {% block module_card %}
-    <div class="module-card status-$status">
+    <div class="module-card status-{{ module.status(course) }}">
     <div class="module-image">
         <a class="launch-module{{ classLink }}" href="{{ activityLink }}">
             {% if image is not null %}<img src="{{ image|e }}" alt="Image du module {{ module.title }}" />{% endif %}

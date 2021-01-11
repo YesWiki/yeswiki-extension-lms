@@ -52,7 +52,7 @@ class CourseMenuAction extends YesWikiAction
                 if ($activity = $courseManager->getActivity($pageTag)){
                     // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the
                     // parent tab activity
-                    $pageTag = $courseController->getParentTabActivity($activity);
+                    $pageTag = $courseController->getParentTabActivity($activity)->getTag();
                 }
 
                 // display the modules only if the current module is in the modules displayed
@@ -72,11 +72,12 @@ class CourseMenuAction extends YesWikiAction
                         }
                     );*/
                     return $this->render('@lms/course-menu.twig',[
-                        "pageTag" => $pageTag,
-                        "course" => $course,
-                        "module" => $module,
-                        "modulesDisplayed" => $modulesDisplayed,
-                        "isAdmin" => $wiki->UserIsAdmin(),
+                        'pageTag' => $pageTag,
+                        'course' => $course,
+                        'module' => $module,
+                        'modulesDisplayed' => $modulesDisplayed,
+                        'isAdmin' => $wiki->UserIsAdmin(),
+                        'adminAsUser' => $config->get('lms_config')['admin_as_user']
                     ]);
                 }
             }

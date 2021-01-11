@@ -1,14 +1,17 @@
 {% block course_menu %}
     {% for currentModule in modulesDisplayed %}
         <div class="panel-group panel-group-menu-lms" role="tablist">
-            <div class="panel panel-primary panel-menu-lms">
-                <div class="panel-heading{% if currentModule.tag == pageTag %} active{% endif %}">
+            <div class="panel panel-primary panel-menu-lms status-{{ currentModule.status(course) }}">
+                <div class="panel-heading {% if currentModule.tag == pageTag %} active{% endif %}">
                     <h4 class="panel-title">
                         <a href="{{ url({ tag: currentModule.tag, params: {'parcours': course.tag}}) }}"
                            class="bazar-entry">{{ currentModule.fields.bf_titre }}</a>
                     </h4>
                 </div>
-                {% if isAdmin or currentModule.status(course) is constant('YesWiki\\Lms\\ModuleStatus::OPEN')%}
+                {% if currentModule.tag == module.tag and
+                        ( (isAdmin and not adminAsUser)
+                            or currentModule.status(course) is constant('YesWiki\\Lms\\ModuleStatus::OPEN'))
+                %}
                     <div class="panel-collapse">
                         <ul class="list-group">
                             {% for activity in currentModule.activities %}

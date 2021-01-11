@@ -11,6 +11,8 @@ parameters:
     use_yeswiki_comments: false
     # maximum size for both width and height to render the module images in the course entry
     module_image_size_in_course: 400
+    # only for developers : displays the lms pages as a user sees them
+    admin_as_user: false
 
 services:
   _defaults:
