@@ -44,6 +44,10 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_PREVIEW' => 'Prévisualiser l\'activité',
         'LMS_MODULE_PREVIEW' => 'Prévisualiser le module',
         'LMS_COURSE_PREVIEW' => 'Prévisualiser le parcours',
-        'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
+        'LMS_FINISHED_RATIO' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s / Nombre d\'apprenant⋅e⋅s',
+        'LMS_ESTIMATED_TIME_DETAILLED' => 'Temps estimé par les formateurs',
+        'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s',
+        'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé⋅e⋅s',
+        'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours'
     )
 );

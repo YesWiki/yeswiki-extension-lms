@@ -20,7 +20,6 @@ use YesWiki\Lms\Service\CourseManager;
   <?php
     $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
     $courseManager = $GLOBALS['wiki']->services->get(CourseManager::class);
-    $templateEngine = $GLOBALS['wiki']->services->get(TemplateEngine::class);
 
     $course = $courseManager->getCourse($fiche['id_fiche'], $fiche);
 

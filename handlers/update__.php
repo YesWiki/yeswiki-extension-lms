@@ -165,6 +165,32 @@ if ($this->UserIsAdmin()) {
         $output .= '✅ The <em>PageMenuLms</em> page already exists.<br />';
     }
     $output .= '<hr />';
+
+    // if the ProgressDashboard page doesn't exist, create it with a default version
+    if (!$this->LoadPage('ProgressDashboard')) {
+        $output .= 'ℹ️ Adding the <em>ProgressDashboard</em> page<br />';
+        $this->SavePage(
+            'ProgressDashboard',
+            '{{progressdashboard}}'
+        );
+        $output .= '✅ Done !<br />';
+    } else {
+        $output .= '✅ The <em>ProgressDashboard</em> page already exists.<br />';
+    }
+    $output .= '<hr />';
+
+    // if the LearnerDashboard page doesn't exist, create it with a default version
+    if (!$this->LoadPage('LearnerDashboard')) {
+        $output .= 'ℹ️ Adding the <em>LearnerDashboard</em> page<br />';
+        $this->SavePage(
+            'LearnerDashboard',
+            '{{learnerdashboard}}'
+        );
+        $output .= '✅ Done !<br />';
+    } else {
+        $output .= '✅ The <em>LearnerDashboard</em> page already exists.<br />';
+    }
+    $output .= '<hr />';
 }
 
 // Add button to return to previous page

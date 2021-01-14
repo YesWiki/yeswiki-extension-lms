@@ -182,7 +182,7 @@ class CourseController extends YesWikiController
             [ModuleStatus::UNKNOWN, ModuleStatus::CLOSED, ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::TO_BE_OPEN]
         ) ? ' disabled' : null;
 
-        return $this->render('@lms/module-card.twig', [
+       return $this->render('@lms/module-card.twig', [
             'course' => $course,
             'module' => $module,
             'image' => $image,
@@ -191,7 +191,8 @@ class CourseController extends YesWikiController
             'statusMsg' => $statusMsg,
             'classLink' => $classLink,
             'isAdmin' => $this->wiki->UserIsAdmin(),
-            'courseController' => $this
+            // normally you don't have to pass non-model object, but adding a twig helper
+            'formatter' => $this->getTwigFormatter()
         ]);
     }
 
@@ -242,21 +243,30 @@ class CourseController extends YesWikiController
     }
 
     /**
-     * Render a duration in a corresponding string
-     * The format is 'XhXX' if the duration is equal or gretter than 1 hour, otherwise 'X min'
-     * @param int|null $duration the duration
-     * @return string the result string
+     * Create a formatter which have the specific twig function for the CourseStructure objects
+     * @return object the formatter (an object from the anonymous class)
      */
-    public function formatDuration(?int $duration): string
+    public function getTwigFormatter()
     {
-        if (is_null($duration) || $duration == 0) {
-            return '-';
-        }
-        $hours = floor($duration / 60);
-        $minutes = ($duration % 60);
-        return $hours != 0 ?
-            sprintf('%dh%02d', $hours, $minutes)
-            : sprintf('%d min', $minutes);
+        // return the object which have all the twig formatting function
+        return new class() {
+            /**
+             * Render a duration in a corresponding string
+             * The format is 'XhXX' if the duration is equal or gretter than 1 hour, otherwise 'X min'
+             * @param int|null $duration the duration
+             * @return string the result string
+             */
+            function formatDuration(?int $duration): string
+            {
+                if (is_null($duration) || $duration == 0) {
+                    return '-';
+                }
+                $hours = floor($duration / 60);
+                $minutes = ($duration % 60);
+                return $hours != 0 ?
+                    sprintf('%dh%02d', $hours, $minutes)
+                    : sprintf('%d min', $minutes);
+            }
+        };
     }
-
 }

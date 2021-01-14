@@ -10,17 +10,23 @@
             </a>
         </div>
         <div class="finished-ratio">
-            <span class="label-icon"><i class="far fa-check-circle"></i></span> {{ activitiesStat[activity.tag].finished | length }} / {{ userEntries | length }}
+            <span title="{{ _t('LMS_FINISHED_RATIO') }}">
+                <span class="label-icon"><i class="fas fa-user-check"></i></span>
+                {{ activitiesStat[activity.tag].finished | length }} / {{ userEntries | length }}
+            </span>
         </div>
         <div class="estimated-time">
-            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ courseController.formatDuration(activity.duration) }}
+            <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
+                <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>
+                {{ formatter.formatDuration(activity.duration) }}
+            </span>
         </div>
     </div>
     <div id="collapse_{{ activity.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ activity.tag }}" aria-expanded="false">
         <div class="learners-groups emulated-flex-gap">
             <div class="learners-group fieldset-group dashboard-activity-frame">
-                <label><i class="fas fa-check-circle"></i></label>
+                <label><i class="fas fa-user-check"></i></label>
                     <ul class="learner-details">
                         {% for username in activitiesStat[activity.tag].finished %}
                             <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
@@ -28,7 +34,7 @@
                     </ul>
             </div>
             <div class="learners-group fieldset-group dashboard-activity-frame">
-                <label><i class="fas fa-times-circle"></i></label>
+                <label><i class="fas fa-user-times"></i></label>
                     <ul class="learner-details">
                         {% for username in activitiesStat[activity.tag].notFinished %}
                             <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>

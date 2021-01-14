@@ -9,11 +9,15 @@
         </a>
     </div>
     <div class="finished-ratio">
-        <span class="label-icon"><i class="far fa-check-circle"></i></span>
-        {{ coursesStat[module.tag].finished | length}} / {{ userEntries | length }}
+        <span title="{{ _t('LMS_FINISHED_RATIO') }}">
+            <span class="label-icon"><i class="fas fa-user-check"></i></span>
+            {{ coursesStat[module.tag].finished | length}} / {{ userEntries | length }}
+        </span>
     </div>
     <div class="estimated-time">
-        <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ courseController.formatDuration(course.duration) }}
+        <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
+            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ formatter.formatDuration(course.duration) }}
+        </span>
     </div>
 </div>
 

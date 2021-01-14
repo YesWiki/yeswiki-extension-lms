@@ -5,12 +5,14 @@ use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
+use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
 class ProgressDashboardAction extends YesWikiAction
 {
     protected $courseController;
+    protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
     protected $wiki;
@@ -43,6 +45,7 @@ class ProgressDashboardAction extends YesWikiAction
     public function run()
     {
         $this->courseController = $this->getService(CourseController::class);
+        $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
         $this->wiki = $this->getService(Wiki::class);
@@ -91,7 +94,7 @@ class ProgressDashboardAction extends YesWikiAction
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
             'userEntries' => $this->userEntries,
-            'courseController' => $this->courseController
+            'formatter' => $this->courseController->getTwigFormatter()
         ]);
     }
 
@@ -108,19 +111,17 @@ class ProgressDashboardAction extends YesWikiAction
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
             'userEntries' => $this->userEntries,
-            'courseController' => $this->courseController
+            'formatter' => $this->courseController->getTwigFormatter()
         ]);
     }
 
     private function processActivitiesStat(Course $course, Module $module)
     {
         foreach ($module->getActivities() as $activity) {
-            $finishedUsernames = $this->arraytoAssociativeArray(
-                $this->progresses->getUsernamesForFinishedActivity($course, $module, $activity)
-            );
+            $finishedUsernames = $this->progresses->getUsernamesForFinishedActivity($course, $module, $activity);
 
             // the users who havn't finished are those whose username is not in $finishedUsernames
-            $notFinishedUsernames = array_diff_key($this->userEntries, $finishedUsernames);
+            $notFinishedUsernames = array_diff(array_keys($this->userEntries), $finishedUsernames);
             ksort($finishedUsernames);
             ksort($notFinishedUsernames);
 
@@ -142,14 +143,14 @@ class ProgressDashboardAction extends YesWikiAction
                 $finishedUsernames = $this->activitiesStat[$activity->getTag()]['finished'];
             } else {
                 // each time, we keep only the usernames which have finished the current activity and all the previous ones
-                $finishedUsernames = array_intersect_key(
+                $finishedUsernames = array_intersect(
                     $this->activitiesStat[$activity->getTag()]['finished'],
                     $finishedUsernames
                 );
             }
         }
         // $finishedUsernames contains now the usernames which have finished the module
-        $notFinishedUsernames = array_diff_key($this->userEntries, $finishedUsernames);
+        $notFinishedUsernames = array_diff(array_keys($this->userEntries), $finishedUsernames);
         ksort($finishedUsernames);
         ksort($notFinishedUsernames);
         $this->modulesStat[$module->getTag()]['finished'] = $finishedUsernames;
@@ -165,14 +166,14 @@ class ProgressDashboardAction extends YesWikiAction
                 $finishedUsernames = $this->modulesStat[$module->getTag()]['finished'];
             } else {
                 // each time, we keep only the usernames which have finished the current module and all the previous ones
-                $finishedUsernames = array_intersect_key(
+                $finishedUsernames = array_intersect(
                     $this->modulesStat[$module->getTag()]['finished'],
                     $finishedUsernames
                 );
             }
         }
         // $finishedUsernames contains now the usernames which have finished the course
-        $notFinishedUsernames = array_diff_key($this->userEntries, $finishedUsernames);
+        $notFinishedUsernames = array_diff(array_keys($this->userEntries), $finishedUsernames);
         ksort($finishedUsernames);
         ksort($notFinishedUsernames);
         $this->coursesStat[$course->getTag()]['finished'] = $finishedUsernames;
@@ -196,19 +197,5 @@ class ProgressDashboardAction extends YesWikiAction
                 $this->userEntries[$username] = ['bf_titre' => $username, 'id_fiche' => $username];
             }
         }
-    }
-
-    /**
-     * Return an associative array from an array. Each value become both key and value in the result one
-     * @param array $array the simple array
-     * @return array the associative array
-     */
-    private function arraytoAssociativeArray(array $array): array
-    {
-        $result = [];
-        foreach ($array as $elem){
-            $result[$elem] = $elem;
-        }
-        return $result;
     }
 }
