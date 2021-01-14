@@ -11,6 +11,7 @@ class Course extends CourseStructure
 {
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
     protected $modules; // modules of the course
+    protected $duration; // estimated time to complete the module, it's an integer counting the number of minutes
 
     /**
      * Get the modules of the course
@@ -129,19 +130,35 @@ class Course extends CourseStructure
         }
         return $subset;
     }
+    /**
+     * Get the duration of a course by adding the duration of all its modules
+     * @return int the duration in minutes
+     */
+    public function getDuration(): int
+    {
+        // lazy loading
+        if (is_null($this->duration)) {
+            $count = 0;
+            foreach ($this->getModules() as $module) {
+                $count = $count + $module->getDuration();
+            }
+            $this->duration = $count;
+        }
+        return $this->duration;
+    }
 
     /**
-     * Get the course description
-     * @return string the course description
+     * Getter for 'bf_description' of the course entry
+     * @return string the course description or null if not defined
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->getField('bf_description');
     }
 
     /**
-     * Check if modules are scripted
-     * @return boolean are modules scripted ?
+     * Check if the included modules are scripted
+     * @return boolean the answer or if no value defined, return false by default
      */
     public function isModuleScripted(): ?bool
     {
@@ -149,8 +166,8 @@ class Course extends CourseStructure
     }
 
     /**
-     * Check if activities are scripted
-     * @return boolean are activties scripted ?
+     * Check if the included activities are scripted
+     * @return boolean the answer of this condition or if no value defined, return false by default
      */
     public function isActivityScripted(): ?bool
     {

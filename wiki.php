@@ -9,6 +9,9 @@
  * @link     https://yeswiki.net
  */
 
+use YesWiki\Core\Service\TemplateEngine;
+use YesWiki\Lms\Controller\CourseController;
+
 if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
@@ -24,4 +27,3 @@ require_once LMS_PATH . 'libs/Module.php';
 require_once LMS_PATH . 'libs/Course.php';
 require_once LMS_PATH . 'libs/Learner.php';
 require_once LMS_PATH . 'libs/Progresses.php';
-

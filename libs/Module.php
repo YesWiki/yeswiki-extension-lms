@@ -25,7 +25,7 @@ class Module extends CourseStructure
 
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
     protected $activities; // activities of the module
-    protected $duration; // time in hour necessary for completing the module
+    protected $duration; // estimated time to complete the module, it's an integer counting the number of minutes
     protected $status; // see ModuleStatus constants for the different states
 
     /**
@@ -126,32 +126,19 @@ class Module extends CourseStructure
     }
 
     /**
-     * Get the module description
-     * @return string the module description
+     * Get the duration of a module by adding the duration of all its activities (when the value is filled and is a
+     * valid integer)
+     * @return int the duration in minutes
      */
-    public function getDescription(): string
-    {
-        return $this->getField('bf_description');
-    }
-
-    /**
-     * Calculate duration of the module, in hours, based on inside activities
-     * @return string duration in hours
-     */
-    public function getEstimatedTime()
+    public function getDuration(): int
     {
         // lazy loading
         if (is_null($this->duration)) {
-            $time = 0;
-            $activities = $this->getActivities();
-            foreach ($activities as $activity) {
-                if (!empty($activity->getField('bf_duree')) && is_numeric($activity->getField('bf_duree')) && intval($activity->getField('bf_duree')) > 0) {
-                    $time = $time + intval($activity->getField('bf_duree'));
-                }
+            $count = 0;
+            foreach ($this->getActivities() as $activity) {
+                $count = $count + $activity->getDuration();
             }
-            $hours = floor($time / 60);
-            $minutes = ($time % 60);
-            $this->duration = sprintf('%dh%02d', $hours, $minutes);
+            $this->duration = $count;
         }
         return $this->duration;
     }
@@ -174,7 +161,9 @@ class Module extends CourseStructure
                 if ($this->getField('listeListeOuinonLmsbf_actif') == 'non') {
                     $this->status = ModuleStatus::CLOSED;
                 } else {
-                    $d = empty($this->getField('bf_date_ouverture')) ? '' : Carbon::parse($this->getField('bf_date_ouverture'));
+                    $d = empty($this->getField('bf_date_ouverture')) ?
+                        null
+                        : Carbon::parse($this->getField('bf_date_ouverture'));
                     if (!empty($d) && Carbon::now()->lte($d)) {
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
@@ -198,8 +187,17 @@ class Module extends CourseStructure
     }
 
     /**
+     * Getter for 'bf_description' of the module entry
+     * @return string the module description or null if not defined
+     */
+    public function getDescription(): ?string
+    {
+        return $this->getField('bf_description');
+    }
+
+    /**
      * Check if the module is enable
-     * @return boolean is the module enabled ?
+     * @return boolean the answer or if no value defined, return true by default
      */
     public function isEnabled(): ?bool
     {

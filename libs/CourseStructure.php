@@ -48,8 +48,7 @@ abstract class CourseStructure
 
     /**
      * Get the entry fields of the object
-     *
-     * @return array|null the object fields
+     * @return array|null the object fields or null if no entry associated to the object tag
      */
     public function getFields(): ?array
     {
@@ -61,21 +60,22 @@ abstract class CourseStructure
     }
 
     /**
-     * Get a specific field of the object.
+     * Get a specific field of the object
      * This is shortcut for ->getFields()[key].
      *
-     * @return mixed the field
+     * @param string $key the key field
+     * @return string|null the field value or null if not defined
      */
-    public function getField(string $key)
+    public function getField(string $key): ?string
     {
         return key_exists($key, $this->getFields()) ? $this->getFields()[$key] : null;
     }
 
     /**
      * Get the object title
-     * @return string the object title
+     * @return string|null the object title or null if not defined
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->getField('bf_titre');
     }

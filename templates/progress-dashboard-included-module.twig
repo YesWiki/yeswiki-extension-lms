@@ -1,0 +1,40 @@
+<div class="panel panel-lms-dashboard dashboard-module-frame collapsed">
+    <div id="heading_{{ module.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
+         href="#collapse_{{ module.tag }}" aria-expanded="false" aria-controls="collapse_{{ module.tag }}">
+        <div class="panel-title">
+            <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
+            {{ module.title }}
+            <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_MODULE_PREVIEW') }}"
+               href="{{ url({tag: module.tag}) }}">
+                <i class="fas fa-eye"></i>
+            </a>
+        </div>
+        <div class="finished-ratio">
+            <span class="label-icon"><i class="far fa-check-circle"></i></span> {{ modulesStat[module.tag].finished | length }} / {{ userEntries | length }}
+        </div>
+        <div class="estimated-time">
+            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ courseController.formatDuration(module.duration) }}
+        </div>
+    </div>
+    <div id="collapse_{{ module.tag }}" class="panel-collapse collapse" role="tabpanel"
+         aria-labelledby="heading_{{ module.tag }}" aria-expanded="false">
+        <div class="learners-groups emulated-flex-gap">
+            <div class="learners-group fieldset-group dashboard-module-frame">
+                <label><i class="fas fa-check-circle"></i></label>
+                <ul class="learner-details">
+                    {% for username in modulesStat[module.tag].finished %}
+                        <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
+                    {%  endfor %}
+                </ul>
+            </div>
+            <div class="learners-group fieldset-group dashboard-module-frame">
+                <label><i class="fas fa-times-circle"></i></label>
+                <ul class="learner-details">
+                    {% for username in modulesStat[module.tag].notFinished %}
+                        <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
+                    {%  endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
