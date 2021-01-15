@@ -393,6 +393,10 @@
     flex-direction: column;
     font-size: 0.85em;
 }
+.module-activities .activities-duration {
+    white-space: nowrap;
+}
+
 .activities-infos {
     flex: 1;
 }
@@ -424,6 +428,124 @@
 }
 
 /* lms admin dashboard */
+.dashboard-title {
+    margin-bottom: 50px;
+}
+.dashboard-summary {
+    border: .3rem solid transparent;
+    border-radius: 0.5em;
+    background: var(--neutral-light-color);
+    padding: 10px 15px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.dashboard-summary .summary-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    flex: 2;
+}
+.dashboard-summary .finished-ratio {
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+}
+.dashboard-summary .finished-ratio .label-icon,
+.panel-lms-dashboard .panel-heading .finished-ratio .label-icon {
+    color: #8dc63f;
+    margin-right: 5px;
+}
+.dashboard-summary .estimated-time {
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+}
+.dashboard-summary .estimated-time .label-icon,
+.panel-lms-dashboard .panel-heading .estimated-time .label-icon {
+    color: var(--neutral-soft-color);
+    margin-right: 5px;
+}
+.panel-lms-dashboard {
+    border-radius: .5em;
+    margin-top: .6rem !important;
+    background-color: transparent;
+    transition: border .3s, margin .3s;
+    padding: 0 5px;
+    border: .2rem solid transparent;
+    margin-left: 50px;
+    box-shadow: none;
+}
+.panel-lms-dashboard .panel-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+/* display the right chevron according to the panel state */
+.panel-lms-dashboard .panel-heading.collapsed .fa-chevron-up {
+    display: none;
+}
+.panel-lms-dashboard .panel-heading:not(.collapsed) .fa-chevron-down {
+    display: none;
+}
+.panel-heading[data-toggle="collapse"] {
+    --chevron-color: transparent; /* hack to not display the bootstrap right chevron */
+}
+.panel-lms-dashboard .panel-heading .fa-chevron-up,
+.panel-lms-dashboard .panel-heading .fa-chevron-down {
+    margin-right: 20px;
+}
+.panel-lms-dashboard .panel-heading .panel-title {
+    font-size: 1rem;
+    font-weight: 600;
+    flex: 2;
+}
+.panel-lms-dashboard .panel-heading .panel-title a:not(.btn) {
+    color: var(--link-color);
+    font-weight: 600;
+}
+.panel-lms-dashboard .panel-heading .panel-title a:not(.btn):focus,
+.panel-lms-dashboard .panel-heading .panel-title a:not(.btn):hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+.panel-lms-dashboard .panel-heading .finished-ratio {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+}
+.panel-lms-dashboard .panel-heading .estimated-time {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+}
+.dashboard-course {
+    color: var(--secondary-color-1);
+}
+.dashboard-course-frame {
+    border-color: var(--secondary-color-1);
+}
+.dashboard-module {
+    color: var(--secondary-color-2);
+}
+.dashboard-module-frame {
+    border-color: var(--secondary-color-2);
+}
+.dashboard-activity {
+    color: var(--secondary-color-1);
+}
+.dashboard-activity-frame {
+    border-color: var(--secondary-color-1);
+}
+.course-back {
+    margin-bottom: 30px;
+}
 .learners-groups {
     display: flex;
     flex-wrap: wrap;
@@ -451,14 +573,29 @@
     font-size: 1.8em;
     margin: 0;
 }
-.learners-groups .fieldset-group label i.fa-check-circle{
+.learners-groups .fieldset-group label i.fa-user-check{
     color: #8dc63f;
 }
-.learners-groups .fieldset-group label i.fa-times-circle{
-    color: red;
+.learners-groups .fieldset-group label i.fa-user-times{
+    color: var(--danger-color);
 }
 .learners-groups .learner-details {
-    display: flex;
-    margin-top: 10px;
+    /*margin: 10px 5px 0px 5px;*/
+    margin: 10px auto 0px auto;
+    padding: 0;
     list-style: none;
+    /* doesn't manage to make work grid, the nowrap on li make it exceed the learner-details */
+    /*display: grid;*/
+    /*grid-auto-flow: column;*/
+    /*grid-template-columns: max-content max-content;*/
+    /*repeat(auto-fill, minmax(200px, 1fr));*/
+    /*grid-row-gap: 2rem;*/
+    /*grid-column-gap: 1rem;*/
+}
+.learners-groups .learner-details li{
+    display: block;
+    margin-bottom: 2px;
+    /*white-space: nowrap;*/
+    /*margin: 5px 10px;*/
+    /*min-width: 200px;*/
 }

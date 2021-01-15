@@ -16,6 +16,4 @@ if (!defined("WIKINI_VERSION")) {
 
 // add LMS extension css style TODO: fix custom path
 $this->AddCSSFile('tools/lms/presentation/styles/lms.css');
-// add LMS extension js TODO: fix custom path
-$this->AddJavascriptFile('tools/lms/libs/lms.js');
 ?>

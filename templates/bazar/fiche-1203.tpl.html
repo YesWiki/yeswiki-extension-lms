@@ -9,6 +9,7 @@
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
@@ -42,6 +43,7 @@ use YesWiki\Lms\Service\CourseManager;
       }
     } else { // Show modules list
       echo '<div class="module-list">'."\n";
+
       foreach($course->getModules() as $module) {
         echo $courseController->renderModuleCard($course, $module);
       }
@@ -49,9 +51,15 @@ use YesWiki\Lms\Service\CourseManager;
     }
     if ($GLOBALS['wiki']->userIsAdmin()) : ?>
       <div class="admin-infos well">
-        <h3><?php echo _t('RESERVED_FOR_ADMINS'); ?></h3>
-        <p><strong><?php echo _t('ACTIVITY_SCENARISATION'); ?></strong> : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_activites'); ?></p>
-        <p><strong><?php echo _t('MODULE_SCENARISATION'); ?></strong> : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_modules'); ?></p>
+        <h3><?php echo _t('LMS_RESERVED_FOR_ADMINS'); ?></h3>
+        <p><strong><?php echo _t('LMS_ACTIVITY_SCENARISATION'); ?></strong> : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_activites'); ?></p>
+        <p><strong><?php echo _t('LMS_MODULE_SCENARISATION'); ?></strong> : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_modules'); ?></p>
+        <div class="dashboard-launch">
+            <a href="<?php echo $GLOBALS['wiki']->href(null, 'ProgressDashboard', ['parcours' => $course->getTag()]) ?>"
+               class="btn btn-secondary-2 btn-large">
+                <i class="fas fa-chart-bar"></i><?php echo _t('LMS_VIEW_PROGRESS_DASHBOARD') ?>
+            </a>
+        </div>
       </div>
     <?php endif; ?>
 </div> <!-- /.course-container -->

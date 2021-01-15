@@ -294,6 +294,7 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
     // the tag of the current entry
     $currentEntryTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
 
+    // TODO refactor it by using the model and the twig template
     if ($mode == 'html' && $currentEntryTag && !empty($fiche['listeListeOuinonLmsbf_reactions']) && $fiche['listeListeOuinonLmsbf_reactions'] == "oui") {
         // load the lms lib
         require_once LMS_PATH . 'libs/lms.lib.php';

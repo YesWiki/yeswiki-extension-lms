@@ -18,7 +18,7 @@
                 : {{ nbActivities }}
             </div>
             <div class="activities-duration"><strong><i class="fas fa-hourglass-half fa-fw"></i> {{ _t('LMS_ESTIMATED_TIME') }}</strong>
-                : {{ module.duration }}
+                : {{ formatter.formatDuration(module.duration) }}
             </div>
         </div>
         <div class="activities-action">

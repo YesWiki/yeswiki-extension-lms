@@ -6,37 +6,36 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Wiki;
 
 class CourseController extends YesWikiController
 {
     protected $entryManager;
     protected $courseManager;
     protected $config;
-    protected $wiki;
 
     /**
      * CourseController constructor
      * @param EntryManager $entryManager the injected EntryManager instance
-     * @param CourseManager $courseManager the injected CourseManager instancz
-     * @param Wiki $wiki the injected Wiki instance
+     * @param CourseManager $courseManager the injected CourseManager instance
+     * @param ParameterBagInterface $config the injected ParameterBagInterface instance
+     * @param TemplateEngine $twig the injected ParameterBagInterface instance
      */
     public function __construct(
         EntryManager $entryManager,
         CourseManager $courseManager,
         ParameterBagInterface $config,
-        Wiki $wiki
+        TemplateEngine $twig
     ) {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
         $this->config = $config;
-        $this->wiki = $wiki;
     }
 
     /**
@@ -87,7 +86,7 @@ class CourseController extends YesWikiController
             : null;
 
         if (!empty($currentPageTag)) {
-            if ($this->wiki->config['lms_config']['use_tabs']) {
+            if ($this->config->get('lms_config')['use_tabs']) {
                 // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
                 // to associate this tab page to its parent one, we remove the number from the page tag
                 $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
@@ -98,7 +97,7 @@ class CourseController extends YesWikiController
                 // if the module is specified in the GET parameter, return it if the tag corresponds
                 $module = $this->courseManager->getModule($moduleTag);
 
-                return ($module && $module->hasActivity($currentPageTag)) ?
+                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($currentPageTag)) ?
                     $module
                     : null;
             } else {
@@ -183,15 +182,17 @@ class CourseController extends YesWikiController
             [ModuleStatus::UNKNOWN, ModuleStatus::CLOSED, ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::TO_BE_OPEN]
         ) ? ' disabled' : null;
 
-        return $this->render('@lms/module-card.twig', [
-            "course" => $course,
-            "module" => $module,
-            "image" => $image,
-            "activityLink" => $activityLink,
-            "labelStart" => $labelStart,
-            "statusMsg" => $statusMsg,
-            "classLink" => $classLink,
-            "isAdmin" => $this->wiki->UserIsAdmin(),
+       return $this->render('@lms/module-card.twig', [
+            'course' => $course,
+            'module' => $module,
+            'image' => $image,
+            'activityLink' => $activityLink,
+            'labelStart' => $labelStart,
+            'statusMsg' => $statusMsg,
+            'classLink' => $classLink,
+            'isAdmin' => $this->wiki->UserIsAdmin(),
+            // TODO replace it by a Twig Macro
+            'formatter' => $this->getTwigFormatter()
         ]);
     }
 
@@ -239,5 +240,34 @@ class CourseController extends YesWikiController
                 return _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }
+    }
+
+    /**
+     * Create a formatter which have the specific twig function for the CourseStructure objects
+     * @return object the formatter (an object from the anonymous class)
+     * TODO replace it by a Twig Macro
+     */
+    public function getTwigFormatter()
+    {
+        // return the object which have all the twig formatting function
+        return new class() {
+            /**
+             * Render a duration in a corresponding string
+             * The format is 'XhXX' if the duration is equal or gretter than 1 hour, otherwise 'X min'
+             * @param int|null $duration the duration
+             * @return string the result string
+             */
+            function formatDuration(?int $duration): string
+            {
+                if (is_null($duration) || $duration == 0) {
+                    return '-';
+                }
+                $hours = floor($duration / 60);
+                $minutes = ($duration % 60);
+                return $hours != 0 ?
+                    sprintf('%dh%02d', $hours, $minutes)
+                    : sprintf('%d min', $minutes);
+            }
+        };
     }
 }

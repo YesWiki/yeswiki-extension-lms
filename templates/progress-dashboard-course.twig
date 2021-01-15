@@ -1,0 +1,33 @@
+<h1 class="dashboard-title">{{ _t('LMS_PROGRESS_DASHBOARD') }}</h1>
+
+<h3 class="dashboard-course course-back">
+    <a href="{{ url({tag: course.tag }) }}">
+        <i class="far fa-arrow-alt-circle-left"></i> {{ _t('LMS_BACK_TO_COURSE') }}
+    </a>
+</h3>
+
+<h2 class="dashboard-course">{{ _t('LMS_COURSE') }}</h2>
+<div class="dashboard-summary dashboard-course-frame">
+    <div class="summary-title">{{ course.title }}
+        <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_COURSE_PREVIEW') }}"
+           href="{{ url({tag: course.tag}) }}">
+            <i class="fas fa-eye"></i>
+        </a>
+    </div>
+    <div class="finished-ratio">
+        <span title="{{ _t('LMS_FINISHED_RATIO') }}">
+            <span class="label-icon"><i class="fas fa-user-check"></i></span>
+            {{ coursesStat[module.tag].finished | length}} / {{ userEntries | length }}
+        </span>
+    </div>
+    <div class="estimated-time">
+        <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
+            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ formatter.formatDuration(course.duration) }}
+        </span>
+    </div>
+</div>
+
+<h3 class="dashboard-module">{{ _t('LMS_MODULES')}}</h3>
+{% for module in course.modules %}
+    {{ include('@lms/progress-dashboard-included-module.twig') }}
+{% endfor %}
