@@ -39,26 +39,6 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
-                                   title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
-                                    {{ userEntries[username].bf_titre }}
-                                </a>
-                                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
-                                   href="{{ url({tag: username}) }}">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
-                                   title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
-                                    {{ userEntries[username].bf_titre }}
-                                </a>
-                                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
-                                   href="{{ url({tag: username}) }}">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </li>
                         {%  endfor %}
                     </ul>
             </div>
