@@ -92,7 +92,7 @@
 .module-launch > a {
     width: 160px;
 }
-.pager-lms {
+.module-nav .pager-lms {
     margin: 0
 }
 .module-nav li.square>a {
