@@ -166,35 +166,39 @@ class CourseController extends YesWikiController
                 'fit'
             );
 
+        $status = $module->getStatus($course);
+        $disabledLink = ($status == ModuleStatus::UNKNOWN ?
+            true :
+            !($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])
+                && in_array($status,
+                    [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]));
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-        $activityLink = $this->wiki->href(
-            '',
-            $module->getFirstActivityTag(),
-            ['parcours' => $course->getTag(), 'module' => $module->getTag()],
-            false
-        );
-        // TODO manage different buttons label : Start / Resume / Admin Acces only
-        $labelStart = _t('LMS_BEGIN');//'LMS_BEGIN_NOACCESS_ADMIN'
+        if (!$disabledLink){
+            $activityLink = $this->wiki->href(
+                '',
+                $module->getFirstActivityTag(),
+                ['parcours' => $course->getTag(), 'module' => $module->getTag()],
+                false
+            );
+        }
+        $labelStart = ($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])
+            && in_array($status, [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]) ?
+                _t('LMS_BEGIN_NOACCESS_ADMIN')
+                : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
 
-        $classLink = !($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])
-            && in_array(
-                $module->getStatus($course),
-                [ModuleStatus::UNKNOWN, ModuleStatus::CLOSED, ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::TO_BE_OPEN]
-            ) ? ' disabled' : null;
-
-       return $this->render('@lms/module-card.twig', [
+        return $this->render('@lms/module-card.twig', [
             'course' => $course,
             'module' => $module,
             'image' => $image,
             'activityLink' => $activityLink,
             'labelStart' => $labelStart,
             'statusMsg' => $statusMsg,
-            'classLink' => $classLink,
+            'disabledLink' => $disabledLink,
             'isAdmin' => $this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'],
             // TODO replace it by a Twig Macro
             'formatter' => $this->getTwigFormatter()
-        ]);
+         ]);
     }
 
     /**

@@ -1,14 +1,14 @@
 {% block module_card %}
     <div class="module-card status-{{ module.status(course) }}">
     <div class="module-image">
-        <a class="launch-module{{ classLink }}" href="{{ activityLink }}">
+        <a {% if not disabledLink %}href="{{ activityLink }}"{% endif %} class="launch-module{% if disabledLink %} disabled{% endif %}">
             {% if image is not null %}<img src="{{ image|e }}" alt="Image du module {{ module.title }}" />{% endif %}
         </a>
     </div>
     <div class="module-content">
-        <h3 class="module-title"><a class="launch-module{{ classLink }}" href="{{ activityLink }}">{{ module.title }}</a></h3>
+        <h3 class="module-title"><a {% if not disabledLink %}href="{{ activityLink }}"{% endif %} class="launch-module{% if disabledLink %} disabled{% endif %}">{{ module.title }}</a></h3>
         {% if module.description is not null %}<div class="description-module">{{ format(module.description) | raw }}</div>{% endif %}
-        <small class="module-date"><em>{{ statusMsg }}.</em></small>
+        <small class="module-status"><em>{{ statusMsg }}.</em></small>
     </div>
     <div class="module-activities">
         <div class="activities-infos">
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="activities-action">
-            <a href="{{ activityLink }}" class="btn btn-primary btn-block launch-module{{ classLink }}">
+            <a {% if not disabledLink %}href="{{ activityLink }}"{% endif %} class="btn btn-primary btn-block launch-module{% if disabledLink %} disabled{% endif %}">
                 <i class="fas fa-play fa-fw"></i>{{ labelStart }}
             </a>
             {% if isAdmin %}

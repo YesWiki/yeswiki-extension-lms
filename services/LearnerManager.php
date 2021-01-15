@@ -13,25 +13,30 @@ use YesWiki\Lms\Course;
 use YesWiki\lms\Learner;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
+use YesWiki\Wiki;
 
 
 class LearnerManager
 {
     protected $config;
+    protected $wiki;
     protected $userManager;
     protected $courseManager;
     protected $tripleStore;
 
+
     /**
      * LearnerManager constructor
+     * @param Wiki $wiki the injected wiki instance
      * @param ParameterBagInterface $config the injected configuration instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param TripleStore $tripleStore the injected TripleStore instance
      */
-    public function __construct(ParameterBagInterface $config, UserManager $userManager, CourseManager $courseManager,
-        TripleStore $tripleStore)
+    public function __construct(Wiki $wiki, ParameterBagInterface $config, UserManager $userManager,
+        CourseManager $courseManager, TripleStore $tripleStore)
     {
+        $this->wiki = $wiki;
         $this->config = $config;
         $this->userManager = $userManager;
         $this->tripleStore = $tripleStore;
@@ -75,15 +80,18 @@ class LearnerManager
 
     private function saveActivityOrModuleProgress(Course $course, Module $module, ?Activity $activity): bool
     {
-        // get the current learner if the user is connected
-        $learner = $this->getLearner();
-        if (!$learner) {
-            return false;
-        }
-        $progress = $this->getOneProgressForLearner($learner, $course, $module, $activity);
-        if (empty($progress)) {
-            // save the current progress
-            return $learner->saveProgress($course, $module, $activity);
+        // doesn't save the admin's progresses
+        if (!($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])) {
+            // get the current learner if the user is connected
+            $learner = $this->getLearner();
+            if (!$learner) {
+                return false;
+            }
+            $progress = $this->getOneProgressForLearner($learner, $course, $module, $activity);
+            if (empty($progress)) {
+                // save the current progress
+                return $learner->saveProgress($course, $module, $activity);
+            }
         }
         return false;
     }

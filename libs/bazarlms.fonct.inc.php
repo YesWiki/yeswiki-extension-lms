@@ -14,6 +14,7 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
+use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 
@@ -161,44 +162,47 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
             // save the activity progress if not already exists for this user and activity
             $learnerManager->saveModuleProgress($course, $module);
 
-            $output .= '<nav aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
-                    . '"' : '') . '> 
-                <ul class="pager pager-lms">';
+            // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
 
-            // check the access to the module
-            if (empty($module->getActivities()) || !$module->isEnabled()){
-                if (!$GLOBALS['wiki']->userIsAdmin()) {
-                    // if the module has any activity or if the module is desactivated, inform the learner he doesn't have access to him
-                    $output .= '<li class="noaccess">' . _t('LMS_MODULE_NOACCESS') . '</li>';
-                } else {
-                    // for an admin, inform him and let a button to access to the first activity
-                    $output .= '<li class="noaccess"><div>' . _t('LMS_MODULE_NOACCESS_ADMIN') . '</div>'
-                        . '<div class="admin-access"><a href="'
-                        . $GLOBALS['wiki']->href(
-                            '',
-                            $module->getFirstActivityTag(),
-                            ['parcours' => $course->getTag(), 'module' => $currentModuleTag]
-                        )
-                        . '">' . _t('LMS_BEGIN_NOACCESS_ADMIN') . '</a></div></li>';
-                }
-            } else {
-                // otherwise display the button 'Commencer'
-                $firstActivityTag = $module->getFirstActivityTag();
-                $output .= '<li class="center lms-begin"><a class="launch-module" href="'
-                    . $GLOBALS['wiki']->href(
-                        '',
-                        $module->getFirstActivityTag(),
-                        ['parcours' => $course->getTag(), 'module' => $currentModuleTag]
-                    )
-                    . '">' . _t('LMS_BEGIN') . '</a></li>';
+            // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
+            $status = $module->getStatus($course);
+            $disabledLink = ($status == ModuleStatus::UNKNOWN ?
+                true :
+                !($GLOBALS['wiki']->userIsAdmin() && !$GLOBALS['wiki']->config['lms_config']['admin_as_user'])
+                && in_array($status,
+                    [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]));
+            // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
+            if (!$disabledLink){
+                $activityLink = $GLOBALS['wiki']->href(
+                    '',
+                    $module->getFirstActivityTag(),
+                    ['parcours' => $course->getTag(), 'module' => $module->getTag()],
+                    false
+                );
             }
+            $labelStart = ($GLOBALS['wiki']->userIsAdmin() && !$GLOBALS['wiki']->config['lms_config']['admin_as_user'])
+                && in_array($status, [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]) ?
+                    _t('LMS_BEGIN_NOACCESS_ADMIN')
+                    : _t('LMS_BEGIN');
+            $statusMsg = $courseController->calculateModuleStatusMessage($course, $module);
+
+            // End of duplicate code
+
+            // display the status
+            $output .= '<small class="module-status"><em>' . $statusMsg . '.</em></small>';
+            $output .= '<nav class="module-nav" aria-label="navigation"' . (!empty($tableau_template[1]) ? ' data-id="' . $tableau_template[1]
+                    . '"' : '') . '>';
+
+            $output .= '<div class="module-launch"><a class="btn btn-primary btn-block launch-module' . ($disabledLink ? ' disabled' : '') .
+                '"' . (!$disabledLink ? ' href="' . $activityLink .'"' : '') .  '>
+                <i class="fas fa-play fa-fw"></i>' . $labelStart . '</a></div>';
 
             // we show the previous and next module's buttons only if it's in a modal
             if ($moduleModal) {
                 $output .= displayNextModuleButtons($currentModuleTag, $course, $moduleModal);
             }
 
-            $output .= '</ul>
+            $output .= '
                 </nav>';
         }
     }
@@ -214,7 +218,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
  */
 function displayNextModuleButtons(string $currentModuleTag, Course $course, bool $moduleModal): string
 {
-    $output = '';
+    $output = '<ul class="pager pager-lms">';
     // display the module next button
     if ($currentModuleTag != $course->getLastModuleTag()) {
         // if not the last module of the course, a link to the next module is displayed
@@ -239,6 +243,7 @@ function displayNextModuleButtons(string $currentModuleTag, Course $course, bool
                 . '><i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';
         }
     }
+    $output .= '</ul>';
     return $output;
 }
 
