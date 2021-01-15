@@ -174,13 +174,14 @@ class CourseController extends YesWikiController
             false
         );
         // TODO manage different buttons label : Start / Resume / Admin Acces only
-        $labelStart = _t('LMS_BEGIN');
+        $labelStart = _t('LMS_BEGIN');//'LMS_BEGIN_NOACCESS_ADMIN'
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
 
-        $classLink = !$this->wiki->UserIsAdmin() && in_array(
-            $module->getStatus($course),
-            [ModuleStatus::UNKNOWN, ModuleStatus::CLOSED, ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::TO_BE_OPEN]
-        ) ? ' disabled' : null;
+        $classLink = !($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])
+            && in_array(
+                $module->getStatus($course),
+                [ModuleStatus::UNKNOWN, ModuleStatus::CLOSED, ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::TO_BE_OPEN]
+            ) ? ' disabled' : null;
 
        return $this->render('@lms/module-card.twig', [
             'course' => $course,
@@ -190,7 +191,7 @@ class CourseController extends YesWikiController
             'labelStart' => $labelStart,
             'statusMsg' => $statusMsg,
             'classLink' => $classLink,
-            'isAdmin' => $this->wiki->UserIsAdmin(),
+            'isAdmin' => $this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'],
             // TODO replace it by a Twig Macro
             'formatter' => $this->getTwigFormatter()
         ]);

@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
@@ -15,6 +16,7 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
+    protected $config;
     protected $wiki;
 
     // the progresses related to the current course for all users
@@ -49,8 +51,9 @@ class ProgressDashboardAction extends YesWikiAction
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
         $this->wiki = $this->getService(Wiki::class);
+        $this->config = $this->getService(ParameterBagInterface::class);
 
-        if (!$this->wiki->UserIsAdmin()){
+        if (!($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])){
             // reserved only to the admins
             return $this->render('@lms/alert-message.twig', [
                 'alertMessage' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'

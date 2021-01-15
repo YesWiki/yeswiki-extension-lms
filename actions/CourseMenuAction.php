@@ -64,20 +64,12 @@ class CourseMenuAction extends YesWikiAction
                 ));
 
                 if ($currentModuleInModules) {
-                    //  display only the activities for the modules opened (or all of them for admin users)
-                    /*$modulesDisplayed = array_filter(
-                        $modulesDisplayed,
-                        function ($item) use ($wiki) {
-                            return $wiki->UserIsAdmin() || $item->getField('listeListeOuinonLmsbf_actif') == 'oui';
-                        }
-                    );*/
                     return $this->render('@lms/course-menu.twig',[
                         'pageTag' => $pageTag,
                         'course' => $course,
                         'module' => $module,
                         'modulesDisplayed' => $modulesDisplayed,
-                        'isAdmin' => $wiki->UserIsAdmin(),
-                        'adminAsUser' => $config->get('lms_config')['admin_as_user']
+                        'isAdmin' => $wiki->userIsAdmin() && !$config->get('lms_config')['admin_as_user']
                     ]);
                 }
             }

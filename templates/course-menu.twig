@@ -9,8 +9,7 @@
                     </h4>
                 </div>
                 {% if currentModule.tag == module.tag and
-                        ( (isAdmin and not adminAsUser)
-                            or currentModule.status(course) is constant('YesWiki\\Lms\\ModuleStatus::OPEN'))
+                        ( isAdmin or currentModule.status(course) is constant('YesWiki\\Lms\\ModuleStatus::OPEN'))
                 %}
                     <div class="panel-collapse">
                         <ul class="list-group">

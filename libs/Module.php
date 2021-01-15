@@ -155,8 +155,8 @@ class Module extends CourseStructure
     {
         // lazy loading
         if (is_null($this->status)) {
-            if (empty($course)) {
-                $this->status = ModuleStatus::UNKNOWN; // if no course associated, we cannot check..
+            if (empty($course) || empty($this->getActivities())) {
+                $this->status = ModuleStatus::UNKNOWN; // if no course associated or no activity, we cannot check..
             } else {
                 if ($this->getField('listeListeOuinonLmsbf_actif') == 'non') {
                     $this->status = ModuleStatus::CLOSED;
@@ -167,18 +167,11 @@ class Module extends CourseStructure
                     if (!empty($d) && Carbon::now()->lte($d)) {
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
-                        if (!$course->isModuleScripted()) {
+                        // TODO finish the scenarisation
+                        //if (!$course->isModuleScripted()) {
                             $this->status = ModuleStatus::OPEN;
-                        } else {
-                            // TODO finish the scenarisation
-                            // if it's the first module, it is open
-                            if (!empty($course->getModules()) && $course->getModules()[0] == $this->getTag()) {
-                                $this->status = ModuleStatus::OPEN;
-                            } else {
-                                // todo : check user progress
-                                $this->status = ModuleStatus::NOT_ACCESSIBLE;
-                            }
-                        }
+                        //} else {
+                        //}
                     }
                 }
             }
