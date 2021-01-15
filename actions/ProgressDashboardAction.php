@@ -94,6 +94,7 @@ class ProgressDashboardAction extends YesWikiAction
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
             'userEntries' => $this->userEntries,
+            // TODO replace it by a Twig Macro
             'formatter' => $this->courseController->getTwigFormatter()
         ]);
     }
@@ -106,11 +107,13 @@ class ProgressDashboardAction extends YesWikiAction
         $this->processCourseStat($course);
 
         // render the dashboard for a course
+        $this->wiki->AddJavascriptFile('tools/lms/presentation/javascript/collapsible-panel.js');
         return $this->render('@lms/progress-dashboard-course.twig', [
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
             'userEntries' => $this->userEntries,
+            // TODO replace it by a Twig Macro
             'formatter' => $this->courseController->getTwigFormatter()
         ]);
     }

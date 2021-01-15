@@ -3,7 +3,8 @@
          href="#collapse_{{ module.tag }}" aria-expanded="false" aria-controls="collapse_{{ module.tag }}">
         <div class="panel-title">
             <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
-            <a href="{{ url({tag: 'ProgressDashboard', params: {'course': course.tag, 'module': module.tag} }) }}" title="">
+            <a class="no-collapsable" href="{{ url({params: {'parcours': course.tag, 'module': module.tag} }) }}"
+               title="{{ _t('LMS_VIEW_MODULE_PROGRESSES') }}">
                 {{ module.title }}
             </a>
             <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_MODULE_PREVIEW') }}"
@@ -31,7 +32,16 @@
                 <label><i class="fas fa-user-check" title="{{ _t('LMS_FINISHED_LEARNERS') }}"></i></label>
                 <ul class="learner-details">
                     {% for username in modulesStat[module.tag].finished %}
-                        <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
+                        <li>
+                            <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                               title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+                                {{ userEntries[username].bf_titre }}
+                            </a>
+                            <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
+                               href="{{ url({tag: username}) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </li>
                     {%  endfor %}
                 </ul>
             </div>
@@ -39,7 +49,16 @@
                 <label><i class="fas fa-user-times" title="{{ _t('LMS_NOT_FINISHED_LEARNERS') }}"></i></label>
                 <ul class="learner-details">
                     {% for username in modulesStat[module.tag].notFinished %}
-                        <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
+                        <li>
+                            <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                               title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+                                {{ userEntries[username].bf_titre }}
+                            </a>
+                            <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
+                               href="{{ url({tag: username}) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </li>
                     {%  endfor %}
                 </ul>
             </div>

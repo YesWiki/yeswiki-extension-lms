@@ -29,7 +29,36 @@
                 <label><i class="fas fa-user-check"></i></label>
                     <ul class="learner-details">
                         {% for username in activitiesStat[activity.tag].finished %}
-                            <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
+                            <li>
+                                <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                                   title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+                                    {{ userEntries[username].bf_titre }}
+                                </a>
+                                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
+                                   href="{{ url({tag: username}) }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                                   title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+                                    {{ userEntries[username].bf_titre }}
+                                </a>
+                                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
+                                   href="{{ url({tag: username}) }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                                   title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+                                    {{ userEntries[username].bf_titre }}
+                                </a>
+                                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
+                                   href="{{ url({tag: username}) }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </li>
                         {%  endfor %}
                     </ul>
             </div>
@@ -37,7 +66,16 @@
                 <label><i class="fas fa-user-times"></i></label>
                     <ul class="learner-details">
                         {% for username in activitiesStat[activity.tag].notFinished %}
-                            <li><a href="{{ url({tag: username}) }}">{{ userEntries[username].bf_titre }}</a></li>
+                            <li>
+                                <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                                   title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+                                    {{ userEntries[username].bf_titre }}
+                                </a>
+                                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
+                                   href="{{ url({tag: username}) }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </li>
                         {%  endfor %}
                     </ul>
             </div>

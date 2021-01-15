@@ -1,5 +1,12 @@
 <h1 class="dashboard-title">{{ _t('LMS_PROGRESS_DASHBOARD') }}</h1>
 
+<h3 class="dashboard-course course-back">
+    <a href="{{ url({params: {'parcours': course.tag} }) }}"
+       title="{{ _t('LMS_BACK_TO_COURSE_PROGRESSES') }}">
+        <i class="far fa-arrow-alt-circle-left"></i> {{ _t('LMS_COURSE') }} : {{ course.title }}
+    </a>
+</h3>
+
 <h2 class="dashboard-module">{{ _t('LMS_MODULE') }}</h2>
 <div class="dashboard-summary dashboard-module-frame">
     <div class="summary-title">{{ module.title }}

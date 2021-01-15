@@ -191,7 +191,7 @@ class CourseController extends YesWikiController
             'statusMsg' => $statusMsg,
             'classLink' => $classLink,
             'isAdmin' => $this->wiki->UserIsAdmin(),
-            // normally you don't have to pass non-model object, but adding a twig helper
+            // TODO replace it by a Twig Macro
             'formatter' => $this->getTwigFormatter()
         ]);
     }
@@ -245,6 +245,7 @@ class CourseController extends YesWikiController
     /**
      * Create a formatter which have the specific twig function for the CourseStructure objects
      * @return object the formatter (an object from the anonymous class)
+     * TODO replace it by a Twig Macro
      */
     public function getTwigFormatter()
     {
