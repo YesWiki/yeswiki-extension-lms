@@ -13,6 +13,9 @@ parameters:
     module_image_size_in_course: 400
     # only for developers : displays the lms pages as a user sees them
     admin_as_user: false
+    # for learner dashboard
+    use_only_custom_elapsed_time: true
+    display_activity_elapsed_time: false
 
 services:
   _defaults:

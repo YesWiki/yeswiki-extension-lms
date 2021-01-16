@@ -44,15 +44,26 @@ class LearnerDashboardAction extends YesWikiAction
 
     private function renderDashboard()
     {
-        // get all courses
-        $courses = $this->courseManager->getAllCourses() ;
+        $courseTag = (isset($_GET['course'])) ? $_GET['course'] : null ;
+        $courseTag = (!$courseTag && isset($_POST['course'])) ? $_POST['course'] : $courseTag ;
+
+        if ($courseTag) {
+            // get one tag
+            $courses = $this->courseManager->getCourse($courseTag) ;
+            $courses = ($courses) ? [$courses] : null ;
+        }
+        if (!isset($courses)) {
+            // get all courses
+            $courses = $this->courseManager->getAllCourses() ;
+        }
         
         $coursesStat = $this->LearnerDashboardController->processCoursesStat($courses, $this->learner) ;
         
         return $this->render('@lms/learner-dashboard.twig', [
             'userName' => $this->learner->getUsername(),
             'courses' => $courses,
-            'coursesStat' => $coursesStat
+            'coursesStat' => $coursesStat,
+            'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time']
         ]);
     }
     private function renderSelectUser()

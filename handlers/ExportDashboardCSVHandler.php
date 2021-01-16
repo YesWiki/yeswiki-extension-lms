@@ -87,11 +87,13 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                 } else {
                     $progressRatio = $moduleStat['progressRatio'] . ' %';
                 }
+                $elapsedTime = ($moduleStat['elapsedTime']) ? 
+                                $moduleStat['elapsedTime']->format('%h h %I min.') : null ;
                 $row = [
                     _t('LMS_DASHBOARD_MODULE') . ' '. $courseIndex . '.' . $moduleIndex ,
                     $module->getTitle(),
                     $progressRatio,
-                    '' /* TODO elapsedTime */,
+                    $elapsedTime,
                     ($moduleStat['firstAccessDate']) ? $moduleStat['firstAccessDate']->isoFormat('LLLL') : '' 
                 ];
                 fputcsv($output, $row) ;
@@ -104,11 +106,14 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                     } else {
                         $progressRatio = '----';
                     }
+                    $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time'] && 
+                                        $activityStat['elapsedTime'] && $activityStat['finished']) ? 
+                                    $activityStat['elapsedTime']->format('%h h %I min.') : null ;
                     $row = [
                         _t('LMS_ACTIVITY') . ' '. $courseIndex  . '.' . $moduleIndex . '.' . $activityIndex,
                         $activity->getTitle(),
                         $progressRatio,
-                        '' /* TODO elapsedTime */,
+                        $elapsedTime,
                         ($activityStat['firstAccessDate']) ? $activityStat['firstAccessDate']->isoFormat('LLLL') : '' 
                     ];
                     fputcsv($output, $row) ;

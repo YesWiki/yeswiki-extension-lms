@@ -44,4 +44,29 @@
       {{ include('@lms/learner-dashboard-module.twig') }}
   {% endfor %}
 {% endfor %}
+<div class="panel panel-lms-dashboard dashboard-legend-frame">
+ <div class="panel-heading">
+  <div class="summary-title">
+    {{ _t('LMS_DASHBOARD_LEGEND') }}       
+  </div>
+  <div class="finished-ratio">
+    <span title="{{ _t('LMS_DASHBOARD_PROGRESS') }}">
+      <span class="label-icon"><i class="fa fa-tasks"></i></span>
+      {{ _t('LMS_DASHBOARD_PROGRESS') }}
+    </span>
+  </div>
+  <div class="estimated-time">
+    <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
+      <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
+      {{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}
+    </span> 
+  </div>
+   <div class="first-access">
+    <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
+      <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
+      {{ _t('LMS_DASHBOARD_FIRSTACCESS') }}
+    </span>
+  </div>
+ </div>
+</div>
 {{ include_css('tools/lms/presentation/styles/lms.css') }}

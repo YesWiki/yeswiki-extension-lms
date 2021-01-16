@@ -65,13 +65,11 @@ $GLOBALS['translations'] = array_merge(
         'LMS_DASHBOARD_FIRSTACCESS' => 'Premier accès',
         'LMS_DASHBOARD_COURSE' => 'Parcours',
         'LMS_DASHBOARD_MODULE' => 'Module',
-        'LMS_DASHBOARD_SEE_ITEM' => 'Voir l\'&eacute;l&eacute;ment',
-        'LMS_DASHBOARD_GO_ITEM' => 'Se rendre vers l\'&eacute;l&eacute;ment',
-        'LMS_DASHBOARD_FINISHED' => 'Terminé',
         'LMS_DASHBOARD_FINISHED_F' => 'Terminée',
         'LMS_DASHBOARD_IN_COURSE' => 'En cours',
         'LMS_DASHBOARD_SELECT_USER_TITLE' => 'Choix de l\'utilisateur',
         'LMS_DASHBOARD_EXPORT_TO_CSV' => 'Export CSV',
+        'LMS_DASHBOARD_LEGEND' => 'Légende', 
         'LMS_DASHBOARD_FILENAME' => 'tableau_de_bord'
     )
 );

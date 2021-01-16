@@ -515,7 +515,12 @@
     font-size: 1rem;
     font-weight: 600;
     text-align: right;
+}
+.panel-lms-dashboard .panel-heading .estimated-time {
     flex: 1;
+}
+.panel-lms-dashboard .panel-heading .first-access {
+    flex: 2;
 }
 .dashboard-course {
     color: var(--secondary-color-1);
@@ -534,6 +539,9 @@
 }
 .dashboard-activity-frame {
     border-color: var(--secondary-color-1);
+}
+.dashboard-legend-frame {
+    border-color: var(--neutral-soft-color);
 }
 .course-back {
     margin-bottom: 30px;

@@ -18,10 +18,11 @@
             {% endif %}
         </span>
     </div>
-    {% if activitiesStat[activity.tag].elapsedTime %}
+    {% if display_activity_elapsed_time and activitiesStat[activity.tag].elapsedTime and activitiesStat[activity.tag].finished %}
         <div class="estimated-time">
         <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
-            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>TODO
+            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
+            {{ activitiesStat[activity.tag].elapsedTime.format('%h h %I min.') }}
         </span> 
         </div>
     {% endif %}

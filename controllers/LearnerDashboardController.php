@@ -117,11 +117,23 @@ class LearnerDashboardController extends YesWikiController
                 $firstAccessDate = $firstActivityAccessDate;
             }
 
+            if (!$this->wiki->config['lms_config']['use_only_custom_elapsed_time']) {
+                $moduleDuration = 0;
+                foreach ($activitiesStat as $activityStat){
+                    $moduleDuration += (isset($activityStat['elapsedTime']) && $activityStat['finished']) ? 
+                       $activityStat['elapsedTime']->h*60 +
+                       $activityStat['elapsedTime']->i: 0 ;
+                }
+                $moduleDuration = ($moduleDuration = 0) ? null : $moduleDuration ;
+            } else {
+                $moduleDuration = null ;
+            }
+
             $modulesStat[$module->getTag()] = [
                 "started" => $started , // bool
                 "finished" => $finished , //bool
                 "progressRatio" => $progressRatio , // int between 0 and 100 in pourcent
-                "elapsedTime" => null ,//DateInterval object,
+                "elapsedTime" => ($moduleDuration) ? new \DateInterval('PT'.$moduleDuration.'M') : null ,//DateInterval object,
                 "firstAccessDate" => $firstAccessDate ,//Carbon object,
                 "activitiesStat" => $activitiesStat
             ];
@@ -161,10 +173,12 @@ class LearnerDashboardController extends YesWikiController
                 $finished = false ;
             }
 
+            $activityDuration = ($this->wiki->config['lms_config']['use_only_custom_elapsed_time']) ? null : $activity->getDuration() ;
+
             $activitiesStat[$activity->getTag()] = [
                 "started" => $started , // bool
                 "finished" => $finished , //bool
-                "elapsedTime" => null ,//DateInterval object,
+                "elapsedTime" => ($activityDuration) ? new \DateInterval('PT'.$activityDuration.'M') : null,//DateInterval object,
                 "firstAccessDate" =>  $this->accessDate($progress) //Carbon object,
             ];
         }
