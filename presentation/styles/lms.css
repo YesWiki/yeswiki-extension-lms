@@ -446,14 +446,17 @@
     color: #8dc63f;
     margin-right: 5px;
 }
-.dashboard-summary .estimated-time {
+.dashboard-summary .estimated-time,
+.dashboard-summary .first-access {
     font-size: 1.2rem;
     font-weight: 600;
     text-align: right;
     flex: 1;
 }
 .dashboard-summary .estimated-time .label-icon,
-.panel-lms-dashboard .panel-heading .estimated-time .label-icon {
+.panel-lms-dashboard .panel-heading .estimated-time .label-icon,
+.dashboard-summary .first-access .label-icon,
+.panel-lms-dashboard .panel-heading .first-access .label-icon {
     color: var(--neutral-soft-color);
     margin-right: 5px;
 }
@@ -507,7 +510,8 @@
     text-align: right;
     flex: 1;
 }
-.panel-lms-dashboard .panel-heading .estimated-time {
+.panel-lms-dashboard .panel-heading .estimated-time,
+.panel-lms-dashboard .panel-heading .first-access {
     font-size: 1rem;
     font-weight: 600;
     text-align: right;

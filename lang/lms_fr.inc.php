@@ -54,6 +54,24 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ESTIMATED_TIME_DETAILLED' => 'Temps estimé par les formateurs',
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé⋅e⋅s',
-        'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours'
+        'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
+        
+        // For User Dash Board
+        'LMS_DASHBOARD' => 'Tableau de bord de ',
+        'LMS_DASHBOARD_TYPE' => 'Type',
+        'LMS_DASHBOARD_NAME' => 'Nom',
+        'LMS_DASHBOARD_PROGRESS' => 'Avancement',
+        'LMS_DASHBOARD_ELAPSEDTIME' => 'Temps passé',
+        'LMS_DASHBOARD_FIRSTACCESS' => 'Premier accès',
+        'LMS_DASHBOARD_COURSE' => 'Parcours',
+        'LMS_DASHBOARD_MODULE' => 'Module',
+        'LMS_DASHBOARD_SEE_ITEM' => 'Voir l\'&eacute;l&eacute;ment',
+        'LMS_DASHBOARD_GO_ITEM' => 'Se rendre vers l\'&eacute;l&eacute;ment',
+        'LMS_DASHBOARD_FINISHED' => 'Terminé',
+        'LMS_DASHBOARD_FINISHED_F' => 'Terminée',
+        'LMS_DASHBOARD_IN_COURSE' => 'En cours',
+        'LMS_DASHBOARD_SELECT_USER_TITLE' => 'Choix de l\'utilisateur',
+        'LMS_DASHBOARD_EXPORT_TO_CSV' => 'Export CSV',
+        'LMS_DASHBOARD_FILENAME' => 'tableau_de_bord'
     )
 );
