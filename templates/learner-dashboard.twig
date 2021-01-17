@@ -24,18 +24,12 @@
       {% if coursesStat[course.tag].elapsedTime %}
         <div class="estimated-time">
           <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
-            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>TODO
+            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
+                {{ _self.displayTime(coursesStat[course.tag].elapsedTime) }}
           </span> 
         </div>
       {% endif %}
-      {% if coursesStat[course.tag].firstAccessDate %}
-        <div class="first-access">
-          <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
-            <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
-            {{ coursesStat[course.tag].firstAccessDate.isoFormat('LLLL')}}
-          </span>
-        </div>
-      {% endif %}
+      {{ _self.displayDate(coursesStat[course.tag].firstAccessDate)}}
   </div>
 
   <h3 class="dashboard-module">{{ _t('LMS_MODULES')}}</h3>
@@ -70,3 +64,21 @@
  </div>
 </div>
 {{ include_css('tools/lms/presentation/styles/lms.css') }}
+
+{% macro displayTime(dateInterval) %}
+  {% if dateInterval.h > 0 or dateInterval.d > 0 or dateInterval.i > 60 %}
+      {{ dateInterval.format('%h h %I min.') }}
+  {% else %}
+      {{ dateInterval.format('%i min.') }}
+  {% endif %}
+{% endmacro %}
+{% macro displayDate(dateTime) %}
+  {% if dateTime %}
+    <div class="first-access">
+      <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
+        <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
+        {{ dateTime.isoFormat('LLLL')}}
+      </span>
+    </div>
+  {% endif %}
+{% endmacro %}

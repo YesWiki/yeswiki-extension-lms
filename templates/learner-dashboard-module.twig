@@ -1,3 +1,4 @@
+{% from "@lms/learner-dashboard.twig" import displayTime,displayDate %}
 <div class="panel panel-lms-dashboard dashboard-module-frame collapsed">
     <div id="heading_{{ course.tag ~ '_' ~ module.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
          href="#collapse_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false" aria-controls="collapse_{{ course.tag ~ '_' ~ module.tag }}">
@@ -25,18 +26,11 @@
             <div class="estimated-time">
             <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
                 <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
-                {{ modulesStat[module.tag].elapsedTime.format('%h h %I min.') }}
+                {{ displayTime(modulesStat[module.tag].elapsedTime) }}
             </span> 
             </div>
         {% endif %}
-        {% if modulesStat[module.tag].firstAccessDate %}
-            <div class="first-access">
-            <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
-                <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
-                {{ modulesStat[module.tag].firstAccessDate.isoFormat('LLLL')}}
-            </span>
-            </div>
-        {% endif %}
+        {{ displayDate(modulesStat[module.tag].firstAccessDate)}}
     </div>
     <div id="collapse_{{ course.tag ~ '_' ~ module.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false">

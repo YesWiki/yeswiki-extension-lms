@@ -58,12 +58,21 @@ class LearnerDashboardController extends YesWikiController
             $finished = ($nbModulesFinished == $nbModules) ;
 
             $progressRatio = ($nbModules > 0) ? round($nbModulesFinished/$nbModules * 100) : 0 ;
+            
+            $tempDateTimeZero = (new \DateTime())->setTimestamp(0) ;
+            $tempDateTime = (new \DateTime())->setTimestamp(0) ;
+            foreach ($modulesStat as $moduleStat){
+                if (isset($moduleStat['elapsedTime']) && $moduleStat['finished']) {
+                    $tempDateTime->add($moduleStat['elapsedTime']);
+                }
+            }
+            $courseDuration = ($tempDateTime->getTimestamp() == 0) ? null : $tempDateTimeZero->diff($tempDateTime) ;
 
             $coursesStat[$course->getTag()] = [
                 "started" => $started , // bool
                 "finished" => $finished , //bool
                 "progressRatio" => $progressRatio , // int between 0 and 100 in pourcent
-                "elapsedTime" => null ,//DateInterval object,
+                "elapsedTime" => $courseDuration ,//DateInterval object,
                 "firstAccessDate" => $this->findFirstAccessDate($modulesStat) ,//Carbon object,
                 "modulesStat" => $modulesStat
             ];
@@ -117,23 +126,25 @@ class LearnerDashboardController extends YesWikiController
                 $firstAccessDate = $firstActivityAccessDate;
             }
 
-            if (!$this->wiki->config['lms_config']['use_only_custom_elapsed_time']) {
-                $moduleDuration = 0;
-                foreach ($activitiesStat as $activityStat){
-                    $moduleDuration += (isset($activityStat['elapsedTime']) && $activityStat['finished']) ? 
-                       $activityStat['elapsedTime']->h*60 +
-                       $activityStat['elapsedTime']->i: 0 ;
-                }
-                $moduleDuration = ($moduleDuration = 0) ? null : $moduleDuration ;
+            if ($this->wiki->config['lms_config']['use_only_custom_elapsed_time'] ||
+                    isset($progress['elapsed_time'])) {
+                    $moduleDuration = $this->elapsedTimeStringToDateInterval($progress) ;
             } else {
-                $moduleDuration = null ;
+                $tempDateTimeZero = (new \DateTime())->setTimestamp(0) ;
+                $tempDateTime = (new \DateTime())->setTimestamp(0) ;
+                foreach ($activitiesStat as $activityStat){
+                    if (isset($activityStat['elapsedTime']) && $activityStat['finished']) {
+                        $tempDateTime->add($activityStat['elapsedTime']);
+                    }
+                }
+                $moduleDuration = ($tempDateTime->getTimestamp() == 0) ? null : $tempDateTimeZero->diff($tempDateTime) ;
             }
 
             $modulesStat[$module->getTag()] = [
                 "started" => $started , // bool
                 "finished" => $finished , //bool
                 "progressRatio" => $progressRatio , // int between 0 and 100 in pourcent
-                "elapsedTime" => ($moduleDuration) ? new \DateInterval('PT'.$moduleDuration.'M') : null ,//DateInterval object,
+                "elapsedTime" => $moduleDuration ,//DateInterval object,
                 "firstAccessDate" => $firstAccessDate ,//Carbon object,
                 "activitiesStat" => $activitiesStat
             ];
@@ -173,12 +184,21 @@ class LearnerDashboardController extends YesWikiController
                 $finished = false ;
             }
 
-            $activityDuration = ($this->wiki->config['lms_config']['use_only_custom_elapsed_time']) ? null : $activity->getDuration() ;
+            if ($this->wiki->config['lms_config']['use_only_custom_elapsed_time'] ||
+                    isset($progress['elapsed_time'])) {
+                $activityDuration = $this->elapsedTimeStringToDateInterval($progress) ;
+            } else {
+                $activityDuration =  $activity->getDuration() ;
+                $refTime = (new \DateTime())->setTimestamp('0') ;
+                $newTime = (new \DateTime())->setTimestamp('0') ;
+                $newTime->add(new \DateInterval('P0DT'.$activityDuration.'M')) ;
+                $activityDuration = $refTime->diff($newTime) ;
+            }
 
             $activitiesStat[$activity->getTag()] = [
                 "started" => $started , // bool
                 "finished" => $finished , //bool
-                "elapsedTime" => ($activityDuration) ? new \DateInterval('PT'.$activityDuration.'M') : null,//DateInterval object,
+                "elapsedTime" => $activityDuration,//DateInterval object,
                 "firstAccessDate" =>  $this->accessDate($progress) //Carbon object,
             ];
         }
@@ -217,5 +237,19 @@ class LearnerDashboardController extends YesWikiController
             null ;
         $firstAccessDate = ($firstAccessDate) ? $firstAccessDate->locale($GLOBALS['prefered_language']): null ;
         return $firstAccessDate ;
+    }
+
+    /* Convert timestring to DateInterval
+     * @param $progress array from with 'elapsed_time' key
+     * return \DateInterval
+     */
+    private function elapsedTimeStringToDateInterval(?array $progress): ?\DateInterval
+    {
+        $duration = (isset($progress['elapsed_time'])) ? 
+            (new \DateTime())->setTimestamp(strtotime('00:00:00'))->diff(
+                (new \DateTime())->setTimestamp(strtotime($progress['elapsed_time']))  
+            )  : null ;
+        $duration = ($duration === false) ? null : $duration ;
+        return $duration ;
     }
 }

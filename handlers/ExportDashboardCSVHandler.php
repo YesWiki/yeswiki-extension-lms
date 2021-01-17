@@ -70,11 +70,13 @@ class ExportDashboardCSvHandler extends YesWikiHandler
             } else {
                 $progressRatio = $courseStat['progressRatio'] . ' %';
             }
+            $elapsedTime = ($courseStat['elapsedTime']) ? 
+                $courseStat['elapsedTime']->format('%h h %I min.') : null ;
             $row = [
                 _t('LMS_DASHBOARD_COURSE') . ' '. $courseIndex,
                 $course->getTitle(),
                 $progressRatio,
-                '' /* TODO elapsedTime */,
+                $elapsedTime /* TODO elapsedTime */,
                 ($courseStat['firstAccessDate']) ? $courseStat['firstAccessDate']->isoFormat('LLLL') : '' 
             ];
             fputcsv($output, $row) ;

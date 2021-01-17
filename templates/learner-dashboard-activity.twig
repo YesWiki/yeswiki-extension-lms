@@ -1,37 +1,31 @@
+{% from "@lms/learner-dashboard.twig" import displayTime,displayDate %}
 <div class="panel panel-lms-dashboard panel-heading dashboard-activity-frame">
-    <div class="panel-title">
-        {{ activity.title }}
-        {% if activitiesStat[activity.tag].started %}
-          <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_ACTIVITY_PREVIEW') ~ " " ~ activity.title|e }}"
-            href="{{ url({tag: activity.tag}) }}">
-            <i class="fas fa-eye"></i>
-          </a>
-        {% endif %}
-    </div>
-    <div class="finished-ratio">
-        <span title="{{ _t('LMS_DASHBOARD_PROGRESS') }}">
-        <span class="label-icon"><i class="fa fa-tasks"></i></span>
-            {% if activitiesStat[activity.tag].started %}
-                {{ activitiesStat[activity.tag].finished ? _t('LMS_DASHBOARD_FINISHED_F') :  _t('LMS_DASHBOARD_IN_COURSE')}}
-            {% else %}
-                ----
-            {% endif %}
-        </span>
-    </div>
-    {% if display_activity_elapsed_time and activitiesStat[activity.tag].elapsedTime and activitiesStat[activity.tag].finished %}
-        <div class="estimated-time">
-        <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
-            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
-            {{ activitiesStat[activity.tag].elapsedTime.format('%h h %I min.') }}
-        </span> 
-        </div>
+  <div class="panel-title">
+    {{ activity.title }}
+    {% if activitiesStat[activity.tag].started %}
+      <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_ACTIVITY_PREVIEW') ~ " " ~ activity.title|e }}"
+      href="{{ url({tag: activity.tag}) }}">
+      <i class="fas fa-eye"></i>
+      </a>
     {% endif %}
-    {% if activitiesStat[activity.tag].firstAccessDate %}
-        <div class="first-access">
-        <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
-            <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
-            {{ activitiesStat[activity.tag].firstAccessDate.isoFormat('LLLL')}}
-        </span>
-        </div>
-    {% endif %}
+  </div>
+  <div class="finished-ratio">
+    <span title="{{ _t('LMS_DASHBOARD_PROGRESS') }}">
+    <span class="label-icon"><i class="fa fa-tasks"></i></span>
+      {% if activitiesStat[activity.tag].started %}
+        {{ activitiesStat[activity.tag].finished ? _t('LMS_DASHBOARD_FINISHED_F') :  _t('LMS_DASHBOARD_IN_COURSE')}}
+      {% else %}
+        ----
+      {% endif %}
+    </span>
+  </div>
+  {% if display_activity_elapsed_time and activitiesStat[activity.tag].elapsedTime and activitiesStat[activity.tag].finished %}
+    <div class="estimated-time">
+      <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
+        <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
+           {{ displayTime(activitiesStat[activity.tag].elapsedTime) }}
+      </span> 
+    </div>
+  {% endif %}
+  {{ displayDate(activitiesStat[activity.tag].firstAccessDate)}}
 </div>
