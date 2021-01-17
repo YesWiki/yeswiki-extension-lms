@@ -52,7 +52,7 @@ class LearnerManager
      */
     public function getLearner(string $username = ''): ?Learner
     {
-        if (empty($username)) {
+        if (empty($username) || empty($this->userManager->getOneByName($username))) {
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null

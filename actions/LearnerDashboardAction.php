@@ -21,9 +21,20 @@ class LearnerDashboardAction extends YesWikiAction
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
         $this->userManager = $this->getService(UserManager::class);
-        // get user name option
-        $userNameOption = $this->wiki->GetParameter('user');
-        $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+        // user connected ?
+        if ($this->userManager->getLoggedUser() == ''){
+            // not connected
+            return $this->render('@lms/alert-message.twig', [
+                'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “learnerdashboard”'
+            ]);
+        }
+        // get user name option only for admins
+        if ($this->wiki->UserIsAdmin()) {
+            $userNameOption = $this->wiki->GetParameter('user');
+            $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+        } else{
+            $userNameOption = '' ;
+        }
         // get learner
         $this->learner = $this->learnerManager->getLearner($userNameOption);
         if (!$this->learner) {

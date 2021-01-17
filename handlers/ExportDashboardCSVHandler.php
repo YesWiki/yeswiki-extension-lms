@@ -21,16 +21,24 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
         $this->userManager = $this->getService(UserManager::class);
-        // get user name option
-        $userNameOption = $this->wiki->GetParameter('user');
-        $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+        // user connected ?
+        if ($this->userManager->getLoggedUser() == ''){
+            // not connected
+            return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV') ;
+        }
+        // get user name option only for admins
+        if ($this->wiki->UserIsAdmin()) {
+            // get user name option
+            $userNameOption = $this->wiki->GetParameter('user');
+            $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+        } else{
+            $userNameOption = '' ;
+        }
         // get learner
         $this->learner = $this->learnerManager->getLearner($userNameOption);
         if (!$this->learner) {
             // not connected
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “learnerdashboard”'
-            ]);
+            return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV') ;
         }
         return $this->exportToCSV() ;
     }
@@ -124,5 +132,18 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         }
 
         return '' ;
+    }
+
+    private function renderErrorMSG(string $errorMessage): string
+    {
+        $output = $this->wiki->header() ;
+        $output .= $this->render('@lms/alert-message.twig', [
+                'alertMessage' => $errorMessage
+            ]);
+        $output .= $this->render('@lms/return-button.twig', [
+                'tag' => $this->wiki->GetPageTag() 
+            ]);
+        $output .= $this->wiki->footer() ;
+        return $output ;
     }
 }
