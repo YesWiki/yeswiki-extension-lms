@@ -49,9 +49,9 @@ class Progresses
                 && $value['course'] == $course->getTag()
                 && $value['module'] == $module->getTag()
                 && ((!$activity && !isset($value['activity']))
-                    || ($activity && $value['activity'] == $activity->getTag()));
+                    || ($activity && isset($value['activity']) && $value['activity'] == $activity->getTag()));
         });
-        return empty($results) ? null : $results[0];
+        return empty($results) ? null : array_values($results)[0];
     }
 
     public function getActivityProgressesOfModule(Course $course, Module $module): Progresses
