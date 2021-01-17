@@ -78,7 +78,7 @@ class Learner
         ) == 0;
     }
 
-    public function saveElapsedTime(Course $course, Module $module, ?Activity $activity, DateInterval $time): bool
+    public function saveElapsedTime(Course $course, Module $module, ?Activity $activity, \DateInterval $time): bool
     {
         $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() .
             ($activity ?
@@ -92,6 +92,9 @@ class Learner
             '=',
             'LIKE'
         );
+        if (count($results) == 0) {
+            return false ;
+        }
         foreach ($results as $result) {
             $oldvalueJSON = $result['value'] ;
             $oldvalue = json_decode($oldvalueJSON);
@@ -110,5 +113,6 @@ class Learner
                 ''
             );
         }
+        return true ;
     }
 }
