@@ -29,13 +29,13 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         // get user name option only for admins
         if ($this->wiki->UserIsAdmin()) {
             // get user name option
-            $userNameOption = $this->wiki->GetParameter('user');
-            $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+            $learnerNameOption = $this->wiki->GetParameter('learner');
+            $learnerNameOption = (empty($learnerNameOption)) ? ((empty($_REQUEST['learner'])) ? '' : $_REQUEST['learner']) : $learnerNameOption ;
         } else {
-            $userNameOption = '' ;
+            $learnerNameOption = '' ;
         }
         // get learner
-        $this->learner = $this->learnerManager->getLearner($userNameOption);
+        $this->learner = $this->learnerManager->getLearner($learnerNameOption);
         if (!$this->learner) {
             // not connected
             return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV') ;

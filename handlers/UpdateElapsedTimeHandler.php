@@ -29,18 +29,18 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
             return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' UpdateElapsedTime') ;
         }
         // check validity for user
-        $user = '' ;
-        if (isset($_GET['user']) || isset($_POST['user'])) {
+        $learnerName = '' ;
+        if (isset($_GET['learner']) || isset($_POST['learner'])) {
             if ($this->wiki->UserIsAdmin()) {
-                $user = (isset($_GET['user'])) ? $_GET['user'] :
-                    ((isset($_POST['user'])) ? $_POST['user'] : '') ;
-                if (empty($this->userManager->getOneByName($user))) {
-                    return $this->renderErrorMSG('In params, the user "'.$user.'" does not exist !') ;
+                $learnerName = (isset($_GET['learner'])) ? $_GET['learner'] :
+                    ((isset($_POST['learner'])) ? $_POST['learner'] : '') ;
+                if (empty($this->userManager->getOneByName($learnerName))) {
+                    return $this->renderErrorMSG('In params, the user "'.$learnerName.'" does not exist !') ;
                 }
             }
         }
         // get Learner
-        $learner = $this->learnerManager->getLearner($user) ;
+        $learner = $this->learnerManager->getLearner($learnerName) ;
         // get course
         if (isset($_GET['course']) || isset($_POST['course'])) {
             $courseTag = (isset($_GET['course'])) ? $_GET['course'] :

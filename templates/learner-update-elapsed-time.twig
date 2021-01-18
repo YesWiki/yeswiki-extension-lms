@@ -5,7 +5,7 @@
     {{- '" ?'}}</h3>
 <form action="{{ url({tag:'',
                       handler:'UpdateElapsedTime',
-                      params:{user:learner.getUsername,course:course.tag,module:module.tag,activity:activity.tag,previousparams:previousparamskeys}}) }}"
+                      params:{learner:learner.getUsername,course:course.tag,module:module.tag,activity:activity.tag,previousparams:previousparamskeys}}) }}"
                       method="POST" name="formulaire" id="formulaire" enctype="multipart/form-data" class="form-horizontal">
   <input id="elpasedtime" name="elapsedtime" class="form-control" 
     value="{{ activity ? 

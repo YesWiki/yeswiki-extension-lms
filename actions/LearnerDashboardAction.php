@@ -30,13 +30,13 @@ class LearnerDashboardAction extends YesWikiAction
         }
         // get user name option only for admins
         if ($this->wiki->UserIsAdmin()) {
-            $userNameOption = $this->wiki->GetParameter('user');
-            $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+            $learnerNameOption = $this->wiki->GetParameter('learner');
+            $learnerNameOption = (empty($learnerNameOption)) ? ((empty($_REQUEST['learner'])) ? '' : $_REQUEST['learner']) : $learnerNameOption ;
         } else {
-            $userNameOption = '' ;
+            $learnerNameOption = '' ;
         }
         // get learner
-        $this->learner = $this->learnerManager->getLearner($userNameOption);
+        $this->learner = $this->learnerManager->getLearner($learnerNameOption);
         if (!$this->learner) {
             // not connected
             return $this->render('@lms/alert-message.twig', [
@@ -46,7 +46,7 @@ class LearnerDashboardAction extends YesWikiAction
         if ($this->wiki->UserIsAdmin() &&
             (empty($this->wiki->config["ADMIN_AS_USER"]) || $this->wiki->config["ADMIN_AS_USER"] == false) &&
             (empty($this->wiki->GetParameter('selectuser')) || $this->wiki->GetParameter('selectuser') ==  'true') &&
-            empty($userNameOption)) {
+            empty($learnerNameOption)) {
             return $this->renderSelectUser() ;
         } else {
             return $this->renderDashboard() ;
@@ -57,6 +57,15 @@ class LearnerDashboardAction extends YesWikiAction
     {
         $courseTag = (isset($_GET['course'])) ? $_GET['course'] : null ;
         $courseTag = (!$courseTag && isset($_POST['course'])) ? $_POST['course'] : $courseTag ;
+
+        if (empty($_GET['learner']) && !empty($_POST['learner'])) {
+            $params_temp = [] ;
+            $params_temp['learner'] = $this->learner->getUsername() ;
+            if ($courseTag) {
+                $params_temp['course'] = $courseTag ;
+            }
+            $this->wiki->Redirect($this->wiki->Href('', '', $params_temp, false));
+        }
 
         if ($courseTag) {
             // get one tag
@@ -71,7 +80,7 @@ class LearnerDashboardAction extends YesWikiAction
         $coursesStat = $this->LearnerDashboardController->processCoursesStat($courses, $this->learner) ;
         
         return $this->render('@lms/learner-dashboard.twig', [
-            'userName' => $this->learner->getUsername(),
+            'learnerName' => $this->learner->getUsername(),
             'courses' => $courses,
             'coursesStat' => $coursesStat,
             'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time'],
