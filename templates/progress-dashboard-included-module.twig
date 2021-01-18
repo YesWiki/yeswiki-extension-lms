@@ -33,7 +33,7 @@
                 <ul class="learner-details">
                     {% for username in modulesStat[module.tag].finished %}
                         <li>
-                            <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                            <a href="{{ url({tag: 'LearnerDashboard', params: {'learner': username,'course':course.tag}}) }}"
                                title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
                                 {{ userEntries[username].bf_titre }}
                             </a>
@@ -50,7 +50,7 @@
                 <ul class="learner-details">
                     {% for username in modulesStat[module.tag].notFinished %}
                         <li>
-                            <a href="{{ url({tag: 'LearnerDashboard', params: {'user': username}}) }}"
+                            <a href="{{ url({tag: 'LearnerDashboard', params: {'learner': username,'course':course.tag}}) }}"
                                title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
                                 {{ userEntries[username].bf_titre }}
                             </a>
