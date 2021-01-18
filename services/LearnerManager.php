@@ -3,7 +3,6 @@
 
 namespace YesWiki\Lms\Service;
 
-
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
@@ -14,7 +13,6 @@ use YesWiki\lms\Learner;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
 use YesWiki\Wiki;
-
 
 class LearnerManager
 {
@@ -33,9 +31,13 @@ class LearnerManager
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param TripleStore $tripleStore the injected TripleStore instance
      */
-    public function __construct(Wiki $wiki, ParameterBagInterface $config, UserManager $userManager,
-        CourseManager $courseManager, TripleStore $tripleStore)
-    {
+    public function __construct(
+        Wiki $wiki,
+        ParameterBagInterface $config,
+        UserManager $userManager,
+        CourseManager $courseManager,
+        TripleStore $tripleStore
+    ) {
         $this->wiki = $wiki;
         $this->config = $config;
         $this->userManager = $userManager;
@@ -102,8 +104,14 @@ class LearnerManager
             ($activity ?
                 '","activity":"' . $activity->getTag() . '"%'
                 : '","log_time"%'); // if no activity, we are looking for the time attribute just after the module one
-        $results = $this->tripleStore->getMatching($learner->getUsername(), 'https://yeswiki.net/vocabulary/progress',
-            $like, '=', '=', 'LIKE');
+        $results = $this->tripleStore->getMatching(
+            $learner->getUsername(),
+            'https://yeswiki.net/vocabulary/progress',
+            $like,
+            '=',
+            '=',
+            'LIKE'
+        );
         if ($results) {
             // decode the json which have the progress information
             $progress = json_decode($results[0]['value'], true);
@@ -117,8 +125,14 @@ class LearnerManager
     public function getProgressesForAllLearners(Course $course): Progresses
     {
         $like = '%"course":"' . $course->getTag() . '"%';
-        $results = $this->tripleStore->getMatching(null, 'https://yeswiki.net/vocabulary/progress',
-            $like, 'LIKE', '=', 'LIKE');
+        $results = $this->tripleStore->getMatching(
+            null,
+            'https://yeswiki.net/vocabulary/progress',
+            $like,
+            'LIKE',
+            '=',
+            'LIKE'
+        );
         if ($results) {
             // json decode
             $results = new Progresses(

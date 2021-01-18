@@ -22,11 +22,22 @@
                 {% endif %}
             </span>
         </div>
-        {% if modulesStat[module.tag].elapsedTime %}
+        {% if (modulesStat[module.tag].elapsedTime and not use_only_custom_elapsed_time) or modulesStat[module.tag].finished %}
             <div class="estimated-time">
             <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
                 <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
-                {{ displayTime(modulesStat[module.tag].elapsedTime) }}
+                {% if modulesStat[module.tag].elapsedTime %}
+                    {{ displayTime(modulesStat[module.tag].elapsedTime) }}
+                {% else %}
+                    ----
+                {% endif %}
+                <a class="btn btn-xs btn-default" 
+                   href="{{ url({tag:'',
+                                 handler:'UpdateElapsedTime',
+                                 params:{user:userName,course:course.tag,module:module.tag,previousparams:previousparamskeys}}) }}" 
+                   title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}" 
+                   onclick="window.location = this.href;">
+                <i class="fa fa-edit"></i></a>
             </span> 
             </div>
         {% endif %}

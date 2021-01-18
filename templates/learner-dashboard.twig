@@ -1,4 +1,11 @@
-<a href="{{ url({tag:'',handler:'ExportDashboardCSv',params:{user:userName}}) }}" class="btn btn-primary pull-right">
+{% if courses|length == 1 %}
+  {% set courseTag = (courses|first).tag %}
+  {% set previousparamskeys = 'user,course' %}
+{% else %}
+  {% set courseTag = '' %}
+  {% set previousparamskeys = 'user' %}
+{% endif %}
+<a href="{{ url({tag:'',handler:'ExportDashboardCSv',params:{user:userName,course:courseTag}}) }}" class="btn btn-primary pull-right">
 <i class="fas fa-download"></i>{{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}</a>
 <h1 class="dashboard-title">{{ _t('LMS_DASHBOARD') }}{{ userName }}</h1>
 

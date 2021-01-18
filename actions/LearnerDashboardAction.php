@@ -22,7 +22,7 @@ class LearnerDashboardAction extends YesWikiAction
         $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
         $this->userManager = $this->getService(UserManager::class);
         // user connected ?
-        if ($this->userManager->getLoggedUser() == ''){
+        if ($this->userManager->getLoggedUser() == '') {
             // not connected
             return $this->render('@lms/alert-message.twig', [
                 'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “learnerdashboard”'
@@ -32,7 +32,7 @@ class LearnerDashboardAction extends YesWikiAction
         if ($this->wiki->UserIsAdmin()) {
             $userNameOption = $this->wiki->GetParameter('user');
             $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
-        } else{
+        } else {
             $userNameOption = '' ;
         }
         // get learner
@@ -74,7 +74,8 @@ class LearnerDashboardAction extends YesWikiAction
             'userName' => $this->learner->getUsername(),
             'courses' => $courses,
             'coursesStat' => $coursesStat,
-            'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time']
+            'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time'],
+            'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time']
         ]);
     }
     private function renderSelectUser()

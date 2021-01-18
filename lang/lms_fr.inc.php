@@ -69,9 +69,14 @@ $GLOBALS['translations'] = array_merge(
         'LMS_DASHBOARD_IN_COURSE' => 'En cours',
         'LMS_DASHBOARD_SELECT_USER_TITLE' => 'Choix de l\'utilisateur',
         'LMS_DASHBOARD_EXPORT_TO_CSV' => 'Export CSV',
-        'LMS_DASHBOARD_LEGEND' => 'Légende', 
+        'LMS_DASHBOARD_LEGEND' => 'Légende',
         'LMS_DASHBOARD_FILENAME' => 'tableau_de_bord',
         'LMS_DASHBOARD_RETURN' => 'Retourner à ',
-        'LMS_LOGGED_USERS_ONLY_HANDLER' => 'Il faut être connecté pour pouvoir utilisé le handler'
+        'LMS_LOGGED_USERS_ONLY_HANDLER' => 'Il faut être connecté pour pouvoir utilisé le handler',
+        'LMS_UPDATE_ELAPSED_TIME_UPDATE' => 'Mettre à jour',
+        'LMS_UPDATE_ELAPSED_TIME_MESSAGE' => 'Combien de temps avez-vous passé sur ',
+        'LMS_UPDATE_ELAPSED_TIME_MODULE' => 'le module',
+        'LMS_UPDATE_ELAPSED_TIME_ACTIVITY' => 'l\'activté',
+        'LMS_UPDATE_ELAPSED_TIME_MINUTES' => 'minutes'
     )
 );
