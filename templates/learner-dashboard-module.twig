@@ -34,7 +34,7 @@
                 <a class="btn btn-xs btn-default" 
                    href="{{ url({tag:'',
                                  handler:'UpdateElapsedTime',
-                                 params:{learner:learnerName,course:course.tag,module:module.tag,previousparams:previousparamskeys}}) }}" 
+                                 params:{learner:learner.Username,course:course.tag,module:module.tag,previousparams:previousparamskeys}}) }}" 
                    title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}" 
                    onclick="window.location = this.href;">
                 <i class="fa fa-edit"></i></a>

@@ -5,7 +5,7 @@
   <select id="learner" name="learner" class="form-control">
         <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
         {% for user in usersList %}
-            <option value={{ user }}>{{ user }}</option>
+            <option value={{ user.tag }}>{{ user.fullname }}</option>
         {% endfor %}
   </select>
   <div class="form-actions form-group">

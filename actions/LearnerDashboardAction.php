@@ -80,7 +80,7 @@ class LearnerDashboardAction extends YesWikiAction
         $coursesStat = $this->LearnerDashboardController->processCoursesStat($courses, $this->learner) ;
         
         return $this->render('@lms/learner-dashboard.twig', [
-            'learnerName' => $this->learner->getUsername(),
+            'learner' => $this->learner,
             'courses' => $courses,
             'coursesStat' => $coursesStat,
             'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time'],
@@ -100,7 +100,8 @@ class LearnerDashboardAction extends YesWikiAction
         // list user
         $users = $this->userManager->getAll() ;
         $usersList = array_map(function ($user) {
-            return $user['name'] ;
+            $learner = $this->learnerManager->getLearner($user['name']) ;
+            return [ 'tag' => $learner->getUsername() , 'fullname' => $learner->getFullname()] ;
         }, $users) ;
 
         // propose form with select

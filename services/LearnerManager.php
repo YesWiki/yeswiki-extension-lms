@@ -4,6 +4,7 @@
 namespace YesWiki\Lms\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Activity;
@@ -21,6 +22,7 @@ class LearnerManager
     protected $userManager;
     protected $courseManager;
     protected $tripleStore;
+    protected $entryManager;
 
 
     /**
@@ -30,18 +32,21 @@ class LearnerManager
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param TripleStore $tripleStore the injected TripleStore instance
+     * @param EntryManager $entryManager the injected EntryManager instance
      */
     public function __construct(
         Wiki $wiki,
         ParameterBagInterface $config,
         UserManager $userManager,
         CourseManager $courseManager,
-        TripleStore $tripleStore
+        TripleStore $tripleStore,
+        EntryManager $entryManager
     ) {
         $this->wiki = $wiki;
         $this->config = $config;
         $this->userManager = $userManager;
         $this->tripleStore = $tripleStore;
+        $this->entryManager = $entryManager;
     }
 
     /**
@@ -58,9 +63,9 @@ class LearnerManager
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->config, $this->tripleStore);
+                : new Learner($user['name'], $this->config, $this->tripleStore, $this->entryManager);
         }
-        return new Learner($username, $this->config, $this->tripleStore);
+        return new Learner($username, $this->config, $this->tripleStore, $this->entryManager);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool

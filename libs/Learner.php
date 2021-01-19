@@ -3,6 +3,7 @@
 namespace YesWiki\lms;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
 use Carbon\Carbon;
 
@@ -10,6 +11,8 @@ class Learner
 {
     // username of the Learner
     protected $username;
+    // fullname of the Learner
+    protected $fullname;
     // the Progresses object for all activities/modules and courses
     protected $allProgresses;
 
@@ -17,6 +20,8 @@ class Learner
     protected $config;
     // the tripleStore to get the progress information
     protected $tripleStore;
+    // entry manager
+    protected $entryManager;
 
     /**
      * Module constructor
@@ -24,16 +29,38 @@ class Learner
      * @param ParameterBagInterface $config the configuration parameters of YesWiki
      * @param TripleStore $tripleStore the TripleStore Service
      */
-    public function __construct(string $username, ParameterBagInterface $config, TripleStore $tripleStore)
-    {
+    public function __construct(
+        string $username,
+        ParameterBagInterface $config,
+        TripleStore $tripleStore,
+        EntryManager $entryManager
+    ) {
         $this->username = $username;
         $this->config = $config;
         $this->tripleStore = $tripleStore;
+        $this->entryManager = $entryManager;
     }
 
     public function getUsername(): string
     {
         return $this->username;
+    }
+
+    /* Search entries with username if not return tag
+     * return string title or tag
+     */
+    public function getFullName(): string
+    {
+        if ($this->fullname) {
+            return $this->fullname ;
+        } else {
+            $userEntry = $this->entryManager->getOne($this->username);
+            if ($userEntry && isset($userEntry['bf_titre'])) {
+                return $userEntry['bf_titre'] ;
+            } else {
+                return $this->username;
+            }
+        }
     }
 
     public function getAllProgresses(): Progresses
