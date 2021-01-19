@@ -21,16 +21,24 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
         $this->userManager = $this->getService(UserManager::class);
-        // get user name option
-        $userNameOption = $this->wiki->GetParameter('user');
-        $userNameOption = (empty($userNameOption)) ? ((empty($_REQUEST['user'])) ? '' : $_REQUEST['user']) : $userNameOption ;
+        // user connected ?
+        if ($this->userManager->getLoggedUser() == '') {
+            // not connected
+            return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV') ;
+        }
+        // get user name option only for admins
+        if ($this->LearnerDashboardController->UserIsAdvanced()) {
+            // get user name option
+            $learnerNameOption = $this->wiki->GetParameter('learner');
+            $learnerNameOption = (empty($learnerNameOption)) ? ((empty($_REQUEST['learner'])) ? '' : $_REQUEST['learner']) : $learnerNameOption ;
+        } else {
+            $learnerNameOption = '' ;
+        }
         // get learner
-        $this->learner = $this->learnerManager->getLearner($userNameOption);
+        $this->learner = $this->learnerManager->getLearner($learnerNameOption);
         if (!$this->learner) {
             // not connected
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “learnerdashboard”'
-            ]);
+            return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV') ;
         }
         return $this->exportToCSV() ;
     }
@@ -39,9 +47,18 @@ class ExportDashboardCSvHandler extends YesWikiHandler
 
     public function exportToCSV(): string
     {
-        // get all courses
-        $courses = $this->courseManager->getAllCourses() ;
-        
+        $courseTag = (isset($_GET['course'])) ? $_GET['course'] : null ;
+        $courseTag = (!$courseTag && isset($_POST['course'])) ? $_POST['course'] : $courseTag ;
+
+        if ($courseTag) {
+            // get one tag
+            $courses = $this->courseManager->getCourse($courseTag) ;
+            $courses = ($courses) ? [$courses] : null ;
+        }
+        if (!isset($courses)) {
+            // get all courses
+            $courses = $this->courseManager->getAllCourses() ;
+        }
         $coursesStat = $this->LearnerDashboardController->processCoursesStat($courses, $this->learner) ;
 
         // output headers so that the file is downloaded rather than displayed
@@ -70,14 +87,14 @@ class ExportDashboardCSvHandler extends YesWikiHandler
             } else {
                 $progressRatio = $courseStat['progressRatio'] . ' %';
             }
-            $elapsedTime = ($courseStat['elapsedTime']) ? 
+            $elapsedTime = ($courseStat['elapsedTime']) ?
                 $courseStat['elapsedTime']->format('%h h %I min.') : null ;
             $row = [
                 _t('LMS_DASHBOARD_COURSE') . ' '. $courseIndex,
                 $course->getTitle(),
                 $progressRatio,
                 $elapsedTime /* TODO elapsedTime */,
-                ($courseStat['firstAccessDate']) ? $courseStat['firstAccessDate']->isoFormat('LLLL') : '' 
+                ($courseStat['firstAccessDate']) ? $courseStat['firstAccessDate']->isoFormat('LLLL') : ''
             ];
             fputcsv($output, $row) ;
             $moduleIndex = 0 ;
@@ -89,14 +106,15 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                 } else {
                     $progressRatio = $moduleStat['progressRatio'] . ' %';
                 }
-                $elapsedTime = ($moduleStat['elapsedTime']) ? 
+                $elapsedTime = ($moduleStat['elapsedTime'] &&
+                                !($this->wiki->config['lms_config']['use_only_custom_elapsed_time'] && !$moduleStat['finished'])) ?
                                 $moduleStat['elapsedTime']->format('%h h %I min.') : null ;
                 $row = [
                     _t('LMS_DASHBOARD_MODULE') . ' '. $courseIndex . '.' . $moduleIndex ,
                     $module->getTitle(),
                     $progressRatio,
                     $elapsedTime,
-                    ($moduleStat['firstAccessDate']) ? $moduleStat['firstAccessDate']->isoFormat('LLLL') : '' 
+                    ($moduleStat['firstAccessDate']) ? $moduleStat['firstAccessDate']->isoFormat('LLLL') : ''
                 ];
                 fputcsv($output, $row) ;
                 $activityIndex = 0 ;
@@ -108,15 +126,15 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                     } else {
                         $progressRatio = '----';
                     }
-                    $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time'] && 
-                                        $activityStat['elapsedTime'] && $activityStat['finished']) ? 
+                    $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time'] &&
+                                        $activityStat['elapsedTime'] && $activityStat['finished']) ?
                                     $activityStat['elapsedTime']->format('%h h %I min.') : null ;
                     $row = [
                         _t('LMS_ACTIVITY') . ' '. $courseIndex  . '.' . $moduleIndex . '.' . $activityIndex,
                         $activity->getTitle(),
                         $progressRatio,
                         $elapsedTime,
-                        ($activityStat['firstAccessDate']) ? $activityStat['firstAccessDate']->isoFormat('LLLL') : '' 
+                        ($activityStat['firstAccessDate']) ? $activityStat['firstAccessDate']->isoFormat('LLLL') : ''
                     ];
                     fputcsv($output, $row) ;
                 }
@@ -124,5 +142,18 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         }
 
         return '' ;
+    }
+
+    private function renderErrorMSG(string $errorMessage): string
+    {
+        $output = $this->wiki->header() ;
+        $output .= $this->render('@lms/alert-message.twig', [
+                'alertMessage' => $errorMessage
+            ]);
+        $output .= $this->render('@lms/return-button.twig', [
+                'tag' => $this->wiki->GetPageTag()
+            ]);
+        $output .= $this->wiki->footer() ;
+        return $output ;
     }
 }

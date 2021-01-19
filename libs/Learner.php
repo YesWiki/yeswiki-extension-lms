@@ -3,6 +3,7 @@
 namespace YesWiki\lms;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
 use Carbon\Carbon;
 
@@ -10,6 +11,8 @@ class Learner
 {
     // username of the Learner
     protected $username;
+    // fullname of the Learner
+    protected $fullname;
     // the Progresses object for all activities/modules and courses
     protected $allProgresses;
 
@@ -17,6 +20,8 @@ class Learner
     protected $config;
     // the tripleStore to get the progress information
     protected $tripleStore;
+    // entry manager
+    protected $entryManager;
 
     /**
      * Module constructor
@@ -24,16 +29,38 @@ class Learner
      * @param ParameterBagInterface $config the configuration parameters of YesWiki
      * @param TripleStore $tripleStore the TripleStore Service
      */
-    public function __construct(string $username, ParameterBagInterface $config, TripleStore $tripleStore)
-    {
+    public function __construct(
+        string $username,
+        ParameterBagInterface $config,
+        TripleStore $tripleStore,
+        EntryManager $entryManager
+    ) {
         $this->username = $username;
         $this->config = $config;
         $this->tripleStore = $tripleStore;
+        $this->entryManager = $entryManager;
     }
 
     public function getUsername(): string
     {
         return $this->username;
+    }
+
+    /* Search entries with username if not return tag
+     * return string title or tag
+     */
+    public function getFullName(): string
+    {
+        if ($this->fullname) {
+            return $this->fullname ;
+        } else {
+            $userEntry = $this->entryManager->getOne($this->username);
+            if ($userEntry && isset($userEntry['bf_titre'])) {
+                return $userEntry['bf_titre'] ;
+            } else {
+                return $this->username;
+            }
+        }
     }
 
     public function getAllProgresses(): Progresses
@@ -69,21 +96,24 @@ class Learner
                 ['activity' => $activity->getTag()]
                 : [])
             + ['log_time' => date('Y-m-d H:i:s', time())];
-        return $this->tripleStore->create(
+        $resultState = $this->tripleStore->create(
             $this->username,
             'https://yeswiki.net/vocabulary/progress',
             json_encode($progress),
             '',
             ''
         ) == 0;
+        if ($resultState) {
+            $this->allProgresses = null ; // because Progresses are not upto date
+        }
+        return $resultState ;
     }
 
-    public function saveElapsedTime(Course $course, Module $module, ?Activity $activity, DateInterval $time): bool
+    public function saveElapsedTime(Course $course, Module $module, ?Activity $activity, \DateInterval $time): bool
     {
-        $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() .
-            ($activity ?
-                '","activity":"' . $activity->getTag() . '"%'
-                : '","log_time"%'); // if no activity, we are looking for the time attribute just after the module one
+        $like = '%"course":"'.$course->getTag().'","module":"'.$module->getTag().'"' .
+            (($activity) ? ',"activity":"'.$activity->getTag().'"' : ',"log_time"')
+            .'%' ; // if no activity, we are looking for the time attribute just after the module one
         $results = $this->tripleStore->getMatching(
             $this->getUsername(),
             'https://yeswiki.net/vocabulary/progress',
@@ -92,23 +122,98 @@ class Learner
             '=',
             'LIKE'
         );
+        if (count($results) == 0) {
+            return false ;
+        }
         foreach ($results as $result) {
             $oldvalueJSON = $result['value'] ;
-            $oldvalue = json_decode($oldvalueJSON);
-            $newvalue = array_merge(
-                $oldvalue,
-                ['elapsed_time' => $time->format('%H:%I:%S')]
-            );
+            $oldvalue = json_decode($oldvalueJSON, true);
+            if ($oldvalue['course'] == $course->getTag() &&
+                $oldvalue['module'] == $module->getTag() &&
+                (($activity && isset($oldvalue['activity']) &&  $oldvalue['activity'] == $activity->getTag()) ||
+                (!$activity && !isset($oldvalue['activity'])))) {
+                $newvalue = array_merge(
+                    $oldvalue,
+                    ['elapsed_time' => $time->format('%H:%I:%S')]
+                );
 
-            $newvalueJSON = json_encode($newvalue);
-            $this->tripleStore->update(
-                $this->getUsername(),
-                'https://yeswiki.net/vocabulary/progress',
-                $oldvalueJSON,
-                $newvalueJSON,
-                '',
-                ''
-            );
+                $newvalueJSON = json_encode($newvalue);
+                $updateResult = $this->tripleStore->update(
+                    $this->getUsername(),
+                    'https://yeswiki.net/vocabulary/progress',
+                    $oldvalueJSON,
+                    $newvalueJSON,
+                    '',
+                    ''
+                ) ;
+                // TODO find why we must use twice update function
+                if ($updateResult == 0) {
+                    $updateResult = $this->tripleStore->update(
+                        $this->getUsername(),
+                        'https://yeswiki.net/vocabulary/progress',
+                        $newvalueJSON, // because value is updated
+                        $newvalueJSON,
+                        '',
+                        ''
+                    ) ;
+                }
+                return ($updateResult == 1 || $updateResult == 3);
+            }
         }
+        return false ;
+    }
+
+    public function resetElapsedTime(Course $course, Module $module, ?Activity $activity): bool
+    {
+        $like = '%"course":"'.$course->getTag().'","module":"'.$module->getTag().'"' .
+            (($activity) ? ',"activity":"'.$activity->getTag().'"' : ',"log_time"')
+            .'%' ; // if no activity, we are looking for the time attribute just after the module one
+        $results = $this->tripleStore->getMatching(
+            $this->getUsername(),
+            'https://yeswiki.net/vocabulary/progress',
+            $like,
+            '=',
+            '=',
+            'LIKE'
+        );
+        if (count($results) == 0) {
+            return false ;
+        }
+        foreach ($results as $result) {
+            $oldvalueJSON = $result['value'] ;
+            $oldvalue = json_decode($oldvalueJSON, true);
+            if ($oldvalue['course'] == $course->getTag() &&
+                $oldvalue['module'] == $module->getTag() &&
+                (($activity && isset($oldvalue['activity']) &&  $oldvalue['activity'] == $activity->getTag()) ||
+                (!$activity && !isset($oldvalue['activity'])))) {
+                if (isset($oldvalue['elapsed_time'])) {
+                    unset($oldvalue['elapsed_time']) ;
+                }
+                $newvalue = $oldvalue;
+
+                $newvalueJSON = json_encode($newvalue);
+                $updateResult = $this->tripleStore->update(
+                    $this->getUsername(),
+                    'https://yeswiki.net/vocabulary/progress',
+                    $oldvalueJSON,
+                    $newvalueJSON,
+                    '',
+                    ''
+                ) ;
+                // TODO find why we must use twice update function
+                if ($updateResult == 0) {
+                    $updateResult = $this->tripleStore->update(
+                        $this->getUsername(),
+                        'https://yeswiki.net/vocabulary/progress',
+                        $newvalueJSON, // because value is updated
+                        $newvalueJSON,
+                        '',
+                        ''
+                    ) ;
+                }
+                return ($updateResult == 1 || $updateResult == 3);
+            }
+        }
+        return false ;
     }
 }

@@ -3,8 +3,8 @@
 
 namespace YesWiki\Lms\Service;
 
-
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Activity;
@@ -15,7 +15,6 @@ use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
 use YesWiki\Wiki;
 
-
 class LearnerManager
 {
     protected $config;
@@ -23,6 +22,7 @@ class LearnerManager
     protected $userManager;
     protected $courseManager;
     protected $tripleStore;
+    protected $entryManager;
 
 
     /**
@@ -32,14 +32,21 @@ class LearnerManager
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param TripleStore $tripleStore the injected TripleStore instance
+     * @param EntryManager $entryManager the injected EntryManager instance
      */
-    public function __construct(Wiki $wiki, ParameterBagInterface $config, UserManager $userManager,
-        CourseManager $courseManager, TripleStore $tripleStore)
-    {
+    public function __construct(
+        Wiki $wiki,
+        ParameterBagInterface $config,
+        UserManager $userManager,
+        CourseManager $courseManager,
+        TripleStore $tripleStore,
+        EntryManager $entryManager
+    ) {
         $this->wiki = $wiki;
         $this->config = $config;
         $this->userManager = $userManager;
         $this->tripleStore = $tripleStore;
+        $this->entryManager = $entryManager;
     }
 
     /**
@@ -52,13 +59,13 @@ class LearnerManager
      */
     public function getLearner(string $username = ''): ?Learner
     {
-        if (empty($username)) {
+        if (empty($username) || empty($this->userManager->getOneByName($username))) {
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->config, $this->tripleStore);
+                : new Learner($user['name'], $this->config, $this->tripleStore, $this->entryManager);
         }
-        return new Learner($username, $this->config, $this->tripleStore);
+        return new Learner($username, $this->config, $this->tripleStore, $this->entryManager);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool
@@ -102,8 +109,14 @@ class LearnerManager
             ($activity ?
                 '","activity":"' . $activity->getTag() . '"%'
                 : '","log_time"%'); // if no activity, we are looking for the time attribute just after the module one
-        $results = $this->tripleStore->getMatching($learner->getUsername(), 'https://yeswiki.net/vocabulary/progress',
-            $like, '=', '=', 'LIKE');
+        $results = $this->tripleStore->getMatching(
+            $learner->getUsername(),
+            'https://yeswiki.net/vocabulary/progress',
+            $like,
+            '=',
+            '=',
+            'LIKE'
+        );
         if ($results) {
             // decode the json which have the progress information
             $progress = json_decode($results[0]['value'], true);
@@ -117,8 +130,14 @@ class LearnerManager
     public function getProgressesForAllLearners(Course $course): Progresses
     {
         $like = '%"course":"' . $course->getTag() . '"%';
-        $results = $this->tripleStore->getMatching(null, 'https://yeswiki.net/vocabulary/progress',
-            $like, 'LIKE', '=', 'LIKE');
+        $results = $this->tripleStore->getMatching(
+            null,
+            'https://yeswiki.net/vocabulary/progress',
+            $like,
+            'LIKE',
+            '=',
+            'LIKE'
+        );
         if ($results) {
             // json decode
             $results = new Progresses(

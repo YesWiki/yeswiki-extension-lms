@@ -7,6 +7,11 @@
       href="{{ url({tag: activity.tag}) }}">
       <i class="fas fa-eye"></i>
       </a>
+    {% else %}
+      <div class="btn btn-default btn-xs"
+        title="{{ _t('LMS_ACTIVITY_PREVIEW_NOT_POSSIBLE')  ~ activity.title|e }}">
+          <i class="fas fa-eye-slash"></i>
+      </div>
     {% endif %}
   </div>
   <div class="finished-ratio">
@@ -19,11 +24,22 @@
       {% endif %}
     </span>
   </div>
-  {% if display_activity_elapsed_time and activitiesStat[activity.tag].elapsedTime and activitiesStat[activity.tag].finished %}
+  {% if display_activity_elapsed_time and activitiesStat[activity.tag].finished %}
     <div class="estimated-time">
       <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
         <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
-           {{ displayTime(activitiesStat[activity.tag].elapsedTime) }}
+          {% if activitiesStat[activity.tag].elapsedTime %}
+            {{ displayTime(activitiesStat[activity.tag].elapsedTime) }}
+          {% else %}
+              ----
+          {% endif %}
+          <a class="btn btn-xs btn-default" 
+              href="{{ url({tag:'',
+                            handler:'UpdateElapsedTime',
+                            params:{learner:learner.username,course:course.tag,module:module.tag,activity:activity.tag,previousparams:previousparamskeys}}) }}" 
+              title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}" 
+              onclick="window.location = this.href;">
+          <i class="fa fa-edit"></i></a>
       </span> 
     </div>
   {% endif %}
