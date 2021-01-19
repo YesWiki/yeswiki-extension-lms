@@ -31,7 +31,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
         // check validity for user
         $learnerName = '' ;
         if (isset($_GET['learner']) || isset($_POST['learner'])) {
-            if ($this->wiki->UserIsAdmin()) {
+            if ($this->LearnerDashboardController->UserIsAdvanced()) {
                 $learnerName = (isset($_GET['learner'])) ? $_GET['learner'] :
                     ((isset($_POST['learner'])) ? $_POST['learner'] : '') ;
                 if (empty($this->userManager->getOneByName($learnerName))) {

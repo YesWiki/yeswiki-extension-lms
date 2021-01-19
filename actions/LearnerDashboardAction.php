@@ -29,7 +29,7 @@ class LearnerDashboardAction extends YesWikiAction
             ]);
         }
         // get user name option only for admins
-        if ($this->wiki->UserIsAdmin()) {
+        if ($this->LearnerDashboardController->UserIsAdvanced()) {
             $learnerNameOption = $this->wiki->GetParameter('learner');
             $learnerNameOption = (empty($learnerNameOption)) ? ((empty($_REQUEST['learner'])) ? '' : $_REQUEST['learner']) : $learnerNameOption ;
         } else {
@@ -43,8 +43,7 @@ class LearnerDashboardAction extends YesWikiAction
                 'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “learnerdashboard”'
             ]);
         }
-        if ($this->wiki->UserIsAdmin() &&
-            (empty($this->wiki->config["ADMIN_AS_USER"]) || $this->wiki->config["ADMIN_AS_USER"] == false) &&
+        if ($this->LearnerDashboardController->UserIsAdvanced() &&
             (empty($this->wiki->GetParameter('selectuser')) || $this->wiki->GetParameter('selectuser') ==  'true') &&
             empty($learnerNameOption)) {
             return $this->renderSelectUser() ;
@@ -90,7 +89,7 @@ class LearnerDashboardAction extends YesWikiAction
     private function renderSelectUser()
     {
         // check if user is in @admins
-        if (!$this->wiki->UserIsAdmin()) {
+        if (!$this->LearnerDashboardController->UserIsAdvanced()) {
             // not admin
             return $this->render('@lms/alert-message.twig', [
                 'alertMessage' => _t('BAZ_NEED_ADMIN_RIGHTS')

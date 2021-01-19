@@ -2,6 +2,7 @@
 
 namespace YesWiki\Lms\Controller;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Carbon\Carbon;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\CourseManager;
@@ -16,18 +17,22 @@ class LearnerDashboardController extends YesWikiController
 {
     protected $userManager;
     protected $courseManager;
+    protected $config;
 
     /**
      * LearnerDashboardController constructor
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param ParameterBagInterface $config the injected ParameterBagInterface instance
      */
     public function __construct(
         UserManager $userManager,
-        CourseManager $courseManager
+        CourseManager $courseManager,
+        ParameterBagInterface $config
     ) {
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
+        $this->config = $config;
     }
 
     /* process stats for learner dashboard basing on array of Courses
@@ -280,5 +285,13 @@ class LearnerDashboardController extends YesWikiController
         }
         $progresses = $learner->getAllProgresses() ;
         return $progresses ;
+    }
+
+    /* Check if the current user is an advanced user
+     * return bool
+     */
+    public function UserIsAdvanced(): bool
+    {
+        return ($this->wiki->UserIsAdmin() && !$this->config->get('lms_config')['admin_as_user']) ;
     }
 }
