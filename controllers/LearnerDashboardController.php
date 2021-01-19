@@ -297,6 +297,6 @@ class LearnerDashboardController extends YesWikiController
      */
     public function UserIsAdvanced(): bool
     {
-        return ($this->wiki->UserIsAdmin() && !$this->config->get('lms_config')['admin_as_user']) ;
+        return $this->wiki->UserIsAdmin() ;
     }
 }
