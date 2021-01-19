@@ -10,6 +10,11 @@
                 href="{{ url({tag: module.tag}) }}">
                     <i class="fas fa-eye"></i>
                 </a>
+            {% else %}
+                <div class="btn btn-default btn-xs"
+                 title="{{ _t('LMS_MODULE_PREVIEW_NOT_POSSIBLE')  ~ module.title|e }}">
+                    <i class="fas fa-eye-slash"></i>
+                </div>
             {% endif %}
         </div>
         <div class="finished-ratio">
@@ -45,14 +50,12 @@
     </div>
     <div id="collapse_{{ course.tag ~ '_' ~ module.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false">
-      {% if module.activities|length > 0 %}
         <div class="">
-            <h4 class="dashboard-module">{{ _t('LMS_ACTIVITIES')}}</h3>
+            <h4 class="dashboard-module">{{ module.activities|length == 0 ?  _t('LMS_NO_ACTIVITY')  : _t('LMS_ACTIVITIES')}}</h3>
             {% for activity in module.activities %}
                 {% set activitiesStat =  modulesStat[module.tag].activitiesStat %}
                 {{ include('@lms/learner-dashboard-activity.twig') }}
             {% endfor %}
         </div>
-      {% endif %}
     </div>
 </div>
