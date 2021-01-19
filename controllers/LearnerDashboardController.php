@@ -128,14 +128,19 @@ class LearnerDashboardController extends YesWikiController
                 }
             }
 
-            $nbActivitiesFinished = count(array_filter($activitiesStat, function ($activityStat) {
-                return $activityStat['finished'] ;
-            })) ;
             $nbActivities = count($activitiesStat) ;
-
-            $finished = ($nbActivitiesFinished == $nbActivities) ;
-
-            $progressRatio = ($nbActivities > 0) ? round($nbActivitiesFinished/$nbActivities * 100) : 0 ;
+            if ($nbActivities > 0) {
+                $nbActivitiesFinished = count(array_filter($activitiesStat, function ($activityStat) {
+                    return $activityStat['finished'] ;
+                })) ;
+    
+                $finished = ($nbActivitiesFinished == $nbActivities) ;
+    
+                $progressRatio = ($nbActivities > 0) ? round($nbActivitiesFinished/$nbActivities * 100) : 0 ;
+            } else {
+                $finished = false ; // TODO take in count following module
+                $progressRatio = ($finished) ? 100 : 0 ;
+            }
 
             $firstAccessDate = $this->accessDate($progress) ;
             $firstActivityAccessDate = $this->findFirstAccessDate($activitiesStat) ;

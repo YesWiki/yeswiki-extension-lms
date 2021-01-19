@@ -34,7 +34,7 @@
                 <a class="btn btn-xs btn-default" 
                    href="{{ url({tag:'',
                                  handler:'UpdateElapsedTime',
-                                 params:{learner:learner.Username,course:course.tag,module:module.tag,previousparams:previousparamskeys}}) }}" 
+                                 params:{learner:learner.username,course:course.tag,module:module.tag,previousparams:previousparamskeys}}) }}" 
                    title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}" 
                    onclick="window.location = this.href;">
                 <i class="fa fa-edit"></i></a>
@@ -45,6 +45,7 @@
     </div>
     <div id="collapse_{{ course.tag ~ '_' ~ module.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false">
+      {% if module.activities|length > 0 %}
         <div class="">
             <h4 class="dashboard-module">{{ _t('LMS_ACTIVITIES')}}</h3>
             {% for activity in module.activities %}
@@ -52,5 +53,6 @@
                 {{ include('@lms/learner-dashboard-activity.twig') }}
             {% endfor %}
         </div>
+      {% endif %}
     </div>
 </div>

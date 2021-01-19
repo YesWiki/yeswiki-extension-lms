@@ -5,9 +5,9 @@
   {% set courseTag = '' %}
   {% set previousparamskeys = 'learner' %}
 {% endif %}
-<a href="{{ url({tag:'',handler:'ExportDashboardCSv',params:{learner:learner.Username,course:courseTag}}) }}" class="btn btn-primary pull-right">
+<a href="{{ url({tag:'',handler:'ExportDashboardCSv',params:{learner:learner.username,course:courseTag}}) }}" class="btn btn-primary pull-right">
 <i class="fas fa-download"></i>{{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}</a>
-<h1 class="dashboard-title">{{ _t('LMS_DASHBOARD') }}{{ learner.Fullname }}</h1>
+<h1 class="dashboard-title">{{ _t('LMS_DASHBOARD') }}{{ learner.fullname }}</h1>
 
 <h2 class="dashboard-course">{{ _t('LMS_COURSE') }}</h2>
 {% for course in courses %}
