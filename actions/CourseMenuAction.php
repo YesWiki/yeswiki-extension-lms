@@ -1,9 +1,9 @@
 <?php
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use YesWiki\Activity;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
+use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Wiki;
@@ -15,6 +15,7 @@ class CourseMenuAction extends YesWikiAction
     {
         $courseController = $this->getService(CourseController::class);
         $courseManager = $this->getService(CourseManager::class);
+        $entryManager = $this->getService(EntryManager::class);
         $config = $this->getService(ParameterBagInterface::class);
         $wiki = $this->getService(Wiki::class);
 
@@ -48,12 +49,13 @@ class CourseMenuAction extends YesWikiAction
                 : null;
 
             if (!empty($pageTag)) {
-                // if the current page is an activity, get its parent tab activity
-                if ($activity = $courseManager->getActivity($pageTag)){
-                    // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the
-                    // parent tab activity
-                    $pageTag = $courseController->getParentTabActivity($activity)->getTag();
-                }
+
+                // the activity is not loaded from the manager because we don't want to requests the fields
+                // (it's an exception)
+                $activity = new Activity($config, $entryManager, $pageTag);
+                // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the
+                // parent tab activity
+                $activity = $courseController->getParentTabActivity($activity);
 
                 // display the modules only if the current module is in the modules displayed
                 $currentModuleInModules = !empty(array_filter(
@@ -65,7 +67,7 @@ class CourseMenuAction extends YesWikiAction
 
                 if ($currentModuleInModules) {
                     return $this->render('@lms/course-menu.twig',[
-                        'pageTag' => $pageTag,
+                        'pageTag' => $activity->getTag(),
                         'course' => $course,
                         'module' => $module,
                         'modulesDisplayed' => $modulesDisplayed,

@@ -86,31 +86,33 @@ class CourseController extends YesWikiController
             : null;
 
         if (!empty($currentPageTag)) {
-            if ($this->config->get('lms_config')['use_tabs']) {
-                // if a number is at the end of the page tag, it means that it's a tab page corresponding to the page without the number
-                // to associate this tab page to its parent one, we remove the number from the page tag
-                $currentPageTag = preg_replace('/[0-9]*$/', '', $currentPageTag);
-            }
+
+            // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
+            $activity = new Activity($this->config, $this->entryManager, $currentPageTag);
+
+            // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the parent tab activity
+            $activity = $this->getParentTabActivity($activity);
+
             $moduleTag = isset($_GET['module']) ? $_GET['module'] : null;
 
             if ($moduleTag) {
                 // if the module is specified in the GET parameter, return it if the tag corresponds
                 $module = $this->courseManager->getModule($moduleTag);
 
-                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($currentPageTag)) ?
+                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($activity->getTag())) ?
                     $module
                     : null;
             } else {
                 // if the current page refers to a module of the course, return it
-                $currentModule = $this->courseManager->getModule($currentPageTag);
-                if ($currentModule && $course->hasModule($currentPageTag)) {
+                $currentModule = $this->courseManager->getModule($activity->getTag());
+                if ($currentModule && $course->hasModule($activity->getTag())) {
                     return $currentModule;
                 }
 
                 // find in the course modules, the first module which contains the activity
                 if ($course) {
                     foreach ($course->getModules() as $currentModule) {
-                        if ($currentModule->hasActivity($currentPageTag)) {
+                        if ($currentModule->hasActivity($activity->getTag())) {
                             return $currentModule;
                         }
                     }
