@@ -9,7 +9,6 @@
  * @link     https://yeswiki.net
  */
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
@@ -17,6 +16,7 @@ use YesWiki\Lms\Course;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
+use YesWiki\Wiki;
 
 /**
  * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
@@ -36,11 +36,10 @@ use YesWiki\Lms\Service\LearnerManager;
  */
 function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
 {
-
     // load the lms lib
     require_once LMS_PATH . 'libs/lms.lib.php';
 
-    $config = $GLOBALS['wiki']->services->get(ParameterBagInterface::class);
+    $config = $GLOBALS['wiki']->services->get(Wiki::class)->config;
     $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
     $entryManager = $GLOBALS['wiki']->services->get(EntryManager::class);
     $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
@@ -168,11 +167,11 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
             $status = $module->getStatus($course);
             $disabledLink = ($status == ModuleStatus::UNKNOWN ?
                 true :
-                !($GLOBALS['wiki']->userIsAdmin() && !$GLOBALS['wiki']->config['lms_config']['admin_as_user'])
-                && in_array($status,
-                    [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]));
+                !$GLOBALS['wiki']->userIsAdmin() && in_array($status,
+                    [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]
+                ));
             // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-            if (!$disabledLink){
+            if (!$disabledLink) {
                 $activityLink = $GLOBALS['wiki']->href(
                     '',
                     $module->getFirstActivityTag(),
@@ -180,10 +179,11 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
                     false
                 );
             }
-            $labelStart = ($GLOBALS['wiki']->userIsAdmin() && !$GLOBALS['wiki']->config['lms_config']['admin_as_user'])
-                && in_array($status, [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]) ?
-                    _t('LMS_BEGIN_NOACCESS_ADMIN')
-                    : _t('LMS_BEGIN');
+            $labelStart = $GLOBALS['wiki']->userIsAdmin() && in_array($status,
+                [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]
+            ) ?
+                _t('LMS_BEGIN_NOACCESS_ADMIN')
+                : _t('LMS_BEGIN');
             $statusMsg = $courseController->calculateModuleStatusMessage($course, $module);
 
             // End of duplicate code
@@ -194,7 +194,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
                     . '"' : '') . '>';
 
             $output .= '<div class="module-launch"><a class="btn btn-primary btn-block launch-module' . ($disabledLink ? ' disabled' : '') .
-                '"' . (!$disabledLink ? ' href="' . $activityLink .'"' : '') .  '>
+                '"' . (!$disabledLink ? ' href="' . $activityLink . '"' : '') . '>
                 <i class="fas fa-play fa-fw"></i>' . $labelStart . '</a></div>';
 
             // we show the previous and next module's buttons only if it's in a modal

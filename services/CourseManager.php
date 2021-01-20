@@ -2,15 +2,14 @@
 
 namespace YesWiki\Lms\Service;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Core\YesWikiService;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
+use YesWiki\Core\YesWikiService;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
-use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
+use YesWiki\Wiki;
 
 class CourseManager
 {
@@ -23,18 +22,23 @@ class CourseManager
 
     /**
      * CourseManager constructor
-     * @param ParameterBagInterface $config the injected configuration instance
+     * @param Wiki $wiki the injected Wiki instance
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param UserManager $userManager the injected UserManager instance
+     * @param TripleStore $tripleStore the injected TripleStore instance
      */
-    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, UserManager $userManager, TripleStore $tripleStore)
-    {
-        $this->config = $config;
+    public function __construct(
+        Wiki $wiki,
+        EntryManager $entryManager,
+        UserManager $userManager,
+        TripleStore $tripleStore
+    ) {
+        $this->config = $wiki->config;
         $this->entryManager = $entryManager;
         $this->userManager = $userManager;
-        $this->activityFormId = $this->config->get('lms_config')['activity_form_id'];
-        $this->moduleFormId = $this->config->get('lms_config')['module_form_id'];
-        $this->courseFormId = $this->config->get('lms_config')['course_form_id'];
+        $this->activityFormId = $this->config['lms_config']['activity_form_id'];
+        $this->moduleFormId = $this->config['lms_config']['module_form_id'];
+        $this->courseFormId = $this->config['lms_config']['course_form_id'];
     }
 
     /**

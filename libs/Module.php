@@ -6,10 +6,6 @@
 namespace YesWiki\Lms;
 
 use Carbon\Carbon;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Lms\CourseStructure;
-use YesWiki\Wiki;
 
 class ModuleStatus
 {
@@ -37,7 +33,7 @@ class Module extends CourseStructure
     {
         // lazy loading
         if (is_null($this->activities)) {
-            $activitiesTagsId = 'checkboxfiche' . $this->config->get('lms_config')['activity_form_id'] . 'bf_activites';
+            $activitiesTagsId = 'checkboxfiche' . $this->config['lms_config']['activity_form_id'] . 'bf_activites';
             $this->activities = empty($this->getField($activitiesTagsId)) ?
                 [] :
                 array_map(
@@ -98,7 +94,7 @@ class Module extends CourseStructure
                 $foundIndex = $index;
             }
         }
-        return ($foundIndex === false || $foundIndex === count($this->getActivities()) -1) ?
+        return ($foundIndex === false || $foundIndex === count($this->getActivities()) - 1) ?
             null
             : $this->getActivities()[$foundIndex + 1];
     }
@@ -169,7 +165,7 @@ class Module extends CourseStructure
                     } else {
                         // TODO finish the scenarisation
                         //if (!$course->isModuleScripted()) {
-                            $this->status = ModuleStatus::OPEN;
+                        $this->status = ModuleStatus::OPEN;
                         //} else {
                         //}
                     }

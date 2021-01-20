@@ -3,12 +3,10 @@
 
 namespace YesWiki\Lms\Service;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Activity;
-use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
 use YesWiki\lms\Learner;
 use YesWiki\Lms\Module;
@@ -27,8 +25,8 @@ class LearnerManager
 
     /**
      * LearnerManager constructor
+     *
      * @param Wiki $wiki the injected wiki instance
-     * @param ParameterBagInterface $config the injected configuration instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param TripleStore $tripleStore the injected TripleStore instance
@@ -36,14 +34,13 @@ class LearnerManager
      */
     public function __construct(
         Wiki $wiki,
-        ParameterBagInterface $config,
         UserManager $userManager,
         CourseManager $courseManager,
         TripleStore $tripleStore,
         EntryManager $entryManager
     ) {
         $this->wiki = $wiki;
-        $this->config = $config;
+        $this->config = $wiki->config;
         $this->userManager = $userManager;
         $this->tripleStore = $tripleStore;
         $this->entryManager = $entryManager;
@@ -63,9 +60,9 @@ class LearnerManager
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->config, $this->tripleStore, $this->entryManager);
+                : new Learner($user['name'], $this->tripleStore, $this->entryManager);
         }
-        return new Learner($username, $this->config, $this->tripleStore, $this->entryManager);
+        return new Learner($username, $this->tripleStore, $this->entryManager);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool
@@ -88,7 +85,7 @@ class LearnerManager
     private function saveActivityOrModuleProgress(Course $course, Module $module, ?Activity $activity): bool
     {
         // doesn't save the admin's progresses
-        if (!($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])) {
+        if (!($this->wiki->userIsAdmin() && !$this->config['lms_config']['save_progress_for_admins'])) {
             // get the current learner if the user is connected
             $learner = $this->getLearner();
             if (!$learner) {
@@ -103,8 +100,12 @@ class LearnerManager
         return false;
     }
 
-    public function getOneProgressForLearner(Learner $learner, Course $course, Module $module, ?Activity $activity): ?array
-    {
+    public function getOneProgressForLearner(
+        Learner $learner,
+        Course $course,
+        Module $module,
+        ?Activity $activity
+    ): ?array {
         $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() .
             ($activity ?
                 '","activity":"' . $activity->getTag() . '"%'

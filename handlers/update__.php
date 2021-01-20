@@ -108,7 +108,7 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
 }
 
 $output = '';
-if ($this->userIsAdmin() && !$GLOBALS['wiki']->config['lms_config']['admin_as_user']) {
+if ($this->userIsAdmin()) {
     $output .= '<strong>Extension LMS</strong><br/>';
 
     // if the OuiNon Lms list doesn't exist, create it

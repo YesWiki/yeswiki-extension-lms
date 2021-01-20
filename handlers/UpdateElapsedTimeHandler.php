@@ -9,9 +9,11 @@ use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
+use YesWiki\Wiki;
 
 class UpdateElapsedTimeHandler extends YesWikiHandler
 {
+    protected $wiki;
     protected $userManager;
     protected $courseManager;
     protected $learnerManager ;
@@ -19,6 +21,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
 
     public function run()
     {
+        $this->wiki = $this->getService(Wiki::class);
         $this->userManager = $this->getService(UserManager::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
@@ -31,7 +34,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
         // check validity for user
         $learnerName = '' ;
         if (isset($_GET['learner']) || isset($_POST['learner'])) {
-            if ($this->LearnerDashboardController->UserIsAdvanced()) {
+            if ($this->wiki->UserIsAdmin()) {
                 $learnerName = (isset($_GET['learner'])) ? $_GET['learner'] :
                     ((isset($_POST['learner'])) ? $_POST['learner'] : '') ;
                 if (empty($this->userManager->getOneByName($learnerName))) {

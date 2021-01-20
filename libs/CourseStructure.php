@@ -2,7 +2,6 @@
 
 namespace YesWiki\Lms;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 
 abstract class CourseStructure
@@ -20,19 +19,23 @@ abstract class CourseStructure
 
     /**
      * CourseStructure constructor
-     * @param ParameterBagInterface $config the configuration parameters of YesWiki
+     * @param array $config the configuration parameters of YesWiki
      * @param EntryManager $entryManager the manager used to get object entries
      * @param string $objectTag the object tag
      * @param array|null $objectFields the object fields if needed to populate directly the object
      */
-    public function __construct(ParameterBagInterface $config, EntryManager $entryManager, string $objectTag, array $objectFields = null)
-    {
+    public function __construct(
+        array $config,
+        EntryManager $entryManager,
+        string $objectTag,
+        array $objectFields = null
+    ) {
         $this->tag = $objectTag;
 
         if ($objectFields !== null) {
             $this->fields = $objectFields;
         }
-        
+
         $this->config = $config;
         $this->entryManager = $entryManager;
     }

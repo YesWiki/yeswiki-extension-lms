@@ -6,9 +6,11 @@ use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Learner;
+use YesWiki\Wiki;
 
 class LearnerDashboardAction extends YesWikiAction
 {
+    protected $wiki;
     protected $courseManager ;
     protected $userManager;
     protected $learnerManager ;
@@ -17,6 +19,7 @@ class LearnerDashboardAction extends YesWikiAction
     
     public function run()
     {
+        $this->wiki = $this->getService(Wiki::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
@@ -29,7 +32,7 @@ class LearnerDashboardAction extends YesWikiAction
             ]);
         }
         // get user name option only for admins
-        if ($this->LearnerDashboardController->UserIsAdvanced()) {
+        if ($this->wiki->UserIsAdmin()) {
             $learnerNameOption = $this->wiki->GetParameter('learner');
             $learnerNameOption = (empty($learnerNameOption)) ? ((empty($_REQUEST['learner'])) ? '' : $_REQUEST['learner']) : $learnerNameOption ;
         } else {
@@ -43,7 +46,7 @@ class LearnerDashboardAction extends YesWikiAction
                 'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “learnerdashboard”'
             ]);
         }
-        if ($this->LearnerDashboardController->UserIsAdvanced() &&
+        if ($this->wiki->UserIsAdmin() &&
             (empty($this->wiki->GetParameter('selectuser')) || $this->wiki->GetParameter('selectuser') ==  'true') &&
             empty($learnerNameOption)) {
             return $this->renderSelectUser() ;
@@ -89,7 +92,7 @@ class LearnerDashboardAction extends YesWikiAction
     private function renderSelectUser()
     {
         // check if user is in @admins
-        if (!$this->LearnerDashboardController->UserIsAdvanced()) {
+        if (!$this->wiki->UserIsAdmin()) {
             // not admin
             return $this->render('@lms/alert-message.twig', [
                 'alertMessage' => _t('BAZ_NEED_ADMIN_RIGHTS')

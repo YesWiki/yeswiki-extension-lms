@@ -1,6 +1,5 @@
 <?php
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
@@ -16,7 +15,6 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
-    protected $config;
     protected $wiki;
 
     // the progresses related to the current course for all users
@@ -51,9 +49,8 @@ class ProgressDashboardAction extends YesWikiAction
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
         $this->wiki = $this->getService(Wiki::class);
-        $this->config = $this->getService(ParameterBagInterface::class);
 
-        if (!($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])){
+        if (!$this->wiki->userIsAdmin()) {
             // reserved only to the admins
             return $this->render('@lms/alert-message.twig', [
                 'alertMessage' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'
@@ -163,10 +160,11 @@ class ProgressDashboardAction extends YesWikiAction
         $this->modulesStat[$module->getTag()]['notFinished'] = $notFinishedUsernames;
     }
 
-    private function processCourseStat(Course $course){
+    private function processCourseStat(Course $course)
+    {
         // we have to keep the users which have finished all modules of the course
         $finishedUsernames = [];
-        foreach ($course->getModules() as $module){
+        foreach ($course->getModules() as $module) {
             if ($module->getTag() == $course->getFirstModuleTag()) {
                 // for the first module, init with the usernames which have finished
                 $finishedUsernames = $this->modulesStat[$module->getTag()]['finished'];
@@ -193,9 +191,9 @@ class ProgressDashboardAction extends YesWikiAction
     private function setUserEntriesFromUsernames($usernames): void
     {
         $this->userEntries = [];
-        foreach ($usernames as $username){
+        foreach ($usernames as $username) {
             $userEntry = $this->entryManager->getOne($username);
-            if ($userEntry){
+            if ($userEntry) {
                 $this->userEntries[$userEntry['id_fiche']] = $userEntry;
             } else {
                 // in case there is no associated user entry (normally it won't happen), create a dummy entity with the

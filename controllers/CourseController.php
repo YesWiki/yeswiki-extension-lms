@@ -4,7 +4,6 @@ namespace YesWiki\Lms\Controller;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Core\YesWikiController;
@@ -13,6 +12,7 @@ use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Wiki;
 
 class CourseController extends YesWikiController
 {
@@ -24,18 +24,18 @@ class CourseController extends YesWikiController
      * CourseController constructor
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
-     * @param ParameterBagInterface $config the injected ParameterBagInterface instance
-     * @param TemplateEngine $twig the injected ParameterBagInterface instance
+     * @param Wiki $wiki the injected Wiki instance
+     * @param TemplateEngine $twig the injected TemplateEngine instance
      */
     public function __construct(
         EntryManager $entryManager,
         CourseManager $courseManager,
-        ParameterBagInterface $config,
+        Wiki $wiki,
         TemplateEngine $twig
     ) {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
-        $this->config = $config;
+        $this->config = $wiki->config;
     }
 
     /**
@@ -134,7 +134,7 @@ class CourseController extends YesWikiController
      */
     public function getParentTabActivity(Activity $activity): Activity
     {
-        if ($this->config->get('lms_config')['use_tabs']) {
+        if ($this->config['lms_config']['use_tabs']) {
             $parentActivityTag = preg_replace('/[0-9]*$/', '', $activity->getTag());
             if ($parentActivityTag != $activity->getTag()) {
                 return $this->courseManager->getActivity($parentActivityTag);
@@ -154,8 +154,8 @@ class CourseController extends YesWikiController
      */
     public function renderModuleCard(Course $course, Module $module): string
     {
-        $imageSize = is_int($this->config->get('lms_config')['module_image_size_in_course']) ?
-            $this->config->get('lms_config')['module_image_size_in_course']
+        $imageSize = is_int($this->config['lms_config']['module_image_size_in_course']) ?
+            $this->config['lms_config']['module_image_size_in_course']
             : 400;
         $image = empty($module->getField('imagebf_image')) || !is_file('files/' . $module->getField('imagebf_image')) ?
             null :
@@ -171,11 +171,10 @@ class CourseController extends YesWikiController
         $status = $module->getStatus($course);
         $disabledLink = ($status == ModuleStatus::UNKNOWN ?
             true :
-            !($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])
-                && in_array($status,
-                    [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]));
+            !$this->wiki->userIsAdmin() && in_array($status,
+                [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]));
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-        if (!$disabledLink){
+        if (!$disabledLink) {
             $activityLink = $this->wiki->href(
                 '',
                 $module->getFirstActivityTag(),
@@ -183,10 +182,11 @@ class CourseController extends YesWikiController
                 false
             );
         }
-        $labelStart = ($this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'])
-            && in_array($status, [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]) ?
-                _t('LMS_BEGIN_NOACCESS_ADMIN')
-                : _t('LMS_BEGIN');
+        $labelStart = $this->wiki->userIsAdmin() && in_array($status,
+            [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]
+        ) ?
+            _t('LMS_BEGIN_NOACCESS_ADMIN')
+            : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
 
         return $this->render('@lms/module-card.twig', [
@@ -197,10 +197,10 @@ class CourseController extends YesWikiController
             'labelStart' => $labelStart,
             'statusMsg' => $statusMsg,
             'disabledLink' => $disabledLink,
-            'isAdmin' => $this->wiki->userIsAdmin() && !$this->config->get('lms_config')['admin_as_user'],
+            'isAdmin' => $this->wiki->userIsAdmin(),
             // TODO replace it by a Twig Macro
             'formatter' => $this->getTwigFormatter()
-         ]);
+        ]);
     }
 
     /**

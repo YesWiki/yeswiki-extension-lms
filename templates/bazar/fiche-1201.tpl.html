@@ -8,7 +8,7 @@
  */
 ?>
 
-<div class="container lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() && !$GLOBALS['wiki']->config['lms_config']['admin_as_user'] ? 'admin-user' : '' ?>">
+<div class="container lms-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : '' ?>">
     <div class="row">
         <div class="col-md-3 lms-menu">
             <?php

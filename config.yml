@@ -12,7 +12,7 @@ parameters:
     # maximum size for both width and height to render the module images in the course entry
     module_image_size_in_course: 400
     # only for developers : displays the lms pages as a user sees them
-    admin_as_user: false
+    save_progress_for_admins: false
     # for learner dashboard
     use_only_custom_elapsed_time: true
     display_activity_elapsed_time: false

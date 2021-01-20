@@ -2,11 +2,6 @@
 
 namespace YesWiki\Lms;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Lms\CourseStructure;
-use YesWiki\Wiki;
-
 class Course extends CourseStructure
 {
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
@@ -22,7 +17,7 @@ class Course extends CourseStructure
     {
         // lazy loading
         if (is_null($this->modules)) {
-            $modulesTagsId = 'checkboxfiche' . $this->config->get('lms_config')['module_form_id'] . 'bf_modules';
+            $modulesTagsId = 'checkboxfiche' . $this->config['lms_config']['module_form_id'] . 'bf_modules';
             $this->modules = empty($this->getField($modulesTagsId)) ?
                 [] :
                 array_map(
@@ -83,7 +78,7 @@ class Course extends CourseStructure
                 $foundIndex = $index;
             }
         }
-        return ($foundIndex === false || $foundIndex === count($this->getModules()) -1) ?
+        return ($foundIndex === false || $foundIndex === count($this->getModules()) - 1) ?
             null
             : $this->getModules()[$foundIndex + 1];
     }
@@ -130,6 +125,7 @@ class Course extends CourseStructure
         }
         return $subset;
     }
+
     /**
      * Get the duration of a course by adding the duration of all its modules
      * @return int the duration in minutes
