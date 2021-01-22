@@ -18,32 +18,28 @@ class LearnerManager
     protected $config;
     protected $wiki;
     protected $userManager;
-    protected $courseManager;
-    protected $tripleStore;
     protected $entryManager;
-
+    protected $tripleStore;
 
     /**
      * LearnerManager constructor
      *
      * @param Wiki $wiki the injected wiki instance
      * @param UserManager $userManager the injected UserManager instance
-     * @param CourseManager $courseManager the injected CourseManager instance
-     * @param TripleStore $tripleStore the injected TripleStore instance
      * @param EntryManager $entryManager the injected EntryManager instance
+     * @param TripleStore $tripleStore the injected TripleStore instance
      */
     public function __construct(
         Wiki $wiki,
         UserManager $userManager,
-        CourseManager $courseManager,
         TripleStore $tripleStore,
         EntryManager $entryManager
     ) {
         $this->wiki = $wiki;
         $this->config = $wiki->config;
         $this->userManager = $userManager;
-        $this->tripleStore = $tripleStore;
         $this->entryManager = $entryManager;
+        $this->tripleStore = $tripleStore;
     }
 
     /**

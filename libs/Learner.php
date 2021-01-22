@@ -14,10 +14,12 @@ class Learner
     protected $fullname;
     // the Progresses object for all activities/modules and courses
     protected $allProgresses;
+    // the associated user entry if exists
+    protected $userEntry;
 
     // the tripleStore to get the progress information
     protected $tripleStore;
-    // entry manager
+    // the entryManager to get the user entry
     protected $entryManager;
 
     /**
@@ -41,21 +43,46 @@ class Learner
         return $this->username;
     }
 
-    /* Search entries with username if not return tag
-     * return string title or tag
+    /**
+     * Get the associated user entry of the learner
+     * @return array the user entry or an empty array if the user doesn't have
+     */
+    public function getUserEntry(): array
+    {
+        // lazy loading
+        if (is_null($this->userEntry)) {
+            $this->userEntry = $this->entryManager->getOne($this->username);
+            if (!$this->userEntry){
+                // if no associated user entry, we assign an empty array to avoid other loadings
+                $this->userEntry = [];
+            }
+        }
+        return $this->userEntry;
+    }
+
+    /**
+     * Get the full name of the learner
+     * His full name is normally the 'bf_title' field of its user entry, but if he has any, the username will be
+     * returned
+     * @return string if the learner has a user entry return the 'bf_title', otherwise its username
      */
     public function getFullName(): string
     {
-        if ($this->fullname) {
-            return $this->fullname;
-        } else {
-            $userEntry = $this->entryManager->getOne($this->username);
-            if ($userEntry && isset($userEntry['bf_titre'])) {
-                return $userEntry['bf_titre'];
-            } else {
-                return $this->username;
-            }
-        }
+        return !empty($this->getUserEntry()) && !empty($this->getUserEntry()['bf_titre']) ?
+            $this->getUserEntry()['bf_titre']
+            : $this->getUsername();
+    }
+
+    /**
+     * Get the tag of the learner user entry
+     * @return string|null if the learner has a user entry return its tag, otherwise return null
+     */
+    public function getUserEntryTag(): ?string
+    {
+        return !empty($this->getUserEntry()) ?
+            // the user entry tag is always the username
+            $this->getUsername()
+            : null;
     }
 
     public function getAllProgresses(): Progresses

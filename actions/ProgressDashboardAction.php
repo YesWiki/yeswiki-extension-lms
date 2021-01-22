@@ -18,9 +18,8 @@ class ProgressDashboardAction extends YesWikiAction
 
     // the progresses related to the current course for all users
     protected $progresses;
-    // the entries for all users which have already a progress in the current course*
-    // the structure is [username1 => entry1, ... usernameN => entryN]
-    protected $userEntries;
+    // the learners which have already a progress in the current course
+    protected $learners;
 
     // $activitiesStat, $moduleStat & $coursesStat are array with the same structure :
     //  [
@@ -60,8 +59,8 @@ class ProgressDashboardAction extends YesWikiAction
 
         // the progresses we are going to process
         $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
-        // the user entries of learners for this course, we count all users which have already a progress
-        $this->setUserEntriesFromUsernames($this->progresses->getAllUsernames());
+        // the learners for this course, we count all users which have already a progress
+        $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
 
         // check if a GET module parameter is defined
         $moduleParam = isset($_GET['module']) ? $_GET['module'] : null;
@@ -91,7 +90,7 @@ class ProgressDashboardAction extends YesWikiAction
             'module' => $module,
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
-            'userEntries' => $this->userEntries,
+            'learners' => $this->learners,
             // TODO replace it by a Twig Macro
             'formatter' => $this->courseController->getTwigFormatter()
         ]);
@@ -110,7 +109,7 @@ class ProgressDashboardAction extends YesWikiAction
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
-            'userEntries' => $this->userEntries,
+            'learners' => $this->learners,
             // TODO replace it by a Twig Macro
             'formatter' => $this->courseController->getTwigFormatter()
         ]);
@@ -122,7 +121,7 @@ class ProgressDashboardAction extends YesWikiAction
             $finishedUsernames = $this->progresses->getUsernamesForFinishedActivity($course, $module, $activity);
 
             // the users who havn't finished are those whose username is not in $finishedUsernames
-            $notFinishedUsernames = array_diff(array_keys($this->userEntries), $finishedUsernames);
+            $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
             ksort($finishedUsernames);
             ksort($notFinishedUsernames);
 
@@ -151,7 +150,7 @@ class ProgressDashboardAction extends YesWikiAction
             }
         }
         // $finishedUsernames contains now the usernames which have finished the module
-        $notFinishedUsernames = array_diff(array_keys($this->userEntries), $finishedUsernames);
+        $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
         ksort($finishedUsernames);
         ksort($notFinishedUsernames);
         $this->modulesStat[$module->getTag()]['finished'] = $finishedUsernames;
@@ -175,7 +174,7 @@ class ProgressDashboardAction extends YesWikiAction
             }
         }
         // $finishedUsernames contains now the usernames which have finished the course
-        $notFinishedUsernames = array_diff(array_keys($this->userEntries), $finishedUsernames);
+        $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
         ksort($finishedUsernames);
         ksort($notFinishedUsernames);
         $this->coursesStat[$course->getTag()]['finished'] = $finishedUsernames;
@@ -183,21 +182,15 @@ class ProgressDashboardAction extends YesWikiAction
     }
 
     /**
-     * Set userEntries attribute with an associative array of user entries from the array of username
+     * Set learners (with an associative array to get an easy access) from the array of username
      * @param $usernames the usernames for which we want to build the user entries array
      */
-    private function setUserEntriesFromUsernames($usernames): void
+    private function setLearnersFromUsernames($usernames): void
     {
-        $this->userEntries = [];
-        foreach ($usernames as $username) {
-            $userEntry = $this->entryManager->getOne($username);
-            if ($userEntry) {
-                $this->userEntries[$userEntry['id_fiche']] = $userEntry;
-            } else {
-                // in case there is no associated user entry (normally it won't happen), create a dummy entity with the
-                // username as 'bf_titre' and 'id_fiche'
-                $this->userEntries[$username] = ['bf_titre' => $username, 'id_fiche' => $username];
-            }
+        $this->learners = [];
+        foreach ($usernames as $username){
+            $learner = $this->learnerManager->getLearner($username);
+            $this->learners[$username] = $learner;
         }
     }
 }
