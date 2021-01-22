@@ -4,6 +4,7 @@ namespace YesWiki\Lms\Controller;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Core\YesWikiController;
@@ -12,7 +13,6 @@ use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Wiki;
 
 class CourseController extends YesWikiController
 {
@@ -24,18 +24,16 @@ class CourseController extends YesWikiController
      * CourseController constructor
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
-     * @param Wiki $wiki the injected Wiki instance
-     * @param TemplateEngine $twig the injected TemplateEngine instance
+     * @param ParameterBagInterface $config the injected Wiki instance
      */
     public function __construct(
         EntryManager $entryManager,
         CourseManager $courseManager,
-        Wiki $wiki,
-        TemplateEngine $twig
+        ParameterBagInterface $config
     ) {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
-        $this->config = $wiki->config;
+        $this->config = $config->all();
     }
 
     /**

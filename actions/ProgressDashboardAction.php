@@ -15,7 +15,6 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
-    protected $wiki;
 
     // the progresses related to the current course for all users
     protected $progresses;
@@ -48,7 +47,6 @@ class ProgressDashboardAction extends YesWikiAction
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
-        $this->wiki = $this->getService(Wiki::class);
 
         if (!$this->wiki->userIsAdmin()) {
             // reserved only to the admins

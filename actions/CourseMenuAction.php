@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Activity;
@@ -15,8 +16,7 @@ class CourseMenuAction extends YesWikiAction
         $courseController = $this->getService(CourseController::class);
         $courseManager = $this->getService(CourseManager::class);
         $entryManager = $this->getService(EntryManager::class);
-        $wiki = $this->getService(Wiki::class);
-        $config = $wiki->config;
+        $config = $this->wiki->config;
 
         // the course to display
         $course = $courseController->getContextualCourse();
@@ -70,7 +70,7 @@ class CourseMenuAction extends YesWikiAction
                         'course' => $course,
                         'module' => $module,
                         'modulesDisplayed' => $modulesDisplayed,
-                        'isAdmin' => $wiki->userIsAdmin()
+                        'isAdmin' => $this->wiki->userIsAdmin()
                     ]);
                 }
             }

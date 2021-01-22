@@ -9,7 +9,6 @@ use YesWiki\Wiki;
 
 class ExportDashboardCSvHandler extends YesWikiHandler
 {
-    protected $wiki;
     protected $courseManager;
     protected $userManager;
     protected $learnerManager;
@@ -18,7 +17,6 @@ class ExportDashboardCSvHandler extends YesWikiHandler
 
     public function run()
     {
-        $this->wiki = $this->getService(Wiki::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);

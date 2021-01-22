@@ -8,7 +8,7 @@ class IframeHandler__ extends YesWikiHandler
 {
     function run()
     {
-        $config = $this->wiki->services->get(Wiki::class);
+        $config = $this->wiki->config;
 
         // if the use_yeswiki_comments is false in the config and the current page is an activity, see if
         // the activity have its comments enabled. If yes, add the 'data-external-comments' attribute to body to alert

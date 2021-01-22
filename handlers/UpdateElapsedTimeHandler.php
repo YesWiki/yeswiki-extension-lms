@@ -13,7 +13,6 @@ use YesWiki\Wiki;
 
 class UpdateElapsedTimeHandler extends YesWikiHandler
 {
-    protected $wiki;
     protected $userManager;
     protected $courseManager;
     protected $learnerManager ;
@@ -21,7 +20,6 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
 
     public function run()
     {
-        $this->wiki = $this->getService(Wiki::class);
         $this->userManager = $this->getService(UserManager::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
