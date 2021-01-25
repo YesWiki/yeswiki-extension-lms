@@ -191,7 +191,7 @@ class CourseController extends YesWikiController
             'course' => $course,
             'module' => $module,
             'image' => $image,
-            'activityLink' => $activityLink,
+            'activityLink' => $activityLink ?? null,
             'labelStart' => $labelStart,
             'statusMsg' => $statusMsg,
             'disabledLink' => $disabledLink,
