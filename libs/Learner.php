@@ -5,6 +5,7 @@ namespace YesWiki\lms;
 use Carbon\Carbon;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
+use YesWiki\Wiki;
 
 class Learner
 {
@@ -21,21 +22,26 @@ class Learner
     protected $tripleStore;
     // the entryManager to get the user entry
     protected $entryManager;
+    // the Wiki service
+    protected $wiki;
 
     /**
      * Module constructor
      * @param string $username the name of the learner
      * @param TripleStore $tripleStore the TripleStore service
      * @param EntryManager $entryManager the EntryManager service
+     * @param Wiki $wiki the Wiki service
      */
     public function __construct(
         string $username,
         TripleStore $tripleStore,
-        EntryManager $entryManager
+        EntryManager $entryManager,
+        Wiki $wiki
     ) {
         $this->username = $username;
         $this->tripleStore = $tripleStore;
         $this->entryManager = $entryManager;
+        $this->wiki = $wiki;
     }
 
     public function getUsername(): string
@@ -52,7 +58,7 @@ class Learner
         // lazy loading
         if (is_null($this->userEntry)) {
             $this->userEntry = $this->entryManager->getOne($this->username);
-            if (!$this->userEntry){
+            if (!$this->userEntry) {
                 // if no associated user entry, we assign an empty array to avoid other loadings
                 $this->userEntry = [];
             }
@@ -83,6 +89,16 @@ class Learner
             // the user entry tag is always the username
             $this->getUsername()
             : null;
+    }
+
+    /**
+     * Does the learner is a wiki admin ?
+     * (TODO if needed, it can evolved in isInstructor but for the moment instructors are wiki admins)
+     * @return bool the answer
+     */
+    public function isAdmin(): bool
+    {
+        return $this->wiki->userIsAdmin($this->username);
     }
 
     public function getAllProgresses(): Progresses

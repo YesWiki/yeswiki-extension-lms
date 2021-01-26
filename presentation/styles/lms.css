@@ -11,11 +11,6 @@
     display: none;
 }
 
-/* remove the alert div inside the bazar entry */
-.lms-activity-content .alert {
-    display: none;
-}
-
 /* the lms container takes the full width, and adds minimum padding left and right */
 .lms-container {
     width: 100vw !important;

@@ -50,15 +50,15 @@ class LearnerManager
      * @param string $username the username for a specific learner
      * @return Learner|null the Learner or null if not connected or not existing
      */
-    public function getLearner(string $username = ''): ?Learner
+    public function getLearner(string $username = null): ?Learner
     {
         if (empty($username) || empty($this->userManager->getOneByName($username))) {
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->tripleStore, $this->entryManager);
+                : new Learner($user['name'], $this->tripleStore, $this->entryManager, $this->wiki);
         }
-        return new Learner($username, $this->tripleStore, $this->entryManager);
+        return new Learner($username, $this->tripleStore, $this->entryManager, $this->wiki);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool
