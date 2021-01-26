@@ -13,26 +13,31 @@ use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\LearnerManager;
 
 class CourseController extends YesWikiController
 {
     protected $entryManager;
     protected $courseManager;
+    protected $learnerManager;
     protected $config;
 
     /**
      * CourseController constructor
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param LearnerManager $learnerManager the injected LearnerManager instance
      * @param ParameterBagInterface $config the injected Wiki instance
      */
     public function __construct(
         EntryManager $entryManager,
         CourseManager $courseManager,
+        LearnerManager $learnerManager,
         ParameterBagInterface $config
     ) {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
+        $this->learnerManager = $learnerManager;
         $this->config = $config->all();
     }
 
@@ -166,11 +171,9 @@ class CourseController extends YesWikiController
                 'fit'
             );
 
-        $status = $module->getStatus($course);
-        $disabledLink = ($status == ModuleStatus::UNKNOWN ?
-            true :
-            !$this->wiki->userIsAdmin() && in_array($status,
-                [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]));
+        $learner = $this->learnerManager->getLearner();
+        $disabledLink = !$module->isAccessibleBy($learner, $course);
+
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         if (!$disabledLink) {
             $activityLink = $this->wiki->href(
@@ -180,9 +183,7 @@ class CourseController extends YesWikiController
                 false
             );
         }
-        $labelStart = $this->wiki->userIsAdmin() && in_array($status,
-            [ModuleStatus::NOT_ACCESSIBLE, ModuleStatus::CLOSED, ModuleStatus::TO_BE_OPEN]
-        ) ?
+        $labelStart = $this->wiki->userIsAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
             _t('LMS_BEGIN_NOACCESS_ADMIN')
             : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
@@ -195,7 +196,7 @@ class CourseController extends YesWikiController
             'labelStart' => $labelStart,
             'statusMsg' => $statusMsg,
             'disabledLink' => $disabledLink,
-            'isAdmin' => $this->wiki->userIsAdmin(),
+            'learner' => $learner,
             // TODO replace it by a Twig Macro
             'formatter' => $this->getTwigFormatter()
         ]);

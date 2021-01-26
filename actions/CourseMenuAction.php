@@ -6,6 +6,7 @@ use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
 class CourseMenuAction extends YesWikiAction
@@ -15,6 +16,7 @@ class CourseMenuAction extends YesWikiAction
     {
         $courseController = $this->getService(CourseController::class);
         $courseManager = $this->getService(CourseManager::class);
+        $learnerManager = $this->getService(LearnerManager::class);
         $entryManager = $this->getService(EntryManager::class);
         $config = $this->wiki->config;
 
@@ -70,7 +72,7 @@ class CourseMenuAction extends YesWikiAction
                         'course' => $course,
                         'module' => $module,
                         'modulesDisplayed' => $modulesDisplayed,
-                        'isAdmin' => $this->wiki->userIsAdmin()
+                        'learner' => $learnerManager->getLearner()
                     ]);
                 }
             }

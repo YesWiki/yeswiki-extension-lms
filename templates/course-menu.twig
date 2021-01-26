@@ -8,9 +8,7 @@
                            class="bazar-entry">{{ currentModule.fields.bf_titre }}</a>
                     </h4>
                 </div>
-                {% if currentModule.tag == module.tag and
-                        ( isAdmin or currentModule.status(course) is constant('YesWiki\\Lms\\ModuleStatus::OPEN'))
-                %}
+                {% if currentModule.tag == module.tag and currentModule.isAccessibleBy(learner, course) %}
                     <div class="panel-collapse">
                         <ul class="list-group">
                             {% for activity in currentModule.activities %}
