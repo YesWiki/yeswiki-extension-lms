@@ -45,8 +45,7 @@ class CourseController extends YesWikiController
      * Get the contextual course according to the Get parameter 'parcours' and the existing course. By order :
      *
      *   - if the Get parameter 'parcours' refers to a tag associated to a parcours entry, return it
-     *   - if not, return null
-     *   - if there is at least one course in the database, return the first created one
+     *   - else if there is at least one course in the database, return the first created one
      *   - if not, return null
      *
      * @return Course|null the course entry or null if not found
@@ -55,13 +54,14 @@ class CourseController extends YesWikiController
     {
         $courseTag = empty($_GET['parcours']) ? '' : $_GET['parcours'];
         if (!empty($courseTag)) {
-            return $this->courseManager->getCourse($courseTag);
-        } else {
-            $courses = $this->courseManager->getAllCourses();
-            return !empty($courses) ?
-                $courses[array_key_first($courses)]
-                : null;
+            if ($course = $this->courseManager->getCourse($courseTag)) {
+                return $course;
+            }
         }
+        $courses = $this->courseManager->getAllCourses();
+        return !empty($courses) ?
+            $courses[array_key_first($courses)]
+            : null;
     }
 
     /**
@@ -76,7 +76,7 @@ class CourseController extends YesWikiController
      *   current page, return it
      *   - if not, return null
      *
-     * @param $course Course the given course entry
+     * @param $course|null Course the given course entry
      * @return Module|null the module entry or null if not found
      */
     public function getContextualModule(?Course $course): ?Module
@@ -88,7 +88,7 @@ class CourseController extends YesWikiController
                 : $_GET['wiki']
             : null;
 
-        if (!empty($currentPageTag)) {
+        if (!empty($currentPageTag) && $course) {
 
             // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
             $activity = new Activity($this->config, $this->entryManager, $currentPageTag);

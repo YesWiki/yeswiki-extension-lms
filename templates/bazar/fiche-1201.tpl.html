@@ -34,7 +34,7 @@ use YesWiki\Lms\Service\LearnerManager;
             // the current learner
             $learner = $learnerManager->getLearner();
 
-            if ($module->isAccessibleBy($learner, $course)) {
+            if (!$course || !$module || $module->isAccessibleBy($learner, $course)) {
                 $title = ($GLOBALS['wiki']->config['lms_config']['display_activity_title'] && !empty($html['bf_titre'])) ?
                     $html['bf_titre'] :
                     '';
@@ -46,10 +46,10 @@ use YesWiki\Lms\Service\LearnerManager;
                 $content = preg_match($pattern, $content, $matches) ? $matches[1] : $content;
                 echo $title . $content;
 
-                if (!empty($html['reactions'])) {
+                if (!empty($html['reactions']) && $course && $module) {
                     echo $html['reactions'];
                 }
-                if (!empty($html['bf_navigation'])) {
+                if (!empty($html['bf_navigation']) && $course && $module) {
                     echo $html['bf_navigation'];
                 }
             } else {

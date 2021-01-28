@@ -9,7 +9,7 @@ use YesWiki\Wiki;
 
 class Learner
 {
-    // username of the Learner
+    // username of the Learner (the same than the user's one)
     protected $username;
     // fullname of the Learner
     protected $fullname;
@@ -26,7 +26,8 @@ class Learner
     protected $wiki;
 
     /**
-     * Module constructor
+     * Learner constructor
+     * A learner always corresponds to a user
      * @param string $username the name of the learner
      * @param TripleStore $tripleStore the TripleStore service
      * @param EntryManager $entryManager the EntryManager service

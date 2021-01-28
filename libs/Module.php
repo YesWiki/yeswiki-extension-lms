@@ -177,13 +177,13 @@ class Module extends CourseStructure
 
     /**
      * Does the module is accessible by the given learner ?
-     * @param Learner $learner the given learner
+     * @param Learner|null $learner the given learner or null if the current user is not logged
      * @param Course $course the course for which the rights is checked
      * @return bool the answer
      */
-    public function isAccessibleBy(Learner $learner, Course $course): bool
+    public function isAccessibleBy(?Learner $learner, Course $course): bool
     {
-        return $learner->isAdmin() || $this->getStatus($course) == ModuleStatus::OPEN;
+        return ($learner && $learner->isAdmin()) || $this->getStatus($course) == ModuleStatus::OPEN;
     }
 
     /**
