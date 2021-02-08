@@ -80,13 +80,10 @@ class LearnerManager
 
     private function saveActivityOrModuleProgress(Course $course, Module $module, ?Activity $activity): bool
     {
-        // doesn't save the admin's progresses
-        if (!($this->wiki->userIsAdmin() && !$this->config['lms_config']['save_progress_for_admins'])) {
-            // get the current learner if the user is connected
-            $learner = $this->getLearner();
-            if (!$learner) {
-                return false;
-            }
+        // get the current learner
+        $learner = $this->getLearner();
+        // doesn't save the progresses for not logged users or admins
+        if ($learner && (!$learner->isAdmin() || $this->config['lms_config']['save_progress_for_admins'])) {
             $progress = $this->getOneProgressForLearner($learner, $course, $module, $activity);
             if (empty($progress)) {
                 // save the current progress

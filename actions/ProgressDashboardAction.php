@@ -47,7 +47,8 @@ class ProgressDashboardAction extends YesWikiAction
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
 
-        if (!$this->wiki->userIsAdmin()) {
+        $currentLearner = $this->learnerManager->getLearner();
+        if (!$currentLearner || !$currentLearner->isAdmin()) {
             // reserved only to the admins
             return $this->render('@lms/alert-message.twig', [
                 'alertMessage' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'

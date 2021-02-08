@@ -9,14 +9,18 @@
 
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\LearnerManager;
 
+$courseController = $GLOBALS['wiki']->services->get(CourseController::class);
+$courseManager = $GLOBALS['wiki']->services->get(CourseManager::class);
+$learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
+
+// the current learner
+$learner = $learnerManager->getLearner();
 ?>
 
-<div class="course-container <?php echo $GLOBALS['wiki']->userIsAdmin() ? 'admin-user' : '' ?>">
+<div class="course-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
     <?php
-    $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
-    $courseManager = $GLOBALS['wiki']->services->get(CourseManager::class);
-
     $course = $courseManager->getCourse($fiche['id_fiche'], $fiche);
 
     if (!empty($html['bf_titre'])) {
@@ -26,7 +30,7 @@ use YesWiki\Lms\Service\CourseManager;
         echo '<div class="course-description">' . $html['bf_description'] . '</div>';
     }
     if (empty($course->getModules())) {
-        if ($GLOBALS['wiki']->userIsAdmin()) {
+        if ($learner && $learner->isAdmin()) {
             echo '<div class="alert alert-info">' . _t('LMS_ADMIN_NO_MODULES') . '.</div>';
         } else {
             echo '<div class="alert alert-info">' . _t('LMS_NO_MODULES') . '.</div>';
@@ -39,7 +43,7 @@ use YesWiki\Lms\Service\CourseManager;
         }
         echo '</div> <!-- end .module-list -->' . "\n";
     }
-    if ($GLOBALS['wiki']->userIsAdmin()) : ?>
+    if ($learner && $learner->isAdmin()) : ?>
         <div class="admin-infos well">
             <h3><?php echo _t('LMS_RESERVED_FOR_ADMINS'); ?></h3>
             <p><strong><?php echo _t('LMS_ACTIVITY_SCENARISATION'); ?></strong>

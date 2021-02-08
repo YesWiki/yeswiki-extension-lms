@@ -175,7 +175,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
                     false
                 );
             }
-            $labelStart = $GLOBALS['wiki']->userIsAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
+            $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
                 _t('LMS_BEGIN_NOACCESS_ADMIN')
                 : _t('LMS_BEGIN');
             $statusMsg = $courseController->calculateModuleStatusMessage($course, $module);

@@ -13,6 +13,7 @@
 namespace YesWiki;
 
 use YesWiki\Core\Service\Performer;
+use YesWiki\Lms\Service\LearnerManager;
 
 // Verification de securite
 if (!defined("WIKINI_VERSION")) {
@@ -107,8 +108,12 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
     }
 }
 
+$learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
+// the current learner
+$learner = $learnerManager->getLearner();
+
 $output = '';
-if ($this->userIsAdmin()) {
+if ($learner && $learner->isAdmin()) {
     $output .= '<strong>Extension LMS</strong><br/>';
 
     // if the OuiNon Lms list doesn't exist, create it

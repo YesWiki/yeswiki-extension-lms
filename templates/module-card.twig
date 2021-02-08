@@ -25,7 +25,7 @@
             <a {% if not disabledLink %}href="{{ activityLink }}"{% endif %} class="btn btn-primary btn-block launch-module{% if disabledLink %} disabled{% endif %}">
                 <i class="fas fa-play fa-fw"></i>{{ labelStart }}
             </a>
-            {% if learner.isAdmin %}
+            {% if learner and learner.isAdmin %}
                 <a href="{{ url({tag: module.tag, handler: 'edit'}) }}" class="btn btn-default btn-xs">
                     <i class="fa fa-pencil-alt"></i> {{ _t('BAZ_MODIFIER')}}
                 </a>

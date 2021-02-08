@@ -183,7 +183,7 @@ class CourseController extends YesWikiController
                 false
             );
         }
-        $labelStart = $this->wiki->userIsAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
+        $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
             _t('LMS_BEGIN_NOACCESS_ADMIN')
             : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
