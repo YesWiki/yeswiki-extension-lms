@@ -11,7 +11,10 @@ use YesWiki\Bazar\Field\BazarField;
 
 // fields which will be hidden (the names used to identified the fields are given)
 if (!defined('FIELDS_TO_HIDE')) {
-    define('FIELDS_TO_HIDE', ['checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . 'bf_activites', 'listeListeOuinonLmsbf_actif']);
+    define('FIELDS_TO_HIDE', [
+        'checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . 'bf_activites',
+        'listeListeOuinonLmsbf_actif'
+    ]);
 }
 
 // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
@@ -48,21 +51,23 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
                             && !in_array($form['template'][$i][0] . $form['template'][$i][1] . $form['template'][$i][6],
                                 FIELDS_TO_HIDE))
                     )
-                    && (!isset($form['template'][$i][11])
-                        || $form['template'][$i][11] == ''
-                        || $GLOBALS['wiki']->CheckACL($form['template'][$i][11])
-                    )
                 ) {
                     if ($form['prepared'][$i] instanceof BazarField) {
-                        $res .= $form['prepared'][$i]->renderStatic($fiche);
-                    } else {
-                        if (function_exists($form['template'][$i][0])) {
-                            $res .= $form['template'][$i][0](
-                                        $formtemplate,
-                                        $form['template'][$i],
-                                        'html',
-                                        $fiche);
-                        }
+                        $res .= $form['prepared'][$i]->renderStaticIfPermitted($fiche);
+                    } elseif (function_exists($form['template'][$i][0])
+                        && (empty($form['prepared'][$i]['read_acl'])
+                            || $GLOBALS['wiki']->CheckACL(
+                                $form['prepared'][$i]['read_acl'],
+                                null,
+                                true,
+                                $fiche['id_fiche'] ?? null
+                            ))) {
+                        $res .= $form['template'][$i][0](
+                            $formtemplate,
+                            $form['template'][$i],
+                            'html',
+                            $fiche
+                        );
                     }
                 }
             }
