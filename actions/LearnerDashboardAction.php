@@ -75,6 +75,7 @@ class LearnerDashboardAction extends YesWikiAction
 
         $coursesStat = $this->learnerDashboardManager->processCoursesStat($courses, $this->learner);
 
+        $this->wiki->AddJavascriptFile('tools/lms/presentation/javascript/collapsible-panel.js');
         return $this->render('@lms/learner-dashboard.twig', [
             'learner' => $this->learner,
             'courses' => $courses,
