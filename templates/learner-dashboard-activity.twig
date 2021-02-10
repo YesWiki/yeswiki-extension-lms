@@ -1,4 +1,4 @@
-{% from "@lms/learner-dashboard.twig" import displayTime,displayDate %}
+{% from "@lms/datetime-macros.twig" import displayTime %}
 <div class="panel panel-lms-dashboard panel-heading dashboard-activity-frame">
   <div class="panel-title">
     {{ activity.title }}
@@ -43,5 +43,6 @@
       </span> 
     </div>
   {% endif %}
-  {{ displayDate(activitiesStat[activity.tag].firstAccessDate)}}
+  {% set dateTime = activitiesStat[activity.tag].firstAccessDate %}
+  {{ include('@lms/learner-dashboard-date.twig') }}
 </div>

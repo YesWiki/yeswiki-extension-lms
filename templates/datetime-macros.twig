@@ -1,0 +1,13 @@
+{% macro displayTime(dateInterval) %}
+    {% if dateInterval is null %}
+        -
+    {% elseif dateInterval.h > 0 or dateInterval.d > 0 or dateInterval.i > 60 %}
+        {{ dateInterval.format('%hh%I') }}
+    {% else %}
+        {{ dateInterval.format('%i min') }}
+    {% endif %}
+{% endmacro %}
+
+{% macro displayDate(dateTime) %}
+    {{ dateTime.isoFormat('LLLL') }}
+{% endmacro %}
