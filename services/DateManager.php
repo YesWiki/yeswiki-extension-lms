@@ -6,9 +6,8 @@ namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use Carbon\Exceptions\ParseErrorException;
+use Exception;
 use YesWiki\Wiki;
-use \Exception;
 
 class DateManager
 {
@@ -27,7 +26,7 @@ class DateManager
     {
         $date = Carbon::createFromFormat('Y-m-d H:i:s', $dateStr);
         // TODO manage the timezone
-        if (!$date){
+        if (!$date) {
             //error_log("Error by parsing the date. The format 'Y-m-d H:i:s' is expected but '$dateStr' is given");
             return null;
         }
@@ -50,8 +49,14 @@ class DateManager
         }
     }
 
-    public function formatDateWithColons(CarbonInterval $duration): string
+    public function formatTimeWithColons(CarbonInterval $duration): string
     {
         return $duration->format('%H:%I:%S');
     }
+
+    public function formatDateWithWrittenMonth(Carbon $date): string
+    {
+        return $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL');
+    }
+
 }

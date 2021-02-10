@@ -7,7 +7,7 @@ use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 
-class ExportDashboardCSvHandler extends YesWikiHandler
+class ExportDashboardCsvHandler extends YesWikiHandler
 {
     protected $courseManager;
     protected $userManager;
@@ -26,7 +26,7 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         $this->dateManager = $this->getService(DateManager::class);
 
         // user connected ?
-        if ($this->userManager->getLoggedUser() == '') {
+        if (!$this->userManager->getLoggedUser()) {
             // not connected
             return $this->renderErrorMsg(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)');
         }
@@ -54,7 +54,6 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         }
 
         $this->exportToCSV($courses);
-        return '';
     }
 
     public function exportToCSV(array $courses)
@@ -88,13 +87,15 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                 $progressRatio = $courseStat['progressRatio'] . ' %';
             }
             $elapsedTime = ($courseStat['elapsedTime']) ?
-                $this->dateManager->formatDateWithColons($courseStat['elapsedTime']) : null;
+                $this->dateManager->formatTimeWithColons($courseStat['elapsedTime']) : null;
             $row = [
                 _t('LMS_DASHBOARD_COURSE') . ' ' . $courseIndex,
                 $course->getTitle(),
                 $progressRatio,
                 $elapsedTime /* TODO elapsedTime */,
-                ($courseStat['firstAccessDate']) ? $courseStat['firstAccessDate']->isoFormat('LLLL') : ''
+                $courseStat['firstAccessDate'] ?
+                    $this->dateManager->formatDateWithWrittenMonth($courseStat['firstAccessDate'])
+                    : null
             ];
             fputcsv($output, $row);
             $moduleIndex = 0;
@@ -110,14 +111,16 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                     && !($this->wiki->config['lms_config']['use_only_custom_elapsed_time']
                         && !$moduleStat['finished'])
                 ) ?
-                    $this->dateManager->formatDateWithColons($moduleStat['elapsedTime'])
+                    $this->dateManager->formatTimeWithColons($moduleStat['elapsedTime'])
                     : null;
                 $row = [
                     _t('LMS_DASHBOARD_MODULE') . ' ' . $courseIndex . '.' . $moduleIndex,
                     $module->getTitle(),
                     $progressRatio,
                     $elapsedTime,
-                    ($moduleStat['firstAccessDate']) ? $moduleStat['firstAccessDate']->isoFormat('LLLL') : ''
+                    $moduleStat['firstAccessDate'] ?
+                        $this->dateManager->formatDateWithWrittenMonth($moduleStat['firstAccessDate'])
+                        : null
                 ];
                 fputcsv($output, $row);
                 $activityIndex = 0;
@@ -131,14 +134,16 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                     }
                     $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time']
                         && $activityStat['elapsedTime'] && $activityStat['finished']) ?
-                        $this->dateManager->formatDateWithColons($activityStat['elapsedTime'])
+                        $this->dateManager->formatTimeWithColons($activityStat['elapsedTime'])
                         : null;
                     $row = [
                         _t('LMS_ACTIVITY') . ' ' . $courseIndex . '.' . $moduleIndex . '.' . $activityIndex,
                         $activity->getTitle(),
                         $progressRatio,
                         $elapsedTime,
-                        ($activityStat['firstAccessDate']) ? $activityStat['firstAccessDate']->isoFormat('LLLL') : ''
+                        $activityStat['firstAccessDate'] ?
+                            $this->dateManager->formatDateWithWrittenMonth($activityStat['firstAccessDate'])
+                            : null
                     ];
                     fputcsv($output, $row);
                 }
