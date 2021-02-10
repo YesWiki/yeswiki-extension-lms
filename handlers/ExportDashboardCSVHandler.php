@@ -2,7 +2,7 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiHandler;
-use YesWiki\Lms\Controller\LearnerDashboardController;
+use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
@@ -12,7 +12,7 @@ class ExportDashboardCSvHandler extends YesWikiHandler
     protected $courseManager;
     protected $userManager;
     protected $learnerManager;
-    protected $learnerDashboardController;
+    protected $learnerDashboardManager;
     protected $dateManager;
 
     protected $learner;
@@ -22,7 +22,7 @@ class ExportDashboardCSvHandler extends YesWikiHandler
         $this->courseManager = $this->getService(CourseManager::class);
         $this->userManager = $this->getService(UserManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
-        $this->learnerDashboardController = $this->getService(LearnerDashboardController::class);
+        $this->learnerDashboardManager = $this->getService(LearnerDashboardManager::class);
         $this->dateManager = $this->getService(DateManager::class);
 
         // user connected ?
@@ -59,7 +59,7 @@ class ExportDashboardCSvHandler extends YesWikiHandler
 
     public function exportToCSV(array $courses)
     {
-        $coursesStat = $this->learnerDashboardController->processCoursesStat($courses, $this->learner);
+        $coursesStat = $this->learnerDashboardManager->processCoursesStat($courses, $this->learner);
 
         // output headers so that the file is downloaded rather than displayed
         header('Content-Type: text/csv; charset=utf-8');

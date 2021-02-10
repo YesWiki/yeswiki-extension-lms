@@ -1,13 +1,11 @@
 <?php
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
-use YesWiki\Wiki;
 
 class CourseMenuAction extends YesWikiAction
 {

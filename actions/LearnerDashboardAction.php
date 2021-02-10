@@ -2,7 +2,7 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiAction;
-use YesWiki\Lms\Controller\LearnerDashboardController;
+use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 
@@ -11,14 +11,14 @@ class LearnerDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $userManager;
     protected $learnerManager;
-    protected $LearnerDashboardController;
+    protected $learnerDashboardManager;
     protected $learner;
 
     public function run()
     {
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
-        $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
+        $this->learnerDashboardManager = $this->getService(LearnerDashboardManager::class);
         $this->userManager = $this->getService(UserManager::class);
 
         // user connected ?
@@ -73,7 +73,7 @@ class LearnerDashboardAction extends YesWikiAction
             $this->wiki->Redirect($this->wiki->Href('', '', $params_temp, false));
         }
 
-        $coursesStat = $this->LearnerDashboardController->processCoursesStat($courses, $this->learner);
+        $coursesStat = $this->learnerDashboardManager->processCoursesStat($courses, $this->learner);
 
         return $this->render('@lms/learner-dashboard.twig', [
             'learner' => $this->learner,

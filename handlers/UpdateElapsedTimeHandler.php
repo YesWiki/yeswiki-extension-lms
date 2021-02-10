@@ -4,7 +4,7 @@ use Carbon\CarbonInterval;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiHandler;
 use YesWiki\Lms\Activity;
-use YesWiki\Lms\Controller\LearnerDashboardController;
+use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
@@ -17,7 +17,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
     protected $userManager;
     protected $courseManager;
     protected $learnerManager;
-    protected $learnerDashboardController;
+    protected $learnerDashboardManager;
     protected $dateManager;
 
     public function run()
@@ -25,7 +25,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
         $this->userManager = $this->getService(UserManager::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
-        $this->learnerDashboardController = $this->getService(LearnerDashboardController::class);
+        $this->learnerDashboardManager = $this->getService(LearnerDashboardManager::class);
         $this->dateManager = $this->getService(DateManager::class);
 
         // user connected ?
@@ -126,7 +126,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
     {
         // get all courses
         $courses = $this->courseManager->getAllCourses();
-        $coursesStat = $this->learnerDashboardController->processCoursesStat($courses, $learner);
+        $coursesStat = $this->learnerDashboardManager->processCoursesStat($courses, $learner);
 
         $output = $this->wiki->header();
         $previousparams = $this->extractPreviousParams();

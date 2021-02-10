@@ -1,6 +1,6 @@
 <?php
 
-namespace YesWiki\Lms\Controller;
+namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
@@ -12,24 +12,29 @@ use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
+use YesWiki\Wiki;
 
-class LearnerDashboardController extends YesWikiController
+class LearnerDashboardManager
 {
+    protected $wiki;
     protected $userManager;
     protected $courseManager;
     protected $dateManager;
 
     /**
-     * LearnerDashboardController constructor
+     * LearnerDashboardManager constructor
+     * @param Wiki $wiki the injected Wiki instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param DateManager $dateManager the injected DateManager instance
      */
     public function __construct(
+        Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
         DateManager $dateManager
     ) {
+        $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
         $this->dateManager = $dateManager;
