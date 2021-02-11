@@ -180,14 +180,16 @@ class Learner
                     ['elapsed_time' => $time->format('%H:%I:%S')]
                 );
             }
-            return $this->tripleStore->update(
+            $update = $this->tripleStore->update(
                 $this->getUsername(),
                 'https://yeswiki.net/vocabulary/progress',
                 $oldValueJson,
                 json_encode($newvalue),
                 '',
                 ''
-            ) == 0;
+            );
+            // 0 when update is correctly done or 3 when the newValue is the same than oldValue (no update)
+            return $update == 0 || $update == 3;
         }
         return false;
     }
