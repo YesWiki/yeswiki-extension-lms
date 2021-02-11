@@ -1,4 +1,4 @@
-{% from "@lms/learner-dashboard.twig" import displayTime,displayDate %}
+{% from "@lms/datetime-macros.twig" import displayTime %}
 <div class="panel panel-lms-dashboard dashboard-module-frame collapsed">
     <div id="heading_{{ course.tag ~ '_' ~ module.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
          href="#collapse_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false" aria-controls="collapse_{{ course.tag ~ '_' ~ module.tag }}">
@@ -36,21 +36,21 @@
                 {% else %}
                     ----
                 {% endif %}
-                <a class="btn btn-xs btn-default" 
+                <a class="btn btn-xs btn-default no-collapsable"
                    href="{{ url({tag:'',
                                  handler:'UpdateElapsedTime',
-                                 params:{learner:learner.username,course:course.tag,module:module.tag,previousparams:previousparamskeys}}) }}" 
-                   title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}" 
-                   onclick="window.location = this.href;">
+                                 params:{learner: learner.username, course: course.tag, module: module.tag, previousparams: previousparamskeys}}) }}"
+                   title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}">
                 <i class="fa fa-edit"></i></a>
             </span> 
             </div>
         {% endif %}
-        {{ displayDate(modulesStat[module.tag].firstAccessDate)}}
+        {% set dateTime = modulesStat[module.tag].firstAccessDate %}
+        {{ include('@lms/learner-dashboard-date.twig') }}
     </div>
     <div id="collapse_{{ course.tag ~ '_' ~ module.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false">
-        <div class="">
+        <div>
             <h4 class="dashboard-module">{{ module.activities|length == 0 ?  _t('LMS_NO_ACTIVITY')  : _t('LMS_ACTIVITIES')}}</h3>
             {% for activity in module.activities %}
                 {% set activitiesStat =  modulesStat[module.tag].activitiesStat %}

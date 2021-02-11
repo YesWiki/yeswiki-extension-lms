@@ -5,23 +5,21 @@
     {{- '" ?'}}</h3>
 <form action="{{ url({tag:'',
                       handler:'UpdateElapsedTime',
-                      params:{learner:learner.getUsername,course:course.tag,module:module.tag,activity:activity.tag,previousparams:previousparamskeys}}) }}"
+                      params: {learner: learner.username, course: course.tag, module: module.tag, activity: activity.tag, previousparams: previousparams|keys|join(',')}}) }}"
                       method="POST" name="formulaire" id="formulaire" enctype="multipart/form-data" class="form-horizontal">
-  <input id="elpasedtime" name="elapsedtime" class="form-control" 
+  <input id="elapsedtime" name="elapsedtime" class="form-control"
     value="{{ activity ? 
-      (coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime ? 
-          coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime.h * 60 + 
-          coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime.i : activity.duration) : 
-      (coursesStat[course.tag].modulesStat[module.tag].elapsedTime ? 
-          coursesStat[course.tag].modulesStat[module.tag].elapsedTime.h * 60 + 
-          coursesStat[course.tag].modulesStat[module.tag].elapsedTime.i : module.duration) }}" 
+      (coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime ?
+    coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime.totalMinutes : activity.duration) :
+      (coursesStat[course.tag].modulesStat[module.tag].elapsedTime ?
+          coursesStat[course.tag].modulesStat[module.tag].elapsedTime.totalMinutes : module.duration) }}"
     min="0" type="text">
   </input> {{ _t('LMS_UPDATE_ELAPSED_TIME_MINUTES') }}
   <hidden >
   <div class="form-actions form-group">
     <div class="col-sm-9 col-sm-offset-3">
       <button type="submit" class="btn btn-primary">{{ _t('BAZ_VALIDER') }}</button>
-      <a class="btn btn-xs btn-default" href="{{ url({tag: '',params:previousparams}) }}"
+      <a class="btn btn-xs btn-default" href="{{ url({tag: '', params: previousparams}) }}"
         title="{{ _t('BAZ_ANNULER') }}">
         {{ _t('BAZ_ANNULER') }}
       </a>

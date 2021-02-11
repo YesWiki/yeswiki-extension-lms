@@ -1,0 +1,9 @@
+{% from "@lms/datetime-macros.twig" import displayDate %}
+{% if dateTime %}
+    <div class="first-access">
+        <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
+            <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
+            {{ displayDate(dateTime) }}
+        </span>
+    </div>
+{% endif %}

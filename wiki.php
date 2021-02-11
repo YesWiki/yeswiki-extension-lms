@@ -9,9 +9,6 @@
  * @link     https://yeswiki.net
  */
 
-use YesWiki\Core\Service\TemplateEngine;
-use YesWiki\Lms\Controller\CourseController;
-
 if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }

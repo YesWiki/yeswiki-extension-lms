@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;

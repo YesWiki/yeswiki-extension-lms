@@ -2,63 +2,63 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiHandler;
-use YesWiki\Lms\Controller\LearnerDashboardController;
+use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
-use YesWiki\Wiki;
 
-class ExportDashboardCSvHandler extends YesWikiHandler
+class ExportDashboardCsvHandler extends YesWikiHandler
 {
     protected $courseManager;
     protected $userManager;
     protected $learnerManager;
-    protected $LearnerDashboardController;
+    protected $learnerDashboardManager;
+    protected $dateManager;
+
     protected $learner;
 
     public function run()
     {
         $this->courseManager = $this->getService(CourseManager::class);
-        $this->learnerManager = $this->getService(LearnerManager::class);
-        $this->LearnerDashboardController = $this->getService(LearnerDashboardController::class);
         $this->userManager = $this->getService(UserManager::class);
+        $this->learnerManager = $this->getService(LearnerManager::class);
+        $this->learnerDashboardManager = $this->getService(LearnerDashboardManager::class);
+        $this->dateManager = $this->getService(DateManager::class);
+
         // user connected ?
-        if ($this->userManager->getLoggedUser() == '') {
+        if (!$this->userManager->getLoggedUser()) {
             // not connected
-            return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV');
+            return $this->renderErrorMsg(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)');
         }
         // get user name option only for admins
         if ($this->wiki->UserIsAdmin()) {
-            // get user name option
-            $learnerNameOption = $this->wiki->GetParameter('learner');
-            $learnerNameOption = (empty($learnerNameOption)) ? ((empty($_REQUEST['learner'])) ? '' : $_REQUEST['learner']) : $learnerNameOption;
-        } else {
-            $learnerNameOption = '';
+            // get the learner parameter only from GET
+            $learnerNameOption = !empty($_GET['learner']) ? $_GET['learner'] : null;
         }
         // get learner
         $this->learner = $this->learnerManager->getLearner($learnerNameOption);
         if (!$this->learner) {
             // not connected
-            return $this->renderErrorMSG(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' ExportDashboardCSV');
+            return $this->renderErrorMsg(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)');
         }
-        return $this->exportToCSV();
-    }
-
-
-    public function exportToCSV(): string
-    {
-        $courseTag = (isset($_GET['course'])) ? $_GET['course'] : null;
-        $courseTag = (!$courseTag && isset($_POST['course'])) ? $_POST['course'] : $courseTag;
-
+        // get course
+        $courseTag = !empty($_GET['course']) ? $_GET['course'] : null;
         if ($courseTag) {
-            // get one tag
-            $courses = $this->courseManager->getCourse($courseTag);
-            $courses = ($courses) ? [$courses] : null;
+            // restrict to only one course
+            $course = $this->courseManager->getCourse($courseTag);
+            $courses = $course ? [$course] : null;
         }
         if (!isset($courses)) {
             // get all courses
             $courses = $this->courseManager->getAllCourses();
         }
-        $coursesStat = $this->LearnerDashboardController->processCoursesStat($courses, $this->learner);
+
+        $this->exportToCSV($courses);
+    }
+
+    public function exportToCSV(array $courses)
+    {
+        $coursesStat = $this->learnerDashboardManager->processCoursesStat($courses, $this->learner);
 
         // output headers so that the file is downloaded rather than displayed
         header('Content-Type: text/csv; charset=utf-8');
@@ -87,13 +87,15 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                 $progressRatio = $courseStat['progressRatio'] . ' %';
             }
             $elapsedTime = ($courseStat['elapsedTime']) ?
-                $courseStat['elapsedTime']->format('%h h %I min.') : null;
+                $this->dateManager->formatTimeWithColons($courseStat['elapsedTime']) : null;
             $row = [
                 _t('LMS_DASHBOARD_COURSE') . ' ' . $courseIndex,
                 $course->getTitle(),
                 $progressRatio,
                 $elapsedTime /* TODO elapsedTime */,
-                ($courseStat['firstAccessDate']) ? $courseStat['firstAccessDate']->isoFormat('LLLL') : ''
+                $courseStat['firstAccessDate'] ?
+                    $this->dateManager->formatDateWithWrittenMonth($courseStat['firstAccessDate'])
+                    : null
             ];
             fputcsv($output, $row);
             $moduleIndex = 0;
@@ -105,15 +107,20 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                 } else {
                     $progressRatio = $moduleStat['progressRatio'] . ' %';
                 }
-                $elapsedTime = ($moduleStat['elapsedTime'] &&
-                    !($this->wiki->config['lms_config']['use_only_custom_elapsed_time'] && !$moduleStat['finished'])) ?
-                    $moduleStat['elapsedTime']->format('%h h %I min.') : null;
+                $elapsedTime = ($moduleStat['elapsedTime']
+                    && !($this->wiki->config['lms_config']['use_only_custom_elapsed_time']
+                        && !$moduleStat['finished'])
+                ) ?
+                    $this->dateManager->formatTimeWithColons($moduleStat['elapsedTime'])
+                    : null;
                 $row = [
                     _t('LMS_DASHBOARD_MODULE') . ' ' . $courseIndex . '.' . $moduleIndex,
                     $module->getTitle(),
                     $progressRatio,
                     $elapsedTime,
-                    ($moduleStat['firstAccessDate']) ? $moduleStat['firstAccessDate']->isoFormat('LLLL') : ''
+                    $moduleStat['firstAccessDate'] ?
+                        $this->dateManager->formatDateWithWrittenMonth($moduleStat['firstAccessDate'])
+                        : null
                 ];
                 fputcsv($output, $row);
                 $activityIndex = 0;
@@ -125,25 +132,26 @@ class ExportDashboardCSvHandler extends YesWikiHandler
                     } else {
                         $progressRatio = '----';
                     }
-                    $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time'] &&
-                        $activityStat['elapsedTime'] && $activityStat['finished']) ?
-                        $activityStat['elapsedTime']->format('%h h %I min.') : null;
+                    $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time']
+                        && $activityStat['elapsedTime'] && $activityStat['finished']) ?
+                        $this->dateManager->formatTimeWithColons($activityStat['elapsedTime'])
+                        : null;
                     $row = [
                         _t('LMS_ACTIVITY') . ' ' . $courseIndex . '.' . $moduleIndex . '.' . $activityIndex,
                         $activity->getTitle(),
                         $progressRatio,
                         $elapsedTime,
-                        ($activityStat['firstAccessDate']) ? $activityStat['firstAccessDate']->isoFormat('LLLL') : ''
+                        $activityStat['firstAccessDate'] ?
+                            $this->dateManager->formatDateWithWrittenMonth($activityStat['firstAccessDate'])
+                            : null
                     ];
                     fputcsv($output, $row);
                 }
             }
         }
-
-        return '';
     }
 
-    private function renderErrorMSG(string $errorMessage): string
+    private function renderErrorMsg(string $errorMessage): string
     {
         $output = $this->wiki->header();
         $output .= $this->render('@lms/alert-message.twig', [

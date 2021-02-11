@@ -2,6 +2,9 @@
 
 namespace YesWiki\Lms;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
+use \DateInterval;
 use YesWiki\Lms\CourseStructure;
 
 class Activity extends CourseStructure

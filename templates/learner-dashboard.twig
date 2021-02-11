@@ -1,3 +1,4 @@
+{% from "@lms/datetime-macros.twig" import displayTime %}
 {% if courses|length == 1 %}
   {% set courseTag = (courses|first).tag %}
   {% set previousparamskeys = 'learner,course' %}
@@ -5,7 +6,7 @@
   {% set courseTag = '' %}
   {% set previousparamskeys = 'learner' %}
 {% endif %}
-<a href="{{ url({tag:'',handler:'ExportDashboardCSv',params:{learner:learner.username,course:courseTag}}) }}" class="btn btn-primary pull-right">
+<a href="{{ url({tag: '', handler: 'ExportDashboardCsv', params:{learner: learner.username, course: courseTag}}) }}" class="btn btn-primary pull-right">
 <i class="fas fa-download"></i>{{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}</a>
 <h1 class="dashboard-title">{{ _t('LMS_DASHBOARD') }}{{ learner.fullname }}</h1>
 
@@ -32,11 +33,12 @@
         <div class="estimated-time">
           <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
             <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
-                {{ _self.displayTime(coursesStat[course.tag].elapsedTime) }}
+                {{ displayTime(coursesStat[course.tag].elapsedTime) }}
           </span> 
         </div>
       {% endif %}
-      {{ _self.displayDate(coursesStat[course.tag].firstAccessDate)}}
+      {% set dateTime = coursesStat[course.tag].firstAccessDate %}
+      {{ include('@lms/learner-dashboard-date.twig') }}
   </div>
 
   <h3 class="dashboard-module">{{ _t('LMS_MODULES')}}</h3>
@@ -70,22 +72,3 @@
   </div>
  </div>
 </div>
-{{ include_css('tools/lms/presentation/styles/lms.css') }}
-
-{% macro displayTime(dateInterval) %}
-  {% if dateInterval.h > 0 or dateInterval.d > 0 or dateInterval.i > 60 %}
-      {{ dateInterval.format('%h h %I min.') }}
-  {% else %}
-      {{ dateInterval.format('%i min.') }}
-  {% endif %}
-{% endmacro %}
-{% macro displayDate(dateTime) %}
-  {% if dateTime %}
-    <div class="first-access">
-      <span title="{{ _t('LMS_DASHBOARD_FIRSTACCESS') }}">
-        <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
-        {{ dateTime.isoFormat('LLLL')}}
-      </span>
-    </div>
-  {% endif %}
-{% endmacro %}
