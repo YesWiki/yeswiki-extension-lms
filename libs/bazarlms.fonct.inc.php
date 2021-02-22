@@ -75,7 +75,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
             if ($activity->getTag() == $module->getFirstActivityTag()) {
                 // if first activity of a module, the previous link is to the current module entry
                 $output .= '<li class="previous"><a href="'
-                    . $GLOBALS['wiki']->href('', $module->getTag(), ['parcours' => $course->getTag()])
+                    . $GLOBALS['wiki']->href('', $module->getTag(), ['course' => $course->getTag()])
                     . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                     . '><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
             } elseif ($previousActivity = $module->getPreviousActivity($activity->getTag())) {
@@ -84,7 +84,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
                     . $GLOBALS['wiki']->href(
                         '',
                         $previousActivity->getTag(),
-                        ['parcours' => $course->getTag(), 'module' => $module->getTag()]
+                        ['course' => $course->getTag(), 'module' => $module->getTag()]
                     )
                     . '"><span aria-hidden="true">&larr;</span>&nbsp;' . _t('LMS_PREVIOUS') . '</a></li>';
             }
@@ -97,7 +97,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
                     // the next link is to the next module entry
                     // (no next button is showed for the last activity of the last module)
                     $output .= '<li class="next"><a href="'
-                        . $GLOBALS['wiki']->href('', $nextModule->getTag(), ['parcours' => $course->getTag()])
+                        . $GLOBALS['wiki']->href('', $nextModule->getTag(), ['course' => $course->getTag()])
                         . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                         . '>' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
                 }
@@ -108,7 +108,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
                         . $GLOBALS['wiki']->href(
                             '',
                             $nextActivity->getTag(),
-                            ['parcours' => $course->getTag(), 'module' => $module->getTag()]
+                            ['course' => $course->getTag(), 'module' => $module->getTag()]
                         )
                         . '">' . _t('LMS_NEXT') . '&nbsp;<span aria-hidden="true">&rarr;</span></a></li>';
                 }
@@ -171,7 +171,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
                 $activityLink = $GLOBALS['wiki']->href(
                     '',
                     $module->getFirstActivityTag(),
-                    ['parcours' => $course->getTag(), 'module' => $module->getTag()],
+                    ['course' => $course->getTag(), 'module' => $module->getTag()],
                     false
                 );
             }
@@ -219,7 +219,7 @@ function displayNextModuleButtons(string $currentModuleTag, Course $course, bool
         if ($nextModule = $course->getNextModule($currentModuleTag)) {
             $output .= '<li class="next square" title="' . _t('LMS_MODULE_NEXT')
                 . '"><a href="'
-                . $GLOBALS['wiki']->href('', $nextModule->getTag(), ['parcours' => $course->getTag()])
+                . $GLOBALS['wiki']->href('', $nextModule->getTag(), ['course' => $course->getTag()])
                 . '" "aria-label="' . _t('LMS_NEXT')
                 . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                 . '>' . '<i class="fa fa-caret-right" aria-hidden="true"></i></a></li>';
@@ -231,7 +231,7 @@ function displayNextModuleButtons(string $currentModuleTag, Course $course, bool
         if ($previousModule = $course->getPreviousModule($currentModuleTag)) {
             $output .= '<li class="next square" title="' . _t('LMS_MODULE_PREVIOUS')
                 . '"><a href="'
-                . $GLOBALS['wiki']->href('', $previousModule->getTag(), ['parcours' => $course->getTag()])
+                . $GLOBALS['wiki']->href('', $previousModule->getTag(), ['course' => $course->getTag()])
                 . '" "aria-label="' . _t('LMS_PREVIOUS')
                 . '"' . ($moduleModal ? ' class="bazar-entry modalbox"' : '')
                 . '><i class="fa fa-caret-left" aria-hidden="true"></i></a></li>';

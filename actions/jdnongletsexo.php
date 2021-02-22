@@ -19,9 +19,9 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
-// save the parcours and module GET parameter
-$savedParameters = (!empty($_GET['parcours']) ? 'parcours=' . $_GET['parcours'] : '')
-    . (!empty($_GET['parcours']) & !empty($_GET['module']) ? '&' : '')
+// save the course and module GET parameter
+$savedParameters = (!empty($_GET['course']) ? 'course=' . $_GET['course'] : '')
+    . (!empty($_GET['course']) & !empty($_GET['module']) ? '&' : '')
     . (!empty($_GET['module']) ? 'module=' . $_GET['module'] : '');
 
 if (!endsWith($this->GetPageTag(), RESULT_SUFFIX)){

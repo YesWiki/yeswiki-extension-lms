@@ -31,12 +31,12 @@ if (!defined("WIKINI_VERSION")) {
 /**
  * Constants to define the contents of the LMS forms
  */
-!defined('ACTIVITE_FORM_NOM') && define('ACTIVITE_FORM_NOM', 'LMS Activité');
-!defined('ACTIVITE_FORM_DESCRIPTION') && define(
-    'ACTIVITE_FORM_DESCRIPTION',
+!defined('ACTIVITY_FORM_NAME') && define('ACTIVITY_FORM_NAME', 'LMS Activité');
+!defined('ACTIVITY_FORM_DESCRIPTION') && define(
+    'ACTIVITY_FORM_DESCRIPTION',
     'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne'
 );
-!defined('ACTIVITE_FORM_TEMPLATE') && define('ACTIVITE_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
+!defined('ACTIVITY_FORM_TEMPLATE') && define('ACTIVITY_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
 tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
 texte***bf_duree***Durée estimée de l\'activité en minutes*** *** *** *** ***number***0*** *** *** *** *** *** ***
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
@@ -48,7 +48,7 @@ reactions***reactions*** *** *** *** *** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
-!defined('MODULE_FORM_NOM') && define('MODULE_FORM_NOM', 'LMS Module');
+!defined('MODULE_FORM_NAME') && define('MODULE_FORM_NAME', 'LMS Module');
 !defined('MODULE_FORM_DESCRIPTION') && define(
     'MODULE_FORM_DESCRIPTION',
     'Module (enchaînement d\'activités) utilisé pour le module d\'apprentissage en ligne'
@@ -62,12 +62,12 @@ checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] .
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
-!defined('PARCOURS_FORM_NOM') && define('PARCOURS_FORM_NOM', 'LMS Parcours');
-!defined('PARCOURS_FORM_DESCRIPTION') && define(
-    'PARCOURS_FORM_DESCRIPTION',
+!defined('COURSE_FORM_NAME') && define('COURSE_FORM_NAME', 'LMS Parcours');
+!defined('COURSE_FORM_DESCRIPTION') && define(
+    'COURSE_FORM_DESCRIPTION',
     'Parcours (enchaînement de modules) utilisé pour le module d\'apprentissage en ligne'
 );
-!defined('PARCOURS_FORM_TEMPLATE') && define('PARCOURS_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
+!defined('COURSE_FORM_TEMPLATE') && define('COURSE_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module, un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
@@ -134,15 +134,15 @@ if ($learner && $learner->isAdmin()) {
     checkAndAddForm(
         $output,
         $GLOBALS['wiki']->config['lms_config']['activity_form_id'],
-        ACTIVITE_FORM_NOM,
-        ACTIVITE_FORM_DESCRIPTION,
-        ACTIVITE_FORM_TEMPLATE
+        ACTIVITY_FORM_NAME,
+        ACTIVITY_FORM_DESCRIPTION,
+        ACTIVITY_FORM_TEMPLATE
     );
     // test if the module form exists, if not, install it
     checkAndAddForm(
         $output,
         $GLOBALS['wiki']->config['lms_config']['module_form_id'],
-        MODULE_FORM_NOM,
+        MODULE_FORM_NAME,
         MODULE_FORM_DESCRIPTION,
         MODULE_FORM_TEMPLATE
     );
@@ -150,9 +150,9 @@ if ($learner && $learner->isAdmin()) {
     checkAndAddForm(
         $output,
         $GLOBALS['wiki']->config['lms_config']['course_form_id'],
-        PARCOURS_FORM_NOM,
-        PARCOURS_FORM_DESCRIPTION,
-        PARCOURS_FORM_TEMPLATE
+        COURSE_FORM_NAME,
+        COURSE_FORM_DESCRIPTION,
+        COURSE_FORM_TEMPLATE
     );
 
     // if the PageMenuLms page doesn't exist, create it with a default version

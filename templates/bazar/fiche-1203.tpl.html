@@ -52,7 +52,7 @@ $learner = $learnerManager->getLearner();
                 : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_modules'); ?></p>
             <div class="dashboard-launch">
                 <a href="<?php echo $GLOBALS['wiki']->href(null, 'ProgressDashboard',
-                    ['parcours' => $course->getTag()]) ?>"
+                    ['course' => $course->getTag()]) ?>"
                    class="btn btn-secondary-2 btn-large">
                     <i class="fas fa-chart-bar"></i><?php echo _t('LMS_VIEW_PROGRESS_DASHBOARD') ?>
                 </a>

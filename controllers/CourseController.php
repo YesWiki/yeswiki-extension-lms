@@ -41,9 +41,9 @@ class CourseController extends YesWikiController
     }
 
     /**
-     * Get the contextual course according to the Get parameter 'parcours' and the existing course. By order :
+     * Get the contextual course according to the Get parameter 'course' and the existing course. By order :
      *
-     *   - if the Get parameter 'parcours' refers to a tag associated to a parcours entry, return it
+     *   - if the Get parameter 'course' refers to a tag associated to a course entry, return it
      *   - else if there is at least one course in the database, return the first created one
      *   - if not, return null
      *
@@ -51,7 +51,7 @@ class CourseController extends YesWikiController
      */
     public function getContextualCourse(): ?Course
     {
-        $courseTag = empty($_GET['parcours']) ? '' : $_GET['parcours'];
+        $courseTag = empty($_GET['course']) ? '' : $_GET['course'];
         if (!empty($courseTag)) {
             if ($course = $this->courseManager->getCourse($courseTag)) {
                 return $course;
@@ -178,7 +178,7 @@ class CourseController extends YesWikiController
             $activityLink = $this->wiki->href(
                 '',
                 $module->getFirstActivityTag(),
-                ['parcours' => $course->getTag(), 'module' => $module->getTag()],
+                ['course' => $course->getTag(), 'module' => $module->getTag()],
                 false
             );
         }

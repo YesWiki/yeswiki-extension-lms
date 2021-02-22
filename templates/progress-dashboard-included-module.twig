@@ -3,7 +3,7 @@
          href="#collapse_{{ module.tag }}" aria-expanded="false" aria-controls="collapse_{{ module.tag }}">
         <div class="panel-title">
             <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
-            <a class="no-collapsable" href="{{ url({params: {'parcours': course.tag, 'module': module.tag} }) }}"
+            <a class="no-collapsable" href="{{ url({params: {'course': course.tag, 'module': module.tag} }) }}"
                title="{{ _t('LMS_VIEW_MODULE_PROGRESSES') }}">
                 {{ module.title }}
             </a>
