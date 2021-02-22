@@ -28,7 +28,10 @@ class ExportDashboardCsvHandler extends YesWikiHandler
         // user connected ?
         if (!$this->userManager->getLoggedUser()) {
             // not connected
-            return $this->renderErrorMsg(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)');
+            return $this->twig->renderInSquelette('@templates/alert-message-with-back.twig', [
+                'type' => 'danger',
+                'message' => _t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)'
+            ]);
         }
         // get user name option only for admins
         if ($this->wiki->UserIsAdmin()) {
@@ -36,10 +39,13 @@ class ExportDashboardCsvHandler extends YesWikiHandler
             $learnerNameOption = !empty($_GET['learner']) ? $_GET['learner'] : null;
         }
         // get learner
-        $this->learner = $this->learnerManager->getLearner($learnerNameOption);
+        $this->learner = $this->learnerManager->getLearner($learnerNameOption ?? null);
         if (!$this->learner) {
             // not connected
-            return $this->renderErrorMsg(_t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)');
+            return $this->twig->renderInSquelette('@templates/alert-message-with-back.twig', [
+                'type' => 'danger',
+                'message' => _t('LMS_LOGGED_USERS_ONLY_HANDLER') . ' (exportdashboardcsv)'
+            ]);
         }
         // get course
         $courseTag = !empty($_GET['course']) ? $_GET['course'] : null;
@@ -149,18 +155,5 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                 }
             }
         }
-    }
-
-    private function renderErrorMsg(string $errorMessage): string
-    {
-        $output = $this->wiki->header();
-        $output .= $this->render('@lms/alert-message.twig', [
-            'alertMessage' => $errorMessage
-        ]);
-        $output .= $this->render('@lms/return-button.twig', [
-            'tag' => $this->wiki->GetPageTag()
-        ]);
-        $output .= $this->wiki->footer();
-        return $output;
     }
 }

@@ -2,8 +2,8 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiAction;
-use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\LearnerManager;
 
 class LearnerDashboardAction extends YesWikiAction
@@ -24,8 +24,9 @@ class LearnerDashboardAction extends YesWikiAction
         // user connected ?
         if (!$this->userManager->getLoggedUser()) {
             // not connected
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' (learnerdashboard)'
+            return $this->twig->render("@templates/alert-message.twig", [
+                'type' => 'danger',
+                'message' => _t('LOGGED_USERS_ONLY_ACTION') . ' (learnerdashboard)'
             ]);
         }
         // get user name option only for admins
@@ -37,8 +38,9 @@ class LearnerDashboardAction extends YesWikiAction
         $this->learner = $this->learnerManager->getLearner($learnerNameOption);
         if (!$this->learner) {
             // not connected
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' (learnerdashboard)'
+            return $this->render("@templates/alert-message.twig", [
+                'type' => 'danger',
+                'message' => _t('LOGGED_USERS_ONLY_ACTION') . ' (learnerdashboard)'
             ]);
         }
         if ($this->wiki->UserIsAdmin()
@@ -90,8 +92,9 @@ class LearnerDashboardAction extends YesWikiAction
         // check if user is in @admins
         if (!$this->wiki->UserIsAdmin()) {
             // not admin
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('BAZ_NEED_ADMIN_RIGHTS')
+            return $this->render("@templates/alert-message.twig", [
+                'type' => 'danger',
+                'message' => _t('BAZ_NEED_ADMIN_RIGHTS')
             ]);
         }
 

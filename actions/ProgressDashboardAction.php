@@ -50,8 +50,9 @@ class ProgressDashboardAction extends YesWikiAction
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
             // reserved only to the admins
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'
+            return $this->render("@templates/alert-message.twig", [
+                'type' => 'danger',
+                'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'
             ]);
         }
 
@@ -79,8 +80,9 @@ class ProgressDashboardAction extends YesWikiAction
     private function renderModuleProgressDashboard($module, $course): string
     {
         if (!$module || !$course->hasModule($module->getTag())) {
-            return $this->render('@lms/alert-message.twig', [
-                'alertMessage' => _t('LMS_ERROR_NOT_A_VALID_MODULE') . ' (progressdashboard)'
+            return $this->render("@templates/alert-message.twig", [
+                'type' => 'danger',
+                'message' => _t('LMS_ERROR_NOT_A_VALID_MODULE') . ' (progressdashboard)'
             ]);
         }
 
