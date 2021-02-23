@@ -81,6 +81,13 @@ $GLOBALS['translations'] = array_merge(
         'LMS_UPDATE_ELAPSED_TIME_MESSAGE' => 'Combien de temps avez-vous passé sur ',
         'LMS_UPDATE_ELAPSED_TIME_MODULE' => 'le module',
         'LMS_UPDATE_ELAPSED_TIME_ACTIVITY' => 'l\'activté',
-        'LMS_UPDATE_ELAPSED_TIME_MINUTES' => 'minutes'
+        'LMS_UPDATE_ELAPSED_TIME_MINUTES' => 'minutes',
+
+        // LMS Reactions
+        'LMS_LOGIN_TO_REACT' => 'Pour réagir, identifiez-vous!',
+        'LMS_SHARE_YOUR_REACTION' => 'Partagez votre réaction à propos de ce contenu',
+        'LMS_TO_ALLOW_REACTION' => 'Pour vous permettre de réagir',
+        'LMS_PLEASE_LOGIN' => 'veuillez vous identifier',
+        'LMS_SHARE_YOUR_COMMENT' => 'Et n\'hésitez pas à faire un commentaire pour approfondir la réflexion !',
     )
 );
