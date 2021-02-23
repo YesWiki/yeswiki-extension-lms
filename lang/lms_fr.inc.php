@@ -35,6 +35,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_MODULE_NOT_ACCESSIBLE' => 'Ce module n\'est pas accessible sans finir les modules précédents',
         'LMS_UNKNOWN_STATUS_MODULE' => 'Ce module n\'est pas dans un parcours ou ne comporte aucune activité',
         'LMS_RESERVED_FOR_ADMINS' => 'Informations pour les administrateurs',
+        'LMS_DISPLAY_MENU' => 'Menu',
         'LMS_ACTIVITY' => 'Activité',
         'LMS_ACTIVITIES' => 'Activités',
         'LMS_MODULE' => 'Module',
@@ -56,7 +57,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé⋅e⋅s',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
-        
+
         // For Learner Dashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
         'LMS_DASHBOARD_TYPE' => 'Type',
