@@ -48,11 +48,6 @@
 .lms-container .row {
     position: relative;
 }
-.lms-menu {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 1rem;
-}
 
 /* remove all margins in iframe */
 .yeswiki-iframe-body > .container, .yeswiki-iframe-body > .container > .yeswiki-page-widget {
@@ -593,4 +588,12 @@
     /*white-space: nowrap;*/
     /*margin: 5px 10px;*/
     /*min-width: 200px;*/
+}
+
+@media (min-width:992px) {
+    .lms-menu {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 1rem;
+    }
 }
