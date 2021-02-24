@@ -19,7 +19,7 @@ $learner = $learnerManager->getLearner();
 
 <div class="container lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
     <div class="toggle-menu clearfix">
-        <a class="btn btn-default" data-toggle="collapse" href="#menu-content" title="<?php echo _t('LMS_DISPLAY_MENU'); ?>">
+        <a class="btn-menu btn btn-default" data-toggle="collapse" href="#menu-content" title="<?php echo _t('LMS_DISPLAY_MENU'); ?>">
           <span class="fa fa-bars"></span><span class="fas fa-times"></span> <span class="menu-label"><?php echo _t('LMS_DISPLAY_MENU'); ?></span>
         </a>
     </div>
