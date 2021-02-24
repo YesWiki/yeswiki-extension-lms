@@ -169,7 +169,6 @@ if ($learner && $learner->isAdmin()) {
     } else {
         $output .= '✅ The <em>PageMenuLms</em> page already exists.<br />';
     }
-    $output .= '<hr />';
 
     // if the ProgressDashboard page doesn't exist, create it with a default version
     if (!$this->LoadPage('ProgressDashboard')) {
@@ -182,7 +181,6 @@ if ($learner && $learner->isAdmin()) {
     } else {
         $output .= '✅ The <em>ProgressDashboard</em> page already exists.<br />';
     }
-    $output .= '<hr />';
 
     // if the LearnerDashboard page doesn't exist, create it with a default version
     if (!$this->LoadPage('LearnerDashboard')) {
@@ -203,38 +201,47 @@ if ($learner && $learner->isAdmin()) {
 // TODO : in a few releases delete this
 // activity_form_id: 1201
 $activities = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE body LIKE \'%"id_typeannonce":"5001"%\'');
-if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5001' && count($activities)>0) {
-    $output .= 'ℹ️ changing activities id from 5001 to 1201<br />';
+if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5001' && !empty($activities)) {
+    $output .= 'ℹ️ Updating activities id from 5001 to 1201<br/>';
     $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'"id_typeannonce":"5001"\', \'"id_typeannonce":"1201"\') WHERE body LIKE \'%"id_typeannonce":"5001"%\'');
-    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'checkboxfiche5001\', \'checkboxfiche1201bf_activites\') WHERE 1');
     $this->Query('DELETE FROM `'.$this->config['table_prefix'].'nature` WHERE bn_id_nature="5001"');
     $output .= '✅ Done !<br />';
 }
 // module_form_id: 1202
 $modules = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE body LIKE \'%"id_typeannonce":"5002"%\'');
-if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5002' && count($modules)>0) {
-    $output .= 'ℹ️ changing modules id from 5002 to 1202<br />';
+if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5002' && !empty($modules)) {
+    $output .= 'ℹ️ Updating modules id from 5002 to 1202 and updating \'bf_active\' to \'bf_actif\' field<br/>';
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'checkboxfiche5001\', \'checkboxfiche1201bf_activites\') WHERE body LIKE \'%"id_typeannonce":"5002"%\'');
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'listeListeOuinonLmsbf_active\', \'listeListeOuinonLmsbf_actif\') WHERE body LIKE \'%"id_typeannonce":"5002"%\'');
     $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'"id_typeannonce":"5002"\', \'"id_typeannonce":"1202"\') WHERE body LIKE \'%"id_typeannonce":"5002"%\'');
-    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'checkboxfiche5002\', \'checkboxfiche1202bf_modules\') WHERE 1');
     $this->Query('DELETE FROM `'.$this->config['table_prefix'].'nature` WHERE bn_id_nature="5002"');
     $output .= '✅ Done !<br />';
 }
 // course_form_id: 1203
 $courses = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE body LIKE \'%"id_typeannonce":"5003"%\'');
-if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5003' && count($courses)>0) {
-    $output .= 'ℹ️ changing courses id from 5003 to 1203<br />';
+if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5003' && !empty($courses)) {
+    $output .= 'ℹ️ Updating courses id from 5003 to 1203 and updating \'bf_modules_libres\' to \'bf_scenarisation_modules\' field<br/>';
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'checkboxfiche5002\', \'checkboxfiche1202bf_modules\') WHERE body LIKE \'%"id_typeannonce":"5003"%\'');
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'listeListeOuinonLmsbf_modules_libres\', \'listeListeOuinonLmsbf_scenarisation_modules\') WHERE body LIKE \'%"id_typeannonce":"5003"%\'');
     $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'"id_typeannonce":"5003"\', \'"id_typeannonce":"1203"\') WHERE body LIKE \'%"id_typeannonce":"5003"%\'');
     $this->Query('DELETE FROM `'.$this->config['table_prefix'].'nature` WHERE bn_id_nature="5003"');
     $output .= '✅ Done !<br />';
 }
+// replace the action {{menuparcours}} by {{courseparcours}}
+$oldaction = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE latest = \'Y\' AND comment_on=\'\' AND body not LIKE \'{"%\' AND body LIKE \'%{{menuparcours}}%\'');
+if (!empty($oldaction)){
+    $output .= 'ℹ️ Updating {{menuparcours}} action to its successor : {{coursemenu}}<br/>';
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body`, \'{{menuparcours}}\', \'{{coursemenu}}\') WHERE latest = \'Y\' AND comment_on=\'\' AND body not LIKE \'{"%\' AND body LIKE \'%{{menuparcours}}%\'');
+    $output .= '✅ Done !<br />';
+}
 
-// Add button to return to previous page
-$tag = $GLOBALS['wiki']->getPageTag();
-$vars['link'] = $tag;
-$vars['text'] = 'Retourner à la page ' . $tag;
-$vars['title'] = 'Retourner à la page ' . $tag;
-$vars['class'] = 'btn-success';
-$output .= $GLOBALS['wiki']->services->get(Performer::class)->run('button', 'action', $vars);
+
+// add button to return to previous page
+$output .= '<div>
+    <a class="btn btn-sm btn-secondary-1" href="javascript:history.back()">
+        <i class="fas fa-arrow-left"></i>' . _t('GO_BACK') . '
+    </a>
+</div>';
 
 // add the content before footer
 $plugin_output_new = str_replace(
