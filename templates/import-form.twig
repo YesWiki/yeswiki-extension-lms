@@ -1,0 +1,54 @@
+<form class="form-horizontal" action="{{ url }}" method="post">
+  <div class="form-group">
+    <label for="import_url">{{ _t('LMS_IMPORT_URL') }}</label>
+    <input id="import_url" type="url" name="import_url" class="form-control" placeholder="{{ _t('LMS_IMPORT_URL') }}" />
+  </div>
+  <div class="form-group">
+    <label for="token">{{ _t('LMS_IMPORT_TOKEN') }}</label>
+    <input id="token" type="text" name="token" class="form-control" placeholder="{{ _t('LMS_IMPORT_TOKEN') }}" />
+  </div>
+  <button class="btn btn-primary btn-import-form" type="submit">{{ _t('LMS_IMPORT') }}</button>
+</form>
+<hr>
+<div id="import-forms-result"></div>
+<hr>
+<form id="import-forms-form" action="" class="hide" method="post">
+  <div class="table-responsive">
+    <table id="import-forms-table" class="table table-condensed table-striped prevent-auto-init">
+      <thead>
+        <tr>
+          <th class="prevent-sorting">
+            <label class="check-all-container">
+              <input data-target="#import-forms-table tbody" type="checkbox" class="selectall">
+              <span></span>
+            </label>
+          </th>
+          <th>{{ _t('LMS_COURSE') }}</th>
+          <th>{{ _t('LMS_COURSE_ID') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div> <!-- /.table-responsive -->
+  <div class="checkbox">
+    <label class="checkbox">
+      <input data-target="#import-forms-table tbody" type="checkbox" class="selectall">
+      <span>{{ _t('LMS_SELECT_ALL') }}</span>
+    </label>
+  </div>
+  <button id="btn-import-selection" type="submit" class="btn btn-primary">
+    {{ _t('LMS_IMPORT_SELECTION') }}
+  </button>
+</form>
+<div
+    id="form-translations"
+    data-nbformsfound="{{ _t('LMS_NBFORMSFOUND') }}"
+    data-noanswers="{{ _t('LMS_NOANSWERS') }}"
+    data-notvalidurl="{{ _t('LMS_NOTVALIDURL') }}"
+    data-recuperation="{{ _t('LMS_RECUPERATION') }}"
+    data-loading="{{ _t('LMS_LOADING') }}"
+    data-existingmessage="{{ _t('LMS_EXISTINGMESSAGEFORM') }}"
+    data-existingmessagereplace="{{ _t('LMS_EXISTINGMESSAGEREPLACEFORM') }}">
+</div>
+{{ include_javascript('tools/lms/libs/import.js') }}

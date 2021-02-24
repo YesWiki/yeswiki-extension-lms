@@ -90,5 +90,10 @@ $GLOBALS['translations'] = array_merge(
         'LMS_TO_ALLOW_REACTION' => 'Pour vous permettre de réagir',
         'LMS_PLEASE_LOGIN' => 'veuillez vous identifier',
         'LMS_SHARE_YOUR_COMMENT' => 'Et n\'hésitez pas à faire un commentaire pour approfondir la réflexion !',
+
+        // action importcourses
+        'LMS_IMPORT_TOKEN' => 'Token du site distant',
+        'LMS_IMPORT_URL' => 'URL à importer',
+        'LMS_IMPORT' => 'Importer',
     )
 );
