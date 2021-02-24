@@ -48,11 +48,6 @@
 .lms-container .row {
     position: relative;
 }
-.lms-menu {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 1rem;
-}
 
 /* remove all margins in iframe */
 .yeswiki-iframe-body > .container, .yeswiki-iframe-body > .container > .yeswiki-page-widget {
@@ -593,4 +588,62 @@
     /*white-space: nowrap;*/
     /*margin: 5px 10px;*/
     /*min-width: 200px;*/
+}
+
+.toggle-menu {
+    display: block;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 1rem;
+    margin-bottom: 1em;
+    z-index: 10;
+}
+.btn-menu {
+  background: white;
+  border: 1px solid var(--neutral-color);
+}
+.toggle-menu .btn[aria-expanded="true"] {
+  float:right;
+  border:none;
+}
+.toggle-menu .btn .fa-times {
+  display:none;
+}
+.toggle-menu .btn[aria-expanded="true"] .fa-times {
+  display:block;
+}
+.toggle-menu .btn[aria-expanded="true"] .menu-label {
+  display:none;
+}
+.toggle-menu .btn[aria-expanded="true"] .fa-bars {
+  display:none;
+}
+.lms-menu .include {
+    height: 100%;
+}
+.lms-menu {
+    position: -webkit-sticky;
+    position: sticky;
+    top:1rem; 
+    background: white;
+    z-index: 1;
+}
+#menu-content.collapse.in {
+    position: -webkit-sticky;
+    position: sticky;
+    top:0;
+    padding-top: 2.5rem;
+}
+
+@media (min-width:992px) {
+
+    #menu-content {
+        display:block;
+    }
+    .toggle-menu {
+        display: none;
+    }
+    #menu-content.collapse.in {
+        padding-top: 0rem;
+    }
 }

@@ -8,6 +8,12 @@
  */
 
 use YesWiki\Bazar\Field\BazarField;
+use YesWiki\Lms\Service\LearnerManager;
+
+$learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
+
+// the current learner
+$learner = $learnerManager->getLearner();
 
 // fields which will be hidden (the names used to identified the fields are given)
 if (!defined('FIELDS_TO_HIDE')) {
@@ -21,7 +27,7 @@ if (!defined('FIELDS_TO_HIDE')) {
 $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 ?>
 <?php if (!$moduleModal) : ?>
-<div class="container lms-container">
+<div class="container lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
     <div class="row">
         <div class="col-md-3 lms-menu">
             <?php

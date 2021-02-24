@@ -198,6 +198,36 @@ if ($learner && $learner->isAdmin()) {
     $output .= '<hr />';
 }
 
+
+// update old 500* forms to new 120* forms
+// TODO : in a few releases delete this
+// activity_form_id: 1201
+$activities = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE body LIKE \'%"id_typeannonce":"5001"%\'');
+if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5001' && count($activities)>0) {
+    $output .= 'ℹ️ changing activities id from 5001 to 1201<br />';
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'"id_typeannonce":"5001"\', \'"id_typeannonce":"1201"\') WHERE body LIKE \'%"id_typeannonce":"5001"%\'');
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'checkboxfiche5001\', \'checkboxfiche1201bf_activites\') WHERE 1');
+    $this->Query('DELETE FROM `'.$this->config['table_prefix'].'nature` WHERE bn_id_nature="5001"');
+    $output .= '✅ Done !<br />';
+}
+// module_form_id: 1202
+$modules = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE body LIKE \'%"id_typeannonce":"5002"%\'');
+if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5002' && count($modules)>0) {
+    $output .= 'ℹ️ changing modules id from 5002 to 1202<br />';
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'"id_typeannonce":"5002"\', \'"id_typeannonce":"1202"\') WHERE body LIKE \'%"id_typeannonce":"5002"%\'');
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'checkboxfiche5002\', \'checkboxfiche1202bf_modules\') WHERE 1');
+    $this->Query('DELETE FROM `'.$this->config['table_prefix'].'nature` WHERE bn_id_nature="5002"');
+    $output .= '✅ Done !<br />';
+}
+// course_form_id: 1203
+$courses = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE body LIKE \'%"id_typeannonce":"5003"%\'');
+if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5003' && count($courses)>0) {
+    $output .= 'ℹ️ changing courses id from 5003 to 1203<br />';
+    $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body` , \'"id_typeannonce":"5003"\', \'"id_typeannonce":"1203"\') WHERE body LIKE \'%"id_typeannonce":"5003"%\'');
+    $this->Query('DELETE FROM `'.$this->config['table_prefix'].'nature` WHERE bn_id_nature="5003"');
+    $output .= '✅ Done !<br />';
+}
+
 // Add button to return to previous page
 $tag = $GLOBALS['wiki']->getPageTag();
 $vars['link'] = $tag;

@@ -377,23 +377,23 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
             if ($GLOBALS['wiki']->getUser()) {
                 $extraClass = (!empty($r['userReaction']) && $id == $r['userReaction']) ? ' user-reaction' : '';
                 $outputreactions .= '<a href="' . $GLOBALS['wiki']->href(
-                        'reaction',
-                        '',
-                        'id=' . $id
-                    ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
+                    'reaction',
+                    '',
+                    'id=' . $id
+                ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
             } else {
-                $outputreactions .= '<a href="#" onclick="return false;" title="Pour réagir, identifiez-vous!" class="disabled add-reaction">' . $reaction . '</a>';
+                $outputreactions .= '<a href="#" onclick="return false;" title="'._t('LMS_LOGIN_TO_REACT').'" class="disabled add-reaction">' . $reaction . '</a>';
             }
             $outputreactions .= '</div>';
         }
         if ($GLOBALS['wiki']->getUser()) {
-            $msg = 'Partagez votre réaction à propos de ce contenu';
+            $msg = _t('LMS_SHARE_YOUR_REACTION');
         } else {
-            $msg = 'Pour vous permettre de réagir, <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">veuillez vous identifier</a>';
+            $msg = _t('LMS_TO_ALLOW_REACTION').', <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">'._t('LMS_PLEASE_LOGIN').'</a>';
         }
         $output = '<hr /><div class="reactions-container"><h5>' . $msg . '</h5><div class="reactions-flex">' . $outputreactions . '</div>';
         if ($GLOBALS['wiki']->getUser()) {
-            $output .= '<em>Et n\'hésitez pas à faire un commentaire pour approndir la réflexion !</em>';
+            $output .= '<em>'._t('LMS_SHARE_YOUR_COMMENT').'</em>';
         }
         $output .= '</div>' . "\n";
         return $output;
