@@ -376,10 +376,12 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
             $outputreactions .= '<div class="reaction-content">';
             if ($GLOBALS['wiki']->getUser()) {
                 $extraClass = (!empty($r['userReaction']) && $id == $r['userReaction']) ? ' user-reaction' : '';
+                $params = ['id' => $id] + ($_GET['course'] ? ['course' => $_GET['course']] : [])
+                    + ($_GET['module'] ? ['module' => $_GET['module']] : []);
                 $outputreactions .= '<a href="' . $GLOBALS['wiki']->href(
                     'reaction',
                     '',
-                    'id=' . $id
+                    $params
                 ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
             } else {
                 $outputreactions .= '<a href="#" onclick="return false;" title="'._t('LMS_LOGIN_TO_REACT').'" class="disabled add-reaction">' . $reaction . '</a>';

@@ -3,8 +3,12 @@ include_once 'tools/lms/libs/lms.lib.php';
 $pageTag = $this->getPageTag();
 $inIframe = testUrlInIframe();
 $ajaxRequest = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+$getParams = [];
 if ($ajaxRequest) {
     header('Content-type: application/json; charset=UTF-8');
+} else {
+    $getParams = ($_GET['course'] ? ['course' => $_GET['course']] : [])
+        + ($_GET['module'] ? ['module' => $_GET['module']] : []);
 }
 if ($user = $this->GetUser()) {
     if (!empty($_GET['id'])) {
@@ -22,14 +26,14 @@ if ($user = $this->GetUser()) {
         if ($ajaxRequest) {
             echo json_encode(['state' => 'success']);
         } else {
-            $this->redirect($this->href($inIframe ? 'iframe' : ''));
+            $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams));
         }
     } else {
         if ($ajaxRequest) {           
             echo json_encode(['state' => 'error', 'errorMessage' => 'Un type de réaction doit être présent dans l\'url.']);
         } else {
             $this->setMessage('Un type de réaction doit être présent dans l\'url.');
-            $this->redirect($this->href($inIframe ? 'iframe' : ''));
+            $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams));
         }
     }
 } else {
@@ -37,6 +41,6 @@ if ($user = $this->GetUser()) {
         echo json_encode(['state' => 'error', 'errorMessage' => 'Vous devez être connecté pour réagir.']);
     } else {
         $this->setMessage('Vous devez être connecté pour réagir.');
-        $this->redirect($this->href($inIframe ? 'iframe' : ''));
+        $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams));
     }
 }
