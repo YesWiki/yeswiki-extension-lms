@@ -20,9 +20,9 @@ class ImportCoursesAction extends YesWikiAction
     {
         $this->userManager = $this->getService(UserManager::class);
         // user connected ?
-        if ($this->userManager->getLoggedUser() == '') {
+        if (!$this->userManager->getLoggedUser()) {
             // not connected
-            return $this->render('@lms/alert-message.twig', [
+            return $this->render('@templates/alert-message.twig', [
                 'alertMessage' => _t('LOGGED_USERS_ONLY_ACTION') . ' “importcourses”'
             ]);
         }
