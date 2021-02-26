@@ -15,7 +15,13 @@
                             {% for activity in currentModule.activities %}
                                 <li class="list-group-item{% if activity.tag == pageTag %} active{% endif %}">
                                     <a href="{{ url({ tag: activity.tag, params: {'course': course.tag,
-                                        'module': currentModule.tag} }) }}">{{ activity.fields.bf_titre }}</a>
+                                        'module': currentModule.tag} }) }}">
+                                        {% if activity.fields.bf_titre_affiche|trim is empty %}
+                                            {{ activity.fields.bf_titre }}
+                                        {% else %}
+                                            {{ activity.fields.bf_titre_affiche }}
+                                        {% endif %}
+                                    </a>
                                 </li>
                             {% endfor %}
                         </ul>

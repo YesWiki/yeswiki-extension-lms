@@ -37,6 +37,7 @@ if (!defined("WIKINI_VERSION")) {
     'Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d\'apprentissage en ligne'
 );
 !defined('ACTIVITY_FORM_TEMPLATE') && define('ACTIVITY_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***
+texte***bf_titre_affiche***Titre affiché (optionnel)*** *** *** *** ***text***0*** ***Si un titre de remplacement est renseigné, c\'est ce titre qui sera affiché en début d\'activité ou dans le menu*** * *** * *** *** ***
 tags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s
 texte***bf_duree***Durée estimée de l\'activité en minutes*** *** *** *** ***number***0*** *** *** *** *** *** ***
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***

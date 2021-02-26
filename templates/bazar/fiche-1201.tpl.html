@@ -40,9 +40,14 @@ $learner = $learnerManager->getLearner();
             $module = $courseController->getContextualModule($course);
 
             if (!$course || !$module || $module->isAccessibleBy($learner, $course)) {
-                $title = ($GLOBALS['wiki']->config['lms_config']['display_activity_title'] && !empty($html['bf_titre'])) ?
-                    '<h1>' . $html['bf_titre'] . '</h1>'
-                    : '';
+                $title = '';
+                if ($GLOBALS['wiki']->config['lms_config']['display_activity_title'] && !empty($html['bf_titre'])) {
+                    if (empty(trim($fiche['bf_titre_affiche']))){
+                        $title = '<h1>' . $html['bf_titre'] . '</h1>';
+                    } else {
+                        $title = '<h1>' . $fiche['bf_titre_affiche'] . '</h1>';
+                    }
+                }
                 $content = !empty($html['bf_contenu']) ? $html['bf_contenu'] : '';
                 echo $title . $content;
 
