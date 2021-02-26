@@ -376,8 +376,8 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
             $outputreactions .= '<div class="reaction-content">';
             if ($GLOBALS['wiki']->getUser()) {
                 $extraClass = (!empty($r['userReaction']) && $id == $r['userReaction']) ? ' user-reaction' : '';
-                $params = ['id' => $id] + ($_GET['course'] ? ['course' => $_GET['course']] : [])
-                    + ($_GET['module'] ? ['module' => $_GET['module']] : []);
+                $params = ['id' => $id] + (!empty($_GET['course']) && $_GET['course'] ? ['course' => $_GET['course']] : [])
+                    + (!empty($_GET['module']) && $_GET['module'] ? ['module' => $_GET['module']] : []);
                 $outputreactions .= '<a href="' . $GLOBALS['wiki']->href(
                         'reaction',
                         '',
