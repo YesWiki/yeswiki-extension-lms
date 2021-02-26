@@ -24,7 +24,7 @@ $learner = $learnerManager->getLearner();
     $course = $courseManager->getCourse($fiche['id_fiche'], $fiche);
 
     if (!empty($html['bf_titre'])) {
-        $content = $html['bf_titre'];
+        echo '<h1 class="course-title">' . $html['bf_titre'] . '</h1>';
     }
     if (!empty($html['bf_description'])) {
         echo '<div class="course-description">' . $html['bf_description'] . '</div>';
