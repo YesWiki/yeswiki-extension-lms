@@ -379,23 +379,23 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
                 $params = ['id' => $id] + ($_GET['course'] ? ['course' => $_GET['course']] : [])
                     + ($_GET['module'] ? ['module' => $_GET['module']] : []);
                 $outputreactions .= '<a href="' . $GLOBALS['wiki']->href(
-                    'reaction',
-                    '',
-                    $params
-                ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
+                        'reaction',
+                        '',
+                        $params
+                    ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
             } else {
-                $outputreactions .= '<a href="#" onclick="return false;" title="'._t('LMS_LOGIN_TO_REACT').'" class="disabled add-reaction">' . $reaction . '</a>';
+                $outputreactions .= '<a href="#" onclick="return false;" title="' . _t('LMS_LOGIN_TO_REACT') . '" class="disabled add-reaction">' . $reaction . '</a>';
             }
             $outputreactions .= '</div>';
         }
         if ($GLOBALS['wiki']->getUser()) {
             $msg = _t('LMS_SHARE_YOUR_REACTION');
         } else {
-            $msg = _t('LMS_TO_ALLOW_REACTION').', <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">'._t('LMS_PLEASE_LOGIN').'</a>';
+            $msg = _t('LMS_TO_ALLOW_REACTION') . ', <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">' . _t('LMS_PLEASE_LOGIN') . '</a>';
         }
         $output = '<hr /><div class="reactions-container"><h5>' . $msg . '</h5><div class="reactions-flex">' . $outputreactions . '</div>';
         if ($GLOBALS['wiki']->getUser()) {
-            $output .= '<em>'._t('LMS_SHARE_YOUR_COMMENT').'</em>';
+            $output .= '<em>' . _t('LMS_SHARE_YOUR_COMMENT') . '</em>';
         }
         $output .= '</div>' . "\n";
         return $output;

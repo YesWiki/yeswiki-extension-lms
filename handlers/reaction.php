@@ -26,14 +26,14 @@ if ($user = $this->GetUser()) {
         if ($ajaxRequest) {
             echo json_encode(['state' => 'success']);
         } else {
-            $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams));
+            $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams, false));
         }
     } else {
         if ($ajaxRequest) {           
             echo json_encode(['state' => 'error', 'errorMessage' => 'Un type de réaction doit être présent dans l\'url.']);
         } else {
             $this->setMessage('Un type de réaction doit être présent dans l\'url.');
-            $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams));
+            $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams, false));
         }
     }
 } else {
@@ -41,6 +41,6 @@ if ($user = $this->GetUser()) {
         echo json_encode(['state' => 'error', 'errorMessage' => 'Vous devez être connecté pour réagir.']);
     } else {
         $this->setMessage('Vous devez être connecté pour réagir.');
-        $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams));
+        $this->redirect($this->href($inIframe ? 'iframe' : '', '', $getParams, false));
     }
 }
