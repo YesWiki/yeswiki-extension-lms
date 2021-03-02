@@ -1,5 +1,6 @@
 {
     "require": {
-        "nesbot/carbon": "^2.41"
+        "nesbot/carbon": "^2.41",
+        "symfony/console": "^5.2"
     }
 }

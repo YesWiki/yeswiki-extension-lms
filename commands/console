@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+// application.php
+
+namespace YesWiki\Lms\Commands;
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+// ... register commands
+// TODO : make it in the regle de l'art
+// use YesWiki\Lms\Commands\ImportCoursesCommand;
+include_once 'importCoursesCommand.php';
+$application->add(new ImportCoursesCommand());
+
+$application->run();
