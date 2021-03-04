@@ -10,6 +10,9 @@
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\LearnerManager;
 
+// load js for ajax reactions
+$GLOBALS['wiki']->addJavascriptFile('tools/lms/libs/lms.js');
+
 $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
 $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 
@@ -42,10 +45,10 @@ $learner = $learnerManager->getLearner();
             if (!$course || !$module || $module->isAccessibleBy($learner, $course)) {
                 $title = '';
                 if ($GLOBALS['wiki']->config['lms_config']['display_activity_title'] && !empty($html['bf_titre'])) {
-                    if (empty(trim($fiche['bf_titre_affiche']))){
-                        $title = '<h1>' . $html['bf_titre'] . '</h1>';
-                    } else {
+                    if (isset($fiche['bf_titre_affiche'])  && !empty(trim($fiche['bf_titre_affiche']))){
                         $title = '<h1>' . $fiche['bf_titre_affiche'] . '</h1>';
+                    } else {
+                        $title = '<h1>' . $html['bf_titre'] . '</h1>';
                     }
                 }
                 $content = !empty($html['bf_contenu']) ? $html['bf_contenu'] : '';
