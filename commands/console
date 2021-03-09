@@ -63,9 +63,7 @@ require_once 'includes/YesWiki.php';
 $wiki = new \YesWiki\Wiki();
 
 // ... register commands
-// TODO : make it in the regle de l'art
-// use YesWiki\Lms\Commands\ImportCoursesCommand;
-include_once 'ImportCoursesCommand.php';
-$application->add(new ImportCoursesCommand());
+use YesWiki\Lms\Commands\ImportCoursesCommand;
+$application->add(new ImportCoursesCommand($wiki));
 
 $application->run();

@@ -6,12 +6,21 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use YesWiki\Wiki;
 
 
 class ImportCoursesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'lms:import-courses';
+
+    protected $wiki;
+
+    public function __construct(Wiki $wiki)
+    {
+        parent::__construct();
+        $this->wiki = $wiki;
+    }
 
     protected function configure()
     {
