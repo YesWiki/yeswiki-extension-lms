@@ -120,13 +120,13 @@ class ImportCoursesCommand extends Command
 
 
 
-        foreach ($selectedCourses as $selected) {
-            $course = $courses[$selected];
+        foreach ($selectedCourses as $selectedCourse) {
+            $course = $courses[$selectedCourse];
 
             if (true/* TODO check if course already is in db */) {
-                $output->writeln('<info>Importing course "' . $selected . '"</>');
+                $output->writeln('<info>Importing course "' . $selectedCourse . '"</>');
             } else {
-                $output->writeln('<comment>Course "' . $selected . '" already exists, not importing</>');
+                $output->writeln('<comment>Course "' . $selectedCourse . '" already exists, not importing</>');
                 continue;
             }
 
