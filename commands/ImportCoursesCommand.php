@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
 
@@ -121,6 +122,7 @@ class ImportCoursesCommand extends Command
 
 
         $pageManager = $this->wiki->services->get(PageManager::class);
+        $entryManager = $this->wiki->services->get(EntryManager::class);
 
         foreach ($selectedCourses as $selectedCourse) {
             $course = $courses[$selectedCourse];
@@ -157,13 +159,21 @@ class ImportCoursesCommand extends Command
                         continue;
                     }
 
-                    //TODO: Import activity here
+                    // Import activity here
+                    $activity['antispam'] = 1;
+                    $entryManager->create(1201, $activity);
                 }
 
-                //TODO: Import module here
+                // Import module here
+                $module['antispam'] = 1;
+                $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
+                $entryManager->create(1202, $module);
             }
 
-            //TODO: Import course here
+            // Import course here
+            $course['antispam'] = 1;
+            $course['checkboxfiche1202bf_modules_raw'] = $course['checkboxfiche1202bf_modules'];
+            $entryManager->create(1203, $course);
         }
 
         return Command::SUCCESS;
