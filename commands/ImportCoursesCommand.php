@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
 
 
@@ -119,11 +120,12 @@ class ImportCoursesCommand extends Command
         $output->writeln('<info>You have just selected: ' . implode(', ', $selectedCourses) . '</>');
 
 
+        $pageManager = $this->wiki->services->get(PageManager::class);
 
         foreach ($selectedCourses as $selectedCourse) {
             $course = $courses[$selectedCourse];
 
-            if (true/* TODO check if course already is in db */) {
+            if (is_null($pageManager->getOne($selectedCourse, '', 0))) {
                 $output->writeln('<info>Importing course "' . $selectedCourse . '"</>');
             } else {
                 $output->writeln('<comment>Course "' . $selectedCourse . '" already exists, not importing</>');
@@ -135,7 +137,7 @@ class ImportCoursesCommand extends Command
             foreach ($course_modules as $course_module) {
                 $module = $modules[$course_module];
 
-                if (true/* TODO check if module already is in db */) {
+                if (is_null($pageManager->getOne($course_module, '', 0))) {
                     $output->writeln('<info>Importing module "' . $course_module . '"</>');
                 } else {
                     $output->writeln('<comment>Module "' . $course_module . '" already exists, not importing</>');
@@ -148,7 +150,7 @@ class ImportCoursesCommand extends Command
                 foreach ($module_activities as $module_activity) {
                     $activity = $activities[$module_activity];
 
-                    if (false/* TODO check if activity already is in db */) {
+                    if (is_null($pageManager->getOne($module_activity, '', 0))) {
                         $output->writeln('<info>Importing activity "' . $module_activity . '"</>');
                     } else {
                         $output->writeln('<comment>Activity "' . $module_activity . '" already exists, not importing</>');
