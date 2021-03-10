@@ -17,6 +17,8 @@ class ImportCoursesCommand extends Command
     protected static $defaultName = 'lms:import-courses';
 
     protected $wiki;
+    protected $remote_url;
+    protected $remote_token;
 
     public function __construct(Wiki $wiki)
     {
@@ -38,66 +40,60 @@ class ImportCoursesCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    private function fetch_bazar($form_id, $log_name, $output)
     {
-        $remote_url = $input->getArgument('url');
-        $remote_token = $input->getArgument('token');
-
-        if (!filter_var($remote_url, FILTER_VALIDATE_URL)) {
-            $output->writeln('<error>Error : first parameter URL must be a valid url</>');
-            return Command::FAILURE;
-        }
-
-        if ($remote_url[-1] !== '/') {
-            $remote_url .= '/';
-        }
-
         // Create a stream
         $opts = array(
             'http'=>array(
-                'method' => "GET",
-                'header' => "Authorization: Bearer $remote_token\r\n"
+                'method' => 'GET',
+                'header' => 'Authorization: Bearer ' . $this->remote_token . "\r\n"
             )
         );
 
         $context = stream_context_create($opts);
 
         // Fetching all information needed
-        $output->writeln('<info>Fetching courses</>');
-        $courses_str = file_get_contents($remote_url.'?api/fiche/1203', false, $context);
-        if (empty($courses_str) || !$courses_json=json_decode($courses_str, true)) {
-                $output->writeln('<error>Error : unable to fetch courses</>');
-                return Command::FAILURE;
+        $output->writeln('<info>Fetching '.$log_name.'</>');
+        $data_str = file_get_contents($this->remote_url.'?api/fiche/'.$form_id, false, $context);
+        if (empty($data_str)) {
+                $output->writeln('<error>Error : unable to fetch '.$log_name.'</>');
+                return false;
+        } else if (!$data_json=json_decode($data_str, true)) {
+                var_dump($data_str);
+                $output->writeln('<error>Error : unable to parse '.$log_name.'</>');
+                return false;
         } else {
-            $courses = array();
-            foreach ($courses_json as $course) {
-                $courses[$course['id_fiche']] = $course;
+            $data = array();
+            foreach ($data_json as $entry) {
+                $data[$entry['id_fiche']] = $entry;
             }
         }
 
-        $output->writeln('<info>Fetching modules</>');
-        $modules_str = file_get_contents($remote_url.'?api/fiche/1202', false, $context);
-        if (empty($modules_str) || !$modules_json=json_decode($modules_str, true)) {
-                $output->writeln('<error>Error : unable to fetch modules</>');
-                return Command::FAILURE;
-        } else {
-            $modules = array();
-            foreach ($modules_json as $module) {
-                $modules[$module['id_fiche']] = $module;
-            }
+        return $data;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->remote_url = $input->getArgument('url');
+        $this->remote_token = $input->getArgument('token');
+
+        if (!filter_var($this->remote_url, FILTER_VALIDATE_URL)) {
+            $output->writeln('<error>Error : first parameter URL must be a valid url</>');
+            return Command::FAILURE;
         }
 
-        $output->writeln('<info>Fetching activities</>');
-        $activities_str = file_get_contents($remote_url.'?api/fiche/1201', false, $context);
-        if (empty($activities_str) || !$activities_json=json_decode($activities_str, true)) {
-                $output->writeln('<error>Error : unable to fetch activities</>');
-                return Command::FAILURE;
-        } else {
-            $activities = array();
-            foreach ($activities_json as $activity) {
-                $activities[$activity['id_fiche']] = $activity;
-            }
+        if ($this->remote_url[-1] !== '/') {
+            $this->remote_url .= '/';
         }
+
+        // Fetching all information needed
+        if (false === $courses = $this->fetch_bazar(1203, 'courses', $output))
+            return Command::FAILURE;
+        if (false === $modules = $this->fetch_bazar(1202, 'modules', $output))
+            return Command::FAILURE;
+        if (false === $activities = $this->fetch_bazar(1201, 'activities', $output))
+            return Command::FAILURE;
+
 
         // Letting the user choose which courses he wants
         $choices = ['all' => 'All the courses (default)'];
