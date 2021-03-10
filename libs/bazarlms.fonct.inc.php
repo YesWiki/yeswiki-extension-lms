@@ -164,7 +164,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
             // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
 
             $learner = $learnerManager->getLearner();
-            $disabledLink = !$module->isAccessibleBy($learner, $course);
+            $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
 
             // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
             if (!$disabledLink) {
@@ -176,7 +176,7 @@ function navigationmodule(&$formtemplate, $tableau_template, $mode, $fiche)
                 );
             }
             $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-                _t('LMS_BEGIN_NOACCESS_ADMIN')
+                _t('LMS_BEGIN_ONLY_ADMIN')
                 : _t('LMS_BEGIN');
             $statusMsg = $courseController->calculateModuleStatusMessage($course, $module);
 

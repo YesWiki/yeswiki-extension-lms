@@ -170,8 +170,10 @@ class CourseController extends YesWikiController
                 'fit'
             );
 
+        // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
+
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = !$module->isAccessibleBy($learner, $course);
+        $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         if (!$disabledLink) {
@@ -183,9 +185,11 @@ class CourseController extends YesWikiController
             );
         }
         $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-            _t('LMS_BEGIN_NOACCESS_ADMIN')
+            _t('LMS_BEGIN_ONLY_ADMIN')
             : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
+
+        // End of duplicate code
 
         return $this->render('@lms/module-card.twig', [
             'course' => $course,
