@@ -19,8 +19,9 @@ class ImportCoursesCommand extends Command
     protected $wiki;
     protected $remote_url;
     protected $remote_token;
+    protected $upload_path;
 
-    public function __construct(Wiki $wiki)
+    public function __construct(Wiki &$wiki)
     {
         parent::__construct();
         $this->wiki = $wiki;
@@ -70,6 +71,27 @@ class ImportCoursesCommand extends Command
         }
 
         return $data;
+    }
+
+    private function getLocalFileUploadPath()
+    {
+        if ($this->upload_path !== null) {
+            return $this->upload_path;
+        }
+
+        $attachConfig = $this->wiki->GetConfigValue("attach_config");
+
+        if (!is_array($attachConfig)) {
+            $attachConfig = array();
+        }
+
+        if (empty($attachConfig['upload_path'])) {
+            $this->upload_path = 'files';
+        } else {
+            $this->upload_path = $attachConfig['upload_path'];
+        }
+
+        return $this->upload_path;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -165,6 +187,33 @@ class ImportCoursesCommand extends Command
                 }
 
                 // Import module here
+
+                // Checking for module image
+                if(!empty($module['imagebf_image'])) {
+                    $file_name = $module['imagebf_image'];
+                    
+                    $output->writeln('<info>Importing image '.$file_name.'</>');
+
+                    // Assuming the remote uses default file directory
+                    $image_url = $this->remote_url.'/files/'.$file_name;
+
+                    $dest = $this->getLocalFileUploadPath();
+                    $save_file_loc = "$dest/$file_name";
+
+                    if (file_exists($save_file_loc)) {
+                        $output->writeln('<comment>Image '.$save_file_loc.' already exists in filesystem</>');
+                    } else {
+                        // Do cURL transfer
+                        $fp = fopen($save_file_loc, 'wb');
+                        $ch = curl_init($image_url);
+                        curl_setopt($ch, CURLOPT_FILE, $fp);
+                        curl_setopt($ch, CURLOPT_HEADER, 0);
+                        curl_exec($ch);
+                        curl_close($ch);
+                        fclose($fp);
+                    }
+                }
+
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
                 $entryManager->create(1202, $module);
