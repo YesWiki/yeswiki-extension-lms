@@ -48,6 +48,10 @@ class ImportCoursesCommand extends Command
             return Command::FAILURE;
         }
 
+        if ($remote_url[-1] !== '/') {
+            $remote_url .= '/';
+        }
+
         // Create a stream
         $opts = array(
             'http'=>array(
@@ -60,7 +64,7 @@ class ImportCoursesCommand extends Command
 
         // Fetching all information needed
         $output->writeln('<info>Fetching courses</>');
-        $courses_str = file_get_contents($remote_url.'/?api/fiche/1203', false, $context);
+        $courses_str = file_get_contents($remote_url.'?api/fiche/1203', false, $context);
         if (empty($courses_str) || !$courses_json=json_decode($courses_str, true)) {
                 $output->writeln('<error>Error : unable to fetch courses</>');
                 return Command::FAILURE;
@@ -72,7 +76,7 @@ class ImportCoursesCommand extends Command
         }
 
         $output->writeln('<info>Fetching modules</>');
-        $modules_str = file_get_contents($remote_url.'/?api/fiche/1202', false, $context);
+        $modules_str = file_get_contents($remote_url.'?api/fiche/1202', false, $context);
         if (empty($modules_str) || !$modules_json=json_decode($modules_str, true)) {
                 $output->writeln('<error>Error : unable to fetch modules</>');
                 return Command::FAILURE;
@@ -84,7 +88,7 @@ class ImportCoursesCommand extends Command
         }
 
         $output->writeln('<info>Fetching activities</>');
-        $activities_str = file_get_contents($remote_url.'/?api/fiche/1201', false, $context);
+        $activities_str = file_get_contents($remote_url.'?api/fiche/1201', false, $context);
         if (empty($activities_str) || !$activities_json=json_decode($activities_str, true)) {
                 $output->writeln('<error>Error : unable to fetch activities</>');
                 return Command::FAILURE;
