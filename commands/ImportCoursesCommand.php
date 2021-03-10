@@ -94,6 +94,30 @@ class ImportCoursesCommand extends Command
         return $this->upload_path;
     }
 
+    private function importImage($filename, $output)
+    {
+        $output->writeln('<info>Importing image '.$filename.'</>');
+
+        // Assuming the remote uses default file directory
+        $image_url = $this->remote_url.'/files/'.$filename;
+
+        $dest = $this->getLocalFileUploadPath();
+        $save_file_loc = "$dest/$filename";
+
+        if (file_exists($save_file_loc)) {
+            $output->writeln('<comment>Image '.$save_file_loc.' already exists in filesystem</>');
+        } else {
+            // Do cURL transfer
+            $fp = fopen($save_file_loc, 'wb');
+            $ch = curl_init($image_url);
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_exec($ch);
+            curl_close($ch);
+            fclose($fp);
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->remote_url = $input->getArgument('url');
@@ -190,28 +214,7 @@ class ImportCoursesCommand extends Command
 
                 // Checking for module image
                 if(!empty($module['imagebf_image'])) {
-                    $file_name = $module['imagebf_image'];
-                    
-                    $output->writeln('<info>Importing image '.$file_name.'</>');
-
-                    // Assuming the remote uses default file directory
-                    $image_url = $this->remote_url.'/files/'.$file_name;
-
-                    $dest = $this->getLocalFileUploadPath();
-                    $save_file_loc = "$dest/$file_name";
-
-                    if (file_exists($save_file_loc)) {
-                        $output->writeln('<comment>Image '.$save_file_loc.' already exists in filesystem</>');
-                    } else {
-                        // Do cURL transfer
-                        $fp = fopen($save_file_loc, 'wb');
-                        $ch = curl_init($image_url);
-                        curl_setopt($ch, CURLOPT_FILE, $fp);
-                        curl_setopt($ch, CURLOPT_HEADER, 0);
-                        curl_exec($ch);
-                        curl_close($ch);
-                        fclose($fp);
-                    }
+                    $this->importImage($module['imagebf_image'], $output);
                 }
 
                 $module['antispam'] = 1;
