@@ -45,7 +45,7 @@ class ImportCoursesCommand extends Command
         ;
     }
 
-    private function fetch_bazar($form_id, $log_name, $output)
+    private function fetch_bazar($form_id, $log_name, OutputInterface $output)
     {
         // Create a stream
         $opts = array(
@@ -63,7 +63,7 @@ class ImportCoursesCommand extends Command
         if (empty($data_str)) {
                 $output->writeln('<error>Error : unable to fetch '.$log_name.'</>');
                 return false;
-        } else if (!$data_json=json_decode($data_str, true)) {
+        } elseif (!$data_json=json_decode($data_str, true)) {
                 var_dump($data_str);
                 $output->writeln('<error>Error : unable to parse '.$log_name.'</>');
                 return false;
@@ -150,6 +150,7 @@ class ImportCoursesCommand extends Command
                 $att = new \attach($this->wiki);
                 $att->file = $attachment;
                 $new_filename = $att->GetFullFilename(true);
+                echo $new_filename;
 
                 // How to get the remote filename?
             }
