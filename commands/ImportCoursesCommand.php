@@ -11,10 +11,6 @@ use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
 
 
-if (!class_exists('attach')) {
-    require(__DIR__."/../../attach/libs/attach.lib.php");
-}
-
 class ImportCoursesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
@@ -45,7 +41,7 @@ class ImportCoursesCommand extends Command
         ;
     }
 
-    private function fetch_bazar($form_id, $log_name, OutputInterface $output)
+    private function fetch_api($api_args, $log_name, OutputInterface $output)
     {
         // Create a stream
         $opts = array(
@@ -59,7 +55,7 @@ class ImportCoursesCommand extends Command
 
         // Fetching all information needed
         $output->writeln('<info>Fetching '.$log_name.'</>');
-        $data_str = file_get_contents($this->remote_url.'?api/fiche/'.$form_id, false, $context);
+        $data_str = file_get_contents($this->remote_url.'?api/'.$api_args, false, $context);
         if (empty($data_str)) {
                 $output->writeln('<error>Error : unable to fetch '.$log_name.'</>');
                 return false;
@@ -98,61 +94,40 @@ class ImportCoursesCommand extends Command
         return $this->upload_path;
     }
 
-    private function importImage($filename, OutputInterface $output)
-    {
-        $output->writeln('<info>Importing image '.$filename.'</>');
-
-        // Assuming the remote uses default file directory
-        $image_url = $this->remote_url.'/files/'.$filename;
-
-        $dest = $this->getLocalFileUploadPath();
-        $save_file_loc = "$dest/$filename";
-
-        if (file_exists($save_file_loc)) {
-            $output->writeln('<comment>File '.$save_file_loc.' already exists in filesystem</>');
-        } else {
-            // Do cURL transfer
-            $fp = fopen($save_file_loc, 'wb');
-            $ch = curl_init($image_url);
-            curl_setopt($ch, CURLOPT_FILE, $fp);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch,CURLOPT_FAILONERROR,true);
-            curl_exec($ch);
-            $err = curl_error($ch);
-            curl_close($ch);
-            fclose($fp);
-
-            if ($err) {
-                $output->writeln('<error>Error downloading '.$filename.': '.$err);
-                unlink($save_file_loc);
-            }
-        }
-    }
-
     private function downloadAttachments($bazarPage, OutputInterface $output)
     {
-        if (!empty($bazarPage['bf_contenu']))
-            $wikiText = $bazarPage['bf_contenu'];
-        elseif (!empty($bazarPage['bf_description']))
-            $wikiText = $bazarPage['bf_description'];
-        else
-            return;
+        $pagecontent = $this->fetch_api('fiche/'.$bazarPage['id_typeannonce'].'/html/'.$bazarPage['id_fiche'], $bazarPage['id_fiche'], $output);
+        preg_match_all('#(?:href|src)="'.preg_quote($this->remote_url, '#').'files/(.*)"#Ui', $pagecontent[$bazarPage['id_fiche']]['html_output'], $matches);
 
-        $attached = '/{{attach (?:\S+ )*file="(\S+)"(?: \S+)* ?}}/';
-
-        preg_match_all($attached, $wikiText, $matched);
-
-        if (count($matched[1])) {
+        if (count($matches[1])) {
             $this->wiki->SetPage($this->wiki->services->get(PageManager::class)->getOne($bazarPage['id_fiche']));
 
-            foreach ($matched[1] as $attachment) {
-                // Import attachment here, not as simple as self::importImage
-                $att = new \attach($this->wiki);
-                $att->file = $attachment;
-                $new_filename = $att->GetFullFilename(true);
-                echo $new_filename;
+            foreach ($matches[1] as $attachment) {
 
-                // How to get the remote filename?
+                $remote_file_url = $this->remote_url.'/files/'.$attachment;
+
+                $dest = $this->getLocalFileUploadPath();
+                $save_file_loc = "$dest/$attachment";
+
+                if (file_exists($save_file_loc)) {
+                    $output->writeln('<comment>File '.$save_file_loc.' already exists in filesystem</>');
+                } else {
+                    // Do cURL transfer
+                    $fp = fopen($save_file_loc, 'wb');
+                    $ch = curl_init($remote_file_url);
+                    curl_setopt($ch, CURLOPT_FILE, $fp);
+                    curl_setopt($ch, CURLOPT_HEADER, 0);
+                    curl_setopt($ch, CURLOPT_FAILONERROR, true);
+                    curl_exec($ch);
+                    $err = curl_error($ch);
+                    curl_close($ch);
+                    fclose($fp);
+
+                    if ($err) {
+                        $output->writeln('<error>Error downloading '.$filename.': '.$err);
+                        unlink($save_file_loc);
+                    }
+                }
             }
         }
     }
@@ -172,11 +147,11 @@ class ImportCoursesCommand extends Command
         }
 
         // Fetching all information needed
-        if (false === $courses = $this->fetch_bazar(1203, 'courses', $output))
+        if (false === $courses = $this->fetch_api('fiche/1203', 'courses', $output))
             return Command::FAILURE;
-        if (false === $modules = $this->fetch_bazar(1202, 'modules', $output))
+        if (false === $modules = $this->fetch_api('fiche/1202', 'modules', $output))
             return Command::FAILURE;
-        if (false === $activities = $this->fetch_bazar(1201, 'activities', $output))
+        if (false === $activities = $this->fetch_api('fiche/1201', 'activities', $output))
             return Command::FAILURE;
 
 
@@ -247,16 +222,10 @@ class ImportCoursesCommand extends Command
                     // Import activity here
                     $activity['antispam'] = 1;
                     $entryManager->create(1201, $activity);
-
                     $this->downloadAttachments($activity, $output);
                 }
 
                 // Import module here
-
-                // Checking for module image
-                if(!empty($module['imagebf_image'])) {
-                    $this->importImage($module['imagebf_image'], $output);
-                }
 
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
