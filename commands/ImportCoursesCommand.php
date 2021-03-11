@@ -11,6 +11,10 @@ use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
 
 
+if (!class_exists('attach')) {
+    require(__DIR__."/../../attach/libs/attach.lib.php");
+}
+
 class ImportCoursesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
@@ -125,6 +129,33 @@ class ImportCoursesCommand extends Command
         }
     }
 
+    private function downloadAttachments($bazarPage, OutputInterface $output)
+    {
+        if (!empty($bazarPage['bf_contenu']))
+            $wikiText = $bazarPage['bf_contenu'];
+        elseif (!empty($bazarPage['bf_description']))
+            $wikiText = $bazarPage['bf_description'];
+        else
+            return;
+
+        $attached = '/{{attach (?:\S+ )*file="(\S+)"(?: \S+)* ?}}/';
+
+        preg_match_all($attached, $wikiText, $matched);
+
+        if (count($matched[1])) {
+            $this->wiki->SetPage($this->wiki->services->get(PageManager::class)->getOne($bazarPage['id_fiche']));
+
+            foreach ($matched[1] as $attachment) {
+                // Import attachment here, not as simple as self::importImage
+                $att = new \attach($this->wiki);
+                $att->file = $attachment;
+                $new_filename = $att->GetFullFilename(true);
+
+                // How to get the remote filename?
+            }
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->remote_url = $input->getArgument('url');
@@ -215,6 +246,8 @@ class ImportCoursesCommand extends Command
                     // Import activity here
                     $activity['antispam'] = 1;
                     $entryManager->create(1201, $activity);
+
+                    $this->downloadAttachments($activity, $output);
                 }
 
                 // Import module here
@@ -227,12 +260,16 @@ class ImportCoursesCommand extends Command
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
                 $entryManager->create(1202, $module);
+
+                $this->downloadAttachments($module, $output);
             }
 
             // Import course here
             $course['antispam'] = 1;
             $course['checkboxfiche1202bf_modules_raw'] = $course['checkboxfiche1202bf_modules'];
             $entryManager->create(1203, $course);
+
+            $this->downloadAttachments($course, $output);
         }
 
         return Command::SUCCESS;
