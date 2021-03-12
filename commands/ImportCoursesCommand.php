@@ -96,8 +96,11 @@ class ImportCoursesCommand extends Command
 
     private function downloadAttachments($bazarPage, OutputInterface $output)
     {
-        $pagecontent = $this->fetch_api('fiche/'.$bazarPage['id_typeannonce'].'/html/'.$bazarPage['id_fiche'], $bazarPage['id_fiche'], $output);
-        preg_match_all('#(?:href|src)="'.preg_quote($this->remote_url, '#').'files/(.*)"#Ui', $pagecontent[$bazarPage['id_fiche']]['html_output'], $matches);
+        preg_match_all(
+            '#(?:href|src)="'.preg_quote($this->remote_url, '#').'files/(.*)"#Ui',
+            $bazarPage['html_output'],
+            $matches
+        );
 
         if (count($matches[1])) {
             $this->wiki->SetPage($this->wiki->services->get(PageManager::class)->getOne($bazarPage['id_fiche']));
@@ -147,11 +150,11 @@ class ImportCoursesCommand extends Command
         }
 
         // Fetching all information needed
-        if (false === $courses = $this->fetch_api('fiche/1203', 'courses', $output))
+        if (false === $courses = $this->fetch_api('fiche/1203/html', 'courses', $output))
             return Command::FAILURE;
-        if (false === $modules = $this->fetch_api('fiche/1202', 'modules', $output))
+        if (false === $modules = $this->fetch_api('fiche/1202/html', 'modules', $output))
             return Command::FAILURE;
-        if (false === $activities = $this->fetch_api('fiche/1201', 'activities', $output))
+        if (false === $activities = $this->fetch_api('fiche/1201/html', 'activities', $output))
             return Command::FAILURE;
 
 
