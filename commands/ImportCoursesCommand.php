@@ -139,7 +139,7 @@ class ImportCoursesCommand extends Command
 
         if ($c = count($attachments)) {
             $output->writeln(
-                '<info>Downloading '.$c.' attachment'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
+                '<info>Downloading '.$c.' image'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
             
             $dest = $this->getLocalFileUploadPath();
 
@@ -169,7 +169,9 @@ class ImportCoursesCommand extends Command
         $attachments = array_merge($html_matches[1], $wiki_matches[2]);
         $attachments = array_unique($attachments);
 
-        if (count($attachments)) {
+        if ($c = count($attachments)) {
+            $output->writeln(
+                '<info>Downloading '.$c.' attachment'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
             $this->wiki->tag = $bazarPage['id_fiche'];
             $this->wiki->page = array('tag'=>$bazarPage['id_fiche'], 'time'=> $bazarPage['date_maj_fiche']);
 
