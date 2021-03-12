@@ -94,6 +94,29 @@ class ImportCoursesCommand extends Command
         return $this->upload_path;
     }
 
+    private function cURLDownload($from, $to, OutputInterface $output)
+    {
+        if (file_exists($to)) {
+            $output->writeln('<comment>File '.$to.' already exists in filesystem</>');
+        } else {
+            // Do cURL transfer
+            $fp = fopen($to, 'wb');
+            $ch = curl_init($from);
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_FAILONERROR, true);
+            curl_exec($ch);
+            $err = curl_error($ch);
+            curl_close($ch);
+            fclose($fp);
+
+            if ($err) {
+                $output->writeln('<error>Error downloading '.$filename.': '.$err);
+                unlink($to);
+            }
+        }
+    }
+
     private function downloadAttachments($bazarPage, OutputInterface $output)
     {
         preg_match_all(
@@ -120,25 +143,7 @@ class ImportCoursesCommand extends Command
                 $remote_file_url = $this->remote_url.'/files/'.$attachment;
                 $save_file_loc = "$dest/$attachment";
 
-                if (file_exists($save_file_loc)) {
-                    $output->writeln('<comment>File '.$save_file_loc.' already exists in filesystem</>');
-                } else {
-                    // Do cURL transfer
-                    $fp = fopen($save_file_loc, 'wb');
-                    $ch = curl_init($remote_file_url);
-                    curl_setopt($ch, CURLOPT_FILE, $fp);
-                    curl_setopt($ch, CURLOPT_HEADER, 0);
-                    curl_setopt($ch, CURLOPT_FAILONERROR, true);
-                    curl_exec($ch);
-                    $err = curl_error($ch);
-                    curl_close($ch);
-                    fclose($fp);
-
-                    if ($err) {
-                        $output->writeln('<error>Error downloading '.$filename.': '.$err);
-                        unlink($save_file_loc);
-                    }
-                }
+                $this->cURLDownload($remote_file_url, $save_file_loc, $output);
             }
         }
     }
