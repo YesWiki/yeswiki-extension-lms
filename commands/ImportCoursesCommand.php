@@ -11,6 +11,10 @@ use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
 
 
+if (!class_exists('attach')) {
+    require(__DIR__."/../../attach/libs/attach.lib.php");
+}
+
 class ImportCoursesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
@@ -117,8 +121,9 @@ class ImportCoursesCommand extends Command
         }
     }
 
-    private function downloadAttachments($bazarPage, OutputInterface $output)
+    private function downloadAttachments(&$bazarPage, OutputInterface $output)
     {
+        // Downloading images
         preg_match_all(
             '#(?:href|src)="'.preg_quote($this->remote_url, '#').'files/(.*)"#Ui',
             $bazarPage['html_output'],
@@ -146,6 +151,47 @@ class ImportCoursesCommand extends Command
                 $this->cURLDownload($remote_file_url, $save_file_loc, $output);
             }
         }
+
+        // Downloading other attachments
+        preg_match_all(
+            '#(?:href|src)="'.preg_quote($this->remote_url, '#').'\?.+/download&(?:amp;)?file=(.*)"#Ui',
+            $bazarPage['html_output'],
+            $html_matches
+        );
+        $wiki_regex = '#url="' . preg_quote($this->remote_url, '#')
+                      . '(\?.+/download&(?:amp;)?file=(.*))"#Ui';
+        preg_match_all(
+            $wiki_regex,
+            (!empty($bazarPage['bf_contenu']) ? $bazarPage['bf_contenu'] : $bazarPage['bf_description']),
+            $wiki_matches
+        );
+
+        $attachments = array_merge($html_matches[1], $wiki_matches[2]);
+        $attachments = array_unique($attachments);
+
+        if (count($attachments)) {
+            $this->wiki->tag = $bazarPage['id_fiche'];
+            $this->wiki->page = array('tag'=>$bazarPage['id_fiche'], 'time'=> $bazarPage['date_maj_fiche']);
+
+            foreach ($attachments as $attachment) {
+                $remote_file_url = $this->remote_url . '?' . $bazarPage['id_fiche'] . '/download&file=' . $attachment;
+                $att = new \attach($this->wiki);
+                $att->file = $attachment;
+                $new_filename = $att->GetFullFilename(true);
+
+                $this->cURLDownload($remote_file_url, $new_filename, $output);
+            }
+        }
+
+        $replaced = preg_replace(
+            $wiki_regex,
+            'url="'.$this->wiki->getBaseUrl().'/$1"',
+            (!empty($bazarPage['bf_contenu']) ? $bazarPage['bf_contenu'] : $bazarPage['bf_description']),
+        );
+        if (!empty($bazarPage['bf_contenu']))
+            $bazarPage['bf_contenu'] = $replaced;
+        else
+            $bazarPage['bf_description'] = $replaced;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
