@@ -235,26 +235,26 @@ class ImportCoursesCommand extends Command
                     }
 
                     // Import activity here
+                    $this->downloadAttachments($activity, $output);
+
                     $activity['antispam'] = 1;
                     $entryManager->create(1201, $activity);
-                    $this->downloadAttachments($activity, $output);
                 }
 
                 // Import module here
+                $this->downloadAttachments($module, $output);
 
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
                 $entryManager->create(1202, $module);
-
-                $this->downloadAttachments($module, $output);
             }
 
             // Import course here
+            $this->downloadAttachments($course, $output);
+
             $course['antispam'] = 1;
             $course['checkboxfiche1202bf_modules_raw'] = $course['checkboxfiche1202bf_modules'];
             $entryManager->create(1203, $course);
-
-            $this->downloadAttachments($course, $output);
         }
 
         return Command::SUCCESS;
