@@ -4,6 +4,7 @@ namespace YesWiki\Lms\Commands;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use YesWiki\Bazar\Service\EntryManager;
@@ -42,6 +43,7 @@ class ImportCoursesCommand extends Command
             ->setHelp('This command allows you to import courses, and related modules and activities from another YesWiki with LMS extension.')
             ->addArgument('url', InputArgument::REQUIRED, 'URL to another wiki you wish to copy')
             ->addArgument('token', InputArgument::REQUIRED, 'API token for that wiki, found in `wakka.config.php`')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Will force updating of existing courses, modules and activities')
         ;
     }
 
@@ -101,23 +103,29 @@ class ImportCoursesCommand extends Command
     private function cURLDownload($from, $to, OutputInterface $output)
     {
         if (file_exists($to)) {
-            $output->writeln('<comment>File '.$to.' already exists in filesystem</>');
-        } else {
-            // Do cURL transfer
-            $fp = fopen($to, 'wb');
-            $ch = curl_init($from);
-            curl_setopt($ch, CURLOPT_FILE, $fp);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_FAILONERROR, true);
-            curl_exec($ch);
-            $err = curl_error($ch);
-            curl_close($ch);
-            fclose($fp);
-
-            if ($err) {
-                $output->writeln('<error>Error downloading '.$filename.': '.$err);
-                unlink($to);
+            if ($this->force) {
+                $output->writeln('<comment>File '.$to.' already exists in filesystem, overwriting</>');
+            } else {
+                $output->writeln('<comment>File '.$to.' already exists in filesystem, not downloading</>');
+                return;
             }
+        }
+
+        // Do cURL transfer
+        $fp = fopen($to, 'wb');
+        $ch = curl_init($from);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_FAILONERROR, true);
+        curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+        fclose($fp);
+
+        if ($err) {
+            $output->writeln('<error>Error downloading '.$filename.': '.$err);
+            $output->writeln('Removing corrupted file '.$filename.'</>');
+            unlink($to);
         }
     }
 
@@ -200,6 +208,7 @@ class ImportCoursesCommand extends Command
     {
         $this->remote_url = $input->getArgument('url');
         $this->remote_token = $input->getArgument('token');
+        $this->force = $input->getOption('force');
 
         if (!filter_var($this->remote_url, FILTER_VALIDATE_URL)) {
             $output->writeln('<error>Error : first parameter URL must be a valid url</>');
@@ -252,6 +261,10 @@ class ImportCoursesCommand extends Command
 
             if (is_null($pageManager->getOne($selectedCourse, '', 0))) {
                 $output->writeln('<info>Importing course "' . $selectedCourse . '"</>');
+                $createCourse = true;
+            } elseif ($this->force) {
+                $output->writeln('<comment>Course "' . $selectedCourse . '" already exists, updating it</>');
+                $createCourse = false;
             } else {
                 $output->writeln('<comment>Course "' . $selectedCourse . '" already exists, not importing</>');
                 continue;
@@ -264,6 +277,10 @@ class ImportCoursesCommand extends Command
 
                 if (is_null($pageManager->getOne($course_module, '', 0))) {
                     $output->writeln('<info>Importing module "' . $course_module . '"</>');
+                    $createModule = true;
+                } elseif ($this->force) {
+                    $output->writeln('<comment>Module "' . $course_module . '" already exists, updating it</>');
+                    $createModule = false;
                 } else {
                     $output->writeln('<comment>Module "' . $course_module . '" already exists, not importing</>');
                     continue;
@@ -277,6 +294,10 @@ class ImportCoursesCommand extends Command
 
                     if (is_null($pageManager->getOne($module_activity, '', 0))) {
                         $output->writeln('<info>Importing activity "' . $module_activity . '"</>');
+                        $createActivity = true;
+                    } elseif ($this->force) {
+                        $output->writeln('<comment>Activity "' . $module_activity . '" already exists, updating it</>');
+                        $createActivity = false;
                     } else {
                         $output->writeln('<comment>Activity "' . $module_activity . '" already exists, not importing</>');
                         continue;
@@ -286,7 +307,10 @@ class ImportCoursesCommand extends Command
                     $this->downloadAttachments($activity, $output);
 
                     $activity['antispam'] = 1;
-                    $entryManager->create(1201, $activity);
+                    if ($createActivity)
+                        $entryManager->create(1201, $activity);
+                    else
+                        $entryManager->update($module_activity, $activity, false, true);
                 }
 
                 // Import module here
@@ -294,7 +318,10 @@ class ImportCoursesCommand extends Command
 
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
-                $entryManager->create(1202, $module);
+                if ($createModule)
+                    $entryManager->create(1202, $module);
+                else
+                    $entryManager->update($course_module, $module, false, true);
             }
 
             // Import course here
@@ -302,7 +329,10 @@ class ImportCoursesCommand extends Command
 
             $course['antispam'] = 1;
             $course['checkboxfiche1202bf_modules_raw'] = $course['checkboxfiche1202bf_modules'];
-            $entryManager->create(1203, $course);
+            if ($createCourse)
+                $entryManager->create(1203, $course);
+            else
+                $entryManager->update($selectedCourse, $course, false, true);
         }
 
         return Command::SUCCESS;
