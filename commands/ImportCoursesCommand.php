@@ -102,14 +102,22 @@ class ImportCoursesCommand extends Command
             $matches
         );
 
-        if (count($matches[1])) {
-            $this->wiki->SetPage($this->wiki->services->get(PageManager::class)->getOne($bazarPage['id_fiche']));
+        $images = array_filter($bazarPage, function ($k) {
+            return str_starts_with($k, 'image');
+        }, ARRAY_FILTER_USE_KEY);
 
-            foreach ($matches[1] as $attachment) {
+        $attachments = array_merge($matches[1], array_values($images));
+        $attachments = array_unique($attachments);
+
+        if ($c = count($attachments)) {
+            $output->writeln(
+                '<info>Downloading '.$c.' attachment'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
+            
+            $dest = $this->getLocalFileUploadPath();
+
+            foreach ($attachments as $attachment) {
 
                 $remote_file_url = $this->remote_url.'/files/'.$attachment;
-
-                $dest = $this->getLocalFileUploadPath();
                 $save_file_loc = "$dest/$attachment";
 
                 if (file_exists($save_file_loc)) {
