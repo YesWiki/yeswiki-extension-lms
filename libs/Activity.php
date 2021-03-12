@@ -13,11 +13,11 @@ class Activity extends CourseStructure
 
     /**
      * Check if the comments are enable for this activity
-     * @return boolean|null the answer or if no value defined, return false by default
+     * @return boolean|null the answer or if no value defined, return true by default
      */
     public function isCommentsEnabled(): bool
     {
-        return ($this->getField('listeListeOuinonLmsbf_commentaires') == 'oui');
+        return ($this->getField('listeListeOuinonLmsbf_commentaires') != 'non');
     }
 
     /**
