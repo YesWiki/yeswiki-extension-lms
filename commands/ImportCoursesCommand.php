@@ -157,9 +157,8 @@ class ImportCoursesCommand extends Command
 
         // Letting the user choose which courses he wants
         $choices = ['all' => 'All the courses (default)'];
-        foreach ($courses as $course) {
-            //$output->writeln($course['bf_titre']);
-            $choices[$course['id_fiche']] = $course['bf_titre'];
+        foreach ($courses as $course_tag => $course) {
+            $choices[$course_tag] = $course['bf_titre'];
         }
 
         $helper = $this->getHelper('question');
