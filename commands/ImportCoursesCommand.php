@@ -148,7 +148,7 @@ class ImportCoursesCommand extends Command
         if ($c = count($attachments)) {
             $output->writeln(
                 '<info>Downloading '.$c.' image'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
-            
+
             $dest = $this->getLocalFileUploadPath();
 
             foreach ($attachments as $attachment) {
@@ -310,7 +310,12 @@ class ImportCoursesCommand extends Command
                     if ($createActivity)
                         $entryManager->create(1201, $activity);
                     else
-                        $entryManager->update($module_activity, $activity, false, true);
+                        $this->wiki->SavePage(
+                            $module_activity,
+                            json_encode($activity),
+                            '',
+                            true
+                        );
                 }
 
                 // Import module here
@@ -321,7 +326,12 @@ class ImportCoursesCommand extends Command
                 if ($createModule)
                     $entryManager->create(1202, $module);
                 else
-                    $entryManager->update($course_module, $module, false, true);
+                    $this->wiki->SavePage(
+                        $module_activity,
+                        json_encode($activity),
+                        '',
+                        true
+                    );
             }
 
             // Import course here
@@ -332,7 +342,12 @@ class ImportCoursesCommand extends Command
             if ($createCourse)
                 $entryManager->create(1203, $course);
             else
-                $entryManager->update($selectedCourse, $course, false, true);
+                $this->wiki->SavePage(
+                    $module_activity,
+                    json_encode($activity),
+                    '',
+                    true
+                );
         }
 
         return Command::SUCCESS;
