@@ -13,7 +13,7 @@ use YesWiki\Wiki;
 
 
 if (!class_exists('attach')) {
-    require(__DIR__."/../../attach/libs/attach.lib.php");
+    require("tools/attach/libs/attach.lib.php");
 }
 
 class ImportCoursesCommand extends Command
