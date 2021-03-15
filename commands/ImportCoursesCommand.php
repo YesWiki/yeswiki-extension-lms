@@ -25,6 +25,9 @@ class ImportCoursesCommand extends Command
     protected $remote_url;
     protected $remote_token;
     protected $upload_path;
+    protected $force;
+    protected $keep_original;
+    protected $last_choice;
 
     public function __construct(Wiki &$wiki)
     {
@@ -100,7 +103,7 @@ class ImportCoursesCommand extends Command
         return $this->upload_path;
     }
 
-    private function cURLDownload($from, $to, OutputInterface $output)
+    private function cURLDownload($from, $to, $force, OutputInterface $output)
     {
         if (file_exists($to)) {
             if ($this->force) {
@@ -131,6 +134,7 @@ class ImportCoursesCommand extends Command
 
     private function downloadAttachments(&$bazarPage, OutputInterface $output)
     {
+        $force = $this->last_choice == 'r' || $this->last_choice == 'o';
         // Downloading images
         preg_match_all(
             '#(?:href|src)="'.preg_quote($this->remote_url, '#').'files/(.*)"#Ui',
@@ -156,7 +160,7 @@ class ImportCoursesCommand extends Command
                 $remote_file_url = $this->remote_url.'/files/'.$attachment;
                 $save_file_loc = "$dest/$attachment";
 
-                $this->cURLDownload($remote_file_url, $save_file_loc, $output);
+                $this->cURLDownload($remote_file_url, $save_file_loc, $force, $output);
             }
         }
 
@@ -189,7 +193,7 @@ class ImportCoursesCommand extends Command
                 $att->file = $attachment;
                 $new_filename = $att->GetFullFilename(true);
 
-                $this->cURLDownload($remote_file_url, $new_filename, $output);
+                $this->cURLDownload($remote_file_url, $new_filename, $force, $output);
             }
         }
 
@@ -202,6 +206,37 @@ class ImportCoursesCommand extends Command
             $bazarPage['bf_contenu'] = $replaced;
         else
             $bazarPage['bf_description'] = $replaced;
+    }
+
+    private function askWhenDuplicate($localEntry, $remoteEntry, InputInterface $input, OutputInterface $output)
+    {
+      if ($this->keep_original)
+        return false;
+
+      $questionHelper = $this->getHelper('question');
+      $question = new ChoiceQuestion(
+        'Would you like to',
+        [
+          'l' => 'Keep local entry '.$this->wiki->href('', $localEntry['id_fiche']). ' last edited at ' . $localEntry['date_maj_fiche'],
+          'r' => 'Overwrite with remote entry '.$this->remote_url . '?' . $remoteEntry['id_fiche'] . ' last edited at ' . $remoteEntry['date_maj_fiche'],
+          'k' => 'Always keep original',
+          'o' => 'Always overwrite'
+        ],
+        'l'
+      );
+      $this->last_choice = $questionHelper->ask($input, $output, $question);
+      switch ($this->last_choice) {
+        case 'o':
+          $this->force = true;
+        case 'r':
+          return true;
+          break;
+        case 'k':
+          $this->keep_original = true;
+        case 'l':
+          return false;
+          break;
+      }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -253,16 +288,15 @@ class ImportCoursesCommand extends Command
         $output->writeln('<info>You have just selected: ' . implode(', ', $selectedCourses) . '</>');
 
 
-        $pageManager = $this->wiki->services->get(PageManager::class);
         $entryManager = $this->wiki->services->get(EntryManager::class);
 
         foreach ($selectedCourses as $selectedCourse) {
             $course = $courses[$selectedCourse];
 
-            if (is_null($pageManager->getOne($selectedCourse, '', 0))) {
+            if (is_null($localCourse = $entryManager->getOne($selectedCourse))) {
                 $output->writeln('<info>Importing course "' . $selectedCourse . '"</>');
                 $createCourse = true;
-            } elseif ($this->force) {
+            } elseif ($this->force || $this->askWhenDuplicate($localCourse, $course, $input, $output)) {
                 $output->writeln('<comment>Course "' . $selectedCourse . '" already exists, updating it</>');
                 $createCourse = false;
             } else {
@@ -270,15 +304,17 @@ class ImportCoursesCommand extends Command
                 continue;
             }
 
+            $this->downloadAttachments($course, $output);
+
             $course_modules = explode(',', $course['checkboxfiche1202bf_modules']);
 
             foreach ($course_modules as $course_module) {
                 $module = $modules[$course_module];
 
-                if (is_null($pageManager->getOne($course_module, '', 0))) {
+                if (is_null($localModule = $entryManager->getOne($course_module))) {
                     $output->writeln('<info>Importing module "' . $course_module . '"</>');
                     $createModule = true;
-                } elseif ($this->force) {
+                } elseif ($this->force || $this->askWhenDuplicate($localModule, $module, $input, $output)) {
                     $output->writeln('<comment>Module "' . $course_module . '" already exists, updating it</>');
                     $createModule = false;
                 } else {
@@ -286,16 +322,18 @@ class ImportCoursesCommand extends Command
                     continue;
                 }
 
+                $this->downloadAttachments($module, $output);
+
                 $module_activities = explode(',', $module['checkboxfiche1201bf_activites']);
 
 
                 foreach ($module_activities as $module_activity) {
                     $activity = $activities[$module_activity];
 
-                    if (is_null($pageManager->getOne($module_activity, '', 0))) {
+                    if (is_null($localActivity = $entryManager->getOne($module_activity))) {
                         $output->writeln('<info>Importing activity "' . $module_activity . '"</>');
                         $createActivity = true;
-                    } elseif ($this->force) {
+                    } elseif ($this->force || $this->askWhenDuplicate($localActivity, $activity, $input, $output)) {
                         $output->writeln('<comment>Activity "' . $module_activity . '" already exists, updating it</>');
                         $createActivity = false;
                     } else {
@@ -319,7 +357,6 @@ class ImportCoursesCommand extends Command
                 }
 
                 // Import module here
-                $this->downloadAttachments($module, $output);
 
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
@@ -335,7 +372,6 @@ class ImportCoursesCommand extends Command
             }
 
             // Import course here
-            $this->downloadAttachments($course, $output);
 
             $course['antispam'] = 1;
             $course['checkboxfiche1202bf_modules_raw'] = $course['checkboxfiche1202bf_modules'];
