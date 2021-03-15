@@ -10,7 +10,6 @@
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\LearnerManager;
 
-// load js for ajax reactions
 $GLOBALS['wiki']->addJavascriptFile('tools/lms/libs/lms.js');
 
 $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
@@ -21,12 +20,11 @@ $learner = $learnerManager->getLearner();
 ?>
 
 <div class="container lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
-    <div class="toggle-menu clearfix">
-        <a class="btn-menu btn btn-default" data-toggle="collapse" href="#menu-content" title="<?php echo _t('LMS_DISPLAY_MENU'); ?>">
-          <span class="fa fa-bars"></span><span class="fas fa-times"></span> <span class="menu-label"><?php echo _t('LMS_DISPLAY_MENU'); ?></span>
-        </a>
-    </div>
     <div class="row">
+        <button id="burger" class="open-main-nav" aria-label="<?php echo _t('LMS_INDEX_MENU'); ?>">
+            <span class="burger"></span>
+            <span class="burger-text"><?php echo _t('LMS_INDEX_MENU'); ?></span>
+        </button>
         <div class="col-md-3 lms-menu">
             <?php
             // display the PageMenuLms page if it exists
@@ -35,7 +33,7 @@ $learner = $learnerManager->getLearner();
             }
             ?>
         </div>
-        <div class="col-md-9 lms-activity-content">
+        <div class="col-md-9 lms-content lms-activity-content">
             <?php
             // the consulted course entry
             $course = $courseController->getContextualCourse();

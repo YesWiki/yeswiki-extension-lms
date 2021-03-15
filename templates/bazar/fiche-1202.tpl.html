@@ -10,6 +10,8 @@
 use YesWiki\Bazar\Field\BazarField;
 use YesWiki\Lms\Service\LearnerManager;
 
+$GLOBALS['wiki']->addJavascriptFile('tools/lms/libs/lms.js');
+
 $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 
 // the current learner
@@ -29,6 +31,10 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
 <?php if (!$moduleModal) : ?>
 <div class="container lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
     <div class="row">
+        <button id="burger" class="open-main-nav" aria-label="<?php echo _t('LMS_INDEX_MENU'); ?>">
+            <span class="burger"></span>
+            <span class="burger-text"><?php echo _t('LMS_INDEX_MENU'); ?></span>
+        </button>
         <div class="col-md-3 lms-menu">
             <?php
             // display the PageMenuLms page if it exists
@@ -37,7 +43,7 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
             }
             ?>
         </div>
-        <div class="col-md-9 lms-module-content">
+        <div class="col-md-9 lms-content lms-module-content">
             <?php endif ?>
             <?php
             $res = '';

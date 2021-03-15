@@ -46,7 +46,15 @@ $(document).ready(function () {
   })
 
   $(".launch-module").click(function () {
-    
     return true;
   })
 })
+
+/** for menu index in small screen size **/
+let burger = document.getElementById('burger');
+$('#burger').on('click', function(){
+  $('#burger').toggleClass('is-open');
+})
+
+
+
