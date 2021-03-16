@@ -11,7 +11,6 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
 
-
 if (!class_exists('attach')) {
     require("tools/attach/libs/attach.lib.php");
 }
@@ -66,12 +65,12 @@ class ImportCoursesCommand extends Command
         $output->writeln('<info>Fetching '.$log_name.'</>');
         $data_str = file_get_contents($this->remote_url.'?api/'.$api_args, false, $context);
         if (empty($data_str)) {
-                $output->writeln('<error>Error : unable to fetch '.$log_name.'</>');
-                return false;
+            $output->writeln('<error>Error : unable to fetch '.$log_name.'</>');
+            return false;
         } elseif (!$data_json=json_decode($data_str, true)) {
-                var_dump($data_str);
-                $output->writeln('<error>Error : unable to parse '.$log_name.'</>');
-                return false;
+            var_dump($data_str);
+            $output->writeln('<error>Error : unable to parse '.$log_name.'</>');
+            return false;
         } else {
             $data = array();
             foreach ($data_json as $entry) {
@@ -151,12 +150,12 @@ class ImportCoursesCommand extends Command
 
         if ($c = count($attachments)) {
             $output->writeln(
-                '<info>Downloading '.$c.' image'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
+                '<info>Downloading '.$c.' image'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>'
+            );
 
             $dest = $this->getLocalFileUploadPath();
 
             foreach ($attachments as $attachment) {
-
                 $remote_file_url = $this->remote_url.'/files/'.$attachment;
                 $save_file_loc = "$dest/$attachment";
 
@@ -183,7 +182,8 @@ class ImportCoursesCommand extends Command
 
         if ($c = count($attachments)) {
             $output->writeln(
-                '<info>Downloading '.$c.' attachment'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>');
+                '<info>Downloading '.$c.' attachment'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>'
+            );
             $this->wiki->tag = $bazarPage['id_fiche'];
             $this->wiki->page = array('tag'=>$bazarPage['id_fiche'], 'time'=> $bazarPage['date_maj_fiche']);
 
@@ -202,37 +202,41 @@ class ImportCoursesCommand extends Command
             'url="'.$this->wiki->getBaseUrl().'/$1"',
             (!empty($bazarPage['bf_contenu']) ? $bazarPage['bf_contenu'] : $bazarPage['bf_description']),
         );
-        if (!empty($bazarPage['bf_contenu']))
+        if (!empty($bazarPage['bf_contenu'])) {
             $bazarPage['bf_contenu'] = $replaced;
-        else
+        } else {
             $bazarPage['bf_description'] = $replaced;
+        }
     }
 
     private function askWhenDuplicate($localEntry, $remoteEntry, InputInterface $input, OutputInterface $output)
     {
-      if ($this->keep_original)
-        return false;
+        if ($this->keep_original) {
+            return false;
+        }
 
-      $questionHelper = $this->getHelper('question');
-      $question = new ChoiceQuestion(
-        'Would you like to',
-        [
+        $questionHelper = $this->getHelper('question');
+        $question = new ChoiceQuestion(
+            'Would you like to',
+            [
           'l' => 'Keep local entry '.$this->wiki->href('', $localEntry['id_fiche']). ' last edited at ' . $localEntry['date_maj_fiche'],
           'r' => 'Overwrite with remote entry '.$this->remote_url . '?' . $remoteEntry['id_fiche'] . ' last edited at ' . $remoteEntry['date_maj_fiche'],
           'k' => 'Always keep original',
           'o' => 'Always overwrite'
         ],
-        'l'
-      );
-      $this->last_choice = $questionHelper->ask($input, $output, $question);
-      switch ($this->last_choice) {
+            'l'
+        );
+        $this->last_choice = $questionHelper->ask($input, $output, $question);
+        switch ($this->last_choice) {
         case 'o':
           $this->force = true;
+          // no break
         case 'r':
           return true;
           break;
         case 'k':
           $this->keep_original = true;
+          // no break
         case 'l':
           return false;
           break;
@@ -255,12 +259,15 @@ class ImportCoursesCommand extends Command
         }
 
         // Fetching all information needed
-        if (false === $courses = $this->fetch_api('fiche/1203/html', 'courses', $output))
+        if (false === $courses = $this->fetch_api('fiche/1203/html', 'courses', $output)) {
             return Command::FAILURE;
-        if (false === $modules = $this->fetch_api('fiche/1202/html', 'modules', $output))
+        }
+        if (false === $modules = $this->fetch_api('fiche/1202/html', 'modules', $output)) {
             return Command::FAILURE;
-        if (false === $activities = $this->fetch_api('fiche/1201/html', 'activities', $output))
+        }
+        if (false === $activities = $this->fetch_api('fiche/1201/html', 'activities', $output)) {
             return Command::FAILURE;
+        }
 
 
         // Letting the user choose which courses he wants
@@ -292,7 +299,6 @@ class ImportCoursesCommand extends Command
 
         foreach ($selectedCourses as $selectedCourse) {
             $course = $courses[$selectedCourse];
-
             if (is_null($localCourse = $entryManager->getOne($selectedCourse))) {
                 $output->writeln('<info>Importing course "' . $selectedCourse . '"</>');
                 $createCourse = true;
@@ -345,45 +351,48 @@ class ImportCoursesCommand extends Command
                     $this->downloadAttachments($activity, $output);
 
                     $activity['antispam'] = 1;
-                    if ($createActivity)
+                    if ($createActivity) {
                         $entryManager->create(1201, $activity);
-                    else
+                    } else {
                         $this->wiki->SavePage(
                             $module_activity,
                             json_encode($activity),
                             '',
                             true
                         );
+                    }
                 }
 
                 // Import module here
 
                 $module['antispam'] = 1;
                 $module['checkboxfiche1201bf_activites_raw'] = $module['checkboxfiche1201bf_activites'];
-                if ($createModule)
+                if ($createModule) {
                     $entryManager->create(1202, $module);
-                else
+                } else {
                     $this->wiki->SavePage(
                         $module_activity,
                         json_encode($activity),
                         '',
                         true
                     );
+                }
             }
 
             // Import course here
 
             $course['antispam'] = 1;
             $course['checkboxfiche1202bf_modules_raw'] = $course['checkboxfiche1202bf_modules'];
-            if ($createCourse)
+            if ($createCourse) {
                 $entryManager->create(1203, $course);
-            else
+            } else {
                 $this->wiki->SavePage(
                     $module_activity,
                     json_encode($activity),
                     '',
                     true
                 );
+            }
         }
 
         return Command::SUCCESS;
