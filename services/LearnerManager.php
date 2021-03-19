@@ -173,7 +173,7 @@ class LearnerManager
         return new Progresses([]);
     }
 
-    public function saveProgressForLearner(
+    private function saveProgressForLearner(
         Learner $learner,
         Course $course,
         Module $module,
