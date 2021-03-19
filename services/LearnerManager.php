@@ -24,9 +24,6 @@ class LearnerManager
     protected $userManager;
     protected $entryManager;
     protected $tripleStore;
-    // the Progresses associative array 'userName' => Progresses object
-    // for all activities/modules and courses
-    protected $allProgresses;
 
     /**
      * LearnerManager constructor
@@ -47,7 +44,6 @@ class LearnerManager
         $this->userManager = $userManager;
         $this->entryManager = $entryManager;
         $this->tripleStore = $tripleStore;
-        $this->allProgresses = [] ;
     }
 
     /**
@@ -141,8 +137,7 @@ class LearnerManager
             'LIKE'
         );
         if ($results) {
-            // json decode
-            $results = new Progresses(
+            return new Progresses(
                 array_map(function ($res) {
                     // decode the json which have the progress information
                     $progress = json_decode($res['value'], true);
@@ -151,7 +146,6 @@ class LearnerManager
                     return $progress;
                 }, $results)
             );
-            return $results;
         }
         return new Progresses([]);
     }
@@ -159,15 +153,14 @@ class LearnerManager
     public function getAllProgressesForLearner(Learner $learner): Progresses
     {
         $learnerName = $learner->getUsername() ;
-        // lazy loading
-        if (!isset($this->allProgresses[$learnerName])) {
-            $results = $this->tripleStore->getAll(
-                $learnerName,
-                self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
-                '',
-                ''
-            );
-            $this->allProgresses[$learnerName] = new Progresses(
+        $results = $this->tripleStore->getAll(
+            $learnerName,
+            self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
+            '',
+            ''
+        );
+        if ($results) {
+            return new Progresses(
                 array_map(function ($result) use ($learnerName) {
                     // decode the json which have the progress information
                     $progress = json_decode($result['value'], true);
@@ -176,10 +169,8 @@ class LearnerManager
                     return $progress;
                 }, $results)
             );
-        } else {
-            return $this->allProgresses[$learnerName];
         }
-        return $this->allProgresses[$learnerName];
+        return new Progresses([]);
     }
 
     public function saveProgressForLearner(
@@ -203,11 +194,6 @@ class LearnerManager
             '',
             ''
         ) == 0;
-        if ($resultState) {
-            // force update allProgresses
-            $this->allProgresses[$learner->getUsername()] = null ;
-            $this->getAllProgressesForLearner($learner) ;
-        }
         return $resultState;
     }
 
