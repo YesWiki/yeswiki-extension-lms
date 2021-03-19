@@ -231,17 +231,14 @@ class LearnerManager
         );
         if ($result = array_shift($results)) {
             $oldValueJson = $result['value'];
-            $oldvalue = json_decode($oldValueJson, true);
+            $oldValue = json_decode($oldValueJson, true);
             if ($time == null) {
-                // if time is null, reset the elapsed_time attribute
-                if (isset($oldvalue['elapsed_time'])) {
-                    unset($oldvalue['elapsed_time']);
-                }
-                $newvalue = $oldvalue;
+                // if time is null, remove the elapsed_time key
+                $newValue = array_diff_key($oldValue, ['elapsed_time' => null]);
             } else {
                 // otherwise, update it
-                $newvalue = array_merge(
-                    $oldvalue,
+                $newValue = array_merge(
+                    $oldValue,
                     ['elapsed_time' => $time->format('%H:%I:%S')]
                 );
             }
@@ -249,7 +246,7 @@ class LearnerManager
                 $learner->getUsername(),
                 self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
                 $oldValueJson,
-                json_encode($newvalue),
+                json_encode($newValue),
                 '',
                 ''
             );
