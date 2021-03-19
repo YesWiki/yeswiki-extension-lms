@@ -88,7 +88,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
                 ]);
         }
         // get activity
-        $activityTag = $_GET['activity'];
+        $activityTag = $_GET['activity'] ?? null;
         if (!empty($activityTag)) {
             $activity = $this->courseManager->getActivity($activityTag);
             if (!$activity) {
@@ -108,7 +108,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
             $activity = null;
         }
         // check if the needed parameters are defined
-        if (!$learner || !$course || !$module){
+        if (!$learner || !$course || !$module) {
             return $this->twig->renderInSquelette('@templates/alert-message-with-back.twig', [
                 'type' => 'danger',
                 'message' => 'The GET parameters \'learner\', \'course\' and \'module\' need to be defined'
@@ -143,9 +143,9 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
         // update value
         if ($elapsedTime->totalMinutes == 0) {
             // reset elapsed time
-            $updateResult = $learner->resetElapsedTime($course, $module, $activity);
+            $updateResult = $this->learnerManager->resetElapsedTimeForLearner($learner, $course, $module, $activity);
         } else {
-            $updateResult = $learner->saveElapsedTime($course, $module, $activity, $elapsedTime);
+            $updateResult = $this->learnerManager->saveElapsedTimeForLearner($learner, $course, $module, $activity, $elapsedTime);
         }
         if (!$updateResult) {
             return $this->twig->renderInSquelette('@templates/alert-message-with-back.twig', [

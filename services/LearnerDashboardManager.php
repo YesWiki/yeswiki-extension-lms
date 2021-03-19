@@ -12,6 +12,7 @@ use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
+use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
 class LearnerDashboardManager
@@ -32,12 +33,14 @@ class LearnerDashboardManager
         Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
-        DateManager $dateManager
+        DateManager $dateManager,
+        LearnerManager $learnerManager
     ) {
         $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
         $this->dateManager = $dateManager;
+        $this->learnerManager = $learnerManager;
     }
 
     /**
@@ -105,7 +108,7 @@ class LearnerDashboardManager
     {
         $modulesStat = [];
         $modules = $course->getModules();
-        $progresses = $learner->getAllProgresses();
+        $progresses = $this->learnerManager->getAllProgressesForLearner($learner);
 
         foreach ($modules as $module) {
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);
@@ -118,8 +121,8 @@ class LearnerDashboardManager
             );
 
             $started = $progress || !empty(array_filter($activitiesStat, function ($activityStat) {
-                    return $activityStat['started'];
-                }));
+                return $activityStat['started'];
+            }));
 
             $nbActivities = count($activitiesStat);
             if ($nbActivities > 0) {
