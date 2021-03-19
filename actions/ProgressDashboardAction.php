@@ -3,6 +3,7 @@
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
+use YesWiki\Lms\Controller\ExtraActivityController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
@@ -15,6 +16,7 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
+    protected $extraActivityController;
 
     // the progresses related to the current course for all users
     protected $progresses;
@@ -42,6 +44,13 @@ class ProgressDashboardAction extends YesWikiAction
 
     public function run()
     {
+        $this->extraActivityController = $this->getService(ExtraActivityController::class);
+        $this->extraActivityController->setArguments($this->arguments);
+        $result = $this->extraActivityController->run();
+        if (!empty($result)) {
+            return $result ;
+        };
+
         $this->courseController = $this->getService(CourseController::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
@@ -185,7 +194,7 @@ class ProgressDashboardAction extends YesWikiAction
     private function setLearnersFromUsernames($usernames): void
     {
         $this->learners = [];
-        foreach ($usernames as $username){
+        foreach ($usernames as $username) {
             $learner = $this->learnerManager->getLearner($username);
             $this->learners[$username] = $learner;
         }

@@ -1,0 +1,16 @@
+{{ include_javascript('tools/bazar/libs/bazar.js') }}
+
+<h3>{{ _t('LMS_ADD_EXTRA_ACTIVITY') }}</h3>
+<form action="{{ url({tag:'',
+                      handler:'UpdateElapsedTime',
+                      params: {learner: learner.username, course: course.tag, module: module.tag, activity: activity.tag, previousparams: previousparams|keys|join(',')}}) }}"
+                      method="POST" name="formulaire" id="formulaire" enctype="multipart/form-data" class="form-horizontal">
+    {% include '@bazar/inputs/password.twig' with {'field': {
+        'name':'title',
+        'maxChars':'256',
+        'required':true,
+        'type':'text',
+        'hint':  _t('LMS_EXTRA_ACTIVITY_TITLE')  ,
+        'label':  _t('LMS_EXTRA_ACTIVITY_TITLE')
+        }} %}
+</form>

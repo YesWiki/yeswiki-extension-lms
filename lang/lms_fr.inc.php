@@ -95,5 +95,11 @@ $GLOBALS['translations'] = array_merge(
         'LMS_IMPORT_TOKEN' => 'Token du site distant',
         'LMS_IMPORT_URL' => 'URL à importer',
         'LMS_IMPORT' => 'Importer',
+
+        // extra activities
+        'LMS_ADD_EXTRA_ACTIVITY' => 'Ajouter une activité supplémentaire, webinaire',
+        'LMS_EXTRA_ACTIVITY' => 'EXTRA',
+        'LMS_EXTRA_ACTIVITY_TITLE' => 'Titre de l\'activité supplémentaire',
+
     )
 );
