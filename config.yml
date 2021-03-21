@@ -1,4 +1,6 @@
 parameters:
+  # display composant feature for LMS Activities's bf_contenu
+  actionbuilder_textarea_name: 'bf_contenu'
   lms_config:
     use_tabs: true
     # if true, the activity title is automatically added at the begin of the entry page
