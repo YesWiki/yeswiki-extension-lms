@@ -7,21 +7,24 @@
  * (by default 1203). If the course ID change, the installation must be performed again.
  */
 
+use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Lms\Controller\CourseController;
-use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Course;
 use YesWiki\Lms\Service\LearnerManager;
 
 $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
-$courseManager = $GLOBALS['wiki']->services->get(CourseManager::class);
+$entryManager = $GLOBALS['wiki']->services->get(EntryManager::class);
 $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 
 // the current learner
 $learner = $learnerManager->getLearner();
-?>
 
-<div class="course-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
-    <?php
-    $course = $courseManager->getCourse($fiche['id_fiche'], $fiche);
+echo '<div class="course-container' . ($learner && $learner->isAdmin() ? ' admin-user' : '') . '">';
+
+if ($fiche && intval($fiche['id_typeannonce']) == $GLOBALS['wiki']->config['lms_config']['course_form_id']) {
+    // no use of $courseManager->getCourse because sometimes the entry isn't in the db (for importation preview per example)
+    $course = new Course($GLOBALS['wiki']->config, $entryManager, $fiche['id_fiche'], $fiche);
 
     if (!empty($html['bf_titre'])) {
         echo '<h1 class="course-title">' . $html['bf_titre'] . '</h1>';
@@ -43,20 +46,20 @@ $learner = $learnerManager->getLearner();
         }
         echo '</div> <!-- end .module-list -->' . "\n";
     }
-    if ($learner && $learner->isAdmin()) : ?>
-        <div class="admin-infos well">
-            <h3><?php echo _t('LMS_RESERVED_FOR_ADMINS'); ?></h3>
-            <p><strong><?php echo _t('LMS_ACTIVITY_SCENARISATION'); ?></strong>
-                : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_activites'); ?></p>
-            <p><strong><?php echo _t('LMS_MODULE_SCENARISATION'); ?></strong>
-                : <?php echo $course->getField('listeListeOuinonLmsbf_scenarisation_modules'); ?></p>
+    if ($learner && $learner->isAdmin()) {
+        echo '<div class="admin-infos well">
+            <h3>' . _t('LMS_RESERVED_FOR_ADMINS') . '</h3>
+            <p><strong>' . _t('LMS_ACTIVITY_SCENARISATION') . '</strong>
+                : ' . $course->getField('listeListeOuinonLmsbf_scenarisation_activites') . '</p>
+            <p><strong>' . _t('LMS_MODULE_SCENARISATION') . '</strong>
+                : ' . $course->getField('listeListeOuinonLmsbf_scenarisation_modules') . '</p>
             <div class="dashboard-launch">
-                <a href="<?php echo $GLOBALS['wiki']->href(null, 'ProgressDashboard',
-                    ['course' => $course->getTag()]) ?>"
-                   class="btn btn-secondary-2 btn-large">
-                    <i class="fas fa-chart-bar"></i><?php echo _t('LMS_VIEW_PROGRESS_DASHBOARD') ?>
+                <a href="' . $GLOBALS['wiki']->href(null, 'ProgressDashboard',
+                ['course' => $course->getTag()]) . '" class="btn btn-secondary-2 btn-large">
+                    <i class="fas fa-chart-bar"></i>' . _t('LMS_VIEW_PROGRESS_DASHBOARD') . '
                 </a>
             </div>
-        </div>
-    <?php endif; ?>
-</div> <!-- /.course-container -->
+        </div>';
+    }
+}
+echo '</div> <!-- /.course-container -->';
