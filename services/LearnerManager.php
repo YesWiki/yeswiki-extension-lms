@@ -3,6 +3,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use Carbon\CarbonInterval;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
@@ -15,6 +16,9 @@ use YesWiki\Wiki;
 
 class LearnerManager
 {
+    protected const LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY =  'https://yeswiki.net/vocabulary/lms-extra-activity' ;
+    protected const LMS_TRIPLE_PROPERTY_NAME_PROGRESS =  'https://yeswiki.net/vocabulary/progress' ;
+
     protected $config;
     protected $wiki;
     protected $userManager;
@@ -56,9 +60,9 @@ class LearnerManager
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->tripleStore, $this->entryManager, $this->wiki);
+                : new Learner($user['name'], $this->entryManager, $this->wiki);
         }
-        return new Learner($username, $this->tripleStore, $this->entryManager, $this->wiki);
+        return new Learner($username, $this->entryManager, $this->wiki);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool
@@ -87,7 +91,7 @@ class LearnerManager
             $progress = $this->getOneProgressForLearner($learner, $course, $module, $activity);
             if (empty($progress)) {
                 // save the current progress
-                return $learner->saveProgress($course, $module, $activity);
+                return $this->saveProgressForLearner($learner, $course, $module, $activity);
             }
         }
         return false;
@@ -105,7 +109,7 @@ class LearnerManager
                 : '","log_time"%'); // if no activity, we are looking for the time attribute just after the module one
         $results = $this->tripleStore->getMatching(
             $learner->getUsername(),
-            'https://yeswiki.net/vocabulary/progress',
+            self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
             $like,
             '=',
             '=',
@@ -126,15 +130,14 @@ class LearnerManager
         $like = '%"course":"' . $course->getTag() . '"%';
         $results = $this->tripleStore->getMatching(
             null,
-            'https://yeswiki.net/vocabulary/progress',
+            self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
             $like,
             'LIKE',
             '=',
             'LIKE'
         );
         if ($results) {
-            // json decode
-            $results = new Progresses(
+            return new Progresses(
                 array_map(function ($res) {
                     // decode the json which have the progress information
                     $progress = json_decode($res['value'], true);
@@ -143,8 +146,108 @@ class LearnerManager
                     return $progress;
                 }, $results)
             );
-            return $results;
         }
         return new Progresses([]);
+    }
+
+    public function getAllProgressesForLearner(Learner $learner): Progresses
+    {
+        $learnerName = $learner->getUsername() ;
+        $results = $this->tripleStore->getAll(
+            $learnerName,
+            self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
+            '',
+            ''
+        );
+        if ($results) {
+            return new Progresses(
+                array_map(function ($result) use ($learnerName) {
+                    // decode the json which have the progress information
+                    $progress = json_decode($result['value'], true);
+                    // keep the learner username in the progress
+                    $progress['username'] = $learnerName;
+                    return $progress;
+                }, $results)
+            );
+        }
+        return new Progresses([]);
+    }
+
+    private function saveProgressForLearner(
+        Learner $learner,
+        Course $course,
+        Module $module,
+        ?Activity $activity
+    ): bool {
+        $progress = [
+                'course' => $course->getTag(),
+                'module' => $module->getTag()
+            ]
+            + ($activity ?
+                ['activity' => $activity->getTag()]
+                : [])
+            + ['log_time' => date('Y-m-d H:i:s', time())];
+        $resultState = $this->tripleStore->create(
+            $learner->getUsername(),
+            self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
+            json_encode($progress),
+            '',
+            ''
+        ) == 0;
+        return $resultState;
+    }
+
+    public function saveElapsedTimeForLearner(
+        Learner $learner,
+        Course $course,
+        Module $module,
+        ?Activity $activity,
+        ?CarbonInterval $time
+    ): bool {
+        $like = '%"course":"' . $course->getTag() . '","module":"' . $module->getTag() . '"' .
+            (($activity) ? ',"activity":"' . $activity->getTag() . '"' : ',"log_time"')
+            . '%'; // if no activity, we are looking for the time attribute just after the module one
+        $results = $this->tripleStore->getMatching(
+            $learner->getUsername(),
+            self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
+            $like,
+            '=',
+            '=',
+            'LIKE'
+        );
+        if ($result = array_shift($results)) {
+            $oldValueJson = $result['value'];
+            $oldValue = json_decode($oldValueJson, true);
+            if ($time == null) {
+                // if time is null, remove the elapsed_time key
+                $newValue = array_diff_key($oldValue, ['elapsed_time' => null]);
+            } else {
+                // otherwise, update it
+                $newValue = array_merge(
+                    $oldValue,
+                    ['elapsed_time' => $time->format('%H:%I:%S')]
+                );
+            }
+            $update = $this->tripleStore->update(
+                $learner->getUsername(),
+                self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
+                $oldValueJson,
+                json_encode($newValue),
+                '',
+                ''
+            );
+            // 0 when update is correctly done or 3 when the newValue is the same than oldValue (no update)
+            return $update == 0 || $update == 3;
+        }
+        return false;
+    }
+
+    public function resetElapsedTimeForLearner(
+        Learner $learner,
+        Course $course,
+        Module $module,
+        ?Activity $activity
+    ): bool {
+        return $this->saveElapsedTimeForLearner($learner, $course, $module, $activity, null);
     }
 }
