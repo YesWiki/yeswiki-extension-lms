@@ -36,9 +36,9 @@
     {{ include('@lms/progress-dashboard-included-activity.twig') }}
 {% endfor %}
 
-{% if module.extraActivities|length > 0 %}
+{% if extraActivitiesStat[course.tag][module.tag]['extraActivities']|length > 0 %}
     <h3 class="dashboard-activity">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h3>
-    {% for extraActivity in module.extraActivities %}
+    {% for extraActivity in extraActivitiesStat[course.tag][module.tag]['extraActivities'] %}
         {{ include('@lms/progress-dashboard-included-extra-activity.twig') }}
     {% endfor %}
 {% endif %}

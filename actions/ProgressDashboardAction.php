@@ -41,15 +41,19 @@ class ProgressDashboardAction extends YesWikiAction
     protected $modulesStat = [];
     // we keep also the same structure for $courseStat even if it has always one value
     protected $coursesStat = [];
+    // we keep also the same structure for $extraActivitiesStat even if it has always one value
+    protected $extraActivitiesStat = [];
 
     public function run()
     {
+        /* * Manage extra activity * */
         $this->extraActivityController = $this->getService(ExtraActivityController::class);
         $this->extraActivityController->setArguments($this->arguments);
         $result = $this->extraActivityController->run();
         if (!empty($result)) {
             return $result ;
         };
+        /* *************************** */
 
         $this->courseController = $this->getService(CourseController::class);
         $this->courseManager = $this->getService(CourseManager::class);
@@ -94,14 +98,17 @@ class ProgressDashboardAction extends YesWikiAction
         }
 
         $this->processActivitiesAndModuleStat($course, $module);
+        $this->processExtraActivities($course, $module);
+        
         // render the dashboard for a module
         return $this->render('@lms/progress-dashboard-module.twig', [
             'course' => $course,
             'module' => $module,
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
+            'extraActivitiesStat' => $this->extraActivitiesStat,
+            'extraTestMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
             'learners' => $this->learners,
-            'extraTestMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false
         ]);
     }
 
@@ -111,6 +118,7 @@ class ProgressDashboardAction extends YesWikiAction
             $this->processActivitiesAndModuleStat($course, $module);
         }
         $this->processCourseStat($course);
+        $this->processExtraActivities($course);
 
         // render the dashboard for a course
         $this->wiki->AddJavascriptFile('tools/lms/presentation/javascript/collapsible-panel.js');
@@ -118,8 +126,9 @@ class ProgressDashboardAction extends YesWikiAction
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
+            'extraActivitiesStat' => $this->extraActivitiesStat,
+            'extraTestMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
             'learners' => $this->learners,
-            'extraTestMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false
         ]);
     }
 
@@ -187,6 +196,21 @@ class ProgressDashboardAction extends YesWikiAction
         ksort($notFinishedUsernames);
         $this->coursesStat[$course->getTag()]['finished'] = $finishedUsernames;
         $this->coursesStat[$course->getTag()]['notFinished'] = $notFinishedUsernames;
+    }
+
+    
+    private function processExtraActivities(Course $course, Module $module = null)
+    {
+        $indexForExtraActivities = 'extraActivities';
+        $this->extraActivitiesStat = [];
+        $this->extraActivitiesStat[$course->getTag()] = [
+            $indexForExtraActivities => $this->extraActivityController->getExtraActivities($course)];
+        /* TODO add extra activities */
+        if ($module) {
+            $this->extraActivitiesStat[$course->getTag()][$module->getTag()] = [
+                $indexForExtraActivities => $this->extraActivityController->getExtraActivities($course, $module)
+            ];
+        }
     }
 
     /**

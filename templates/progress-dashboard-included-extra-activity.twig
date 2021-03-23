@@ -6,9 +6,9 @@
             <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
             {% if extraActivity.relatedLink %}            
                 <a class="no-collapsable" href="
-                {{- (if extraActivity.relatedLink starts with 'http')
+                {{- (extraActivity.relatedLink starts with 'http')
                      ? extraActivity.relatedLink
-                     : url({tag: extraActivity.tag})
+                     : url({tag: extraActivity.relatedLink})
                 -}}"
                 title="{{ _t('LMS_ACTIVITY_PREVIEW') }}">
                     {{ extraActivity.title }}
@@ -17,6 +17,7 @@
                 {{ extraActivity.title }}
             {% endif %}
             {{ include('@lms/extra-activity-link.twig', {mode:'edit',extraActivityId:extraActivity.tag}) }}
+            {{ include('@lms/extra-activity-link.twig', {mode:'delete',extraActivityId:extraActivity.tag}) }}
         </div>
         <div class="finished-ratio">
             <span title="{{ _t('LMS_FINISHED_RATIO') }}">
@@ -47,3 +48,5 @@
         </div>
     </div>
 </div>
+
+{{ include_javascript('tools/lms/presentation/javascript/collapsible-panel.js') }}

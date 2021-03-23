@@ -3,8 +3,9 @@
 namespace YesWiki\Lms\Controller;
 
 use YesWiki\Core\YesWikiController;
-
-;
+use YesWiki\Lms\Course;
+use YesWiki\Lms\ExtraActivityLog;
+use YesWiki\Lms\Module;
 
 class ExtraActivityController extends YesWikiController
 {
@@ -74,6 +75,53 @@ class ExtraActivityController extends YesWikiController
             case 'delete':
             default:
                 return null ;
+        }
+    }
+
+    /** Manager part **/
+    /* TODO ? move in manager ? */
+    public function getExtraActivities(Course $course, Module $module = null): array
+    {
+        if (!$this->arguments['testmode']) {
+            return [];
+        }
+        if (!$module) {
+            return [new ExtraActivityLog(
+                'TagDeTestExtra',
+                'Webinaire : Titre de test',
+                '',
+                new \DateTime('2000-01-01'),
+                new \DateInterval('PT1H3M2S'),
+                $course
+            )] ;
+        } else {
+            return [new ExtraActivityLog(
+                'TagDeTestExtra',
+                'Webinaire : Titre de test',
+                'BazaR',
+                new \DateTime('2000-01-01'),
+                new \DateInterval('PT1H3M2S'),
+                $course,
+                $module
+            ),
+            new ExtraActivityLog(
+                'TagDeTestExtra2',
+                'Atelier : Titre de test',
+                '',
+                new \DateTime('2000-01-02'),
+                new \DateInterval('PT3H3M2S'),
+                $course,
+                $module
+            ),
+            new ExtraActivityLog(
+                'TagDeTestExtra3',
+                'Formation : Titre de test',
+                'https://yeswiki.net',
+                new \DateTime('2000-04-02'),
+                new \DateInterval('P2DT3H3M2S'),
+                $course,
+                $module
+            )] ;
         }
     }
 }

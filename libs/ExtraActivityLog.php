@@ -2,9 +2,11 @@
 
 namespace YesWiki\Lms;
 
-use Carbon;
+use Carbon\Carbon;
+use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\ModuleManager;
 
-class ExtraActivityLog implements JsonSerializable
+class ExtraActivityLog implements \JsonSerializable
 {
     protected $tag ;
     protected $title ;
@@ -12,6 +14,8 @@ class ExtraActivityLog implements JsonSerializable
     protected $date ;
     protected $elapsedTime ;
     protected $registeredLearnerNames ;
+    protected $course ;
+    protected $module ;
 
     protected const DATE_FORMAT = 'Y-m-d H:i:s';
     protected const TIME_FORMAT = '%H:%I:%S';
@@ -24,29 +28,39 @@ class ExtraActivityLog implements JsonSerializable
      * @param string $relatedLink (url or pageTag)
      * @param \DateTime $date of the beginning
      * @param \DateInterval $elapsedTime
+     * @param Course $course
+     * @param Module $module optional
      */
     public function __construct(
         string $tag,
         string $title,
         string $relatedLink = '',
         \DateTime $date,
-        \DateInterval $elapsedTime
+        \DateInterval $elapsedTime,
+        Course $course,
+        Module $module = null
     ) {
         $this->tag = $tag;
         $this->title = $title;
         $this->relatedLink = $relatedLink;
         $this->date = $date;
         $this->elapsedTime = $elapsedTime;
-        $this->registeredLearnerNames = [];
+        $this->registeredLearnerNames = ['WikiAdmin'];
+        $this->course = $course;
+        $this->module = $module;
     }
 
-    public static function createFromJSON(string $json)
-    {
+    public static function createFromJSON(
+        string $json,
+        CourseManager $courseManager,
+        ModuleManager $moduleManager
+    ) {
         $data = json_decode($json, $true) ;
         if (!empty($data['tag'])
             && !empty($data['title'])
             && !empty($data['date'])
             && !empty($data['elapsedTime'])
+            && !empty($data['course'])
             ) {
             if (preg_match('/([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/i', $data['elapsedTime'], $matches)) {
                 $durationStr = 'PT'.$matches[1].'H'.$matches[2].'M'.$matches[3].'S' ;
@@ -58,7 +72,9 @@ class ExtraActivityLog implements JsonSerializable
                 $data['title'],
                 $data['relatedLink'] ?? '',
                 \DateTime::createFromFormat(self::DATE_FORMAT, $data['date']),
-                new \DateInterval($duration)
+                new \DateInterval($duration),
+                $courseManager->getCourse($data['course']),
+                !empty($data['module']) ? $moduleManager->getCourse($data['module']):null,
             )  ;
         } else {
             return false;
@@ -106,7 +122,7 @@ class ExtraActivityLog implements JsonSerializable
      */
     public function getDuration(): int
     {
-        return Carbon::create(2000, 0, 0, 0)->diffInMinutes(Carbon::create(2000, 0, 0, 0)->add($this->elapsedTime));
+        return Carbon::create(2000, 1, 1, 0)->diffInMinutes(Carbon::create(2000, 1, 1, 0)->add($this->elapsedTime));
     }
 
     public function getRegisteredLearnerNames(): array
@@ -116,12 +132,15 @@ class ExtraActivityLog implements JsonSerializable
 
     public function jsonSerialize()
     {
-        return [
-            'tag' => $this->getTag() ,
-            'title' => $this->getTitle() ,
-            'relatedLink' => $this->getRelatedLink() ,
-            'date' => $this->getFormattedDate() ,
-            'elapsedTime' => $this->getFormattedElapsedTime()
-        ];
+        return array_merge(
+            [
+                'tag' => $this->getTag() ,
+                'title' => $this->getTitle() ,
+                'relatedLink' => $this->getRelatedLink() ,
+                'date' => $this->getFormattedDate() ,
+                'elapsedTime' => $this->getFormattedElapsedTime(),
+                'course' => $this->course->getTag()],
+            !is_null($this->module) ? ['module' => $this->module->getTag()] : []
+        );
     }
 }
