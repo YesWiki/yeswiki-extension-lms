@@ -41,6 +41,9 @@
                         {% for username in extraActivity.RegisteredLearnerNames %}
                             <li>
                                 {{ include('@lms/progress-dashboard-user.twig') }}
+                                {{ include('@lms/extra-activity-link.twig', {mode:'remove',
+                                    extraActivityId:extraActivity.tag,
+                                    learnerName:username}) }}
                             </li>
                         {%  endfor %}
                     </ul>

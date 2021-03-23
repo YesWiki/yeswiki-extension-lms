@@ -54,6 +54,15 @@ class ExtraActivityController extends YesWikiController
                             : ((!empty($arg['extraactivitymode'])) ? $arg['extraactivitymode']: null)
                         ) ,
             'testmode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
+            'course' => (!empty($_GET['course'])) ? $_GET['course']
+                    : (
+                        (!empty($_POST['course'])) ? $_POST['course']
+                        : ((!empty($arg['course'])) ? $arg['course']: null)
+                    ) ,
+            'module' => $_REQUEST['module'] ?? null ,
+            'activity' => $_REQUEST['activity'] ?? null ,
+            'tag' => $_REQUEST['extraactivityid'] ?? null ,
+            'learnerName' => $_REQUEST['extraactivitylearner'] ?? null ,
         ];
     }
     
@@ -71,8 +80,30 @@ class ExtraActivityController extends YesWikiController
                 );
                 break ;
             case 'edit':
+                return $this->render(
+                    '@templates/alert-message.twig',
+                    [
+                        'type' => 'info',
+                        'message' => 'Mode test : édition de l\'activité : '. $this->arguments['tag']
+                    ]
+                );
+                break ;
             case 'remove':
+                return $this->render(
+                    '@templates/alert-message.twig',
+                    [
+                        'type' => 'info',
+                        'message' => 'Mode test : retrait de '.$this->arguments['learnerName'].'  de l\'activité : '. $this->arguments['tag']
+                    ]
+                );
             case 'delete':
+                return $this->render(
+                    '@templates/alert-message.twig',
+                    [
+                        'type' => 'info',
+                        'message' => 'Mode test : suppression  de l\'activité : '. $this->arguments['tag']
+                    ]
+                );
             default:
                 return null ;
         }
