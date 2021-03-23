@@ -101,7 +101,7 @@ class ProgressDashboardAction extends YesWikiAction
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
             'learners' => $this->learners,
-            'extratestmode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false
+            'extraTestMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false
         ]);
     }
 
@@ -119,7 +119,7 @@ class ProgressDashboardAction extends YesWikiAction
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
             'learners' => $this->learners,
-            'extratestmode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false
+            'extraTestMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false
         ]);
     }
 

@@ -102,6 +102,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_EXTRA_ACTIVITY_DELETE' => 'Supprimer l\'activité supplémentaire, le webinaire',
         'LMS_EXTRA_ACTIVITY_EDIT' => 'Modifier l\'activité supplémentaire, le webinaire',
         'LMS_EXTRA_ACTIVITY' => 'EXTRA',
+        'LMS_EXTRA_ACTIVITIES' => 'Webinaires, ateliers, autres activités',
         'LMS_EXTRA_ACTIVITY_TITLE' => 'Titre de l\'activité supplémentaire',
 
     )

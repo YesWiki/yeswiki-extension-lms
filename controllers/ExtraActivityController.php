@@ -69,6 +69,9 @@ class ExtraActivityController extends YesWikiController
                     ]
                 );
                 break ;
+            case 'edit':
+            case 'remove':
+            case 'delete':
             default:
                 return null ;
         }
