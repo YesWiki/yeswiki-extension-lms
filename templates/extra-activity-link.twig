@@ -1,4 +1,6 @@
-<a class="btn btn-primary btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_ADD_EXTRA_ACTIVITY') }}"
-    href="{{ url({tag: '',handler:'render',params:{content:"{{progressdashboard}}",course:course, extraactivitymode:"add"}}) }}">
-    <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY') }}
-</a>
+{% if extratestmode %}
+    <a class="btn btn-primary btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_ADD_EXTRA_ACTIVITY') }}"
+        href="{{ url({tag: '',params:{course:course, extraactivitymode:"add"}}) }}">
+        <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY') }}
+    </a>
+{% endif %}

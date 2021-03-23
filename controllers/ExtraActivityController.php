@@ -52,11 +52,15 @@ class ExtraActivityController extends YesWikiController
                             (!empty($_POST['extraactivitymode'])) ? $_POST['extraactivitymode']
                             : ((!empty($arg['extraactivitymode'])) ? $arg['extraactivitymode']: null)
                         ) ,
+            'testmode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
         ];
     }
     
     public function run(): ?string
     {
+        if (!$this->arguments['testmode']) {
+            return null;
+        }
         switch ($this->arguments['mode']) {
             case 'add':
                 return $this->render(
