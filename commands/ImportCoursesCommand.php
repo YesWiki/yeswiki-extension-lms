@@ -27,11 +27,13 @@ class ImportCoursesCommand extends Command
     protected $force;
     protected $keep_original;
     protected $last_choice;
+    protected $peertube_token;
 
     public function __construct(Wiki &$wiki)
     {
         parent::__construct();
         $this->wiki = $wiki;
+        $this->peertube_token = null;
     }
 
     protected function configure()
@@ -79,6 +81,29 @@ class ImportCoursesCommand extends Command
         }
 
         return $data;
+    }
+
+    private function importToPeertube($url, $title, OutputInterface $output)
+    {
+        $output->writeln('<info>Importing video '.$title.' ('.$url.')</>');
+        $channel = json_decode(file_get_contents($this->wiki->config['peertube_url'].'/api/v1/video-channels/'.$this->wiki->config['peertube_channel']), true);
+        // Get user token
+        $data = [
+          'channelId' => $channel['id'],
+          'name' => $title,
+          'targetUrl' => $url,
+        ];
+        $opts = array(
+            'http'=>array(
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n".
+                             "Authorization: Bearer ".$this->peertube_token."\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data)
+            )
+        );
+        $context = stream_context_create($opts);
+        $apiUrl = $this->wiki->config['peertube_url'].'/api/v1/videos/imports';
+        $data_str = file_get_contents($apiUrl, false, $context);
     }
 
     private function getLocalFileUploadPath()
@@ -133,6 +158,7 @@ class ImportCoursesCommand extends Command
 
     private function downloadAttachments(&$bazarPage, OutputInterface $output)
     {
+        // Handle Pictures and file attachments
         $force = $this->last_choice == 'r' || $this->last_choice == 'o';
         // Downloading images
         preg_match_all(
@@ -207,6 +233,72 @@ class ImportCoursesCommand extends Command
         } else {
             $bazarPage['bf_description'] = $replaced;
         }
+
+        // Handle Videos if a peertube location is configured
+        if (!empty($this->peertube_token)) {
+            $content = (!empty($bazarPage['bf_contenu']) ? $bazarPage['bf_contenu'] : $bazarPage['bf_description']);
+            $video_wiki_regex = '#{{video(?:\s*(?:id="(?<id>\S+)"|serveur="(?<serveur>peertube|vimeo|youtube)"|peertubeinstance="(?<peertubeinstance>\S+)"|ratio="(?<ratio>.+)"|largeurmax="(?<largeurmax>\d+)"|hauteurmax="(?<hauteurmax>\d+)"| class="(?<class>.+)"))+\s*}}#i';
+            preg_match_all(
+                $video_wiki_regex,
+                $content,
+                $video_wiki_matches
+            );
+
+            $video_html_regex = '#<iframe.+?(?:\s*width=["\'](?<width>[^"\']+)["\']|\s*height=["\'](?<height>[^\'"]+)["\']|\s*src=["\'](?<src>[^\'"]+["\']))+[^>]*>(<\/iframe>)?#mi';
+            preg_match_all(
+                $video_html_regex,
+                $content,
+                $video_html_matches
+            );
+
+            if (!empty($video_wiki_matches['id'])) {
+                foreach ($video_wiki_matches['id'] as $index => $videoId) {
+                    // trouver l'instance video entre youtube|vimeo|peertube
+                    // creer l'url de la video et la mettre dans $urlVideo
+                    if (empty($video_wiki_matches['serveur'][$index])) {
+                        if (strlen($videoId) == 11) {
+                            $video_wiki_matches['serveur'][$index] = 'youtube';
+                        } elseif (preg_match("/^\d+$/", $videoId)) {
+                            $video_wiki_matches['serveur'][$index] = 'vimeo';
+                        } else {
+                            $video_wiki_matches['serveur'][$index] = 'peertube';
+                        }
+                    }
+                    switch ($video_wiki_matches['serveur'][$index]) {
+                        case 'youtube':
+                            $urlVideo = 'https://youtu.be/'.$videoId;
+                            $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$urlVideo), true);
+                            $titleVideo = $video['title'];
+                            break;
+                        case 'vimeo':
+                            $urlVideo = 'https://vimeo.com/'.$videoId;
+                            $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$urlVideo), true);
+                            $titleVideo = $video['title'];
+                            break;
+                        case 'peertube':
+                            if (!empty($video_wiki_matches['peertubeinstance'][$index])) {
+                                $urlVideo = $video_wiki_matches['peertubeinstance'][$index].'/videos/watch/'.$videoId;
+                            } else {
+                                $urlVideo = 'https://video.colibris-outilslibres.org/videos/watch/'.$videoId;
+                            }
+                            $video = json_decode(file_get_contents(str_replace('videos/watch', 'api/v1/videos', $urlVideo)), true);
+                            $titleVideo = $video['name'];
+                            break;
+
+                        default:
+                            $output->writeln('<error>Something went very wrong determining which provider the video included by "'.$video_wiki_matches[0][$index].'" has.');
+                            die(1); // This part should never run, the switch should be handled by the cases above
+                    }
+                    $this->importToPeertube($urlVideo, $titleVideo, $output);
+                }
+            }
+
+            if (!empty($video_html_matches['src'])) {
+              // checker si l'url est une video youtube|vimeo|peertube
+              // uploader
+              echo 'TODO';
+            }
+        }
     }
 
     private function askWhenDuplicate($localEntry, $remoteEntry, InputInterface $input, OutputInterface $output)
@@ -256,6 +348,53 @@ class ImportCoursesCommand extends Command
 
         if ($this->remote_url[-1] !== '/') {
             $this->remote_url .= '/';
+        }
+
+        //initialise peertube token
+        if (!empty($this->wiki->config['peertube_url'])
+          && !empty($this->wiki->config['peertube_user'])
+          && !empty($this->wiki->config['peertube_password'])
+          && !empty($this->wiki->config['peertube_channel'])
+        ) {
+            // get token from peertube
+            $output->writeln('<info>Get Oauth client</>');
+            $apiUrl = $this->wiki->config['peertube_url'].'/api/v1/oauth-clients/local';
+            $data_str = @file_get_contents($apiUrl);
+            $token = json_decode($data_str, true);
+
+            if (!empty($token['client_id']) && !empty($token['client_secret'])) {
+                // Get user token
+                $data = [
+                  'client_id' => $token['client_id'],
+                  'client_secret' => $token['client_secret'],
+                  'grant_type' => 'password',
+                  'response_type' => 'code',
+                  'username' => $this->wiki->config['peertube_user'],
+                  'password' => $this->wiki->config['peertube_password'],
+                ];
+                $opts = array(
+                    'http'=>array(
+                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method'  => 'POST',
+                        'content' => http_build_query($data)
+                    )
+                );
+                $context = stream_context_create($opts);
+                $apiUrl = $this->wiki->config['peertube_url'].'/api/v1/users/token';
+                $data_str = @file_get_contents($apiUrl, false, $context);
+                $token = json_decode($data_str, true);
+                if (!empty($token['access_token'])) {
+                    $this->peertube_token = $token['access_token'];
+                    $output->writeln('<fg=cyan>Got access token : '.$this->peertube_token.'</>');
+                } else {
+                    $output->writeln('<error>Got no access token from : '.$apiUrl.'</>');
+                }
+            } else {
+                $output->writeln('<error>Got no client credentials from : '.$apiUrl.'</>');
+            }
+        } else {
+            $output->writeln('<info>Configuration : "peertube_url", "peertube_user", "peertube_password" or "peertube_channel" were not set in configuration file :'
+              .' no local video imports.</>');
         }
 
         // Fetching all information needed
