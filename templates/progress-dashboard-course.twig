@@ -33,3 +33,10 @@
 {% for module in course.modules %}
     {{ include('@lms/progress-dashboard-included-module.twig') }}
 {% endfor %}
+
+{% if course.extraActivities|length > 0 %}
+    <h3 class="dashboard-module">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h3>
+    {% for extraActivity in course.extraActivities %}
+        {{ include('@lms/progress-dashboard-included-extra-activity.twig',{level:'module'}) }}
+    {% endfor %}
+{% endif %}

@@ -15,7 +15,7 @@
            href="{{ url({tag: module.tag}) }}">
             <i class="fas fa-eye"></i>
         </a>
-    {{ include('@lms/extra-activity-link.twig', {course: course.tag,module: modulte.tag}) }}
+    {{ include('@lms/extra-activity-link.twig', {course: course.tag,module: module.tag}) }}
     </div>
     <div class="finished-ratio">
         <span title="{{ _t('LMS_FINISHED_RATIO') }}">
@@ -35,3 +35,10 @@
 {% for activity in module.activities %}
     {{ include('@lms/progress-dashboard-included-activity.twig') }}
 {% endfor %}
+
+{% if module.extraActivities|length > 0 %}
+    <h3 class="dashboard-activity">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h3>
+    {% for extraActivity in module.extraActivities %}
+        {{ include('@lms/progress-dashboard-included-extra-activity.twig') }}
+    {% endfor %}
+{% endif %}

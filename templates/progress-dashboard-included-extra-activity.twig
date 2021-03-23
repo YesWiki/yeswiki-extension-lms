@@ -1,0 +1,38 @@
+{% set level = (level ?? 'activity') %}
+<div class="panel panel-lms-dashboard dashboard-{{ level }}-frame collapsed">
+    <div id="heading_{{ extraActivity.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
+         href="#collapse_{{ extraActivity.tag }}" aria-expanded="false" aria-controls="collapse_{{ extraActivity.tag }}">
+        <div class="panel-title">
+            <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
+            {{ extraActivity.title }}
+            {{ include('@lms/extra-activity-link.twig', {mode:'edit',extraActivityId:extraActivity.tag}) }}
+        </div>
+        <div class="finished-ratio">
+            <span title="{{ _t('LMS_FINISHED_RATIO') }}">
+                <span class="label-icon"><i class="fas fa-user"></i></span>
+                {{ extraActivitiesStat[extraActivity.tag].finished | length }}
+            </span>
+        </div>
+        <div class="estimated-time">
+            <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
+                <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>
+                {{ formatter.formatDuration(extraActivity.duration) }}
+            </span>
+        </div>
+    </div>
+    <div id="collapse_{{ extraActivity.tag }}" class="panel-collapse collapse" role="tabpanel"
+         aria-labelledby="heading_{{ extraActivity.tag }}" aria-expanded="false">
+        <div class="learners-groups emulated-flex-gap">
+            <div class="learners-group fieldset-group dashboard-activity-frame">
+                <label><i class="fas fa-user"></i></label>
+                    <ul class="learner-details">
+                        {% for username in extraActivitiesStat[extraActivity.tag].finished %}
+                            <li>
+                                {{ include('@lms/progress-dashboard-user.twig') }}
+                            </li>
+                        {%  endfor %}
+                    </ul>
+            </div>
+        </div>
+    </div>
+</div>
