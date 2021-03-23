@@ -1,6 +1,37 @@
 {% if extratestmode %}
-    <a class="btn btn-primary btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_ADD_EXTRA_ACTIVITY') }}"
-        href="{{ url({tag: '',params:{course:course, extraactivitymode:"add"}}) }}">
-        <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY') }}
-    </a>
-{% endif %}
+    {% set mode = (mode ?? 'add') %}
+    {% set class = 'btn-primary' %}
+    {% set title = _t('LMS_EXTRA_ACTIVITY_ADD') %}
+    {% set text = _t('LMS_EXTRA_ACTIVITY') %}
+    {% set icon = 'fas fa-plus' %}
+    {% if mode == 'add' %}
+        {% block link %}
+            <a class="btn {{class}} btn-xs modalbox" data-size="modal-lg" title="{{ title }}"
+                href="{{ url({tag: '',
+                    params:{course:course, 
+                            module:module, 
+                            activity:activity,
+                            extraactivitymode:"#{mode}"}}) }}">
+                <i class="{{ icon }}"></i> {{ text }}
+            </a>
+        {% endblock %}
+    {% elseif mode == 'edit' %}
+        {% set class = 'btn-default' %}
+        {% set title = _t('LMS_EXTRA_ACTIVITY_EDIT') %}
+        {% set text = '' %}
+        {% set icon = 'fas fa-edit' %}
+        {{ block("link") }}
+    {% elseif mode == 'remove' %}
+        {% set class = 'btn-default' %}
+        {% set title = _t('LMS_EXTRA_ACTIVITY_REMOVE') %}
+        {% set text = '' %}
+        {% set icon = 'fas fa-user-minus' %}
+        {{ block("link") }}
+    {% elseif mode == 'delete' %}
+        {% set class = 'btn-default' %}
+        {% set title = _t('LMS_EXTRA_ACTIVITY_DELETE') %}
+        {% set text = '' %}
+        {% set icon = 'fas fa-trash-alt' %}
+        {{ block("link") }}
+    {% endif  %}
+{% endif  %}

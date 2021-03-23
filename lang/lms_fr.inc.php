@@ -97,7 +97,10 @@ $GLOBALS['translations'] = array_merge(
         'LMS_IMPORT' => 'Importer',
 
         // extra activities
-        'LMS_ADD_EXTRA_ACTIVITY' => 'Ajouter une activité supplémentaire, webinaire',
+        'LMS_EXTRA_ACTIVITY_ADD' => 'Ajouter une activité supplémentaire, un webinaire',
+        'LMS_EXTRA_ACTIVITY_REMOVE' => 'Retirer cet utilisateur',
+        'LMS_EXTRA_ACTIVITY_DELETE' => 'Supprimer l\'activité supplémentaire, le webinaire',
+        'LMS_EXTRA_ACTIVITY_EDIT' => 'Modifier l\'activité supplémentaire, le webinaire',
         'LMS_EXTRA_ACTIVITY' => 'EXTRA',
         'LMS_EXTRA_ACTIVITY_TITLE' => 'Titre de l\'activité supplémentaire',
 

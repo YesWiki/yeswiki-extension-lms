@@ -1,6 +1,6 @@
 {{ include_javascript('tools/bazar/libs/bazar.js') }}
 
-<h3>{{ _t('LMS_ADD_EXTRA_ACTIVITY') }}</h3>
+<h3>{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}</h3>
 <form action="{{ url({tag:'',
                       handler:'UpdateElapsedTime',
                       params: {learner: learner.username, course: course.tag, module: module.tag, activity: activity.tag, previousparams: previousparams|keys|join(',')}}) }}"
