@@ -9,7 +9,18 @@
                         extraactivitymode:mode
                         }
                     }) }}">
-            <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY') }}
+            <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY_ADD') }}
+        </a>
+    {% elseif mode == 'add-light' %}
+        <a class="btn btn-primary btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}"
+            href="{{ url({tag: '',
+                    params:{course:course, 
+                        module:module, 
+                        activity:activity,
+                        extraactivitymode:'add'
+                        }
+                    }) }}">
+            <i class="fas fa-plus"></i>
         </a>
     {% elseif mode == 'edit' %}
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_EDIT') }}"
