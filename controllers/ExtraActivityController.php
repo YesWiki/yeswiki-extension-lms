@@ -9,29 +9,13 @@ use YesWiki\Lms\Module;
 
 class ExtraActivityController extends YesWikiController
 {
-    // protected $entryManager;
-    // protected $courseManager;
-    // protected $learnerManager;
-    // protected $config;
     protected $arguments;
 
     /**
-     * CourseController constructor
-     * @param EntryManager $entryManager the injected EntryManager instance
-     * @param CourseManager $courseManager the injected CourseManager instance
-     * @param LearnerManager $learnerManager the injected LearnerManager instance
-     * @param ParameterBagInterface $config the injected Wiki instance
+     * ExtraActivityController constructor
      */
     public function __construct(
-        // EntryManager $entryManager,
-        // CourseManager $courseManager,
-        // LearnerManager $learnerManager,
-        // ParameterBagInterface $config
     ) {
-        // $this->entryManager = $entryManager;
-        // $this->courseManager = $courseManager;
-        // $this->learnerManager = $learnerManager;
-        // $this->config = $config->all();
         $this->arguments = [] ;
     }
 
@@ -74,6 +58,12 @@ class ExtraActivityController extends YesWikiController
         switch ($this->arguments['mode']) {
             case 'add':
                 return $this->render(
+                    '@templates/alert-message.twig',
+                    [
+                        'type' => 'warning',
+                        'message' => 'Mode test : création d\'une  activité. Non fonctionnel !! '
+                    ]
+                ) . $this->render(
                     '@lms/extra-activity-form.twig',
                     [
                     ]
@@ -109,50 +99,8 @@ class ExtraActivityController extends YesWikiController
         }
     }
 
-    /** Manager part **/
-    /* TODO ? move in manager ? */
-    public function getExtraActivities(Course $course, Module $module = null): array
+    public function getTestMode()
     {
-        if (!$this->arguments['testmode']) {
-            return [];
-        }
-        if (!$module) {
-            return [new ExtraActivityLog(
-                'TagDeTestExtra',
-                'Webinaire : Titre de test',
-                '',
-                new \DateTime('2000-01-01'),
-                new \DateInterval('PT1H3M2S'),
-                $course
-            )] ;
-        } else {
-            return [new ExtraActivityLog(
-                'TagDeTestExtra',
-                'Webinaire : Titre de test',
-                'BazaR',
-                new \DateTime('2000-01-01'),
-                new \DateInterval('PT1H3M2S'),
-                $course,
-                $module
-            ),
-            new ExtraActivityLog(
-                'TagDeTestExtra2',
-                'Atelier : Titre de test',
-                '',
-                new \DateTime('2000-01-02'),
-                new \DateInterval('PT3H3M2S'),
-                $course,
-                $module
-            ),
-            new ExtraActivityLog(
-                'TagDeTestExtra3',
-                'Formation : Titre de test',
-                'https://yeswiki.net',
-                new \DateTime('2000-04-02'),
-                new \DateInterval('P2DT3H3M2S'),
-                $course,
-                $module
-            )] ;
-        }
+        return (isset($this->arguments['testmode']) && $this->arguments['testmode']) ;
     }
 }
