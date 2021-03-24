@@ -138,7 +138,7 @@ class Course extends CourseStructure
         if (is_null($this->duration)) {
             $count = CarbonInterval::minutes(0);
             foreach ($this->getModules() as $module) {
-                if ($module->getDuration()){
+                if ($module->getDuration()) {
                     $count = $count->add($module->getDuration());
                 }
             }

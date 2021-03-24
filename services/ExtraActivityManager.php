@@ -5,7 +5,6 @@ namespace YesWiki\Lms\Service;
 
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Wiki;
-use YesWiki\Lms\CourseStructure ;
 use YesWiki\Lms\ExtraActivityLog ;
 use YesWiki\Lms\Module ;
 use YesWiki\Lms\Course ;
@@ -41,23 +40,22 @@ class ExtraActivityManager
      *
      * @return [] the courseStructure's extraActivities
      */
-    public function getExtraActivities(CourseStructure $courseStructure): array
+    public function getExtraActivities(Course $course, Module $module = null): array
     {
         if (!$this->extraActivityController->getTestMode()) {
             return [];
         }
 
-        
-        if ($courseStructure instanceof Course) {
+        if (!$module) {
             return [new ExtraActivityLog(
                 'TagDeTestExtra',
                 'Webinaire : Titre de test',
                 '',
                 new \DateTime('2000-01-01'),
                 new \DateInterval('PT1H3M2S'),
-                $courseStructure
+                $course
             )] ;
-        } elseif ($courseStructure instanceof Module) {
+        } else {
             return [new ExtraActivityLog(
                 'TagDeTestExtra',
                 'Webinaire : Titre de test',
@@ -65,7 +63,7 @@ class ExtraActivityManager
                 new \DateTime('2000-01-01'),
                 new \DateInterval('PT1H3M2S'),
                 $course,
-                $courseStructure
+                $module
             ),
             new ExtraActivityLog(
                 'TagDeTestExtra2',
@@ -74,7 +72,7 @@ class ExtraActivityManager
                 new \DateTime('2000-01-02'),
                 new \DateInterval('PT3H3M2S'),
                 $course,
-                $courseStructure
+                $module
             ),
             new ExtraActivityLog(
                 'TagDeTestExtra3',
@@ -83,9 +81,8 @@ class ExtraActivityManager
                 new \DateTime('2000-04-02'),
                 new \DateInterval('P2DT3H3M2S'),
                 $course,
-                $courseStructure
+                $module
             )] ;
         }
-        return [] ;
     }
 }
