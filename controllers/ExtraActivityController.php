@@ -3,19 +3,29 @@
 namespace YesWiki\Lms\Controller;
 
 use YesWiki\Core\YesWikiController;
+use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\ExtraActivityLog;
 use YesWiki\Lms\Module;
+use YesWiki\Lms\Service\CourseManager;
 
 class ExtraActivityController extends YesWikiController
 {
     protected $arguments;
+    protected $courseManager;
+    protected $userManager;
 
     /**
      * ExtraActivityController constructor
+     * @param CourseManager $courseManager the injected CourseManager instance
+     * @param UserManager $userManager the injected UserManager instance
      */
     public function __construct(
+        CourseManager $courseManager,
+        UserManager $userManager
     ) {
+        $this->courseManager = $courseManager;
+        $this->userManager = $userManager;
         $this->arguments = [] ;
     }
 
@@ -44,7 +54,6 @@ class ExtraActivityController extends YesWikiController
                         : ((!empty($arg['course'])) ? $arg['course']: null)
                     ) ,
             'module' => $_REQUEST['module'] ?? null ,
-            'activity' => $_REQUEST['activity'] ?? null ,
             'tag' => $_REQUEST['extraactivityid'] ?? null ,
             'learnerName' => $_REQUEST['extraactivitylearner'] ?? null ,
         ];
@@ -57,6 +66,15 @@ class ExtraActivityController extends YesWikiController
         }
         switch ($this->arguments['mode']) {
             case 'add':
+                $course = $this->courseManager->getCourse($this->arguments['course']) ;
+                $modules = [];
+                foreach ($course->getModules() as $module) {
+                    $modules[$module->getTag()] = $module->getTitle();
+                }
+                $learners = [];
+                foreach ($this->userManager->getAll() as $user) {
+                    $learners[$user['name']] = $user['name'] ;
+                }
                 return $this->render(
                     '@templates/alert-message.twig',
                     [
@@ -66,6 +84,11 @@ class ExtraActivityController extends YesWikiController
                 ) . $this->render(
                     '@lms/extra-activity-form.twig',
                     [
+                        'course' => $course,
+                        'module' => $this->arguments['module'],
+                        'modules' => $modules,
+                        'learners' => $learners,
+                        'registeredLearners' => [],
                     ]
                 );
                 break ;
@@ -75,6 +98,15 @@ class ExtraActivityController extends YesWikiController
                     [
                         'type' => 'info',
                         'message' => 'Mode test : édition de l\'activité : '. $this->arguments['tag']
+                    ]
+                );
+                break ;
+            case 'save':
+                return $this->render(
+                    '@templates/alert-message.twig',
+                    [
+                        'type' => 'info',
+                        'message' => 'Mode test : sauvegarde de :<div style="word-wrap:break-word;">'. json_encode($_POST) .'</div>'
                     ]
                 );
                 break ;

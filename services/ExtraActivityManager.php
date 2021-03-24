@@ -36,6 +36,16 @@ class ExtraActivityManager
     }
 
     /**
+     * Save a Extra-activity
+     *
+     * @return bool
+     */
+    public function saveExtraActivity(array $data): bool
+    {
+        return false;
+    }
+
+    /**
      * Get the Extra-activities of a courseStructure
      *
      * @return [] the courseStructure's extraActivities

@@ -1,16 +1,87 @@
 {{ include_javascript('tools/bazar/libs/bazar.js') }}
 
 <h3>{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}</h3>
-<form action="{{ url({tag:'',
-                      handler:'UpdateElapsedTime',
-                      params: {learner: learner.username, course: course.tag, module: module.tag, activity: activity.tag, previousparams: previousparams|keys|join(',')}}) }}"
-                      method="POST" name="formulaire" id="formulaire" enctype="multipart/form-data" class="form-horizontal">
-    {% include '@bazar/inputs/password.twig' with {'field': {
+<form action="{{ url({tag:''}) }}"
+    method="POST" name="formulaire" id="formulaire" enctype="multipart/form-data" class="form-horizontal">
+    {{ include('@bazar/inputs/text.twig',{'field': {
         'name':'title',
         'maxChars':'256',
         'required':true,
         'type':'text',
         'hint':  _t('LMS_EXTRA_ACTIVITY_TITLE')  ,
         'label':  _t('LMS_EXTRA_ACTIVITY_TITLE')
-        }} %}
+        }}) }}
+    {{ include('@bazar/inputs/text.twig', {'field': {
+        'name':'relatedLink',
+        'maxChars':'256',
+        'required':false,
+        'type':'url',
+        'hint':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')  ,
+        'label':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')
+        }}) }}
+    {{ include_javascript('tools/bazar/libs/vendor/bootstrap-datepicker.js')}}
+    {{ include('@bazar/inputs/date.twig', {'field': {
+            'name':'date',
+            'required':true,
+            'hint':  _t('LMS_EXTRA_ACTIVITY_DATE')  ,
+            'label':  _t('LMS_EXTRA_ACTIVITY_DATE')
+            },        
+        'day': date()|date("Y-m-d"),
+        'hour':12,
+        'minute':0,
+        'hasTime':true
+        }) }}
+    {{ include('@bazar/inputs/date.twig', {'field': {
+            'name':'enddate',
+            'required':true,
+            'hint':  _t('LMS_EXTRA_ACTIVITY_END_DATE')  ,
+            'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
+            },        
+        'day': date()|date("Y-m-d"),
+        'hour':14,
+        'minute':0,
+        'hasTime':true
+        }) }}
+    {{ include('@bazar/fields/text.twig',{'field': {
+        'name':'course',
+        'type':'text',
+        'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_COURSE')
+        },
+        'value': course.title}) }}
+    <input type="hidden" id="course" name="course" value="{{ course.tag }}">
+    {{ include('@bazar/inputs/select.twig', {'field': {
+            'name':'module',
+            'required':true,
+            'hint':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')  ,
+            'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')
+            },        
+        'value': module,
+        'options': modules
+        }) }}
+    {{ include('@bazar/inputs/checkbox_drag_and_drop.twig', {'field': {
+            'name':'registeredLearnerNames',
+            'propertyName':'registeredLearnerNames',
+            'required':false,
+            'hint':  _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')  ,
+            'label':  _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
+            },        
+        'value': module,
+        'options': learners,
+        'selectedOptionsId': registeredLearners,
+        'formName': _t('LMS_EXTRA_ACTIVITY_LEARNERS'),
+        'name': _t('BAZ_DRAG_n_DROP_CHECKBOX_LIST') ~ _t('LMS_EXTRA_ACTIVITY_D') ~ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
+        }) }}
+    <input type="hidden" id="tag" name="tag" value="{{ tag }}">
+    <input type="hidden" id="extraactivitymode" name="extraactivitymode" value="save">
+    <div class="form-actions form-group">
+        <div class="col-sm-9 col-sm-offset-3">
+        <button type="submit" class="btn btn-primary">{{ _t('BAZ_VALIDER') }}</button>
+        </div>
+    </div>
 </form>
+<h3 class="dashboard-course course-back">
+    <a href="{{ url({params: {course: course.tag,module: module} }) }}"
+       title="{{ _t('LMS_BACK_TO_PROGRESSES_DASH_BOARD') }}">
+        <i class="far fa-arrow-alt-circle-left"></i> {{ _t('LMS_BACK_TO_PROGRESSES_DASH_BOARD') }}
+    </a>
+</h3>

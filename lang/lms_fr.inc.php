@@ -103,6 +103,15 @@ $GLOBALS['translations'] = array_merge(
         'LMS_EXTRA_ACTIVITY_EDIT' => 'Modifier l\'activité supplémentaire, le webinaire',
         'LMS_EXTRA_ACTIVITIES' => 'Webinaires, ateliers, autres activités',
         'LMS_EXTRA_ACTIVITY_TITLE' => 'Titre de l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_RELATED_LINK' => 'Lien ou pageTag vers des détails sur l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_DATE' => 'Date de démarrage de l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_END_DATE' => 'Date de fin de l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_ASSOCIATED_COURSE' => 'Cours associé',
+        'LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE' => 'Module associé',
+        'LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS' => 'Inscrit.e.s',
+        'LMS_EXTRA_ACTIVITY_D' => ' d\' ',
+        'LMS_EXTRA_ACTIVITY_LEARNERS' => 'Apprenant⋅e⋅s',
+        'LMS_BACK_TO_PROGRESSES_DASH_BOARD' => 'Retour au tableau de bord',
 
     )
 );
