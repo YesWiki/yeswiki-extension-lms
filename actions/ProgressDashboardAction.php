@@ -46,15 +46,6 @@ class ProgressDashboardAction extends YesWikiAction
 
     public function run()
     {
-        /* * Manage extra activity * */
-        $this->extraActivityController = $this->getService(ExtraActivityController::class);
-        $this->extraActivityController->setArguments($this->arguments);
-        $result = $this->extraActivityController->run();
-        if (!empty($result)) {
-            return $result ;
-        };
-        /* *************************** */
-
         $this->courseController = $this->getService(CourseController::class);
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
@@ -68,6 +59,16 @@ class ProgressDashboardAction extends YesWikiAction
                 'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'
             ]);
         }
+        
+        /* * Manage extra activity * */
+        $this->extraActivityController = $this->getService(ExtraActivityController::class);
+        $this->extraActivityController->setArguments($this->arguments);
+        $result = $this->extraActivityController->run();
+        if (!empty($result)) {
+            return $result ;
+        };
+        /* *************************** */
+
 
         // the course for which we want to display the dashboard
         $course = $this->courseController->getContextualCourse();
