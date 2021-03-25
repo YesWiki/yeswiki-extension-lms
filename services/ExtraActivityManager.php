@@ -6,6 +6,7 @@ namespace YesWiki\Lms\Service;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Wiki;
 use YesWiki\Lms\ExtraActivityLog ;
+use YesWiki\Lms\ExtraActivityLogs ;
 use YesWiki\Lms\Module ;
 use YesWiki\Lms\Course ;
 use YesWiki\Lms\Controller\ExtraActivityController ;
@@ -48,25 +49,28 @@ class ExtraActivityManager
     /**
      * Get the Extra-activities of a courseStructure
      *
-     * @return [] the courseStructure's extraActivities
+     * @return ExtraActivityLogs the courseStructure's extraActivities
      */
-    public function getExtraActivities(Course $course, Module $module = null): array
+    public function getExtraActivities(Course $course, Module $module = null): ExtraActivityLogs
     {
         if (!$this->extraActivityController->getTestMode()) {
-            return [];
+            return new ExtraActivityLogs();
         }
 
         if (!$module) {
-            return [new ExtraActivityLog(
+            $extraActivities = new ExtraActivityLogs() ;
+            $extraActivities->add(new ExtraActivityLog(
                 'TagDeTestExtra',
                 'Webinaire : Titre de test',
                 '',
                 new \DateTime('2000-01-01'),
                 new \DateInterval('PT1H3M2S'),
                 $course
-            )] ;
+            ));
+            return $extraActivities ;
         } else {
-            return [new ExtraActivityLog(
+            $extraActivities = new ExtraActivityLogs() ;
+            $extraActivities->add(new ExtraActivityLog(
                 'TagDeTestExtra',
                 'Webinaire : Titre de test',
                 'BazaR',
@@ -74,8 +78,8 @@ class ExtraActivityManager
                 new \DateInterval('PT1H3M2S'),
                 $course,
                 $module
-            ),
-            new ExtraActivityLog(
+            ));
+            $extraActivities->add(new ExtraActivityLog(
                 'TagDeTestExtra2',
                 'Atelier : Titre de test',
                 '',
@@ -83,8 +87,8 @@ class ExtraActivityManager
                 new \DateInterval('PT3H3M2S'),
                 $course,
                 $module
-            ),
-            new ExtraActivityLog(
+            ));
+            $extraActivities->add(new ExtraActivityLog(
                 'TagDeTestExtra3',
                 'Formation : Titre de test',
                 'https://yeswiki.net',
@@ -92,7 +96,8 @@ class ExtraActivityManager
                 new \DateInterval('P2DT3H3M2S'),
                 $course,
                 $module
-            )] ;
+            ));
+            return $extraActivities ;
         }
     }
 }
