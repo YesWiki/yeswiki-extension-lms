@@ -10,6 +10,7 @@ use YesWiki\Lms\ExtraActivityLogs ;
 use YesWiki\Lms\Module ;
 use YesWiki\Lms\Course ;
 use YesWiki\Lms\Controller\ExtraActivityController ;
+use YesWiki\Lms\Service\CourseManager;
 
 class ExtraActivityManager
 {
@@ -18,21 +19,25 @@ class ExtraActivityManager
     protected $tripleStore;
     protected $extraActivityController;
     protected $wiki;
+    protected $courseManager ;
 
     /**
      * LearnerManager constructor
      *
      * @param TripleStore $tripleStore the injected TripleStore instance
      * @param ExtraActivityController $extraActivityController the injected ExtraActivityController instance
+     * @param CourseManager $courseManager the injected CourseManager instance
      * @param Wiki $wiki
      */
     public function __construct(
         TripleStore $tripleStore,
         ExtraActivityController $extraActivityController,
+        CourseManager $courseManager,
         Wiki $wiki
     ) {
         $this->tripleStore = $tripleStore;
         $this->extraActivityController = $extraActivityController;
+        $this->courseManager = $courseManager;
         $this->wiki = $wiki;
     }
 
@@ -57,47 +62,35 @@ class ExtraActivityManager
             return new ExtraActivityLogs();
         }
 
-        if (!$module) {
-            $extraActivities = new ExtraActivityLogs() ;
-            $extraActivities->add(new ExtraActivityLog(
-                'TagDeTestExtra',
-                'Webinaire : Titre de test',
-                '',
-                new \DateTime('2000-01-01'),
-                new \DateInterval('PT1H3M2S'),
-                $course
-            ));
-            return $extraActivities ;
-        } else {
-            $extraActivities = new ExtraActivityLogs() ;
-            $extraActivities->add(new ExtraActivityLog(
-                'TagDeTestExtra',
-                'Webinaire : Titre de test',
-                'BazaR',
-                new \DateTime('2000-01-01'),
-                new \DateInterval('PT1H3M2S'),
-                $course,
-                $module
-            ));
-            $extraActivities->add(new ExtraActivityLog(
-                'TagDeTestExtra2',
-                'Atelier : Titre de test',
-                '',
-                new \DateTime('2000-01-02'),
-                new \DateInterval('PT3H3M2S'),
-                $course,
-                $module
-            ));
-            $extraActivities->add(new ExtraActivityLog(
-                'TagDeTestExtra3',
-                'Formation : Titre de test',
-                'https://yeswiki.net',
-                new \DateTime('2000-04-02'),
-                new \DateInterval('P2DT3H3M2S'),
-                $course,
-                $module
-            ));
-            return $extraActivities ;
+        $like = '%"course":"' . $course->getTag() . '"%';
+        if (!is_null($module)) {
+            $like .= '"module":"' . $module->getTag() . '"%';
         }
+        $results = $this->tripleStore->getMatching(
+            null,
+            self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
+            $like,
+            'LIKE',
+            '=',
+            'LIKE'
+        );
+        
+        $extraActivities = new ExtraActivityLogs() ;
+        if ($results) {
+            foreach ($results as $result) {
+                $extraActivity = ExtraActivityLog::createFromJSON(
+                    $result['value'],
+                    $this->courseManager
+                );
+                if ($extraActivity) {
+                    if (!$extraActivities->add($extraActivity)) {
+                        // already present
+                        $extraActivity = $extraActivities->get($extraActivity->getTag());
+                    };
+                    $extraActivity->addLearnerName($result['resource']) ;
+                }
+            }
+        }
+        return $extraActivities ;
     }
 }

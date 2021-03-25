@@ -4,7 +4,6 @@ namespace YesWiki\Lms;
 
 use Carbon\Carbon;
 use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Lms\Service\ModuleManager;
 
 class ExtraActivityLog implements \JsonSerializable
 {
@@ -45,16 +44,15 @@ class ExtraActivityLog implements \JsonSerializable
         $this->relatedLink = $relatedLink;
         $this->date = $date;
         $this->elapsedTime = $elapsedTime;
-        $this->registeredLearnerNames = ['WikiAdmin'];
+        $this->registeredLearnerNames = [];
         $this->course = $course;
         $this->module = $module;
     }
 
     public static function createFromJSON(
         string $json,
-        CourseManager $courseManager,
-        ModuleManager $moduleManager
-    ) {
+        CourseManager $courseManager
+    ): ?ExtraActivityLog {
         $data = json_decode($json, $true) ;
         if (!empty($data['tag'])
             && !empty($data['title'])
@@ -74,10 +72,10 @@ class ExtraActivityLog implements \JsonSerializable
                 \DateTime::createFromFormat(self::DATE_FORMAT, $data['date']),
                 new \DateInterval($duration),
                 $courseManager->getCourse($data['course']),
-                !empty($data['module']) ? $moduleManager->getCourse($data['module']):null,
+                !empty($data['module']) ? $courseManager->getModule($data['module']):null,
             )  ;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -128,6 +126,27 @@ class ExtraActivityLog implements \JsonSerializable
     public function getRegisteredLearnerNames(): array
     {
         return $this->registeredLearnerNames ;
+    }
+
+    public function addLearnerName(string $learnerName): bool
+    {
+        if (in_array($learnerName, $this->registeredLearnerNames)) {
+            return false ;
+        }
+        $this->registeredLearnerNames[] = $learnerName ;
+        return true ;
+    }
+
+    public function removeLearnerName(string $learnerName): bool
+    {
+        if (in_array($learnerName, $this->registeredLearnerNames)) {
+            array_filter($this->registeredLearnerNames, function ($value) use ($learnerName) {
+                return ($value != $learnerName);
+            });
+            return true ;
+        } else {
+            return false ;
+        }
     }
 
     public function jsonSerialize()
