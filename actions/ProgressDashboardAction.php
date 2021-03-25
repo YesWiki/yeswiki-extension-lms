@@ -59,17 +59,6 @@ class ProgressDashboardAction extends YesWikiAction
                 'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (progressdashboard)'
             ]);
         }
-        
-        /* * Manage extra activity * */
-        $this->extraActivityController = $this->getService(ExtraActivityController::class);
-        $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
-        $this->extraActivityController->setArguments($this->arguments);
-        $result = $this->extraActivityController->run();
-        if (!empty($result)) {
-            return $result ;
-        };
-        /* *************************** */
-
 
         // the course for which we want to display the dashboard
         $course = $this->courseController->getContextualCourse();
@@ -78,6 +67,16 @@ class ProgressDashboardAction extends YesWikiAction
         $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
         // the learners for this course, we count all users which have already a progress
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
+        
+        /* * Manage extra activity * */
+        $this->extraActivityController = $this->getService(ExtraActivityController::class);
+        $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
+        $this->extraActivityController->setArguments($this->arguments);
+        $result = $this->extraActivityController->run($this->learners);
+        if (!empty($result)) {
+            return $result ;
+        };
+        /* *************************** */
 
         // check if a GET module parameter is defined
         $moduleParam = isset($_GET['module']) ? $_GET['module'] : null;

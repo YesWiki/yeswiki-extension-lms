@@ -3,7 +3,6 @@
 namespace YesWiki\Lms\Controller;
 
 use YesWiki\Core\YesWikiController;
-use YesWiki\Core\Service\UserManager;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\ExtraActivityLog;
 use YesWiki\Lms\Module;
@@ -13,19 +12,15 @@ class ExtraActivityController extends YesWikiController
 {
     protected $arguments;
     protected $courseManager;
-    protected $userManager;
 
     /**
      * ExtraActivityController constructor
      * @param CourseManager $courseManager the injected CourseManager instance
-     * @param UserManager $userManager the injected UserManager instance
      */
     public function __construct(
-        CourseManager $courseManager,
-        UserManager $userManager
+        CourseManager $courseManager
     ) {
         $this->courseManager = $courseManager;
-        $this->userManager = $userManager;
         $this->arguments = [] ;
     }
 
@@ -59,7 +54,7 @@ class ExtraActivityController extends YesWikiController
         ];
     }
     
-    public function run(): ?string
+    public function run(array $learners): ?string
     {
         if (!$this->arguments['testmode']) {
             return null;
@@ -70,10 +65,6 @@ class ExtraActivityController extends YesWikiController
                 $modules = [];
                 foreach ($course->getModules() as $module) {
                     $modules[$module->getTag()] = $module->getTitle();
-                }
-                $learners = [];
-                foreach ($this->userManager->getAll() as $user) {
-                    $learners[$user['name']] = $user['name'] ;
                 }
                 return $this->render(
                     '@templates/alert-message.twig',
