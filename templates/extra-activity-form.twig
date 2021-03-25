@@ -51,7 +51,7 @@
     <input type="hidden" id="course" name="course" value="{{ course.tag }}">
     {{ include('@bazar/inputs/select.twig', {'field': {
             'name':'module',
-            'required':true,
+            'required':false,
             'hint':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')
             },        

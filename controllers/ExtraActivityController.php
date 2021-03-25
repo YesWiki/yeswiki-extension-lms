@@ -78,7 +78,9 @@ class ExtraActivityController extends YesWikiController
                         'course' => $course,
                         'module' => $this->arguments['module'],
                         'modules' => $modules,
-                        'learners' => $learners,
+                        'learners' => array_map(function ($learner) {
+                            return $learner->getFullName() ;
+                        }, $learners),
                         'registeredLearners' => [],
                     ]
                 );

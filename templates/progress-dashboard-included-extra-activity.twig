@@ -38,7 +38,7 @@
             <div class="learners-group fieldset-group dashboard-activity-frame">
                 <label><i class="fas fa-user"></i></label>
                     <ul class="learner-details">
-                        {% for username in extraActivity.RegisteredLearnerNames %}
+                        {% for username in extraActivity.registeredLearnerNames %}
                             <li>
                                 {{ include('@lms/progress-dashboard-user.twig') }}
                                 {{ include('@lms/extra-activity-link.twig', {mode:'remove',
