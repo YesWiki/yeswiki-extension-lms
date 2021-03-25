@@ -164,7 +164,10 @@ class ProgressDashboardAction extends YesWikiAction
             }
         }
         
-        $module->setExtraActivities($this->extraActivityManager->getExtraActivities($course, $module));
+        
+        if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+            $module->setExtraActivities($this->extraActivityManager->getExtraActivities($course, $module));
+        }
         // $finishedUsernames contains now the usernames which have finished the module
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
         ksort($finishedUsernames);
@@ -189,7 +192,10 @@ class ProgressDashboardAction extends YesWikiAction
                 );
             }
         }
-        $course->setExtraActivities($this->extraActivityManager->getExtraActivities($course));
+        
+        if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+            $course->setExtraActivities($this->extraActivityManager->getExtraActivities($course));
+        }
         // $finishedUsernames contains now the usernames which have finished the course
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
         ksort($finishedUsernames);

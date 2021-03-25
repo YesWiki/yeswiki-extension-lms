@@ -3,25 +3,35 @@
 namespace YesWiki\Lms\Controller;
 
 use YesWiki\Core\YesWikiController;
+use YesWiki\Wiki;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\ExtraActivityLog;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\ExtraActivityManager;
 
 class ExtraActivityController extends YesWikiController
 {
     protected $arguments;
     protected $courseManager;
+    protected $extraActivityManager;
+    protected $wiki;
 
     /**
      * ExtraActivityController constructor
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param ExtraActivityManager $extraActivityManager the injected ExtraActivityManager instance
+     * @param Wiki $wiki
      */
     public function __construct(
-        CourseManager $courseManager
+        CourseManager $courseManager,
+        ExtraActivityManager $extraActivityManager,
+        Wiki $wiki
     ) {
         $this->courseManager = $courseManager;
+        $this->extraActivityManager = $extraActivityManager;
         $this->arguments = [] ;
+        $this->wiki = $wiki;
     }
 
     
@@ -61,47 +71,45 @@ class ExtraActivityController extends YesWikiController
         }
         switch ($this->arguments['mode']) {
             case 'add':
-                $course = $this->courseManager->getCourse($this->arguments['course']) ;
-                $modules = [];
-                foreach ($course->getModules() as $module) {
-                    $modules[$module->getTag()] = $module->getTitle();
-                }
-                return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'warning',
-                        'message' => 'Mode test : création d\'une  activité. Non fonctionnel !! '
-                    ]
-                ) . $this->render(
-                    '@lms/extra-activity-form.twig',
-                    [
-                        'course' => $course,
-                        'module' => $this->arguments['module'],
-                        'modules' => $modules,
-                        'learners' => array_map(function ($learner) {
-                            return $learner->getFullName() ;
-                        }, $learners),
-                        'registeredLearners' => [],
-                    ]
-                );
+                return $this->edit($learners);
                 break ;
             case 'edit':
+                $extraActivity = $this->extraActivityManager->getExtraActivity(
+                    $this->arguments['tag'],
+                    $this->arguments['course'],
+                    $this->arguments['module'] ?? '',
+                );
                 return $this->render(
                     '@templates/alert-message.twig',
                     [
-                        'type' => 'info',
-                        'message' => 'Mode test : édition de l\'activité : '. $this->arguments['tag']
+                        'type' => 'danger',
+                        'message' => 'Toujours en test : ne met pas à jour masi crée une nouvelle entrée'
                     ]
+                )
+                . $this->edit(
+                    $learners,
+                    ($extraActivity) ? ['extraActivity' => $extraActivity] : []
                 );
                 break ;
             case 'save':
-                return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'info',
-                        'message' => 'Mode test : sauvegarde de :<div style="word-wrap:break-word;">'. json_encode($_POST) .'</div>'
-                    ]
-                );
+                if ($this->extraActivityManager->saveExtraActivity($_POST)) {
+                    $this->wiki->Redirect($this->wiki->Href(null, null, [
+                        'course' => $this->arguments['course'],
+                        'module' => $this->arguments['module']
+                    ]));
+                } else {
+                    return $this->render(
+                        '@templates/alert-message.twig',
+                        [
+                            'type' => 'danger',
+                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') . ($_POST['title'] ?? '$_POST[\'title\'] not set')
+                        ]
+                    )
+                    . $this->render('@lms/extra-activity-backlink.twig', [
+                        'course' => ['tag' => $this->arguments['course']],
+                        'module' => $this->arguments['module']
+                    ]);
+                }
                 break ;
             case 'remove':
                 return $this->render(
@@ -124,8 +132,23 @@ class ExtraActivityController extends YesWikiController
         }
     }
 
-    public function getTestMode()
+    private function edit(array $learners, array $params = []): string
     {
-        return (isset($this->arguments['testmode']) && $this->arguments['testmode']) ;
+        $course = $this->courseManager->getCourse($this->arguments['course']) ;
+        $modules = [];
+        foreach ($course->getModules() as $module) {
+            $modules[$module->getTag()] = $module->getTitle();
+        }
+        return $this->render(
+            '@lms/extra-activity-form.twig',
+            array_merge([
+                'course' => $course,
+                'module' => $this->arguments['module'],
+                'modules' => $modules,
+                'learners' => array_map(function ($learner) {
+                    return $learner->getFullName() ;
+                }, $learners),
+            ], $params)
+        );
     }
 }

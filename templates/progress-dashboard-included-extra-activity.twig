@@ -16,7 +16,7 @@
             {% else %}
                 {{ extraActivity.title }}
             {% endif %}
-            {{ include('@lms/extra-activity-link.twig', {mode:'edit',extraActivityId:extraActivity.tag}) }}
+            {{ include('@lms/extra-activity-link.twig', {mode:'edit',course:course.tag,module:module.tag,extraActivityId:extraActivity.tag}) }}
             {{ include('@lms/extra-activity-link.twig', {mode:'delete',extraActivityId:extraActivity.tag}) }}
         </div>
         <div class="finished-ratio">

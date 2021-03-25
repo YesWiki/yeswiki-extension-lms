@@ -53,7 +53,7 @@ class ExtraActivityLog implements \JsonSerializable
         string $json,
         CourseManager $courseManager
     ): ?ExtraActivityLog {
-        $data = json_decode($json, $true) ;
+        $data = json_decode($json, true) ;
         if (!empty($data['tag'])
             && !empty($data['title'])
             && !empty($data['date'])
@@ -63,14 +63,14 @@ class ExtraActivityLog implements \JsonSerializable
             if (preg_match('/([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/i', $data['elapsedTime'], $matches)) {
                 $durationStr = 'PT'.$matches[1].'H'.$matches[2].'M'.$matches[3].'S' ;
             } else {
-                $duration = '';
+                $durationStr = '';
             }
             return new ExtraActivityLog(
                 $data['tag'],
                 $data['title'],
                 $data['relatedLink'] ?? '',
                 \DateTime::createFromFormat(self::DATE_FORMAT, $data['date']),
-                new \DateInterval($duration),
+                new \DateInterval($durationStr),
                 $courseManager->getCourse($data['course']),
                 !empty($data['module']) ? $courseManager->getModule($data['module']):null,
             )  ;

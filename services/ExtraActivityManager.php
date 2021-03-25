@@ -9,7 +9,6 @@ use YesWiki\Lms\ExtraActivityLog ;
 use YesWiki\Lms\ExtraActivityLogs ;
 use YesWiki\Lms\Module ;
 use YesWiki\Lms\Course ;
-use YesWiki\Lms\Controller\ExtraActivityController ;
 use YesWiki\Lms\Service\CourseManager;
 
 class ExtraActivityManager
@@ -17,7 +16,6 @@ class ExtraActivityManager
     protected const LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY =  'https://yeswiki.net/vocabulary/lms-extra-activity' ;
 
     protected $tripleStore;
-    protected $extraActivityController;
     protected $wiki;
     protected $courseManager ;
 
@@ -25,18 +23,15 @@ class ExtraActivityManager
      * LearnerManager constructor
      *
      * @param TripleStore $tripleStore the injected TripleStore instance
-     * @param ExtraActivityController $extraActivityController the injected ExtraActivityController instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param Wiki $wiki
      */
     public function __construct(
         TripleStore $tripleStore,
-        ExtraActivityController $extraActivityController,
         CourseManager $courseManager,
         Wiki $wiki
     ) {
         $this->tripleStore = $tripleStore;
-        $this->extraActivityController = $extraActivityController;
         $this->courseManager = $courseManager;
         $this->wiki = $wiki;
     }
@@ -48,7 +43,95 @@ class ExtraActivityManager
      */
     public function saveExtraActivity(array $data): bool
     {
+        if (!empty($data['title'])
+                && !empty($data['bf_date_debut_evenement'])
+                && !empty($data['bf_date_fin_evenement'])
+                && !empty($data['course'])
+                && isset($data['registeredLearnerNames'])
+                && count($data['registeredLearnerNames']) > 0) {
+            $course = $this->courseManager->getCourse($data['course']);
+            $module = !empty($data['module']) ? $this->courseManager->getModule($data['module']) : null;
+            $extraActivities = $this->getExtraActivities($course, $module);
+            if (empty($data['tag'])) {
+                $i = 1 ;
+                // check if tag is a pageName or already exists for this course
+                $tmptag = genere_nom_wiki($data['title'], 1);
+                do {
+                    $tag = genere_nom_wiki($tmptag, $i);
+                    ++$i;
+                } while ($i < 1000 && $extraActivities->has($tag)) ;
+                if ($i > (1000-1)) {
+                    if ($this->wiki->GetConfigValue('debug')=='yes') {
+                        echo 'Errors in '. get_class($this) . ' : genere_nom_wiki does not work' ;
+                    }
+                    return false;
+                } else {
+                    $data['tag'] = $tag ;
+                }
+            } elseif (!$extraActivities->has($data['tag'])) {
+                if ($this->wiki->GetConfigValue('debug')=='yes') {
+                    echo 'Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' ;
+                }
+                return false;
+            }
+            $dateStr = $data['bf_date_debut_evenement'];
+            if (isset($data['bf_date_debut_evenement_allday']) && $data['bf_date_debut_evenement_allday'] == 0) {
+                $dateStr .= ' ' . ($data['bf_date_debut_evenement_hour'] ?? '00'). '-' ;
+                $dateStr .= ' ' . ($data['bf_date_debut_evenement_minutes'] ?? '00'). '-00' ;
+            }
+            $date = new \DateTime($dateStr) ;
+            $dateStr = $data['bf_date_fin_evenement'];
+            if (isset($data['bf_date_fin_evenement_allday']) && $data['bf_date_fin_evenement_allday'] == 0) {
+                $dateStr .= ' ' . ($data['bf_date_fin_evenement_hour'] ?? '00'). '-' ;
+                $dateStr .= ' ' . ($data['bf_date_fin_evenement_minutes'] ?? '00'). '-00' ;
+            }
+            $endDate = new \DateTime($dateStr) ;
+            if (isset($data['bf_date_fin_evenement_allday']) && $data['bf_date_fin_evenement_allday'] == 1) {
+                $endDate->add(new \DateInterval('P1D')) ;
+            }
+            $elapsedTime = $date->diff($endDate) ;
+            $extraActivity = new ExtraActivityLog(
+                $data['tag'],
+                $data['title'],
+                $data['relatedLink'] ?? '',
+                $date,
+                $elapsedTime,
+                $course,
+                $module
+            );
+            foreach ($data['registeredLearnerNames'] as $learnerName => $value) {
+                if ($value == 1) {
+                    if (!$this->saveExtraActivityForLearner($learnerName, $extraActivity)) {
+                        if ($this->wiki->GetConfigValue('debug')=='yes') {
+                            echo 'Errors in '. get_class($this) . ' : $this->saveExtraActivityForLearner() does not work' ;
+                        }
+                        return false;
+                    } ;
+                }
+            }
+            return true;
+        } elseif ($this->wiki->GetConfigValue('debug')=='yes') {
+            $output = 'Errors in '. get_class($this) . ' :<br>' ;
+            $output .= (empty($data['title'])) ? 'empty($data[\'title\'])<br>' : '' ;
+            $output .= (empty($data['bf_date_debut_evenement'])) ? 'empty($data[\'bf_date_debut_evenement\'])<br>' : '' ;
+            $output .= (empty($data['bf_date_fin_evenement'])) ? 'empty($data[\'bf_date_fin_evenement\'])<br>' : '' ;
+            $output .= (empty($data['course'])) ? 'empty($data[\'course\'])<br>' : '' ;
+            $output .= (!isset($data['registeredLearnerNames'])) ? 'not isset($data[\'registeredLearnerNames\'])<br>' : '' ;
+            $output .= (isset($data['registeredLearnerNames']) && count($data['registeredLearnerNames']) == 0) ? 'count($data[\'registeredLearnerNames\']) == 0<br>' : '' ;
+            echo $output;
+        }
         return false;
+    }
+
+    private function saveExtraActivityForLearner(string $learnerName, ExtraActivityLog $extraActivityLog):bool
+    {
+        return ($this->tripleStore->create(
+            $learnerName,
+            self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
+            json_encode($extraActivityLog),
+            '',
+            ''
+        ) == 0);
     }
 
     /**
@@ -58,13 +141,11 @@ class ExtraActivityManager
      */
     public function getExtraActivities(Course $course, Module $module = null): ExtraActivityLogs
     {
-        if (!$this->extraActivityController->getTestMode()) {
-            return new ExtraActivityLogs();
-        }
-
-        $like = '%"course":"' . $course->getTag() . '"%';
+        $like = '%"course":"' . $course->getTag() . '"';
         if (!is_null($module)) {
-            $like .= '"module":"' . $module->getTag() . '"%';
+            $like .= '%"module":"' . $module->getTag() . '"%';
+        } else {
+            $like .= '}%';
         }
         $results = $this->tripleStore->getMatching(
             null,
@@ -74,7 +155,45 @@ class ExtraActivityManager
             '=',
             'LIKE'
         );
-        
+        return $this->getExtraActivityLogsFromResults($results) ;
+    }
+
+    /**
+     * Get a Extra-activity from tag
+     *
+     * @return ExtraActivityLog
+     */
+    public function getExtraActivity(string $tag, string $courseTag, string $moduleTag=''): ?ExtraActivityLog
+    {
+        if (empty($tag)) {
+            return null;
+        }
+
+        $course = $this->courseManager->getCourse($courseTag);
+        $module = !empty($moduleTag) ? $this->courseManager->getModule($moduleTag) : null;
+
+        $like = '%"tag":"' . $tag . '"';
+        $like .= '%"course":"' . $course->getTag() . '"';
+        if (!is_null($module)) {
+            $like .= '%"module":"' . $module->getTag() . '"%';
+        } else {
+            $like .= '}%';
+        }
+        $results = $this->tripleStore->getMatching(
+            null,
+            self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
+            $like,
+            'LIKE',
+            '=',
+            'LIKE'
+        );
+
+        $extraActivities = $this->getExtraActivityLogsFromResults($results) ;
+        return $extraActivities->get($tag) ;
+    }
+
+    private function getExtraActivityLogsFromResults($results):ExtraActivityLogs
+    {
         $extraActivities = new ExtraActivityLogs() ;
         if ($results) {
             foreach ($results as $result) {

@@ -111,6 +111,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS' => 'Inscrit.e.s',
         'LMS_EXTRA_ACTIVITY_D' => ' d\' ',
         'LMS_EXTRA_ACTIVITY_LEARNERS' => 'Apprenant⋅e⋅s',
+        'LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE' => 'Erreur lors de la sauvegarde de l\'activité supplémentaire : ',
         'LMS_BACK_TO_PROGRESSES_DASH_BOARD' => 'Retour au tableau de bord',
 
     )

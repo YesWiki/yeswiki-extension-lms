@@ -10,34 +10,36 @@
         'type':'text',
         'hint':  _t('LMS_EXTRA_ACTIVITY_TITLE')  ,
         'label':  _t('LMS_EXTRA_ACTIVITY_TITLE')
-        }}) }}
+        },
+        'value':extraActivity.title}) }}
     {{ include('@bazar/inputs/text.twig', {'field': {
         'name':'relatedLink',
         'maxChars':'256',
-        'required':false,
+        'required':false,        
         'type':'url',
         'hint':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')  ,
         'label':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')
-        }}) }}
+        },
+        'value':extraActivity.relatedLink}) }}
     {{ include_javascript('tools/bazar/libs/vendor/bootstrap-datepicker.js')}}
     {{ include('@bazar/inputs/date.twig', {'field': {
-            'name':'date',
+            'name':'bf_date_debut_evenement',
             'required':true,
             'hint':  _t('LMS_EXTRA_ACTIVITY_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_DATE')
             },        
-        'day': date()|date("Y-m-d"),
-        'hour':12,
-        'minute':0,
+        'day': (extraActivity ? extraActivity.date|date("Y-m-d"):null),
+        'hour':(extraActivity ? extraActivity.date|date("h"):12),
+        'minute':(extraActivity ? extraActivity.date|date("i"):0),
         'hasTime':true
         }) }}
     {{ include('@bazar/inputs/date.twig', {'field': {
-            'name':'enddate',
+            'name':'bf_date_fin_evenement',
             'required':true,
             'hint':  _t('LMS_EXTRA_ACTIVITY_END_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
             },        
-        'day': date()|date("Y-m-d"),
+        'day': (extraActivity ? extraActivity.date|date("Y-m-d"):null),
         'hour':14,
         'minute':0,
         'hasTime':true
@@ -51,6 +53,7 @@
     <input type="hidden" id="course" name="course" value="{{ course.tag }}">
     {{ include('@bazar/inputs/select.twig', {'field': {
             'name':'module',
+            'propertyName':'module',
             'required':false,
             'hint':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')
@@ -67,11 +70,11 @@
             },        
         'value': module,
         'options': learners,
-        'selectedOptionsId': registeredLearners,
+        'selectedOptionsId': extraActivity.registeredLearnerNames,
         'formName': _t('LMS_EXTRA_ACTIVITY_LEARNERS'),
         'name': _t('BAZ_DRAG_n_DROP_CHECKBOX_LIST') ~ _t('LMS_EXTRA_ACTIVITY_D') ~ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
         }) }}
-    <input type="hidden" id="tag" name="tag" value="{{ tag }}">
+    <input type="hidden" id="tag" name="tag" value="{{ extraActivity.tag }}">
     <input type="hidden" id="extraactivitymode" name="extraactivitymode" value="save">
     <div class="form-actions form-group">
         <div class="col-sm-9 col-sm-offset-3">
@@ -79,9 +82,4 @@
         </div>
     </div>
 </form>
-<h3 class="dashboard-course course-back">
-    <a href="{{ url({params: {course: course.tag,module: module} }) }}"
-       title="{{ _t('LMS_BACK_TO_PROGRESSES_DASH_BOARD') }}">
-        <i class="far fa-arrow-alt-circle-left"></i> {{ _t('LMS_BACK_TO_PROGRESSES_DASH_BOARD') }}
-    </a>
-</h3>
+{{ include('@lms/extra-activity-backlink.twig') }}
