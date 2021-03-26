@@ -2,14 +2,14 @@
 
 namespace YesWiki\Lms;
 
-use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use \DateInterval;
-use YesWiki\Lms\CourseStructure;
+use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Lms\Service\DateManager;
 
 class Activity extends CourseStructure
 {
-    protected $duration; // estimated time to complete the module, it's an integer counting the number of minutes
+    // estimated time to complete the module, it's a CarbonInterval object
+    protected $duration;
 
     /**
      * Check if the comments are enable for this activity
@@ -31,17 +31,17 @@ class Activity extends CourseStructure
 
     /**
      * Getter for 'bf_duree' of the activity entry
-     * @return int the duration in minutes or 0 if not defined or not an integer
+     * @return CarbonInterval|null the duration or null if duration is zero or the activity has no duration
      */
-    public function getDuration(): int
+    public function getDuration(): ?CarbonInterval
     {
         // lazy loading
         if (is_null($this->duration)) {
             $duration = $this->getField('bf_duree');
             if ($duration && is_numeric($duration) && is_int(intval($duration))) {
-                $this->duration = intval($duration);
+                $this->duration = $this->dateManager->createIntervalFromMinutes(intval($duration));
             } else {
-                $this->duration = 0;
+                $this->duration = null;
             }
         }
         return $this->duration;

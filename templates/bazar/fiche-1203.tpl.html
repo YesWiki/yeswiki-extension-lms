@@ -11,11 +11,13 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TemplateEngine;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
+use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 
 $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
 $entryManager = $GLOBALS['wiki']->services->get(EntryManager::class);
 $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
+$dateManager = $GLOBALS['wiki']->services->get(DateManager::class);
 
 // the current learner
 $learner = $learnerManager->getLearner();
@@ -24,7 +26,7 @@ echo '<div class="course-container' . ($learner && $learner->isAdmin() ? ' admin
 
 if ($fiche && intval($fiche['id_typeannonce']) == $GLOBALS['wiki']->config['lms_config']['course_form_id']) {
     // no use of $courseManager->getCourse because sometimes the entry isn't in the db (for importation preview per example)
-    $course = new Course($GLOBALS['wiki']->config, $entryManager, $fiche['id_fiche'], $fiche);
+    $course = new Course($GLOBALS['wiki']->config, $entryManager, $dateManager, $fiche['id_fiche'], $fiche);
 
     if (!empty($html['bf_titre'])) {
         echo '<h1 class="course-title">' . $html['bf_titre'] . '</h1>';

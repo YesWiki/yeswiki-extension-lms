@@ -2,11 +2,13 @@
 
 namespace YesWiki\Lms;
 
+use Carbon\CarbonInterval;
+
 class Course extends CourseStructure
 {
     // the next fiels are lazy loaded : don't use direct access to them, call the getters instead
     protected $modules; // modules of the course
-    protected $duration; // estimated time to complete the module, it's an integer counting the number of minutes
+    protected $duration; // estimated time to complete the module, it's a CarbonInterval object
 
     /**
      * Get the modules of the course
@@ -22,7 +24,7 @@ class Course extends CourseStructure
                 [] :
                 array_map(
                     function ($moduleTag) {
-                        return new Module($this->config, $this->entryManager, $moduleTag);
+                        return new Module($this->config, $this->entryManager, $this->dateManager, $moduleTag);
                     },
                     explode(',', $this->getField($modulesTagsId))
                 );
@@ -128,17 +130,19 @@ class Course extends CourseStructure
 
     /**
      * Get the duration of a course by adding the duration of all its modules
-     * @return int the duration in minutes
+     * @return CarbonInterval|null the duration or null if duration is zero or there is no activity with duration
      */
-    public function getDuration(): int
+    public function getDuration(): ?CarbonInterval
     {
         // lazy loading
         if (is_null($this->duration)) {
-            $count = 0;
+            $count = CarbonInterval::minutes(0);
             foreach ($this->getModules() as $module) {
-                $count = $count + $module->getDuration();
+                if ($module->getDuration()){
+                    $count = $count->add($module->getDuration());
+                }
             }
-            $this->duration = $count;
+            $this->duration = $count->totalMinutes != 0 ? $count->cascade() : null;
         }
         return $this->duration;
     }

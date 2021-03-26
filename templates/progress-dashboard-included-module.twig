@@ -1,3 +1,4 @@
+{% from "@lms/datetime-macros.twig" import displayTime %}
 <div class="panel panel-lms-dashboard dashboard-module-frame collapsed">
     <div id="heading_{{ module.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
          href="#collapse_{{ module.tag }}" aria-expanded="false" aria-controls="collapse_{{ module.tag }}">
@@ -21,7 +22,7 @@
         <div class="estimated-time">
             <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
                 <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>
-                {{ formatter.formatDuration(module.duration) }}
+                {{ displayTime(module.duration) }}
             </span>
         </div>
     </div>

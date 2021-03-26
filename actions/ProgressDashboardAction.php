@@ -73,8 +73,6 @@ class ProgressDashboardAction extends YesWikiAction
         } else {
             return $this->renderCourseProgressDashboard($course);
         }
-
-        // TODO delete the admin user from the progresses
     }
 
     private function renderModuleProgressDashboard($module, $course): string
@@ -94,8 +92,6 @@ class ProgressDashboardAction extends YesWikiAction
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
             'learners' => $this->learners,
-            // TODO replace it by a Twig Macro
-            'formatter' => $this->courseController->getTwigFormatter()
         ]);
     }
 
@@ -113,8 +109,6 @@ class ProgressDashboardAction extends YesWikiAction
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
             'learners' => $this->learners,
-            // TODO replace it by a Twig Macro
-            'formatter' => $this->courseController->getTwigFormatter()
         ]);
     }
 

@@ -5,6 +5,7 @@ use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 
 class CourseMenuAction extends YesWikiAction
@@ -16,6 +17,7 @@ class CourseMenuAction extends YesWikiAction
         $courseManager = $this->getService(CourseManager::class);
         $learnerManager = $this->getService(LearnerManager::class);
         $entryManager = $this->getService(EntryManager::class);
+        $dateManager = $this->getService(DateManager::class);
         $config = $this->wiki->config;
 
         // the course to display
@@ -51,7 +53,7 @@ class CourseMenuAction extends YesWikiAction
 
                 // the activity is not loaded from the manager because we don't want to requests the fields
                 // (it's an exception)
-                $activity = new Activity($config, $entryManager, $pageTag);
+                $activity = new Activity($config, $entryManager, $dateManager, $pageTag);
                 // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the
                 // parent tab activity
                 $activity = $courseController->getParentTabActivity($activity);

@@ -85,8 +85,8 @@ class LearnerDashboardManager
                 "started" => $started, // bool
                 "finished" => $finished, //bool
                 "progressRatio" => $progressRatio, // int between 0 and 100 in pourcent
-                "elapsedTime" => $courseDuration, // CarbonInterval object,
-                "firstAccessDate" => $this->findFirstAccessDate($modulesStat), // Carbon object,
+                "elapsedTime" => $courseDuration, // CarbonInterval object
+                "firstAccessDate" => $this->findFirstAccessDate($modulesStat), // Carbon object
                 "modulesStat" => $modulesStat
             ];
         }

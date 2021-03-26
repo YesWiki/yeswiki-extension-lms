@@ -12,6 +12,7 @@ use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 
 class CourseController extends YesWikiController
@@ -19,6 +20,7 @@ class CourseController extends YesWikiController
     protected $entryManager;
     protected $courseManager;
     protected $learnerManager;
+    protected $dateManager;
     protected $config;
 
     /**
@@ -26,17 +28,20 @@ class CourseController extends YesWikiController
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param LearnerManager $learnerManager the injected LearnerManager instance
+     * @param DateManager $dateManager the injected DateManager instance
      * @param ParameterBagInterface $config the injected Wiki instance
      */
     public function __construct(
         EntryManager $entryManager,
         CourseManager $courseManager,
         LearnerManager $learnerManager,
+        DateManager $dateManager,
         ParameterBagInterface $config
     ) {
         $this->entryManager = $entryManager;
         $this->courseManager = $courseManager;
         $this->learnerManager = $learnerManager;
+        $this->dateManager = $dateManager;
         $this->config = $config->all();
     }
 
@@ -90,7 +95,7 @@ class CourseController extends YesWikiController
         if (!empty($currentPageTag) && $course) {
 
             // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
-            $activity = new Activity($this->config, $this->entryManager, $currentPageTag);
+            $activity = new Activity($this->config, $this->entryManager, $this->dateManager, $currentPageTag);
 
             // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the parent tab activity
             $activity = $this->getParentTabActivity($activity);
@@ -249,34 +254,5 @@ class CourseController extends YesWikiController
                 return _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }
-    }
-
-    /**
-     * Create a formatter which have the specific twig function for the CourseStructure objects
-     * @return object the formatter (an object from the anonymous class)
-     * TODO replace it by a Twig Macro
-     */
-    public function getTwigFormatter()
-    {
-        // return the object which have all the twig formatting function
-        return new class() {
-            /**
-             * Render a duration in a corresponding string
-             * The format is 'XhXX' if the duration is equal or gretter than 1 hour, otherwise 'X min'
-             * @param int|null $duration the duration
-             * @return string the result string
-             */
-            function formatDuration(?int $duration): string
-            {
-                if (is_null($duration) || $duration == 0) {
-                    return '-';
-                }
-                $hours = floor($duration / 60);
-                $minutes = ($duration % 60);
-                return $hours != 0 ?
-                    sprintf('%dh%02d', $hours, $minutes)
-                    : sprintf('%d min', $minutes);
-            }
-        };
     }
 }
