@@ -1,11 +1,11 @@
-{% if extraTestMode %}
+{% if extraActivityMode %}
     {% set mode = (mode ?? 'add') %}
     {% if mode == 'add' %}
         <a class="btn btn-primary btn-xs" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}"
             href="{{ url({tag: '',
                     params:{course:course, 
                         module:module, 
-                        extraactivitymode:mode
+                        mode:mode
                         }
                     }) }}">
             <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY_ADD') }}
@@ -15,7 +15,7 @@
             href="{{ url({tag: '',
                     params:{course:course, 
                         module:module, 
-                        extraactivitymode:'add'
+                        mode:'add'
                         }
                     }) }}">
             <i class="fas fa-plus"></i>
@@ -26,7 +26,7 @@
                     params:{course:course, 
                         module:module,
                         extraactivityid:extraActivityId, 
-                        extraactivitymode:mode
+                        mode:mode
                         }
                     }) }}">
             <i class="fas fa-edit"></i>
@@ -35,7 +35,7 @@
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_REMOVE') }}"
             href="{{ url({tag: '',
                     params:{extraactivityid:extraActivityId, 
-                        extraactivitymode:mode,
+                        mode:mode,
                         extraactivitylearner:learnerName
                         }
                     }) }}">
@@ -45,7 +45,7 @@
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_DELETE') }}"
             href="{{ url({tag: '',
                     params:{extraactivityid:extraActivityId, 
-                        extraactivitymode:mode,
+                        mode:mode,
                         course:course, 
                         module:module
                         }

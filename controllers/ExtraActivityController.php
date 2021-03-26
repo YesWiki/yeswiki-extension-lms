@@ -47,12 +47,12 @@ class ExtraActivityController extends YesWikiController
     protected function formatArguments($arg)
     {
         return [
-            'mode' => (!empty($_GET['extraactivitymode'])) ? $_GET['extraactivitymode']
+            'mode' => (!empty($_GET['mode'])) ? $_GET['mode']
                         : (
-                            (!empty($_POST['extraactivitymode'])) ? $_POST['extraactivitymode']
-                            : ((!empty($arg['extraactivitymode'])) ? $arg['extraactivitymode']: null)
+                            (!empty($_POST['mode'])) ? $_POST['mode']
+                            : ((!empty($arg['mode'])) ? $arg['mode']: null)
                         ) ,
-            'testmode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
+            'extra_activity_mode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
             'course' => (!empty($_GET['course'])) ? $_GET['course']
                     : (
                         (!empty($_POST['course'])) ? $_POST['course']
@@ -67,7 +67,7 @@ class ExtraActivityController extends YesWikiController
     
     public function run(array $learners): ?string
     {
-        if (!$this->arguments['testmode']) {
+        if (!$this->arguments['extra_activity_mode']) {
             return null;
         }
         switch ($this->arguments['mode']) {
@@ -82,7 +82,7 @@ class ExtraActivityController extends YesWikiController
                     '@templates/alert-message.twig',
                     [
                         'type' => 'danger',
-                        'message' => 'Toujours en test : ne met pas à jour masi crée une nouvelle entrée'
+                        'message' => 'Toujours en test : l\'affichage des dates lors de la modification n\'est pas stable'
                     ]
                 )
                 . $this->edit(
