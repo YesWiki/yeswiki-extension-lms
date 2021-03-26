@@ -3,8 +3,8 @@
     {% if mode == 'add' %}
         <a class="btn btn-primary btn-xs" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}"
             href="{{ url({tag: '',
-                    params:{course:course, 
-                        module:module, 
+                    params:{course:course.tag, 
+                        module:module.tag, 
                         mode:mode
                         }
                     }) }}">
@@ -13,8 +13,8 @@
     {% elseif mode == 'add-light' %}
         <a class="btn btn-primary btn-xs" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}"
             href="{{ url({tag: '',
-                    params:{course:course, 
-                        module:module, 
+                    params:{course:course.tag, 
+                        module:module.tag, 
                         mode:'add'
                         }
                     }) }}">
@@ -23,9 +23,9 @@
     {% elseif mode == 'edit' %}
         <a class="btn btn-default btn-xs no-collapsable" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_EDIT') }}"
             href="{{ url({tag: '',
-                    params:{course:course, 
-                        module:module,
-                        tag:tag, 
+                    params:{course:course.tag, 
+                        module:module.tag,
+                        tag:extraActivity.tag, 
                         mode:mode
                         }
                     }) }}">
@@ -34,9 +34,11 @@
     {% elseif mode == 'remove' %}
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_REMOVE') }}"
             href="{{ url({tag: '',
-                    params:{tag:tag, 
+                    params:{tag:extraActivity.tag, 
                         mode:mode,
-                        learner:learner
+                        learner:learner,
+                        course:course.tag, 
+                        module:module.tag
                         }
                     }) }}">
             <i class="fas fa-user-minus"></i>
@@ -44,10 +46,10 @@
     {% elseif mode == 'delete' %}
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_DELETE') }}"
             href="{{ url({tag: '',
-                    params:{tag:tag, 
+                    params:{tag:extraActivity.tag, 
                         mode:mode,
-                        course:course, 
-                        module:module
+                        course:course.tag, 
+                        module:module.tag
                         }
                     }) }}">
             <i class="fas fa-trash-alt"></i>

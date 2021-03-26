@@ -16,8 +16,8 @@
             {% else %}
                 {{ extraActivity.title }}
             {% endif %}
-            {{ include('@lms/extra-activity-link.twig', {mode:'edit',course:course.tag,module:module.tag,tag:extraActivity.tag}) }}
-            {{ include('@lms/extra-activity-link.twig', {mode:'delete',course:course.tag,module:module.tag,tag:extraActivity.tag}) }}
+            {{ include('@lms/extra-activity-link.twig', {mode:'edit'}) }}
+            {{ include('@lms/extra-activity-link.twig', {mode:'delete'}) }}
         </div>
         <div class="finished-ratio">
             <span title="{{ _t('LMS_FINISHED_RATIO') }}">
@@ -42,8 +42,7 @@
                             <li>
                                 {{ include('@lms/progress-dashboard-user.twig') }}
                                 {{ include('@lms/extra-activity-link.twig', {mode:'remove',
-                                    tag:extraActivity.tag,
-                                    learnerName:username}) }}
+                                    learner:username}) }}
                             </li>
                         {%  endfor %}
                     </ul>
