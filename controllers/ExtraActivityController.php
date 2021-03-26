@@ -105,7 +105,7 @@ class ExtraActivityController extends YesWikiController
                         ]
                     )
                     . $this->render('@lms/extra-activity-backlink.twig', [
-                        'course' => ['tag' => $this->arguments['course']],
+                        'course' => $this->arguments['course'],
                         'module' => $this->arguments['module']
                     ]);
                 }
@@ -144,7 +144,7 @@ class ExtraActivityController extends YesWikiController
                         ]
                     )
                     . $this->render('@lms/extra-activity-backlink.twig', [
-                        'course' => ['tag' => $this->arguments['course']],
+                        'course' => $this->arguments['course'],
                         'module' => $this->arguments['module']
                     ]);
                 }
@@ -176,7 +176,7 @@ class ExtraActivityController extends YesWikiController
                         ]
                     )
                     . $this->render('@lms/extra-activity-backlink.twig', [
-                        'course' => ['tag' => $this->arguments['course']],
+                        'course' => $this->arguments['course'],
                         'module' => $this->arguments['module']
                     ]);
                 }

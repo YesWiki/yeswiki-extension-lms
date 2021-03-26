@@ -28,7 +28,7 @@
             'hint':  _t('LMS_EXTRA_ACTIVITY_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_DATE')
             },        
-        'day': (extraActivity ? extraActivity.date|date("Y-m-d"):null),
+        'day': (extraActivity ? extraActivity.date:date())|date("Y-m-d"),
         'hour':(extraActivity ? extraActivity.date|date("h"):12),
         'minute':(extraActivity ? extraActivity.date|date("i"):0),
         'hasTime':true
@@ -39,7 +39,7 @@
             'hint':  _t('LMS_EXTRA_ACTIVITY_END_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
             },        
-        'day': (extraActivity ? extraActivity.endDate|date("Y-m-d"):null),
+        'day': (extraActivity ? extraActivity.endDate:date())|date("Y-m-d"),
         'hour':(extraActivity ? extraActivity.endDate|date("h"):14),
         'minute':(extraActivity ? extraActivity.endDate|date("i"):0),
         'hasTime':true
@@ -82,4 +82,4 @@
         </div>
     </div>
 </form>
-{{ include('@lms/extra-activity-backlink.twig') }}
+{{ include('@lms/extra-activity-backlink.twig',{course:course.tag}) }}
