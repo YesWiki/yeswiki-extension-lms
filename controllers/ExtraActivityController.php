@@ -44,6 +44,11 @@ class ExtraActivityController extends YesWikiController
         $this->arguments = $this->formatArguments($arguments);
     }
 
+    /**
+     * format arguments property
+     * @param array $arguments
+     * @return string html to display
+     */
     protected function formatArguments($arg)
     {
         return [
@@ -65,6 +70,10 @@ class ExtraActivityController extends YesWikiController
         ];
     }
     
+    /**
+     * run the controller
+     * @param array $learners ['username1','username2',...]
+     */
     public function run(array $learners): ?string
     {
         if (!$this->arguments['extra_activity_mode']) {
@@ -179,6 +188,12 @@ class ExtraActivityController extends YesWikiController
         }
     }
 
+    /**
+     * render the edit form
+     * @param array $learners ['username1','username2',...]
+     * @param array $params ['index' => 'value','other_index'=>'value'] whould be merged with default
+     * @return string html to display
+     */
     private function edit(array $learners, array $params = []): string
     {
         $course = $this->courseManager->getCourse($this->arguments['course']) ;

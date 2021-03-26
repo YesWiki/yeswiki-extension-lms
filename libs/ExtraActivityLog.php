@@ -52,6 +52,13 @@ class ExtraActivityLog implements \JsonSerializable
         $this->module = $module;
     }
 
+    /**
+     * create from JSON
+     * @param string $json values of the extra activity
+     * @param CourseManager $courseManager
+     * @param DateManager $dateManager
+     * @return null|ExtraActivityLog null if error
+     */
     public static function createFromJSON(
         string $json,
         CourseManager $courseManager,
@@ -79,41 +86,73 @@ class ExtraActivityLog implements \JsonSerializable
         }
     }
 
+    /**
+     * Get the tag of the ExtraActivityLog
+     * @return string
+     */
     public function getTag(): string
     {
         return $this->tag ;
     }
 
+    /**
+     * Get the title of the ExtraActivityLog
+     * @return string
+     */
     public function getTitle(): string
     {
         return $this->title ;
     }
 
+    /**
+     * Get the relatedLink of the ExtraActivityLog
+     * @return string
+     */
     public function getRelatedLink(): string
     {
         return $this->relatedLink ;
     }
 
+    /**
+     * Get the starting date of the ExtraActivityLog
+     * @return Carbon
+     */
     public function getDate(): Carbon
     {
         return $this->date ;
     }
 
+    /**
+     * Get the ending date of the ExtraActivityLog
+     * @return Carbon
+     */
     public function getEndDate(): Carbon
     {
         return $this->date->copy()->add($this->elapsedTime) ;
     }
 
+    /**
+     * Format the starting date of the ExtraActivityLog
+     * @return string
+     */
     public function getFormattedDate(): string
     {
         return $this->dateManager->formatDatetime($this->date);
     }
 
+    /**
+     * Get the elapsedTime of the ExtraActivityLog
+     * @return CarbonInterval
+     */
     public function getElapsedTime(): CarbonInterval
     {
         return $this->elapsedTime ;
     }
 
+    /**
+     * Format the elapsedTime of the ExtraActivityLog
+     * @return string
+     */
     public function getFormattedElapsedTime(): string
     {
         return $this->dateManager->formatTimeWithColons($this->elapsedTime) ;
@@ -128,11 +167,20 @@ class ExtraActivityLog implements \JsonSerializable
         return $this->elapsedTime->totalMinutes;
     }
 
+    /**
+     * Get the registered Learners of the ExtraActivityLog
+     * @return array ['username1','username2',...]
+     */
     public function getRegisteredLearnerNames(): array
     {
         return $this->registeredLearnerNames ;
     }
 
+    /**
+     * Register a learner to the ExtraActivityLog
+     * @param string $learnerName
+     * @return bool true if added, false if already existing
+     */
     public function addLearnerName(string $learnerName): bool
     {
         if (in_array($learnerName, $this->registeredLearnerNames)) {
@@ -142,6 +190,11 @@ class ExtraActivityLog implements \JsonSerializable
         return true ;
     }
 
+    /**
+     * Remove a learner from the ExtraActivityLog
+     * @param string $learnerName
+     * @return bool true if removed, false if not present
+     */
     public function removeLearnerName(string $learnerName): bool
     {
         if (in_array($learnerName, $this->registeredLearnerNames)) {

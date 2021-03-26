@@ -44,8 +44,8 @@ class ExtraActivityManager
 
     /**
      * Save a Extra-activity
-     *
-     * @return bool
+     * @param array $data $_POST data to save
+     * @return bool false if error
      */
     public function saveExtraActivity(array $data): bool
     {
@@ -204,6 +204,12 @@ class ExtraActivityManager
         return new Carbon($date) ;
     }
 
+    /**
+     * Get the triples for a learner and a tag
+     * @param string $learnerName
+     * @param string $tag tag of the ExtraActivityLog
+     * @return array results from TripleStore->getMatching
+     */
     private function getTripplesForLearner(string $learnerName, string $tag)
     {
         $like = '%"tag":"' . $tag . '"%';
@@ -219,7 +225,8 @@ class ExtraActivityManager
 
     /**
      * Get the Extra-activities of a courseStructure
-     *
+     * @param Course @course
+     * @param Module @module (optional)
      * @return ExtraActivityLogs the courseStructure's extraActivities
      */
     public function getExtraActivities(Course $course, Module $module = null): ExtraActivityLogs
@@ -235,8 +242,8 @@ class ExtraActivityManager
 
     /**
      * Get a Extra-activity from tag
-     *
-     * @return ExtraActivityLog
+     * @param string $tag tag of the ExtraActivityLog
+     * @return ExtraActivityLog|null return null if empty tag
      */
     public function getExtraActivity(string $tag): ?ExtraActivityLog
     {
@@ -248,6 +255,11 @@ class ExtraActivityManager
         return $extraActivities->get($tag) ;
     }
 
+    /**
+     * Get extra-activitylogs from like query
+     * @param string $like query to send to TripleStore->getMatching
+     * @return ExtraActivityLogs the courseStructure's extraActivities
+     */
     private function getExtraActivityLogsFromLike(string $like):ExtraActivityLogs
     {
         $results = $this->tripleStore->getMatching(
@@ -259,7 +271,7 @@ class ExtraActivityManager
             'LIKE'
         );
 
-        $extraActivities = new ExtraActivityLogs() ;
+        $extraActivities = new ExtraActivityLogs([]) ;
         if ($results) {
             foreach ($results as $result) {
                 $extraActivity = ExtraActivityLog::createFromJSON(
@@ -282,8 +294,9 @@ class ExtraActivityManager
     
     /**
      * delete the Extra-activities of a courseStructure
-     *
-     * @return bool
+     * @param string $tag tag of the ExtraActivityLog
+     * @param string $learnerName (optional), if not present, delete for all learners
+     * @return bool false in cas of error
      */
     public function deleteExtraActivity(string $tag, string $learnerName = ''): bool
     {
