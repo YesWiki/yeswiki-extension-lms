@@ -24,6 +24,7 @@ class LearnerManager
     protected $userManager;
     protected $entryManager;
     protected $tripleStore;
+    protected $dateManager;
 
     /**
      * LearnerManager constructor
@@ -32,18 +33,21 @@ class LearnerManager
      * @param UserManager $userManager the injected UserManager instance
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param TripleStore $tripleStore the injected TripleStore instance
+     * @param DateManager $dateManager the injected DateManager instance
      */
     public function __construct(
         Wiki $wiki,
         UserManager $userManager,
         TripleStore $tripleStore,
-        EntryManager $entryManager
+        EntryManager $entryManager,
+        DateManager $dateManager
     ) {
         $this->wiki = $wiki;
         $this->config = $wiki->config;
         $this->userManager = $userManager;
         $this->entryManager = $entryManager;
         $this->tripleStore = $tripleStore;
+        $this->dateManager = $dateManager;
     }
 
     /**
@@ -186,7 +190,7 @@ class LearnerManager
             + ($activity ?
                 ['activity' => $activity->getTag()]
                 : [])
-            + ['log_time' => date('Y-m-d H:i:s', time())];
+            + ['log_time' => $this->dateManager->formatDateToString()];
         $resultState = $this->tripleStore->create(
             $learner->getUsername(),
             self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
@@ -225,7 +229,7 @@ class LearnerManager
                 // otherwise, update it
                 $newValue = array_merge(
                     $oldValue,
-                    ['elapsed_time' => $time->format('%H:%I:%S')]
+                    ['elapsed_time' => $this->dateManager->formatTimeWithColons($time)]
                 );
             }
             $update = $this->tripleStore->update(
