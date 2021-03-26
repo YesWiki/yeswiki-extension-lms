@@ -23,6 +23,7 @@ require_once LMS_PATH . 'libs/Activity.php';
 require_once LMS_PATH . 'libs/Module.php';
 require_once LMS_PATH . 'libs/Course.php';
 require_once LMS_PATH . 'libs/Learner.php';
+require_once LMS_PATH . 'libs/TimeLogs.php'; // to require before following lines
 require_once LMS_PATH . 'libs/ExtraActivityLog.php';
 require_once LMS_PATH . 'libs/ExtraActivityLogs.php';
 require_once LMS_PATH . 'libs/Progresses.php';

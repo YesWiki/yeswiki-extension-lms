@@ -2,16 +2,16 @@
 
 namespace YesWiki\Lms;
 
-class ExtraActivityLogs implements \Countable, \Iterator
+class ExtraActivityLogs extends TimeLogs implements \Countable, \Iterator
 {
     // an array of ExtraActivityLog
     protected $values;
     private $position = 0;
 
-    public function __construct()
+    public function __construct(array $values)
     {
+        parent::__construct($values);
         $this->position = 0;
-        $this->values = [];
     }
 
     public function has(string $tag): bool
