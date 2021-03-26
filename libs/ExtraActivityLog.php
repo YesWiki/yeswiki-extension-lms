@@ -99,6 +99,11 @@ class ExtraActivityLog implements \JsonSerializable
         return $this->date ;
     }
 
+    public function getEndDate(): \DateTime
+    {
+        return $this->date->add($this->elapsedTime) ;
+    }
+
     public function getFormattedDate(): string
     {
         return $this->date->format(self::DATE_FORMAT) ;

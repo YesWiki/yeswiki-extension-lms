@@ -39,9 +39,9 @@
             'hint':  _t('LMS_EXTRA_ACTIVITY_END_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
             },        
-        'day': (extraActivity ? extraActivity.date|date("Y-m-d"):null),
-        'hour':14,
-        'minute':0,
+        'day': (extraActivity ? extraActivity.endDate|date("Y-m-d"):null),
+        'hour':(extraActivity ? extraActivity.endDate|date("h"):14),
+        'minute':(extraActivity ? extraActivity.endDate|date("i"):0),
         'hasTime':true
         }) }}
     {{ include('@bazar/fields/text.twig',{'field': {
