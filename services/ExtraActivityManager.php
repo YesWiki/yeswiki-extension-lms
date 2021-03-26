@@ -51,7 +51,8 @@ class ExtraActivityManager
                 && count($data['registeredLearnerNames']) > 0) {
             $course = $this->courseManager->getCourse($data['course']);
             $module = !empty($data['module']) ? $this->courseManager->getModule($data['module']) : null;
-            $extraActivities = $this->getExtraActivities($course, $module);
+            // get all extra-activities
+            $extraActivities = $this->getExtraActivityLogsFromLike('%"tag"%');
             if (empty($data['tag'])) {
                 $i = 1 ;
                 // check if tag is a pageName or already exists for this course
@@ -71,6 +72,11 @@ class ExtraActivityManager
             } elseif (!$extraActivities->has($data['tag'])) {
                 if ($this->wiki->GetConfigValue('debug')=='yes') {
                     echo 'Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' ;
+                }
+                return false;
+            } elseif (!$this->deleteExtraActivity($extraActivities->get($data['tag']))) {
+                if ($this->wiki->GetConfigValue('debug')=='yes') {
+                    echo 'Errors in '. get_class($this) . ' : not possible to delete $data[\'tag\'] before update'  ;
                 }
                 return false;
             }
@@ -147,15 +153,7 @@ class ExtraActivityManager
         } else {
             $like .= '}%';
         }
-        $results = $this->tripleStore->getMatching(
-            null,
-            self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
-            $like,
-            'LIKE',
-            '=',
-            'LIKE'
-        );
-        return $this->getExtraActivityLogsFromResults($results) ;
+        return $this->getExtraActivityLogsFromLike($like) ;
     }
 
     /**
@@ -163,22 +161,18 @@ class ExtraActivityManager
      *
      * @return ExtraActivityLog
      */
-    public function getExtraActivity(string $tag, string $courseTag, string $moduleTag=''): ?ExtraActivityLog
+    public function getExtraActivity(string $tag): ?ExtraActivityLog
     {
         if (empty($tag)) {
             return null;
         }
+        $like = '%"tag":"' . $tag . '"%';
+        $extraActivities = $this->getExtraActivityLogsFromLike($like) ;
+        return $extraActivities->get($tag) ;
+    }
 
-        $course = $this->courseManager->getCourse($courseTag);
-        $module = !empty($moduleTag) ? $this->courseManager->getModule($moduleTag) : null;
-
-        $like = '%"tag":"' . $tag . '"';
-        $like .= '%"course":"' . $course->getTag() . '"';
-        if (!is_null($module)) {
-            $like .= '%"module":"' . $module->getTag() . '"%';
-        } else {
-            $like .= '}%';
-        }
+    private function getExtraActivityLogsFromLike(string $like):ExtraActivityLogs
+    {
         $results = $this->tripleStore->getMatching(
             null,
             self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
@@ -188,12 +182,6 @@ class ExtraActivityManager
             'LIKE'
         );
 
-        $extraActivities = $this->getExtraActivityLogsFromResults($results) ;
-        return $extraActivities->get($tag) ;
-    }
-
-    private function getExtraActivityLogsFromResults($results):ExtraActivityLogs
-    {
         $extraActivities = new ExtraActivityLogs() ;
         if ($results) {
             foreach ($results as $result) {
@@ -211,5 +199,48 @@ class ExtraActivityManager
             }
         }
         return $extraActivities ;
+    }
+
+    
+    /**
+     * delete the Extra-activities of a courseStructure
+     *
+     * @return bool
+     */
+    public function deleteExtraActivity(string $tag): bool
+    {
+        $like = '%"tag":"' . $tag . '"%';
+        $results = $this->tripleStore->getMatching(
+            null,
+            self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
+            $like,
+            'LIKE',
+            '=',
+            'LIKE'
+        );
+
+        if (!$results) {
+            if ($this->wiki->GetConfigValue('debug')=='yes') {
+                echo 'Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing'  ;
+            }
+            return false ;
+        }
+
+        $log = true ;
+        foreach ($results as $result) {
+            if ($this->tripleStore->delete(
+                $result['resource'],
+                self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
+                $result['value'],
+                '',
+                ''
+            ) != 0) {
+                $log = false ;
+                if ($this->wiki->GetConfigValue('debug')=='yes') {
+                    echo 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStroe'  ;
+                }
+            };
+        }
+        return $log ;
     }
 }

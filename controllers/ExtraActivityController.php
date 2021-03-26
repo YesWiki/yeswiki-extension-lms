@@ -61,6 +61,7 @@ class ExtraActivityController extends YesWikiController
             'module' => $_REQUEST['module'] ?? null ,
             'tag' => $_REQUEST['extraactivityid'] ?? null ,
             'learnerName' => $_REQUEST['extraactivitylearner'] ?? null ,
+            'confirm' => $_REQUEST['confirm'] ?? null ,
         ];
     }
     
@@ -75,9 +76,7 @@ class ExtraActivityController extends YesWikiController
                 break ;
             case 'edit':
                 $extraActivity = $this->extraActivityManager->getExtraActivity(
-                    $this->arguments['tag'],
-                    $this->arguments['course'],
-                    $this->arguments['module'] ?? '',
+                    $this->arguments['tag']
                 );
                 return $this->render(
                     '@templates/alert-message.twig',
@@ -112,6 +111,23 @@ class ExtraActivityController extends YesWikiController
                 }
                 break ;
             case 'remove':
+                if ($this->arguments['confirm'] != 'yes') {
+                    return $this->render(
+                        '@lms/extra-activity-confirm.twig',
+                        [
+                            'message' => _t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER')
+                                    .'"'.$this->arguments['learnerName'].'"'
+                                    ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
+                                    .'"'.$this->arguments['tag'].'"'
+                                    ,
+                            'course' => $this->arguments['course'],
+                            'module' => $this->arguments['module'],
+                            'tag' => $this->arguments['tag'],
+                            'learnerName' => $this->arguments['learnerName'],
+                            'mode' => $this->arguments['mode'],
+                        ]
+                    );
+                }
                 return $this->render(
                     '@templates/alert-message.twig',
                     [
@@ -120,6 +136,18 @@ class ExtraActivityController extends YesWikiController
                     ]
                 );
             case 'delete':
+                if ($this->arguments['confirm'] != 'yes') {
+                    return $this->render(
+                        '@lms/extra-activity-confirm.twig',
+                        [
+                            'message' => _t('LMS_EXTRA_ACTIVITY_DELETE').'"'.$this->arguments['tag'].'"',
+                            'course' => $this->arguments['course'],
+                            'module' => $this->arguments['module'],
+                            'tag' => $this->arguments['tag'],
+                            'mode' => $this->arguments['mode'],
+                        ]
+                    );
+                }
                 return $this->render(
                     '@templates/alert-message.twig',
                     [

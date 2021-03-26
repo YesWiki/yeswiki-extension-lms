@@ -1,0 +1,19 @@
+<div>
+    {{ message|raw }}
+    <a href="{{ url({params: {
+        extraactivitymode: mode,
+        course: course,
+        module: module,
+        extraactivityid:tag,
+        extraactivitylearner: learnerName,
+        confirm:'yes'} }) }}"
+      class="btn btn-danger btn-sm">
+      {{ _t('LMS_YES') }}
+    </a>
+    <a href="{{ url({params: {
+        course: course,
+        module: module} }) }}"
+      class="btn btn-primary btn-sm" >
+      {{ _t('LMS_NO') }}
+    </a>
+</div>

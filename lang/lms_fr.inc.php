@@ -112,6 +112,11 @@ $GLOBALS['translations'] = array_merge(
         'LMS_EXTRA_ACTIVITY_D' => ' d\' ',
         'LMS_EXTRA_ACTIVITY_LEARNERS' => 'Apprenant⋅e⋅s',
         'LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE' => 'Erreur lors de la sauvegarde de l\'activité supplémentaire : ',
+        'LMS_EXTRA_ACTIVITY_DELETE' => 'Confirmer la suppression de l\'activité supplémentaire : ',
+        'LMS_EXTRA_ACTIVITY_REMOVE_LEARNER' => 'Confirmer le retrait de l\'apprenant.e : ',
+        'LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END' => ', de l\'activité supplémentaire : ',
+        'LMS_YES' => 'Oui',
+        'LMS_NO' => 'Non',
         'LMS_BACK_TO_PROGRESSES_DASH_BOARD' => 'Retour au tableau de bord',
 
     )
