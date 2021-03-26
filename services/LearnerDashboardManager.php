@@ -79,7 +79,7 @@ class LearnerDashboardManager
                     $duration->add($moduleStat['elapsedTime']);
                 }
             }
-            $courseDuration = ($duration->totalMinutes == 0) ? null : $duration;
+            $courseDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
 
             $coursesStat[$course->getTag()] = [
                 "started" => $started, // bool
@@ -157,7 +157,7 @@ class LearnerDashboardManager
                         $duration->add($activityStat['elapsedTime']);
                     }
                 }
-                $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration;
+                $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
             }
 
             $modulesStat[$module->getTag()] = [

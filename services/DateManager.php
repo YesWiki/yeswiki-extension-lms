@@ -12,6 +12,7 @@ class DateManager
 {
     protected const DATE_FORMAT = 'Y-m-d H:i:s';
     protected const TIME_FORMAT_WITH_COLONS = '%H:%I:%S';
+    protected const TIME_FORMAT_WITH_COLONS_FOR_IMPORT = 'H:i:s';
     protected $config;
 
     /**
@@ -43,7 +44,7 @@ class DateManager
     public function createIntervalFromString(string $durationString): ?CarbonInterval
     {
         try {
-            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS, $durationString);
+            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT, $durationString)->cascade();
         } catch (Exception $e) {
             //error_log("Error by parsing the interval. The format '00:00:00' is expected but '$durationString' is given");
             return null;
