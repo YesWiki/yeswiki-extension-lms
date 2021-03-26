@@ -140,7 +140,7 @@ class ExtraActivityLog implements \JsonSerializable
     public function removeLearnerName(string $learnerName): bool
     {
         if (in_array($learnerName, $this->registeredLearnerNames)) {
-            array_filter($this->registeredLearnerNames, function ($value) use ($learnerName) {
+            $this->registeredLearnerNames = array_filter($this->registeredLearnerNames, function ($value) use ($learnerName) {
                 return ($value != $learnerName);
             });
             return true ;

@@ -95,13 +95,13 @@ class ExtraActivityController extends YesWikiController
                     $this->wiki->Redirect($this->wiki->Href(null, null, [
                         'course' => $this->arguments['course'],
                         'module' => $this->arguments['module']
-                    ]));
+                    ], false));
                 } else {
                     return $this->render(
                         '@templates/alert-message.twig',
                         [
                             'type' => 'danger',
-                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') . ($_POST['title'] ?? '$_POST[\'title\'] not set')
+                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') . ($_POST['title'] ?? !!!'$_POST[\'title\'] not set!!!')
                         ]
                     )
                     . $this->render('@lms/extra-activity-backlink.twig', [
@@ -127,14 +127,28 @@ class ExtraActivityController extends YesWikiController
                             'mode' => $this->arguments['mode'],
                         ]
                     );
+                } elseif ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'], $this->arguments['learnerName'])) {
+                    $this->wiki->Redirect($this->wiki->Href(null, null, [
+                        'course' => $this->arguments['course'],
+                        'module' => $this->arguments['module']
+                    ], false));
+                } else {
+                    return $this->render(
+                        '@templates/alert-message.twig',
+                        [
+                            'type' => 'danger',
+                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE')
+                            .'"'.($this->arguments['learnerName'] ?? '!!!$_GET[\'extraactivitylearner\'] not set!!').'"'
+                            ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
+                            .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'extraactivityid\'] not set!!').'"'
+                        ]
+                    )
+                    . $this->render('@lms/extra-activity-backlink.twig', [
+                        'course' => ['tag' => $this->arguments['course']],
+                        'module' => $this->arguments['module']
+                    ]);
                 }
-                return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'info',
-                        'message' => 'Mode test : retrait de '.$this->arguments['learnerName'].'  de l\'activité : '. $this->arguments['tag']
-                    ]
-                );
+                // no break
             case 'delete':
                 if ($this->arguments['confirm'] != 'yes') {
                     return $this->render(
@@ -147,14 +161,26 @@ class ExtraActivityController extends YesWikiController
                             'mode' => $this->arguments['mode'],
                         ]
                     );
+                } elseif ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'])) {
+                    $this->wiki->Redirect($this->wiki->Href(null, null, [
+                        'course' => $this->arguments['course'],
+                        'module' => $this->arguments['module']
+                    ], false));
+                } else {
+                    return $this->render(
+                        '@templates/alert-message.twig',
+                        [
+                            'type' => 'danger',
+                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
+                                ($this->arguments['tag'] ?? '!!!$_GET[\'extraactivityid\'] not set!!')
+                        ]
+                    )
+                    . $this->render('@lms/extra-activity-backlink.twig', [
+                        'course' => ['tag' => $this->arguments['course']],
+                        'module' => $this->arguments['module']
+                    ]);
                 }
-                return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'info',
-                        'message' => 'Mode test : suppression  de l\'activité : '. $this->arguments['tag']
-                    ]
-                );
+                // no break
             default:
                 return null ;
         }
