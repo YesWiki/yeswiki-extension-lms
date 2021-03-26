@@ -25,7 +25,7 @@
             href="{{ url({tag: '',
                     params:{course:course, 
                         module:module,
-                        extraactivityid:extraActivityId, 
+                        tag:tag, 
                         mode:mode
                         }
                     }) }}">
@@ -34,9 +34,9 @@
     {% elseif mode == 'remove' %}
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_REMOVE') }}"
             href="{{ url({tag: '',
-                    params:{extraactivityid:extraActivityId, 
+                    params:{tag:tag, 
                         mode:mode,
-                        extraactivitylearner:learnerName
+                        learner:learner
                         }
                     }) }}">
             <i class="fas fa-user-minus"></i>
@@ -44,7 +44,7 @@
     {% elseif mode == 'delete' %}
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_DELETE') }}"
             href="{{ url({tag: '',
-                    params:{extraactivityid:extraActivityId, 
+                    params:{tag:tag, 
                         mode:mode,
                         course:course, 
                         module:module

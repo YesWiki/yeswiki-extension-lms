@@ -59,8 +59,8 @@ class ExtraActivityController extends YesWikiController
                         : ((!empty($arg['course'])) ? $arg['course']: null)
                     ) ,
             'module' => $_REQUEST['module'] ?? null ,
-            'tag' => $_REQUEST['extraactivityid'] ?? null ,
-            'learnerName' => $_REQUEST['extraactivitylearner'] ?? null ,
+            'tag' => $_REQUEST['tag'] ?? null ,
+            'learner' => $_REQUEST['learner'] ?? null ,
             'confirm' => $_REQUEST['confirm'] ?? null ,
         ];
     }
@@ -116,18 +116,18 @@ class ExtraActivityController extends YesWikiController
                         '@lms/extra-activity-confirm.twig',
                         [
                             'message' => _t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER')
-                                    .'"'.$this->arguments['learnerName'].'"'
+                                    .'"'.$this->arguments['learner'].'"'
                                     ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
                                     .'"'.$this->arguments['tag'].'"'
                                     ,
                             'course' => $this->arguments['course'],
                             'module' => $this->arguments['module'],
                             'tag' => $this->arguments['tag'],
-                            'learnerName' => $this->arguments['learnerName'],
+                            'learner' => $this->arguments['learner'],
                             'mode' => $this->arguments['mode'],
                         ]
                     );
-                } elseif ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'], $this->arguments['learnerName'])) {
+                } elseif ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'], $this->arguments['learner'])) {
                     $this->wiki->Redirect($this->wiki->Href(null, null, [
                         'course' => $this->arguments['course'],
                         'module' => $this->arguments['module']
@@ -138,9 +138,9 @@ class ExtraActivityController extends YesWikiController
                         [
                             'type' => 'danger',
                             'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE')
-                            .'"'.($this->arguments['learnerName'] ?? '!!!$_GET[\'extraactivitylearner\'] not set!!').'"'
+                            .'"'.($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!').'"'
                             ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
-                            .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'extraactivityid\'] not set!!').'"'
+                            .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!').'"'
                         ]
                     )
                     . $this->render('@lms/extra-activity-backlink.twig', [
@@ -172,7 +172,7 @@ class ExtraActivityController extends YesWikiController
                         [
                             'type' => 'danger',
                             'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
-                                ($this->arguments['tag'] ?? '!!!$_GET[\'extraactivityid\'] not set!!')
+                                ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!')
                         ]
                     )
                     . $this->render('@lms/extra-activity-backlink.twig', [
