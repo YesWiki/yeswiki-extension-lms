@@ -4,15 +4,19 @@
 namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
 use Exception;
 use YesWiki\Wiki;
 
 class DateManager
 {
-    protected const DATE_FORMAT = 'Y-m-d H:i:s';
+
+    protected const DATETIME_FORMAT = 'Y-m-d H:i:s';
     protected const TIME_FORMAT_WITH_COLONS = '%H:%I:%S';
     protected const TIME_FORMAT_WITH_COLONS_FOR_IMPORT = 'H:i:s';
+    protected const LONG_DATE_ISOFORMAT = 'LL';
+    protected const LONG_DATETIME_ISOFORMAT = 'LLLL';
     protected $config;
 
     /**
@@ -24,9 +28,9 @@ class DateManager
         $this->config = $wiki->config;
     }
 
-    public function createDateFromString(string $dateStr): ?Carbon
+    public function createDatetimeFromString(string $dateStr): ?Carbon
     {
-        $date = Carbon::createFromFormat(self::DATE_FORMAT, $dateStr);
+        $date = Carbon::createFromFormat(self::DATETIME_FORMAT, $dateStr);
         // TODO manage the timezone
         if (!$date) {
             //error_log("Error by parsing the date. The format 'Y-m-d H:i:s' is expected but '$dateStr' is given");
@@ -56,16 +60,30 @@ class DateManager
         return $duration->format(self::TIME_FORMAT_WITH_COLONS);
     }
 
-    public function formatDateWithWrittenMonth(Carbon $date): string
+    public function formatLongDatetime(Carbon $date): string
     {
-        return $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL');
+        return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATETIME_ISOFORMAT);
     }
 
-    public function formatDateToString(Carbon $date = null): string
+    public function formatLongDate(Carbon $date): string
+    {
+        return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATE_ISOFORMAT);
+    }
+
+    public function formatDatetimeToString(Carbon $date = null): string
     {
         if (is_null($date)) {
             $date = Carbon::now();
         }
-        return $date->locale($GLOBALS['prefered_language'])->format(self::DATE_FORMAT);
+        return $date->locale($GLOBALS['prefered_language'])->format(self::DATETIME_FORMAT);
+    }
+
+    public function diffDatesInReadableFormat(Carbon $fromDate, Carbon $toDate = null): string
+    {
+        if (is_null($toDate)){
+            $toDate = Carbon::now();
+        }
+        return $toDate->locale($GLOBALS['prefered_language'])->DiffForHumans($fromDate,
+            CarbonInterface::DIFF_ABSOLUTE);
     }
 }

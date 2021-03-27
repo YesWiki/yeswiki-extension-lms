@@ -139,7 +139,7 @@ class LearnerDashboardManager
 
             // the first access date displayed is the earliest log_time between the module and all its activities
             $firstAccessDate = !empty($progress['log_time']) ?
-                $this->dateManager->createDateFromString($progress['log_time'])
+                $this->dateManager->createDatetimeFromString($progress['log_time'])
                 : null;
             $firstActivityAccessDate = $this->findFirstAccessDate($activitiesStat);
             if (($firstActivityAccessDate && $firstActivityAccessDate->lessThan($firstAccessDate))
@@ -213,7 +213,7 @@ class LearnerDashboardManager
             }
 
             $firstAccessDate = !empty($progress['log_time']) ?
-                $this->dateManager->createDateFromString($progress['log_time'])
+                $this->dateManager->createDatetimeFromString($progress['log_time'])
                 : null;
 
             $activitiesStat[$activity->getTag()] = [

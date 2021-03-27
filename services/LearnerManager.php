@@ -190,7 +190,7 @@ class LearnerManager
             + ($activity ?
                 ['activity' => $activity->getTag()]
                 : [])
-            + ['log_time' => $this->dateManager->formatDateToString()];
+            + ['log_time' => $this->dateManager->formatDatetimeToString()];
         $resultState = $this->tripleStore->create(
             $learner->getUsername(),
             self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,

@@ -204,9 +204,7 @@ class CourseController extends YesWikiController
             'labelStart' => $labelStart,
             'statusMsg' => $statusMsg,
             'disabledLink' => $disabledLink,
-            'learner' => $learner,
-            // TODO replace it by a Twig Macro
-            'formatter' => $this->getTwigFormatter()
+            'learner' => $learner
         ]);
     }
 
@@ -228,25 +226,16 @@ class CourseController extends YesWikiController
                 return _t('LMS_CLOSED_MODULE');
                 break;
             case ModuleStatus::TO_BE_OPEN:
-                return _t('LMS_MODULE_WILL_OPEN') . ' '
-                    . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans($date,
-                        CarbonInterface::DIFF_ABSOLUTE)
-                    . ' (' . str_replace(' 00:00', '',
-                        $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')) . ')';
+                return _t('LMS_MODULE_WILL_OPEN')
+                    . ' ' . $this->dateManager->diffDatesInReadableFormat($date)
+                    . ' (' . $this->dateManager->formatLongDate($date) . ')';
                 break;
             case ModuleStatus::OPEN:
                 $msg = _t('LMS_OPEN_MODULE');
                 if (!empty($date)) {
                     $msg .= ' ' . _t('LMS_SINCE')
-                        . ' ' . Carbon::now()->locale($GLOBALS['prefered_language'])->DiffForHumans(
-                            $date,
-                            CarbonInterface::DIFF_ABSOLUTE
-                        )
-                        . ' (' . str_replace(
-                            ' 00:00',
-                            '',
-                            $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL')
-                        ) . ')';
+                        . ' ' . $this->dateManager->diffDatesInReadableFormat($date)
+                        . ' (' . $this->dateManager->formatLongDate($date) . ')';
                 }
                 return $msg;
                 break;

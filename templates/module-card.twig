@@ -1,3 +1,4 @@
+{% from "@lms/datetime-macros.twig" import displayTime %}
 {% block module_card %}
     <div class="module-card status-{{ module.status(course) }}">
     <div class="module-image">
@@ -18,7 +19,7 @@
                 : {{ nbActivities }}
             </div>
             <div class="activities-duration"><strong><i class="fas fa-hourglass-half fa-fw"></i> {{ _t('LMS_ESTIMATED_TIME') }}</strong>
-                : {{ formatter.formatDuration(module.duration) }}
+                : {{ displayTime(module.duration) }}
             </div>
         </div>
         <div class="activities-action">
