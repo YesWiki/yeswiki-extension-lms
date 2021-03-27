@@ -209,7 +209,7 @@ class LearnerDashboardManager
                     $this->dateManager->createIntervalFromString($progress['elapsed_time'])
                     : null;
             } else {
-                $activityDuration = $this->dateManager->createIntervalFromMinutes($activity->getDuration());
+                $activityDuration = $activity->getDuration();
             }
 
             $firstAccessDate = !empty($progress['log_time']) ?
