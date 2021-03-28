@@ -57,7 +57,13 @@ class DateManager
 
     public function formatTimeWithColons(CarbonInterval $duration): string
     {
-        return $duration->format(self::TIME_FORMAT_WITH_COLONS);
+        // create new CarbonInterval to set total hours without cascade
+        // difference between 2021-01-01 00:00:00 and 2021-01-02 01:05:00 should give 25:05:00
+        // whereas $duration->format(self::TIME_FORMAT_WITH_COLONS) gives 01:05:00
+        return CarbonInterval::hours($duration->totalHours)
+            ->minutes($duration->minutes)
+            ->seconds($duration->seconds)
+            ->format(self::TIME_FORMAT_WITH_COLONS);
     }
 
     public function formatLongDatetime(Carbon $date): string
