@@ -11,10 +11,9 @@ use YesWiki\Wiki;
 
 class DateManager
 {
-
-    protected const DATETIME_FORMAT = 'Y-m-d H:i:s';
     protected const TIME_FORMAT_WITH_COLONS = '%H:%I:%S';
     protected const TIME_FORMAT_WITH_COLONS_FOR_IMPORT = 'H:i:s';
+    protected const DATETIME_FORMAT = 'Y-m-d H:i:s';
     protected const LONG_DATE_ISOFORMAT = 'LL';
     protected const LONG_DATETIME_ISOFORMAT = 'LLLL';
     protected $config;
@@ -26,6 +25,22 @@ class DateManager
     public function __construct(Wiki $wiki)
     {
         $this->config = $wiki->config;
+    }
+
+    public function createIntervalFromMinutes(int $minutes): CarbonInterval
+    {
+        return CarbonInterval::minutes($minutes)->cascade();
+    }
+
+    public function createIntervalFromString(string $durationString): ?CarbonInterval
+    {
+        try {
+            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT,
+                $durationString)->cascade();
+        } catch (Exception $e) {
+            //error_log("Error by parsing the interval. The format '00:00:00' is expected but '$durationString' is given");
+            return null;
+        }
     }
 
     public function createDatetimeFromString(string $dateStr): ?Carbon
@@ -40,21 +55,6 @@ class DateManager
         return $date;
     }
 
-    public function createIntervalFromMinutes(int $minutes): CarbonInterval
-    {
-        return CarbonInterval::minutes($minutes)->cascade();
-    }
-
-    public function createIntervalFromString(string $durationString): ?CarbonInterval
-    {
-        try {
-            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT, $durationString)->cascade();
-        } catch (Exception $e) {
-            //error_log("Error by parsing the interval. The format '00:00:00' is expected but '$durationString' is given");
-            return null;
-        }
-    }
-
     public function formatTimeWithColons(CarbonInterval $duration): string
     {
         // create new CarbonInterval to set total hours without cascade
@@ -66,9 +66,9 @@ class DateManager
             ->format(self::TIME_FORMAT_WITH_COLONS);
     }
 
-    public function formatLongDatetime(Carbon $date): string
+    public function formatDatetime(Carbon $date): string
     {
-        return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATETIME_ISOFORMAT);
+        return $date->locale($GLOBALS['prefered_language'])->format(self::DATETIME_FORMAT);
     }
 
     public function formatLongDate(Carbon $date): string
@@ -76,19 +76,18 @@ class DateManager
         return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATE_ISOFORMAT);
     }
 
-    public function formatDatetimeToString(Carbon $date = null): string
+    public function formatLongDatetime(Carbon $date): string
     {
-        if (is_null($date)) {
-            $date = Carbon::now();
-        }
-        return $date->locale($GLOBALS['prefered_language'])->format(self::DATETIME_FORMAT);
+        return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATETIME_ISOFORMAT);
     }
 
-    public function diffDatesInReadableFormat(Carbon $fromDate, Carbon $toDate = null): string
+    public function diffToNowInReadableFormat(Carbon $date): string
     {
-        if (is_null($toDate)){
-            $toDate = Carbon::now();
-        }
+        $this->diffDatesInReadableFormat($date, Carbon::now());
+    }
+
+    public function diffDatesInReadableFormat(Carbon $fromDate, Carbon $toDate): string
+    {
         return $toDate->locale($GLOBALS['prefered_language'])->DiffForHumans($fromDate,
             CarbonInterface::DIFF_ABSOLUTE);
     }

@@ -21,26 +21,28 @@ class LearnerDashboardManager
     protected $userManager;
     protected $courseManager;
     protected $dateManager;
+    protected $learnerManager;
 
     /**
      * LearnerDashboardManager constructor
      * @param Wiki $wiki the injected Wiki instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param LearnerManager $learnerManager the injected LearnerManager instance
      * @param DateManager $dateManager the injected DateManager instance
      */
     public function __construct(
         Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
-        DateManager $dateManager,
-        LearnerManager $learnerManager
+        LearnerManager $learnerManager,
+        DateManager $dateManager
     ) {
         $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
-        $this->dateManager = $dateManager;
         $this->learnerManager = $learnerManager;
+        $this->dateManager = $dateManager;
     }
 
     /**

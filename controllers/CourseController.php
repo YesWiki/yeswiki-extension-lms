@@ -227,14 +227,14 @@ class CourseController extends YesWikiController
                 break;
             case ModuleStatus::TO_BE_OPEN:
                 return _t('LMS_MODULE_WILL_OPEN')
-                    . ' ' . $this->dateManager->diffDatesInReadableFormat($date)
+                    . ' ' . $this->dateManager->diffToNowInReadableFormat($date)
                     . ' (' . $this->dateManager->formatLongDate($date) . ')';
                 break;
             case ModuleStatus::OPEN:
                 $msg = _t('LMS_OPEN_MODULE');
                 if (!empty($date)) {
                     $msg .= ' ' . _t('LMS_SINCE')
-                        . ' ' . $this->dateManager->diffDatesInReadableFormat($date)
+                        . ' ' . $this->dateManager->diffToNowInReadableFormat($date)
                         . ' (' . $this->dateManager->formatLongDate($date) . ')';
                 }
                 return $msg;
