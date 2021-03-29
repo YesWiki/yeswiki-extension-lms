@@ -25,8 +25,8 @@
     {{ include('@bazar/inputs/date.twig', {'field': {
             'name':'bf_date_debut_evenement',
             'required':true,
-            'hint':  _t('LMS_EXTRA_ACTIVITY_DATE')  ,
-            'label':  _t('LMS_EXTRA_ACTIVITY_DATE')
+            'hint':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE')  ,
+            'label':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE')
             },        
         'day': (extraActivity ? extraActivity.date:date())|date("Y-m-d"),
         'hour':(extraActivity ? extraActivity.date|date("H"):12),

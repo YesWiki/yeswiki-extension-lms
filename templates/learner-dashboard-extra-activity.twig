@@ -1,4 +1,4 @@
-{% from "@lms/datetime-macros.twig" import displayTime %}
+{% from "@lms/datetime-macros.twig" import displayTime,displayDate %}
 {% set level = (level ?? 'activity') %}
 <div class="panel panel-lms-dashboard dashboard-{{ level }}-frame">
   <div class="panel-heading">
@@ -9,7 +9,7 @@
                     ? extraActivity.relatedLink
                     : url({tag: extraActivity.relatedLink})
             -}}"
-            title="{{ _t('LMS_ACTIVITY_PREVIEW') }}">
+            title="{{ _t('LMS_EXTRA_ACTIVITY_LINK') }}">
                 {{ extraActivity.title }}
             </a>
         {% else %}
@@ -30,7 +30,11 @@
           {% endif %}
       </span> 
     </div>
-    {% set dateTime = extraActivity.date %}
-    {{ include('@lms/learner-dashboard-date.twig') }}
+    <div class="first-access">
+        <span title="{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}">
+            <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
+            {{ displayDate(extraActivity.date) }}
+        </span>
+    </div>
   </div>
 </div>
