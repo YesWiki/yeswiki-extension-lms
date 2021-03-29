@@ -29,7 +29,7 @@
             'label':  _t('LMS_EXTRA_ACTIVITY_DATE')
             },        
         'day': (extraActivity ? extraActivity.date:date())|date("Y-m-d"),
-        'hour':(extraActivity ? extraActivity.date|date("h"):12),
+        'hour':(extraActivity ? extraActivity.date|date("H"):12),
         'minute':(extraActivity ? extraActivity.date|date("i"):0),
         'hasTime':true
         }) }}
@@ -40,7 +40,7 @@
             'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
             },        
         'day': (extraActivity ? extraActivity.endDate:date())|date("Y-m-d"),
-        'hour':(extraActivity ? extraActivity.endDate|date("h"):14),
+        'hour':(extraActivity ? extraActivity.endDate|date("H"):14),
         'minute':(extraActivity ? extraActivity.endDate|date("i"):0),
         'hasTime':true
         }) }}

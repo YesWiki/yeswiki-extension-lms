@@ -78,14 +78,7 @@ class ExtraActivityController extends YesWikiController
                 $extraActivity = $this->extraActivityManager->getExtraActivity(
                     $this->arguments['tag']
                 );
-                return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'danger',
-                        'message' => 'Toujours en test : l\'affichage des dates lors de la modification n\'est pas stable'
-                    ]
-                )
-                . $this->edit(
+                return $this->edit(
                     $learners,
                     ($extraActivity) ? ['extraActivity' => $extraActivity] : []
                 );

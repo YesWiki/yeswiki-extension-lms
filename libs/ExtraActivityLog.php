@@ -3,7 +3,9 @@
 namespace YesWiki\Lms;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 
 class ExtraActivityLog implements \JsonSerializable
 {
@@ -16,29 +18,30 @@ class ExtraActivityLog implements \JsonSerializable
     protected $course ;
     protected $module ;
 
-    protected const DATE_FORMAT = 'Y-m-d H:i:s';
-    protected const TIME_FORMAT = '%H:%I:%S';
+    protected $dateManager;
 
     /**
      * constructor
-     * @param $values
+     * @param DateManager $dateManager
      * @param string $tag of the extra activity
      * @param string $title
      * @param string $relatedLink (url or pageTag)
-     * @param \DateTime $date of the beginning
-     * @param \DateInterval $elapsedTime
+     * @param Carbon $date of the beginning
+     * @param CarbonInterval $elapsedTime
      * @param Course $course
      * @param Module $module optional
      */
     public function __construct(
+        DateManager $dateManager,
         string $tag,
         string $title,
         string $relatedLink = '',
-        \DateTime $date,
-        \DateInterval $elapsedTime,
+        Carbon $date,
+        CarbonInterval $elapsedTime,
         Course $course,
         Module $module = null
     ) {
+        $this->dateManager = $dateManager;
         $this->tag = $tag;
         $this->title = $title;
         $this->relatedLink = $relatedLink;
@@ -51,7 +54,8 @@ class ExtraActivityLog implements \JsonSerializable
 
     public static function createFromJSON(
         string $json,
-        CourseManager $courseManager
+        CourseManager $courseManager,
+        DateManager $dateManager
     ): ?ExtraActivityLog {
         $data = json_decode($json, true) ;
         if (!empty($data['tag'])
@@ -60,17 +64,13 @@ class ExtraActivityLog implements \JsonSerializable
             && !empty($data['elapsedTime'])
             && !empty($data['course'])
             ) {
-            if (preg_match('/([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})/i', $data['elapsedTime'], $matches)) {
-                $durationStr = 'PT'.$matches[1].'H'.$matches[2].'M'.$matches[3].'S' ;
-            } else {
-                $durationStr = '';
-            }
             return new ExtraActivityLog(
+                $dateManager,
                 $data['tag'],
                 $data['title'],
                 $data['relatedLink'] ?? '',
-                \DateTime::createFromFormat(self::DATE_FORMAT, $data['date']),
-                new \DateInterval($durationStr),
+                $dateManager->createDatetimeFromString($data['date']),
+                $dateManager->createIntervalFromString($data['elapsedTime']),
                 $courseManager->getCourse($data['course']),
                 !empty($data['module']) ? $courseManager->getModule($data['module']):null,
             )  ;
@@ -94,29 +94,29 @@ class ExtraActivityLog implements \JsonSerializable
         return $this->relatedLink ;
     }
 
-    public function getDate(): \DateTime
+    public function getDate(): Carbon
     {
         return $this->date ;
     }
 
-    public function getEndDate(): \DateTime
+    public function getEndDate(): Carbon
     {
-        return $this->date->add($this->elapsedTime) ;
+        return $this->date->copy()->add($this->elapsedTime) ;
     }
 
     public function getFormattedDate(): string
     {
-        return $this->date->format(self::DATE_FORMAT) ;
+        return $this->dateManager->formatDatetime($this->date);
     }
 
-    public function getElapsedTime(): \DateInterval
+    public function getElapsedTime(): CarbonInterval
     {
         return $this->elapsedTime ;
     }
 
     public function getFormattedElapsedTime(): string
     {
-        return $this->elapsedTime->format(self::TIME_FORMAT) ;
+        return $this->dateManager->formatTimeWithColons($this->elapsedTime) ;
     }
 
     /**
@@ -125,7 +125,7 @@ class ExtraActivityLog implements \JsonSerializable
      */
     public function getDuration(): int
     {
-        return Carbon::create(2000, 1, 1, 0)->diffInMinutes(Carbon::create(2000, 1, 1, 0)->add($this->elapsedTime));
+        return $this->elapsedTime->totalMinutes;
     }
 
     public function getRegisteredLearnerNames(): array

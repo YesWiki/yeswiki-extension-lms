@@ -3,6 +3,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use Carbon\Carbon;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Wiki;
 use YesWiki\Lms\ExtraActivityLog ;
@@ -10,6 +11,7 @@ use YesWiki\Lms\ExtraActivityLogs ;
 use YesWiki\Lms\Module ;
 use YesWiki\Lms\Course ;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 
 class ExtraActivityManager
 {
@@ -18,21 +20,25 @@ class ExtraActivityManager
     protected $tripleStore;
     protected $wiki;
     protected $courseManager ;
+    protected $dateManager ;
 
     /**
      * LearnerManager constructor
      *
      * @param TripleStore $tripleStore the injected TripleStore instance
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param DateManager $dateManager the injected CourseManager instance
      * @param Wiki $wiki
      */
     public function __construct(
         TripleStore $tripleStore,
         CourseManager $courseManager,
+        DateManager $dateManager,
         Wiki $wiki
     ) {
         $this->tripleStore = $tripleStore;
         $this->courseManager = $courseManager;
+        $this->dateManager = $dateManager;
         $this->wiki = $wiki;
     }
 
@@ -111,8 +117,10 @@ class ExtraActivityManager
         if (isset($data['bf_date_fin_evenement_allday']) && $data['bf_date_fin_evenement_allday'] == 1) {
             $endDate->add(new \DateInterval('P1D')) ;
         }
-        $elapsedTime = $date->diff($endDate) ;
+        $elapsedTime = $date->diffAsCarbonInterval($endDate, false) ;
+        $elapsedTime->invert = false; // to have only positive without warning
         $extraActivity = new ExtraActivityLog(
+            $this->dateManager,
             $data['tag'],
             $data['title'],
             $data['relatedLink'] ?? '',
@@ -186,14 +194,14 @@ class ExtraActivityManager
         return !$error;
     }
 
-    private function getDateFromData(string $prefix, array $data): ?\DateTime
+    private function getDateFromData(string $prefix, array $data): ?Carbon
     {
         $date = $data[$prefix];
         if (isset($data[$prefix.'_allday']) && $data[$prefix.'_allday'] == 0) {
             $date .= ' ' . ($data[$prefix.'_hour'] ?? '00'). ':' ;
             $date .=  ($data[$prefix.'_minutes'] ?? '00'). ':00' ;
         }
-        return new \DateTime($date) ;
+        return new Carbon($date) ;
     }
 
     private function getTripplesForLearner(string $learnerName, string $tag)
@@ -256,7 +264,8 @@ class ExtraActivityManager
             foreach ($results as $result) {
                 $extraActivity = ExtraActivityLog::createFromJSON(
                     $result['value'],
-                    $this->courseManager
+                    $this->courseManager,
+                    $this->dateManager
                 );
                 if ($extraActivity) {
                     if (!$extraActivities->add($extraActivity)) {
