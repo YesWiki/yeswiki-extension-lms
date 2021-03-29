@@ -1,68 +1,81 @@
 <?php
-/**
- * Extension of bazar for the LMS module
- *
- * @category YesWiki
- * @package  lms
- * @author   Adrien Cheype <adrien.cheype@gmail.com>
- * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
- * @link     https://yeswiki.net
- */
 
-use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Lms\Activity;
-use YesWiki\Lms\Controller\CourseController;
-use YesWiki\Lms\Course;
-use YesWiki\Lms\ModuleStatus;
-use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Lms\Service\DateManager;
-use YesWiki\Lms\Service\LearnerManager;
+namespace YesWiki\Lms\Field;
+
+use Psr\Container\ContainerInterface;
 use YesWiki\Wiki;
 
-/**
- * Display the possible reactions to comment an activity.
- * Must be declare in the bazar form definition as followed :
- *    'reactions***idreaction1,idreaction2,idreaction3***titlereaction1,titlereaction2,titlereaction3***image1,image2,image3*** *** *** *** *** *** ***'
- * Some ids are generic and have associated images and titles : j-ai-appris,j-aime,pas-clair,pas-compris,pas-d-accord,top-gratitude
- * otherwise, you will need to give a filename that is included in files directory
- *
- * cf. formulaire.fonct.inc.php of the bazar extension to see the other field definitions
- *
- * @param array $formtemplate
- * @param array $tableau_template The bazar field definition inside the form definition
- * @param string $mode Action type for the form : 'saisie', 'requete', 'html', ...
- * @param array $fiche The entry which is displayed or modified
- * @return string Return the generated html to include
- */
-function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
+class ReactionsField extends LmsField
 {
+    protected const FIELD_IDS = 2;
+    protected const FIELD_TITLES = 3;
+    protected const FIELD_IMAGES = 4;
+    protected const DEFAULT_REACTIONS = ['top-gratitude', 'j-aime', 'j-ai-appris', 'pas-compris', 'pas-d-accord', 'idee-noire'];
 
-    // the tag of the current entry
-    $currentEntryTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
+    protected $ids;
+    protected $titles;
+    protected $images;
 
-    // TODO refactor it by using the model and the twig template
-    if ($mode == 'html' && $currentEntryTag && !empty($fiche['listeListeOuinonLmsbf_reactions']) && $fiche['listeListeOuinonLmsbf_reactions'] == "oui") {
-        // load the lms lib
-        require_once LMS_PATH . 'libs/lms.lib.php';
+    /*
+     * Display the possible reactions to comment an activity.
+     * Must be declare in the bazar form definition as followed :
+     *    'reactions***idreaction1,idreaction2,idreaction3***titlereaction1,titlereaction2,titlereaction3***image1,image2,image3*** *** *** *** *** *** ***'
+     * Some ids are generic and have associated images and titles : j-ai-appris,j-aime,pas-clair,pas-compris,pas-d-accord,top-gratitude
+     * otherwise, you will need to give a filename that is included in files directory
+     */
+    public function __construct(array $values, ContainerInterface $services)
+    {
+        parent::__construct($values, $services);
 
-        $ids = explode(',', $tableau_template[2]);
-        $ids = array_map('trim', $ids);
+        $this->wiki = $services->get(Wiki::class);
+
+        // reset not used values
+        $this->label = null;
+        $this->size = null;
+        $this->maxChars = null;
+        
+        $this->ids = $values[self::FIELD_IDS];
+        $this->ids = explode(',', $this->ids);
+        $this->ids = array_map('trim', $this->ids);
         // if empty, we use default values
-        if (count($ids) == 1 && empty($ids[0])) {
-            $ids = ['top-gratitude', 'j-aime', 'j-ai-appris', 'pas-compris', 'pas-d-accord', 'idee-noire'];
+        if (count($this->ids) == 1 && empty($this->ids[0])) {
+            $this->ids = self::DEFAULT_REACTIONS;
         }
-        $titles = explode(',', $tableau_template[3]);
-        $titles = array_map('trim', $titles);
-        $images = explode(',', $tableau_template[4]);
-        $images = array_map('trim', $images);
+
+        $this->titles = $values[self::FIELD_TITLES];
+        $this->titles = explode(',', $this->titles);
+        $this->titles = array_map('trim', $this->titles);
+
+        $this->images = $values[self::FIELD_IMAGES];
+        $this->images = explode(',', $this->images);
+        $this->images = array_map('trim', $this->images);
         // TODO : check realpath for security
         // $images = array_map('realpath', $images);
+
+        // load the lms lib
+        require_once LMS_PATH . 'libs/lms.lib.php';
+    }
+
+    protected function getAllReactions($pageTag, $ids, $user)
+    {
+        return getAllReactions($pageTag, $ids, $user);
+    }
+
+    // Render the show view of the field
+    protected function renderStatic($entry)
+    {
+        // the tag of the current entry
+        $currentEntryTag = $this->getCurrentTag($entry);
+
+        if (is_null($currentEntryTag) || empty($entry['listeListeOuinonLmsbf_reactions']) || $entry['listeListeOuinonLmsbf_reactions'] != "oui") {
+            return null ;
+        }
         $outputreactions = '';
         // get reactions numbers for templating later
-        $r = getAllReactions($fiche['id_fiche'], $ids, $GLOBALS['wiki']->getUsername());
+        $r = $this->getAllReactions($entry['id_fiche'], $this->ids, $this->wiki->getUsername());
 
-        foreach ($ids as $k => $id) {
-            if (empty($titles[$k])) { // if ids are default ones, we have some titles
+        foreach ($this->ids as $k => $id) {
+            if (empty($htis->titles[$k])) { // if ids are default ones, we have some titles
                 switch ($id) {
                     case 'j-ai-appris':
                         $title = "J'ai appris quelque chose";
@@ -87,9 +100,9 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
                         break;
                 }
             } else {
-                $title = $titles[$k]; // custom title
+                $title = $this->titles[$k]; // custom title
             }
-            if (empty($images[$k])) { // if ids are default ones, we have some images
+            if (empty($this->images[$k])) { // if ids are default ones, we have some images
                 switch ($id) {
                     case 'j-ai-appris':
                     case 'j-aime':
@@ -104,9 +117,9 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
                         break;
                 }
             } else {
-                if (file_exists('files/' . $images[$k])) { // custom image in files folder
-                    $image = 'files/' . $images[$k];
-                } elseif (file_exists(LMS_PATH . 'presentation/images/mikone-' . $images[$k] . '.svg')) {
+                if (file_exists('files/' . $this->images[$k])) { // custom image in files folder
+                    $image = 'files/' . $this->images[$k];
+                } elseif (file_exists(LMS_PATH . 'presentation/images/mikone-' . $this->images[$k] . '.svg')) {
                     $image = LMS_PATH . 'presentation/images/mikone-' . $id . '.svg';
                 } else {
                     $image = false;
@@ -121,11 +134,11 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
                     <div class="reaction-numbers">' . $nbReactions . '</div>';
             }
             $outputreactions .= '<div class="reaction-content">';
-            if ($GLOBALS['wiki']->getUser()) {
+            if ($this->wiki->getUser()) {
                 $extraClass = (!empty($r['userReaction']) && $id == $r['userReaction']) ? ' user-reaction' : '';
                 $params = ['id' => $id] + (!empty($_GET['course']) && $_GET['course'] ? ['course' => $_GET['course']] : [])
                     + (!empty($_GET['module']) && $_GET['module'] ? ['module' => $_GET['module']] : []);
-                $outputreactions .= '<a href="' . $GLOBALS['wiki']->href(
+                $outputreactions .= '<a href="' . $this->wiki->href(
                     'reaction',
                     '',
                     $params
@@ -135,13 +148,13 @@ function reactions(&$formtemplate, $tableau_template, $mode, $fiche)
             }
             $outputreactions .= '</div>';
         }
-        if ($GLOBALS['wiki']->getUser()) {
+        if ($this->wiki->getUser()) {
             $msg = _t('LMS_SHARE_YOUR_REACTION');
         } else {
             $msg = _t('LMS_TO_ALLOW_REACTION') . ', <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">' . _t('LMS_PLEASE_LOGIN') . '</a>';
         }
         $output = '<hr /><div class="reactions-container"><h5>' . $msg . '</h5><div class="reactions-flex">' . $outputreactions . '</div>';
-        if ($GLOBALS['wiki']->getUser()) {
+        if ($this->wiki->getUser()) {
             $output .= '<em>' . _t('LMS_SHARE_YOUR_COMMENT') . '</em>';
         }
         $output .= '</div>' . "\n";

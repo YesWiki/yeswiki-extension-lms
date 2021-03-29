@@ -9,7 +9,7 @@ use YesWiki\Lms\Service\CourseManager;
 /**
  * @Field({"navigationmodule","modulenavigation"})
  */
-class ModuleNavigationField extends LmsNavigationField
+class ModuleNavigationField extends LmsField
 {
     /**
      * Display the different options to navigate into a module according to module field 'Activé' and the navigation of the learner.

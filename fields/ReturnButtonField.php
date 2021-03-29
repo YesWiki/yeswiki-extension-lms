@@ -7,7 +7,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @Field({"boutonretour","returnbutton"})
  */
-class ReturnButtonField extends LmsNavigationField
+class ReturnButtonField extends LmsField
 {
     /**
      * Display the 'Return' button which permit to come back to the calling page (history back). The button is displayed only

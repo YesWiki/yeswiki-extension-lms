@@ -7,7 +7,7 @@ use YesWiki\Bazar\Field\BazarField;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\LearnerManager;
 
-abstract class LmsNavigationField extends BazarField
+abstract class LmsField extends BazarField
 {
     /**
      * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity or module page

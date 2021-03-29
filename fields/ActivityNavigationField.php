@@ -11,7 +11,7 @@ use YesWiki\Lms\Service\DateManager;
 /**
  * @Field({"navigationactivite","activitynavigation"})
  */
-class ActivityNavigationField extends LmsNavigationField
+class ActivityNavigationField extends LmsField
 {
     /**
      * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
