@@ -81,6 +81,9 @@ class LearnerDashboardManager
                     $duration->add($moduleStat['elapsedTime']);
                 }
             }
+            foreach ($course->getExtraActivities() as $extraActivity) {
+                $duration->add($extraActivity->getElapsedTime());
+            }
             $courseDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
 
             $coursesStat[$course->getTag()] = [
@@ -158,6 +161,9 @@ class LearnerDashboardManager
                     if (!empty($activityStat['elapsedTime']) && $activityStat['finished']) {
                         $duration->add($activityStat['elapsedTime']);
                     }
+                }
+                foreach ($module->getExtraActivities() as $extraActivity) {
+                    $duration->add($extraActivity->getElapsedTime());
                 }
                 $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
             }
