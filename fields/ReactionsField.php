@@ -5,6 +5,9 @@ namespace YesWiki\Lms\Field;
 use Psr\Container\ContainerInterface;
 use YesWiki\Wiki;
 
+/**
+ * @Field({"reactions"})
+ */
 class ReactionsField extends LmsField
 {
     protected const FIELD_IDS = 2;
@@ -70,9 +73,11 @@ class ReactionsField extends LmsField
         if (is_null($currentEntryTag) || empty($entry['listeListeOuinonLmsbf_reactions']) || $entry['listeListeOuinonLmsbf_reactions'] != "oui") {
             return null ;
         }
-        $outputreactions = '';
+
         // get reactions numbers for templating later
         $r = $this->getAllReactions($entry['id_fiche'], $this->ids, $this->wiki->getUsername());
+
+        $reactions = [];
 
         foreach ($this->ids as $k => $id) {
             if (empty($htis->titles[$k])) { // if ids are default ones, we have some titles
@@ -125,39 +130,22 @@ class ReactionsField extends LmsField
                     $image = false;
                 }
             }
-            if (!$image) {
-                $reaction = '<div class="alert alert-danger">Image non trouvée...</div>';
-            } else {
+            if ($image) {
                 $nbReactions = $r['reactions'][$id];
-                $reaction = '<img class="reaction-img" alt="icon ' . $id . '" src="' . $image . '" />
-                    <h6 class="reaction-title">' . $title . '</h6>
-                    <div class="reaction-numbers">' . $nbReactions . '</div>';
             }
-            $outputreactions .= '<div class="reaction-content">';
-            if ($this->wiki->getUser()) {
-                $extraClass = (!empty($r['userReaction']) && $id == $r['userReaction']) ? ' user-reaction' : '';
-                $params = ['id' => $id] + (!empty($_GET['course']) && $_GET['course'] ? ['course' => $_GET['course']] : [])
-                    + (!empty($_GET['module']) && $_GET['module'] ? ['module' => $_GET['module']] : []);
-                $outputreactions .= '<a href="' . $this->wiki->href(
-                    'reaction',
-                    '',
-                    $params
-                ) . '" class="add-reaction' . (!empty($extraClass) ? '' . $extraClass : '') . '">' . $reaction . '</a>';
-            } else {
-                $outputreactions .= '<a href="#" onclick="return false;" title="' . _t('LMS_LOGIN_TO_REACT') . '" class="disabled add-reaction">' . $reaction . '</a>';
-            }
-            $outputreactions .= '</div>';
+            $reactions[$id] = [
+                'id' => $id,
+                'nbReactions' => $nbReactions ?? null,
+                'image' => $image ?? null,
+                'title' => $title ?? null,
+            ];
         }
-        if ($this->wiki->getUser()) {
-            $msg = _t('LMS_SHARE_YOUR_REACTION');
-        } else {
-            $msg = _t('LMS_TO_ALLOW_REACTION') . ', <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">' . _t('LMS_PLEASE_LOGIN') . '</a>';
-        }
-        $output = '<hr /><div class="reactions-container"><h5>' . $msg . '</h5><div class="reactions-flex">' . $outputreactions . '</div>';
-        if ($this->wiki->getUser()) {
-            $output .= '<em>' . _t('LMS_SHARE_YOUR_COMMENT') . '</em>';
-        }
-        $output .= '</div>' . "\n";
-        return $output;
+        return $this->render("@lms/fields/reactions.twig", [
+                'connected' => ($this->wiki->getUser()),
+                'course' => $_GET['course'] ?? null,
+                'module' => $_GET['module'] ?? null,
+                'reactions' => $reactions,
+                'userReaction' => $r['userReaction'] ?? null,
+            ]);
     }
 }
