@@ -4,17 +4,14 @@ namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
 use YesWiki\Wiki;
-use YesWiki\Bazar\Field\BazarField;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
-use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\DateManager;
-use YesWiki\Lms\Service\LearnerManager;
 
 /**
  * @Field({"navigationactivite","activitynavigation"})
  */
-class ActivityNavigationField extends BazarField
+class ActivityNavigationField extends LmsNavigationField
 {
     /**
      * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
@@ -26,9 +23,7 @@ class ActivityNavigationField extends BazarField
      */
 
     protected $config;
-    protected $courseController;
     protected $entryManager;
-    protected $learnerManager;
     protected $dateManager;
     protected $wiki;
     protected $moduleModal;
@@ -40,19 +35,11 @@ class ActivityNavigationField extends BazarField
 
         $this->wiki = $services->get(Wiki::class);
         $this->config = $this->wiki->config ;
-        $this->courseController = $services->get(CourseController::class);
         $this->entryManager = $services->get(EntryManager::class);
-        $this->learnerManager = $services->get(LearnerManager::class);
         $this->dateManager = $services->get(DateManager::class);
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($this->label == 'module_modal');
-    }
-
-    protected function getCurrentActivityTag($entry): ?string
-    {
-        // the tag of the current activity page
-        return !empty($entry['id_fiche']) ? $entry['id_fiche'] : null;
     }
 
     // Render the show view of the field
@@ -107,34 +94,5 @@ class ActivityNavigationField extends BazarField
             ]);
         }
         return $output;
-    }
-
-    protected function renderInput($entry)
-    {
-        // No input need to be displayed for this example field
-        return null;
-    }
-
-    // Format input values before save
-    public function formatValuesBeforeSave($entry)
-    {
-        return [] ;
-    }
-
-    
-    protected function getValue($entry)
-    {
-        return null;
-    }
-
-    
-    public function jsonSerialize()
-    {
-        return array_merge(
-            parent::jsonSerialize(),
-            [
-                'moduleModal' => $this->moduleModal
-            ]
-        );
     }
 }
