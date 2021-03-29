@@ -8,6 +8,7 @@ use YesWiki\Core\Service\TripleStore;
 use YesWiki\Wiki;
 use YesWiki\Lms\ExtraActivityLog ;
 use YesWiki\Lms\ExtraActivityLogs ;
+use YesWiki\Lms\Learner ;
 use YesWiki\Lms\Module ;
 use YesWiki\Lms\Course ;
 use YesWiki\Lms\Service\CourseManager;
@@ -227,9 +228,10 @@ class ExtraActivityManager
      * Get the Extra-activities of a courseStructure
      * @param Course @course
      * @param Module @module (optional)
+     * @param Learner @learner (optional)
      * @return ExtraActivityLogs the courseStructure's extraActivities
      */
-    public function getExtraActivities(Course $course, Module $module = null): ExtraActivityLogs
+    public function getExtraActivities(Course $course, Module $module = null, Learner $learner = null): ExtraActivityLogs
     {
         $like = '%"course":"' . $course->getTag() . '"';
         if (!is_null($module)) {
@@ -237,7 +239,7 @@ class ExtraActivityManager
         } else {
             $like .= '}%';
         }
-        return $this->getExtraActivityLogsFromLike($like) ;
+        return $this->getExtraActivityLogsFromLike($like, (!is_null($learner))?$learner->getUsername():'') ;
     }
 
     /**
@@ -258,15 +260,16 @@ class ExtraActivityManager
     /**
      * Get extra-activitylogs from like query
      * @param string $like query to send to TripleStore->getMatching
+     * @param string $learnerName
      * @return ExtraActivityLogs the courseStructure's extraActivities
      */
-    private function getExtraActivityLogsFromLike(string $like):ExtraActivityLogs
+    private function getExtraActivityLogsFromLike(string $like, string $learnerName = ''):ExtraActivityLogs
     {
         $results = $this->tripleStore->getMatching(
-            null,
+            (empty($learnerName) ? null : $learnerName),
             self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
             $like,
-            'LIKE',
+            (empty($learnerName) ? 'LIKE' : '='),
             '=',
             'LIKE'
         );

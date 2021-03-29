@@ -13,6 +13,7 @@ use YesWiki\Lms\Progresses;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
+use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Wiki;
 
 class LearnerDashboardManager
@@ -22,6 +23,7 @@ class LearnerDashboardManager
     protected $courseManager;
     protected $dateManager;
     protected $learnerManager;
+    protected $extraActivityManager;
 
     /**
      * LearnerDashboardManager constructor
@@ -30,19 +32,22 @@ class LearnerDashboardManager
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param LearnerManager $learnerManager the injected LearnerManager instance
      * @param DateManager $dateManager the injected DateManager instance
+     * @param ExtraActivityManager $extraActivityManager the injected ExtraActivityManager instance
      */
     public function __construct(
         Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
         LearnerManager $learnerManager,
-        DateManager $dateManager
+        DateManager $dateManager,
+        ExtraActivityManager $extraActivityManager
     ) {
         $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
         $this->learnerManager = $learnerManager;
         $this->dateManager = $dateManager;
+        $this->extraActivityManager = $extraActivityManager;
     }
 
     /**
@@ -60,6 +65,10 @@ class LearnerDashboardManager
     {
         $coursesStat = [];
         foreach ($courses as $course) {
+            // extra activity part
+            if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+                $course->setExtraActivities($this->extraActivityManager->getExtraActivities($course, null, $learner));
+            }
             $modulesStat = $this->processModulesStat($course, $learner);
 
             $started = !empty(array_filter($modulesStat, function ($moduleStat) {
@@ -116,6 +125,10 @@ class LearnerDashboardManager
         $progresses = $this->learnerManager->getAllProgressesForLearner($learner);
 
         foreach ($modules as $module) {
+            // extra activity part
+            if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+                $module->setExtraActivities($this->extraActivityManager->getExtraActivities($course, $module, $learner));
+            }
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);
             // get progress
             $progress = $progresses->getProgressForActivityOrModuleForLearner(

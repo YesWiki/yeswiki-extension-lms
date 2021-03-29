@@ -132,7 +132,8 @@ class ExtraActivityController extends YesWikiController
                 } elseif ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'], $this->arguments['learner'])) {
                     $this->wiki->Redirect($this->wiki->Href(null, null, [
                         'course' => $this->arguments['course'],
-                        'module' => $this->arguments['module']
+                        'module' => $this->arguments['module'],
+                        'learner' => $this->arguments['learner']
                     ], false));
                 } else {
                     return $this->render(

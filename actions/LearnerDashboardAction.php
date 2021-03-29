@@ -2,6 +2,7 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiAction;
+use YesWiki\Lms\Controller\ExtraActivityController;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\LearnerManager;
@@ -43,6 +44,16 @@ class LearnerDashboardAction extends YesWikiAction
                 'message' => _t('LOGGED_USERS_ONLY_ACTION') . ' (learnerdashboard)'
             ]);
         }
+        
+        /* * Manage extra activity * */
+        $this->extraActivityController = $this->getService(ExtraActivityController::class);
+        $this->extraActivityController->setArguments($this->arguments);
+        $result = $this->extraActivityController->run([$this->learner]);
+        if (!empty($result)) {
+            return $result ;
+        };
+        /* *************************** */
+
         if ($this->wiki->UserIsAdmin()
             && (empty($this->wiki->GetParameter('selectuser')) || $this->wiki->GetParameter('selectuser') == 'true')
             && empty($learnerNameOption)
@@ -83,7 +94,9 @@ class LearnerDashboardAction extends YesWikiAction
             'courses' => $courses,
             'coursesStat' => $coursesStat,
             'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time'],
-            'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time']
+            'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time'],
+            'user_is_admin' => $this->wiki->UserIsAdmin(),
+            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
         ]);
     }
 
