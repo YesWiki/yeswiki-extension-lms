@@ -20,37 +20,6 @@ use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
 /**
- * Display the 'Return' button which permit to come back to the calling page (history back). The button is displayed only
- * in 'view' mode and if the entry is not opened from a modal.
- * Must be declare in the bazar form definition as followed :
- *    'boutonretour*** *** *** *** *** *** *** *** *** ***'
- *
- * cf. formulaire.fonct.inc.php of the bazar extension to see the other field definitions
- *
- * @param array $formtemplate
- * @param array $tableau_template The bazar field definition inside the form definition
- * @param string $mode Action type for the form : 'saisie', 'requete', 'html', ...
- * @param array $fiche The entry which is displayed or modified
- * @return string Return the generated html to include
- */
-function boutonretour(&$formtemplate, $tableau_template, $mode, $fiche)
-{
-    // the tag of the current entry
-    $currentEntryTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : '';
-
-    if ($mode == 'html' && $currentEntryTag) {
-        // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
-        $entryModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-
-        // display the button if it's not inside a modal box
-        if (!$entryModal) {
-            return '<div class="BAZ_boutonretour" style="margin-top: 30px;"><a class="btn btn-xs btn-secondary-1" href="javascript:history.back()">'
-                . '<i class="fas fa-arrow-left"></i>&nbsp;' . _t('LMS_RETURN_BUTTON') . '</a></div>';
-        }
-    }
-}
-
-/**
  * Display the possible reactions to comment an activity.
  * Must be declare in the bazar form definition as followed :
  *    'reactions***idreaction1,idreaction2,idreaction3***titlereaction1,titlereaction2,titlereaction3***image1,image2,image3*** *** *** *** *** *** ***'
