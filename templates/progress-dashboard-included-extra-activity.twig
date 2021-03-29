@@ -29,9 +29,11 @@
         <div class="estimated-time">
             <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
                 <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>
-                {{ displayTime(extraActivity.duration) }}
+                {{ displayTime(extraActivity.elapsedTime) }}
             </span>
         </div>
+        {% set dateTime = extraActivity.date %}
+        {{ include('@lms/learner-dashboard-date.twig') }}
     </div>
     <div id="collapse_{{ extraActivity.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ extraActivity.tag }}" aria-expanded="false">
