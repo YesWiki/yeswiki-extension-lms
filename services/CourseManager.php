@@ -3,7 +3,6 @@
 namespace YesWiki\Lms\Service;
 
 use YesWiki\Bazar\Service\EntryManager;
-use YesWiki\Core\Service\TripleStore;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiService;
 use YesWiki\Lms\Activity;
@@ -16,6 +15,7 @@ class CourseManager
     protected $config;
     protected $entryManager;
     protected $userManager;
+    protected $dateManager;
     protected $activityFormId;
     protected $moduleFormId;
     protected $courseFormId;
@@ -25,17 +25,18 @@ class CourseManager
      * @param Wiki $wiki the injected Wiki instance
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param UserManager $userManager the injected UserManager instance
-     * @param TripleStore $tripleStore the injected TripleStore instance
+     * @param DateManager $dateManager the injected UserManager instance
      */
     public function __construct(
         Wiki $wiki,
         EntryManager $entryManager,
         UserManager $userManager,
-        TripleStore $tripleStore
+        DateManager $dateManager
     ) {
         $this->config = $wiki->config;
         $this->entryManager = $entryManager;
         $this->userManager = $userManager;
+        $this->dateManager = $dateManager;
         $this->activityFormId = $this->config['lms_config']['activity_form_id'];
         $this->moduleFormId = $this->config['lms_config']['module_form_id'];
         $this->courseFormId = $this->config['lms_config']['course_form_id'];
@@ -51,7 +52,7 @@ class CourseManager
     {
         $activityEntry = $this->entryManager->getOne($entryTag);
         if ($activityEntry && intval($activityEntry['id_typeannonce']) == $this->activityFormId) {
-            return new Activity($this->config, $this->entryManager, $activityEntry['id_fiche'], $activityEntry);
+            return new Activity($this->config, $this->entryManager, $this->dateManager, $activityEntry['id_fiche'], $activityEntry);
         } else {
             return null;
         }
@@ -67,7 +68,7 @@ class CourseManager
     {
         $moduleEntry = $this->entryManager->getOne($entryTag);
         if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $this->moduleFormId) {
-            return new Module($this->config, $this->entryManager, $moduleEntry['id_fiche'], $moduleEntry);
+            return new Module($this->config, $this->entryManager, $this->dateManager, $moduleEntry['id_fiche'], $moduleEntry);
         } else {
             return null;
         }
@@ -83,7 +84,7 @@ class CourseManager
     {
         $courseEntry = $this->entryManager->getOne($entryTag);
         if ($courseEntry && intval($courseEntry['id_typeannonce']) == $this->courseFormId) {
-            return new Course($this->config, $this->entryManager, $courseEntry['id_fiche'], $courseEntry);
+            return new Course($this->config, $this->entryManager, $this->dateManager, $courseEntry['id_fiche'], $courseEntry);
         } else {
             return null;
         }
@@ -101,7 +102,7 @@ class CourseManager
             [] :
             array_map(
                 function ($courseEntry) {
-                    return new Course($this->config, $this->entryManager, $courseEntry['id_fiche'], $courseEntry);
+                    return new Course($this->config, $this->entryManager, $this->dateManager, $courseEntry['id_fiche'], $courseEntry);
                 },
                 $entries
             );

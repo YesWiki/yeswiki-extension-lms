@@ -100,7 +100,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                 $progressRatio,
                 $elapsedTime /* TODO elapsedTime */,
                 $courseStat['firstAccessDate'] ?
-                    $this->dateManager->formatDateWithWrittenMonth($courseStat['firstAccessDate'])
+                    $this->dateManager->formatLongDatetime($courseStat['firstAccessDate'])
                     : null
             ];
             fputcsv($output, $row);
@@ -125,7 +125,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                     $progressRatio,
                     $elapsedTime,
                     $moduleStat['firstAccessDate'] ?
-                        $this->dateManager->formatDateWithWrittenMonth($moduleStat['firstAccessDate'])
+                        $this->dateManager->formatLongDatetime($moduleStat['firstAccessDate'])
                         : null
                 ];
                 fputcsv($output, $row);
@@ -148,7 +148,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                         $progressRatio,
                         $elapsedTime,
                         $activityStat['firstAccessDate'] ?
-                            $this->dateManager->formatDateWithWrittenMonth($activityStat['firstAccessDate'])
+                            $this->dateManager->formatLongDatetime($activityStat['firstAccessDate'])
                             : null
                     ];
                     fputcsv($output, $row);

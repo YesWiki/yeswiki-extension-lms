@@ -15,6 +15,7 @@ use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
@@ -43,6 +44,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
     $courseController = $GLOBALS['wiki']->services->get(CourseController::class);
     $entryManager = $GLOBALS['wiki']->services->get(EntryManager::class);
     $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
+    $dateManager = $GLOBALS['wiki']->services->get(DateManager::class);
 
     // the tag of the current activity page
     $currentActivityTag = !empty($fiche['id_fiche']) ? $fiche['id_fiche'] : null;
@@ -50,7 +52,7 @@ function navigationactivite(&$formtemplate, $tableau_template, $mode, $fiche)
     $output = '';
     if ($mode == 'html' && $currentActivityTag) {
         // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
-        $activity = new Activity($config, $entryManager, $currentActivityTag);
+        $activity = new Activity($config, $entryManager, $dateManager, $currentActivityTag);
 
         // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the parent tab activity
         $activity = $courseController->getParentTabActivity($activity);

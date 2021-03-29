@@ -4,15 +4,18 @@
 namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
 use Exception;
 use YesWiki\Wiki;
 
 class DateManager
 {
-    protected const DATE_FORMAT = 'Y-m-d H:i:s';
     protected const TIME_FORMAT_WITH_COLONS = '%H:%I:%S';
     protected const TIME_FORMAT_WITH_COLONS_FOR_IMPORT = 'H:i:s';
+    protected const DATETIME_FORMAT = 'Y-m-d H:i:s';
+    protected const LONG_DATE_ISOFORMAT = 'LL';
+    protected const LONG_DATETIME_ISOFORMAT = 'LLLL';
     protected $config;
 
     /**
@@ -24,9 +27,25 @@ class DateManager
         $this->config = $wiki->config;
     }
 
-    public function createDateFromString(string $dateStr): ?Carbon
+    public function createIntervalFromMinutes(int $minutes): CarbonInterval
     {
-        $date = Carbon::createFromFormat(self::DATE_FORMAT, $dateStr);
+        return CarbonInterval::minutes($minutes)->cascade();
+    }
+
+    public function createIntervalFromString(string $durationString): ?CarbonInterval
+    {
+        try {
+            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT,
+                $durationString)->cascade();
+        } catch (Exception $e) {
+            //error_log("Error by parsing the interval. The format '00:00:00' is expected but '$durationString' is given");
+            return null;
+        }
+    }
+
+    public function createDatetimeFromString(string $dateStr): ?Carbon
+    {
+        $date = Carbon::createFromFormat(self::DATETIME_FORMAT, $dateStr);
         // TODO manage the timezone
         if (!$date) {
             //error_log("Error by parsing the date. The format 'Y-m-d H:i:s' is expected but '$dateStr' is given");
@@ -36,36 +55,40 @@ class DateManager
         return $date;
     }
 
-    public function createIntervalFromMinutes(int $minutes): CarbonInterval
-    {
-        return CarbonInterval::minutes($minutes)->cascade();
-    }
-
-    public function createIntervalFromString(string $durationString): ?CarbonInterval
-    {
-        try {
-            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT, $durationString)->cascade();
-        } catch (Exception $e) {
-            //error_log("Error by parsing the interval. The format '00:00:00' is expected but '$durationString' is given");
-            return null;
-        }
-    }
-
     public function formatTimeWithColons(CarbonInterval $duration): string
     {
-        return $duration->format(self::TIME_FORMAT_WITH_COLONS);
+        // create new CarbonInterval to set total hours without cascade
+        // difference between 2021-01-01 00:00:00 and 2021-01-02 01:05:00 should give 25:05:00
+        // whereas $duration->format(self::TIME_FORMAT_WITH_COLONS) gives 01:05:00
+        return CarbonInterval::hours($duration->totalHours)
+            ->minutes($duration->minutes)
+            ->seconds($duration->seconds)
+            ->format(self::TIME_FORMAT_WITH_COLONS);
     }
 
-    public function formatDateWithWrittenMonth(Carbon $date): string
+    public function formatDatetime(Carbon $date): string
     {
-        return $date->locale($GLOBALS['prefered_language'])->isoFormat('LLLL');
+        return $date->locale($GLOBALS['prefered_language'])->format(self::DATETIME_FORMAT);
     }
 
-    public function formatDateToString(Carbon $date = null): string
+    public function formatLongDate(Carbon $date): string
     {
-        if (is_null($date)) {
-            $date = Carbon::now();
-        }
-        return $date->locale($GLOBALS['prefered_language'])->format(self::DATE_FORMAT);
+        return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATE_ISOFORMAT);
+    }
+
+    public function formatLongDatetime(Carbon $date): string
+    {
+        return $date->locale($GLOBALS['prefered_language'])->isoFormat(self::LONG_DATETIME_ISOFORMAT);
+    }
+
+    public function diffToNowInReadableFormat(Carbon $date): string
+    {
+        $this->diffDatesInReadableFormat($date, Carbon::now());
+    }
+
+    public function diffDatesInReadableFormat(Carbon $fromDate, Carbon $toDate): string
+    {
+        return $toDate->locale($GLOBALS['prefered_language'])->DiffForHumans($fromDate,
+            CarbonInterface::DIFF_ABSOLUTE);
     }
 }

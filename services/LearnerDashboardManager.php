@@ -21,26 +21,28 @@ class LearnerDashboardManager
     protected $userManager;
     protected $courseManager;
     protected $dateManager;
+    protected $learnerManager;
 
     /**
      * LearnerDashboardManager constructor
      * @param Wiki $wiki the injected Wiki instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param LearnerManager $learnerManager the injected LearnerManager instance
      * @param DateManager $dateManager the injected DateManager instance
      */
     public function __construct(
         Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
-        DateManager $dateManager,
-        LearnerManager $learnerManager
+        LearnerManager $learnerManager,
+        DateManager $dateManager
     ) {
         $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
-        $this->dateManager = $dateManager;
         $this->learnerManager = $learnerManager;
+        $this->dateManager = $dateManager;
     }
 
     /**
@@ -85,8 +87,8 @@ class LearnerDashboardManager
                 "started" => $started, // bool
                 "finished" => $finished, //bool
                 "progressRatio" => $progressRatio, // int between 0 and 100 in pourcent
-                "elapsedTime" => $courseDuration, // CarbonInterval object,
-                "firstAccessDate" => $this->findFirstAccessDate($modulesStat), // Carbon object,
+                "elapsedTime" => $courseDuration, // CarbonInterval object
+                "firstAccessDate" => $this->findFirstAccessDate($modulesStat), // Carbon object
                 "modulesStat" => $modulesStat
             ];
         }
@@ -139,7 +141,7 @@ class LearnerDashboardManager
 
             // the first access date displayed is the earliest log_time between the module and all its activities
             $firstAccessDate = !empty($progress['log_time']) ?
-                $this->dateManager->createDateFromString($progress['log_time'])
+                $this->dateManager->createDatetimeFromString($progress['log_time'])
                 : null;
             $firstActivityAccessDate = $this->findFirstAccessDate($activitiesStat);
             if (($firstActivityAccessDate && $firstActivityAccessDate->lessThan($firstAccessDate))
@@ -209,11 +211,11 @@ class LearnerDashboardManager
                     $this->dateManager->createIntervalFromString($progress['elapsed_time'])
                     : null;
             } else {
-                $activityDuration = $this->dateManager->createIntervalFromMinutes($activity->getDuration());
+                $activityDuration = $activity->getDuration();
             }
 
             $firstAccessDate = !empty($progress['log_time']) ?
-                $this->dateManager->createDateFromString($progress['log_time'])
+                $this->dateManager->createDatetimeFromString($progress['log_time'])
                 : null;
 
             $activitiesStat[$activity->getTag()] = [
