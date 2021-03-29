@@ -3,6 +3,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TripleStore;
@@ -190,7 +191,7 @@ class LearnerManager
             + ($activity ?
                 ['activity' => $activity->getTag()]
                 : [])
-            + ['log_time' => $this->dateManager->formatDatetime()];
+            + ['log_time' => $this->dateManager->formatDatetime(Carbon::now())];
         $resultState = $this->tripleStore->create(
             $learner->getUsername(),
             self::LMS_TRIPLE_PROPERTY_NAME_PROGRESS,
