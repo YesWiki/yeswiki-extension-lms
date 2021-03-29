@@ -1,0 +1,43 @@
+{# display the status #}
+<small class="module-status"><em>{{ statusMsg }}</em></small>
+<nav aria-label="navigation" {{ field.name ? 'data-id="' ~ field.name ~ '"' : ''}}>
+  <div class="module-launch">
+    <a class="btn btn-primary btn-block launch-module {{ disabledLink ? 'disabled' : '' }}"
+      {% if not disabledLink %} href="{{ url({tag:module.firstActivityTag,params:{course:course.tag,module:module.tag}}) }}"{% endif %}}>
+      <i class="fas fa-play fa-fw"></i>{{ labelStart }}
+    </a>
+  </div>
+  {# we show the previous and next module's buttons only if it's in a modal #}
+  {% if field.moduleModal %}
+    <ul class="pager pager-lms">
+      {# display the module next button #}
+      {% if currentModuleTag != course.lastModuleTag %}
+        {# if not the last module of the course, a link to the next module is displayed #}
+        {% if nextModule %}
+          <li class="next square" title="{{ _t('LMS_MODULE_NEXT') }}">
+            <a href="{{ url({tag:nextModule.tag,params:{course:course.tag}}) }}"
+              aria-label="{{ _t('LMS_NEXT') }}"
+              {{- field.moduleModal ? ' class="bazar-entry modalbox"' : '' -}}
+              >
+              <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </a>
+          </li>
+        {% endif %}
+      {% endif %}
+      {# display the module previous button #}
+      {% if currentModuleTag != course.firstModuleTag %}
+        {# if not the first module of the course, a link to the previous module is displayed #}
+        {% if previousModule %}
+          <li class="next square" title="{{ _t('LMS_MODULE_PREVIOUS') }} ">
+            <a href="{{ url({tag:previousModule.tag,params:{course:course.tag}})}}"
+              aria-label="{{ _t('LMS_PREVIOUS') }}"
+              {{- field.moduleModal ? ' class="bazar-entry modalbox"' : '' -}}
+              >
+              <i class="fa fa-caret-left" aria-hidden="true"></i>
+            </a>
+          </li>
+        {% endif %}
+      {% endif %}
+    </ul>
+  {% endif %}
+</nav>

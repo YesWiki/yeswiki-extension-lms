@@ -25,16 +25,13 @@ class ActivityNavigationField extends LmsNavigationField
     protected $config;
     protected $entryManager;
     protected $dateManager;
-    protected $wiki;
     protected $moduleModal;
 
     public function __construct(array $values, ContainerInterface $services)
     {
         parent::__construct($values, $services);
-        // $this->propertyName = null ;
-
-        $this->wiki = $services->get(Wiki::class);
-        $this->config = $this->wiki->config ;
+        
+        $this->config = $services->get(Wiki::class)->config ;
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         
@@ -45,7 +42,7 @@ class ActivityNavigationField extends LmsNavigationField
     // Render the show view of the field
     protected function renderStatic($entry)
     {
-        $currentActivityTag = $this->getCurrentActivityTag($entry);
+        $currentActivityTag = $this->getCurrentTag($entry);
         if (is_null($currentActivityTag)) {
             return null;
         }

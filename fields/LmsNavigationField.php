@@ -26,7 +26,7 @@ abstract class LmsNavigationField extends BazarField
         $this->moduleModal = null;
     }
 
-    protected function getCurrentActivityTag($entry): ?string
+    protected function getCurrentTag($entry): ?string
     {
         // the tag of the current activity page
         return !empty($entry['id_fiche']) ? $entry['id_fiche'] : null;
