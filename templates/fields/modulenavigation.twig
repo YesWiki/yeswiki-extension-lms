@@ -17,8 +17,8 @@
           <li class="next square" title="{{ _t('LMS_MODULE_NEXT') }}">
             <a href="{{ url({tag:nextModule.tag,params:{course:course.tag}}) }}"
               aria-label="{{ _t('LMS_NEXT') }}"
-              {{- field.moduleModal ? ' class="bazar-entry modalbox"' : '' -}}
-              >
+              class="bazar-entry modalbox"
+              data-size="modal-lg">
               <i class="fa fa-caret-right" aria-hidden="true"></i>
             </a>
           </li>
@@ -28,11 +28,11 @@
       {% if currentModuleTag != course.firstModuleTag %}
         {# if not the first module of the course, a link to the previous module is displayed #}
         {% if previousModule %}
-          <li class="next square" title="{{ _t('LMS_MODULE_PREVIOUS') }} ">
+          <li class="previous square" title="{{ _t('LMS_MODULE_PREVIOUS') }} ">
             <a href="{{ url({tag:previousModule.tag,params:{course:course.tag}})}}"
               aria-label="{{ _t('LMS_PREVIOUS') }}"
-              {{- field.moduleModal ? ' class="bazar-entry modalbox"' : '' -}}
-              >
+              class="bazar-entry modalbox"
+              data-size="modal-lg">
               <i class="fa fa-caret-left" aria-hidden="true"></i>
             </a>
           </li>

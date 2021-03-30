@@ -50,13 +50,18 @@ abstract class LmsField extends BazarField
         return null;
     }
 
+    public function getModuleModal()
+    {
+        return $this->moduleModal;
+    }
+
     
     public function jsonSerialize()
     {
         return array_merge(
             parent::jsonSerialize(),
             [
-                'moduleModal' => $this->moduleModal
+                'moduleModal' => $this->getModuleModal()
             ]
         );
     }
