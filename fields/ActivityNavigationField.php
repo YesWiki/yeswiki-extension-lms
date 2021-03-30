@@ -13,6 +13,7 @@ use YesWiki\Lms\Service\DateManager;
  */
 class ActivityNavigationField extends LmsField
 {
+    protected const FIELD_MODAL = 2;
     /**
      * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
      * Must be declare in the bazar form definition as followed :
@@ -30,13 +31,16 @@ class ActivityNavigationField extends LmsField
     public function __construct(array $values, ContainerInterface $services)
     {
         parent::__construct($values, $services);
+
+        
+        $this->label = null;
         
         $this->config = $services->get(Wiki::class)->config ;
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         
         // true if the module links are opened in a modal box
-        $this->moduleModal = ($this->label == 'module_modal');
+        $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
     }
 
     // Render the show view of the field
