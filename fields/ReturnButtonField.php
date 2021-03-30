@@ -3,6 +3,7 @@
 namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
+use YesWiki\Lms\Service\CourseManager;
 
 /**
  * @Field({"boutonretour","returnbutton"})
