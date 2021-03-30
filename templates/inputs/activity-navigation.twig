@@ -1,0 +1,109 @@
+{% extends "@bazar/layouts/input.twig" %}
+
+{%- block label -%}            
+    {% if field.required %}<span class="symbole_obligatoire"></span>{% endif %}
+    {% if field.hint %}
+        <img class="tooltip_aide" title="{{ field.hint|raw('html') }}" src="tools/bazar/presentation/images/aide.png" width="16" height="16" alt="image aide" />
+    {% endif %}
+    {{ _t('LMS_ACTIVITY_CONDITIONS') }}         
+{%- endblock -%}
+
+{% set id = entryId ~'_'~ field.propertyName %}
+
+{% block input %}
+  {# Add javascript definition #}
+  {{ include_javascript('tools/lms/libs/activity-navigation.js') }}
+  {# Border #}
+  {# TODO mode to CSS #}
+  <style>
+    .activity-navigation-border {
+      border-color:var(--secondary-color-2);
+      border-style: solid;
+      border-radius: 0.5rem;
+      border-width: 0.2rem;
+      padding: 15px 5px 5px 5px;
+    }
+    .activity-navigation-condition-container{
+      margin:5px;
+      border-color:var(--primary-color);
+      border-style: solid;
+      border-radius: 0.3rem;
+      border-width: 0.15rem;
+      padding: 3px;
+      display:flex;
+      flex-wrap: none;
+      align-items: center;
+    }
+    .activity-navigation-btn{
+      flex-grow: 0;
+    }
+    .activity-navigation-condition-content{
+      flex-grow: 10;
+    }
+    .activity-navigation-header {
+      display:flex;
+      flex-wrap: none;
+      align-items: center;
+    }
+    .activity-navigation-header-select{
+      flex-grow: 10;
+      width: initial;
+      margin-right: 10px;
+    }
+  </style>
+  <div class="activity-navigation-border">
+    {# Add select #}
+    <div class="activity-navigation-header">
+      <select
+        id="{{ id }}_select"
+        name="{{ id }}_select{% if field.maxChars and field.maxChars > 1 %}[]{% endif %}"
+        class="form-control activity-navigation-header-select"
+        {% if field.maxChars and field.maxChars > 1 %}multiple="multiple" size="{{ field.maxChars }}"{% endif %}
+        {% if field.required %}required{% endif %}>
+        {% if false %}
+            <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
+        {% else %}{# To be able to unselect we need an empty option#}
+            <option value=''></option>
+        {% endif %}
+        {% for key, option in options %}
+            <option value={{ key }} {% if value == key %}selected{% endif %}>{{ option|raw }}</option>
+        {% endfor %}
+      </select>
+      {# Add button #}
+      <button id="{{ id }}_add_button"
+          onclick="activity_navigation_add_button(this)"
+          type="button"
+          class="btn btn-success btn-icon activity-navigation-btn"
+          data-id="{{ id }}">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+    <div class="clearfix"></div>
+    <div id="{{ id }}_container">
+    </div>
+  </div>
+  <input type="hidden" name="{{ field.propertyName }}[new_values]" value="1" disabled>
+  {# Templates for javascript #}
+  <div id="{{ id }}_reaction_needed_template_container" style="display:none;" class="activity-navigation-condition-container">
+    <div class="activity-navigation-condition-content">
+      <input type="hidden" name="{{ field.propertyName }}[reaction_needed]" value="1" disabled>
+      Réaction donnée
+    </div>
+  </div>
+  <div id="{{ id }}_quizz_done_template_container" style="display:none;" class="activity-navigation-condition-container">
+    <div class="activity-navigation-condition-content">
+      <input type="hidden" name="{{ field.propertyName }}[quizz_done]" value="1" disabled>
+      Exemple de condition pour les quizz
+    </div>
+  </div>
+  <button id="{{ id }}_remove_button_template"
+      onclick="activity_navigation_remove_condition(this)"
+      type="button"
+      class="btn btn-danger btn-icon activity-navigation-btn" style="display:none;">
+    <i class="fas fa-times"></i>
+  </button>
+  {# Variable definition for javascripts and start definition #}
+  <script defer>
+    var {{ id }}_data = [];
+  </script>
+{% endblock %}

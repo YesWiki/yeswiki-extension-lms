@@ -118,4 +118,13 @@ class ActivityNavigationField extends LmsField
         }
         return $output;
     }
+
+    protected function renderInput($entry)
+    {
+        return $this->render("@lms/inputs/activity-navigation.twig", [
+            'value' => $this->getValue($entry),
+            'entryId' => $entry['id_fiche'] ?? 'new',
+            'options' => ['reaction_needed' => 'Réaction donnée','quizz_done' => 'Quizz fait']
+        ]);
+    }
 }

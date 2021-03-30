@@ -57,6 +57,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
+        'LMS_ACTIVITY_CONDITIONS' => 'Conditions de passage',
 
         // For Learner Dashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
