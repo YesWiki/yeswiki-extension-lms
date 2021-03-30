@@ -36,12 +36,14 @@
                 {% else %}
                     ----
                 {% endif %}
-                <a class="btn btn-xs btn-default no-collapsable"
-                   href="{{ url({tag:'',
-                                 handler:'UpdateElapsedTime',
-                                 params:{learner: learner.username, course: course.tag, module: module.tag, previousparams: previousparamskeys}}) }}"
-                   title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}">
-                <i class="fa fa-edit"></i></a>
+                {% if modulesStat[module.tag].finished %}
+                    <a class="btn btn-xs btn-default no-collapsable"
+                    href="{{ url({tag:'',
+                                    handler:'UpdateElapsedTime',
+                                    params:{learner: learner.username, course: course.tag, module: module.tag, previousparams: previousparamskeys}}) }}"
+                    title="{{ _t('LMS_UPDATE_ELAPSED_TIME_UPDATE') }}">
+                    <i class="fa fa-edit"></i></a>
+                {% endif %}
             </span> 
             </div>
         {% endif %}

@@ -77,7 +77,7 @@ class LearnerDashboardManager
 
             $duration = CarbonInterval::minutes(0);
             foreach ($modulesStat as $moduleStat) {
-                if (isset($moduleStat['elapsedTime']) && $moduleStat['finished']) {
+                if (isset($moduleStat['elapsedTime'])) {
                     $duration->add($moduleStat['elapsedTime']);
                 }
             }
