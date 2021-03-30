@@ -8,7 +8,6 @@
         'maxChars':'256',
         'required':true,
         'type':'text',
-        'hint':  _t('LMS_EXTRA_ACTIVITY_TITLE')  ,
         'label':  _t('LMS_EXTRA_ACTIVITY_TITLE')
         },
         'value':extraActivity.title}) }}
@@ -17,7 +16,6 @@
         'maxChars':'256',
         'required':false,        
         'type':'url',
-        'hint':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')  ,
         'label':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')
         },
         'value':extraActivity.relatedLink}) }}
@@ -25,7 +23,6 @@
     {{ include('@bazar/inputs/date.twig', {'field': {
             'name':'bf_date_debut_evenement',
             'required':true,
-            'hint':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE')
             },        
         'day': (extraActivity ? extraActivity.date:date())|date("Y-m-d"),
@@ -36,7 +33,6 @@
     {{ include('@bazar/inputs/date.twig', {'field': {
             'name':'bf_date_fin_evenement',
             'required':true,
-            'hint':  _t('LMS_EXTRA_ACTIVITY_END_DATE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
             },        
         'day': (extraActivity ? extraActivity.endDate:date())|date("Y-m-d"),
@@ -55,7 +51,6 @@
             'name':'module',
             'propertyName':'module',
             'required':false,
-            'hint':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')
             },        
         'value': module,
@@ -65,7 +60,6 @@
             'name':'registeredLearnerNames',
             'propertyName':'registeredLearnerNames',
             'required':false,
-            'hint':  _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')  ,
             'label':  _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
             },        
         'value': module,
