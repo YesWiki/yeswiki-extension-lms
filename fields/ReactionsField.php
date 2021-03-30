@@ -3,12 +3,13 @@
 namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
+use YesWiki\Bazar\Field\BazarField;
 use YesWiki\Wiki;
 
 /**
  * @Field({"reactions"})
  */
-class ReactionsField extends LmsField
+class ReactionsField extends BazarField
 {
     protected const FIELD_IDS = 2;
     protected const FIELD_TITLES = 3;
@@ -18,6 +19,8 @@ class ReactionsField extends LmsField
     protected $ids;
     protected $titles;
     protected $images;
+
+    protected $linkedFieldName ;
 
     /*
      * Display the possible reactions to comment an activity.
@@ -31,6 +34,8 @@ class ReactionsField extends LmsField
         parent::__construct($values, $services);
 
         $this->wiki = $services->get(Wiki::class);
+
+        $this->linkedFieldName = 'listeListeOuinonLmsbf_reactions';
 
         // reset not used values
         $this->label = null;
@@ -48,6 +53,33 @@ class ReactionsField extends LmsField
         $this->titles = $values[self::FIELD_TITLES];
         $this->titles = explode(',', $this->titles);
         $this->titles = array_map('trim', $this->titles);
+        foreach ($this->ids as $k => $id) {
+            if (empty($this->titles[$k])) { // if ids are default ones, we have some titles
+                switch ($id) {
+                    case 'j-ai-appris':
+                        $this->titles[$k] = "J'ai appris quelque chose";
+                        break;
+                    case 'j-aime':
+                        $this->titles[$k] = "J'aime";
+                        break;
+                    case 'idee-noire':
+                        $this->titles[$k] = "Ca me perturbe";
+                        break;
+                    case 'pas-compris':
+                        $this->titles[$k] = "J'ai pas compris";
+                        break;
+                    case 'pas-d-accord':
+                        $this->titles[$k] = "Je ne suis pas d'accord";
+                        break;
+                    case 'top-gratitude':
+                        $this->titles[$k] = "Gratitude";
+                        break;
+                    default:
+                        $this->titles[$k] = $id;  // we show just the id, as it's our only information available
+                        break;
+                }
+            }
+        }
 
         $this->images = $values[self::FIELD_IMAGES];
         $this->images = explode(',', $this->images);
@@ -70,7 +102,7 @@ class ReactionsField extends LmsField
         // the tag of the current entry
         $currentEntryTag = $this->getCurrentTag($entry);
 
-        if (is_null($currentEntryTag) || empty($entry['listeListeOuinonLmsbf_reactions']) || $entry['listeListeOuinonLmsbf_reactions'] != "oui") {
+        if (is_null($currentEntryTag) || empty($entry[$this->linkedFieldName]) || $entry[$this->linkedFieldName] != "oui") {
             return null ;
         }
 
@@ -80,33 +112,6 @@ class ReactionsField extends LmsField
         $reactions = [];
 
         foreach ($this->ids as $k => $id) {
-            if (empty($htis->titles[$k])) { // if ids are default ones, we have some titles
-                switch ($id) {
-                    case 'j-ai-appris':
-                        $title = "J'ai appris quelque chose";
-                        break;
-                    case 'j-aime':
-                        $title = "J'aime";
-                        break;
-                    case 'idee-noire':
-                        $title = "Ca me perturbe";
-                        break;
-                    case 'pas-compris':
-                        $title = "J'ai pas compris";
-                        break;
-                    case 'pas-d-accord':
-                        $title = "Je ne suis pas d'accord";
-                        break;
-                    case 'top-gratitude':
-                        $title = "Gratitude";
-                        break;
-                    default:
-                        $title = $id;  // we show just the id, as it's our only information available
-                        break;
-                }
-            } else {
-                $title = $this->titles[$k]; // custom title
-            }
             if (empty($this->images[$k])) { // if ids are default ones, we have some images
                 switch ($id) {
                     case 'j-ai-appris':
@@ -137,7 +142,7 @@ class ReactionsField extends LmsField
                 'id' => $id,
                 'nbReactions' => $nbReactions ?? null,
                 'image' => $image ?? null,
-                'title' => $title ?? null,
+                'title' => $this->titles[$k] ?? null,
             ];
         }
         return $this->render("@lms/fields/reactions.twig", [
@@ -147,5 +152,40 @@ class ReactionsField extends LmsField
                 'reactions' => $reactions,
                 'userReaction' => $r['userReaction'] ?? null,
             ]);
+    }
+
+    protected function getCurrentTag($entry): ?string
+    {
+        // the tag of the current activity page
+        return !empty($entry['id_fiche']) ? $entry['id_fiche'] : null;
+    }
+
+    protected function renderInput($entry)
+    {
+        // No input need to be displayed for this example field
+        return null;
+    }
+
+    // Format input values before save
+    public function formatValuesBeforeSave($entry)
+    {
+        return [] ;
+    }
+
+    protected function getValue($entry)
+    {
+        return null;
+    }
+
+    public function jsonSerialize()
+    {
+        return array_merge(
+            parent::jsonSerialize(),
+            [
+                'ids' => $this->ids,
+                'titles' => $this->titles,
+                // 'images' => $this->images, because containing file system path
+            ]
+        );
     }
 }
