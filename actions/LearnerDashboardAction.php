@@ -35,7 +35,7 @@ class LearnerDashboardAction extends YesWikiAction
             $learnerNameOption = !empty($_REQUEST['learner']) ? $_REQUEST['learner'] : null;
         }
         // get learner
-        $this->learner = $this->learnerManager->getLearner($learnerNameOption);
+        $this->learner = $this->learnerManager->getLearner($learnerNameOption ?? null);
         if (!$this->learner) {
             // not connected
             return $this->render("@templates/alert-message.twig", [
