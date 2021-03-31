@@ -76,7 +76,11 @@ class LearnerManager
             || !$course->hasModule($module->getTag())) {
             return false;
         }
-        return $this->saveActivityOrModuleProgress($course, $module, $activity);
+        if (!$this->saveActivityOrModuleProgress($course, $module, $activity)) {
+            return false;
+        }
+        // save also for module if needed
+        return $this->saveActivityOrModuleProgress($course, $module, null);
     }
 
     public function saveModuleProgress(Course $course, Module $module): bool
