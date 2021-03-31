@@ -45,9 +45,22 @@ class ImportCoursesCommand extends Command
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('This command allows you to import courses, and related modules and activities from another YesWiki with LMS extension.')
-            ->addArgument('url', InputArgument::REQUIRED, 'URL to another wiki you wish to copy')
-            ->addArgument('token', InputArgument::REQUIRED, 'API token for that wiki, found in `wakka.config.php`')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Will force updating of existing courses, modules and activities')
+            ->addArgument(
+                'url',
+                InputArgument::REQUIRED,
+                'URL to another wiki you wish to copy')
+            ->addArgument(
+                'token',
+                InputArgument::REQUIRED,
+                'API token for that wiki, found in `wakka.config.php`')
+            ->addOption(
+                'force', 'f',
+                InputOption::VALUE_NONE,
+                'Will force updating of existing courses, modules and activities')
+            ->addOption(
+                'course', 'c',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Which courses to import')
         ;
     }
 
@@ -340,6 +353,7 @@ class ImportCoursesCommand extends Command
         $this->remote_url = $input->getArgument('url');
         $this->remote_token = $input->getArgument('token');
         $this->force = $input->getOption('force');
+        $askedCourses = $input->getOption('course');
 
         if (!filter_var($this->remote_url, FILTER_VALIDATE_URL)) {
             $output->writeln('<error>Error : first parameter URL must be a valid url</>');
@@ -408,22 +422,29 @@ class ImportCoursesCommand extends Command
             return Command::FAILURE;
         }
 
-
-        // Letting the user choose which courses he wants
-        $choices = ['all' => 'All the courses (default)'];
-        foreach ($courses as $course_tag => $course) {
-            $choices[$course_tag] = $course['bf_titre'];
+        if (count($askedCourses) == 0) {
+            // Letting the user choose which courses he wants
+            $choices = ['all' => 'All the courses (default)'];
+            foreach ($courses as $course_tag => $course) {
+                $choices[$course_tag] = $course['bf_titre'];
+            }
+    
+            $helper = $this->getHelper('question');
+            $question = new ChoiceQuestion(
+                'Please select the courses that you would like to import',
+                $choices,
+                'all'
+            );
+            $question->setMultiselect(true);
+    
+            $selectedCourses = array_values($helper->ask($input, $output, $question));
+        } else {
+            $choices = ['all'];
+            foreach ($courses as $course_tag => $_) {
+                $choices[] = $course_tag;
+            }
+            $selectedCourses = array_intersect($askedCourses, $choices);
         }
-
-        $helper = $this->getHelper('question');
-        $question = new ChoiceQuestion(
-            'Please select the courses that you would like to import',
-            $choices,
-            'all'
-        );
-        $question->setMultiselect(true);
-
-        $selectedCourses = array_values($helper->ask($input, $output, $question));
 
         if (in_array('all', $selectedCourses)) {
             $selectedCourses = array_keys($courses);
