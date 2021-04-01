@@ -14,6 +14,10 @@ use YesWiki\Lms\Service\CourseManager;
  */
 class ActivityNavigationField extends LmsField
 {
+    protected const LABEL_REACTION_NEEDED = 'reaction_needed';
+    protected const LABEL_QUIZZ_DONE = 'quizz_done';
+    protected const LABEL_NEW_VALUES = 'new_values';
+
     protected const FIELD_MODAL = 2;
     /**
      * Display the 'Précédent', 'Suivant' and 'Fait !' buttons which permits to a learner to navigate in an activity page
@@ -124,7 +128,41 @@ class ActivityNavigationField extends LmsField
         return $this->render("@lms/inputs/activity-navigation.twig", [
             'value' => $this->getValue($entry),
             'entryId' => $entry['id_fiche'] ?? 'new',
-            'options' => ['reaction_needed' => 'Réaction donnée','quizz_done' => 'Quizz fait']
+            'options' => [
+                self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_CONDITION_REACTION_NEEDED'),
+                self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE')
+            ]
         ]);
+    }
+
+    // Format input values before save
+    public function formatValuesBeforeSave($entry)
+    {
+        $value = $this->getValue($entry);
+        $id_select = '';
+        if (isset($value['id'])) {
+            $id_select = $value['id'] . '_select';
+        }
+        if ($this->canEdit($entry) && is_array($value) && isset($value[self::LABEL_NEW_VALUES])) {
+            $data = [];
+            if (isset($value[self::LABEL_REACTION_NEEDED])) {
+                $data[] = ['condition' => self::LABEL_REACTION_NEEDED];
+            }
+            if (isset($value[self::LABEL_QUIZZ_DONE])) {
+                $data[] = ['condition' => self::LABEL_QUIZZ_DONE];
+            }
+            $value = $data ;
+        }
+        return (empty($value) || count($value) == 0)
+            ? ['fields-to-remove' => ([$this->getPropertyName()] +
+                (!empty($id_select)?[$id_select]:[]))]
+            : ([$this->getPropertyName() => $value] +
+                (!empty($id_select) ?['fields-to-remove' => [$id_select]]:[]));
+    }
+
+    protected function getValue($entry)
+    {
+        // TODO see if it is necessary to look for $_REQUEST
+        return $entry[$this->propertyName] ?? $_REQUEST[$this->propertyName] ?? $this->default;
     }
 }

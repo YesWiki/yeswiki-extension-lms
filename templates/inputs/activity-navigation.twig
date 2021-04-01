@@ -13,7 +13,6 @@
 {% block input %}
   {# Add javascript definition #}
   {{ include_javascript('tools/lms/libs/activity-navigation.js') }}
-  {# Border #}
   {# TODO mode to CSS #}
   <style>
     .activity-navigation-border {
@@ -51,6 +50,7 @@
       margin-right: 10px;
     }
   </style>
+  {# Border #}
   <div class="activity-navigation-border">
     {# Add select #}
     <div class="activity-navigation-header">
@@ -60,11 +60,7 @@
         class="form-control activity-navigation-header-select"
         {% if field.maxChars and field.maxChars > 1 %}multiple="multiple" size="{{ field.maxChars }}"{% endif %}
         {% if field.required %}required{% endif %}>
-        {% if false %}
-            <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
-        {% else %}{# To be able to unselect we need an empty option#}
-            <option value=''></option>
-        {% endif %}
+        <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
         {% for key, option in options %}
             <option value={{ key }} {% if value == key %}selected{% endif %}>{{ option|raw }}</option>
         {% endfor %}
@@ -82,18 +78,19 @@
     <div id="{{ id }}_container">
     </div>
   </div>
-  <input type="hidden" name="{{ field.propertyName }}[new_values]" value="1" disabled>
+  <input type="hidden" name="{{ field.propertyName }}[new_values]" value="1">
+  <input type="hidden" name="{{ field.propertyName }}[id]" value="{{ id }}">
   {# Templates for javascript #}
   <div id="{{ id }}_reaction_needed_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
       <input type="hidden" name="{{ field.propertyName }}[reaction_needed]" value="1" disabled>
-      Réaction donnée
+      {{ _t('LMS_ACTIVITY_CONDITION_REACTION_NEEDED') }}
     </div>
   </div>
   <div id="{{ id }}_quizz_done_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
       <input type="hidden" name="{{ field.propertyName }}[quizz_done]" value="1" disabled>
-      Exemple de condition pour les quizz
+      {{ _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE') }}
     </div>
   </div>
   <button id="{{ id }}_remove_button_template"
@@ -103,7 +100,10 @@
     <i class="fas fa-times"></i>
   </button>
   {# Variable definition for javascripts and start definition #}
-  <script defer>
-    var {{ id }}_data = [];
+  <script>
+    if (!activityNavigationInit){
+      var activityNavigationInit = [];
+    }
+    activityNavigationInit['{{ id }}'] = {{ value|json_encode()|raw }};
   </script>
 {% endblock %}

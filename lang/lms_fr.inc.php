@@ -132,5 +132,9 @@ $GLOBALS['translations'] = array_merge(
         'LMS_QUIZ_DELETE_WARNING' => 'Attention! Toutes les données enregistrées seront perdues.. Etes-vous sûrs de vouloir ',
         'LMS_QUIZ_FILTER_ON_THIS_USER' => 'Filtrer les résultats pour cet utilisateur',
         'LMS_QUIZ_FILTER_ON_THIS_QUIZID' => 'Filtrer les résultats pour ce quiz',
+        
+        // activity navigation condition
+        'LMS_ACTIVITY_CONDITION_REACTION_NEEDED' => 'Réaction demandée',
+        'LMS_ACTIVITY_CONDITION_QUIZZ_DONE' => 'Quizz fait',
     )
 );
