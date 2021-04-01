@@ -83,7 +83,7 @@ class DateManager
 
     public function diffToNowInReadableFormat(Carbon $date): string
     {
-        $this->diffDatesInReadableFormat($date, Carbon::now());
+        return $this->diffDatesInReadableFormat($date, Carbon::now());
     }
 
     public function diffDatesInReadableFormat(Carbon $fromDate, Carbon $toDate): string
