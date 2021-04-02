@@ -85,7 +85,7 @@ class ActivityNavigationField extends LmsField
                 $nextActivity = $module->getNextActivity($activity->getTag());
             }
 
-            $output = $this->render("@lms/fields/activitynavigation.twig", [
+            $output = $this->render("@lms/fields/activity-navigation.twig", [
                 'activity' => $activity,
                 'module' => $module,
                 'course' => $course,
@@ -95,5 +95,12 @@ class ActivityNavigationField extends LmsField
             ]);
         }
         return $output;
+    }
+
+    protected function renderInput($entry)
+    {
+        return $this->render("@lms/inputs/activity-navigation.twig", [
+            'value' => $this->getValue($entry)
+        ]);
     }
 }

@@ -72,7 +72,7 @@ class ModuleNavigationField extends LmsField
                 $previousModule = $course->getPreviousModule($currentModuleTag);
             }
 
-            $output = $this->render("@lms/fields/modulenavigation.twig", [
+            $output = $this->render("@lms/fields/module-navigation.twig", [
                 'disabledLink' => $disabledLink,
                 'statusMsg' => $statusMsg,
                 'labelStart' => $labelStart,
