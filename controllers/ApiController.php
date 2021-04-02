@@ -6,6 +6,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\QuizManager;
+use YesWiki\Lms\Service\ActivityConditionsManager;
+use YesWiki\Lms\Service\CourseManager; // TODO to move to ActivityConditionsManager
 
 class ApiController extends YesWikiController
 {
@@ -323,6 +325,22 @@ class ApiController extends YesWikiController
     }
 
     /**
+     * @Route("/api/lms/check-conditions/{course}/{module}/{activity}")
+     */
+    public function checkConditions($course, $module, $activity)
+    {
+        $courseManager = $this->getService(CourseManager::class);
+        return new ApiResponse(
+            $this->getService(ActivityConditionsManager::class)
+                ->checkActivityConditions(
+                    $courseManager->getCourse($course),
+                    $courseManager->getCourse($module),
+                    $courseManager->getCourse($activity),
+                )
+        );
+    }
+
+    /**
      * Display lms api documentation
      *
      * @return string
@@ -382,7 +400,7 @@ class ApiController extends YesWikiController
         $output .= '"><code>';
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></a><br />';
-        $output .= 'Same as previous but for current connected leaner<br />';
+        $output .= 'Same as previous but for current connected learner<br />';
         
         $urlSaveQuizResult = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '<br />The following code :<br />';
@@ -397,7 +415,7 @@ class ApiController extends YesWikiController
         $output .= '<br />POST <b><code>';
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></b><br />';
-        $output .= 'Same as previous but for current connected leaner<br />';
+        $output .= 'Same as previous but for current connected learner<br />';
 
         
         $output .= '<br />The following codes delete quiz\'s results:<br />';
@@ -420,6 +438,14 @@ class ApiController extends YesWikiController
         $output .= $this->wiki->Href('lms/quizresults', 'api');
         $output .= '</code> for all quizzes of all user<br />';
         $output .= '<b>You must sent cookies to be connected as admin.</b><br />';
+
+        $urlCheckConditions = $this->wiki->Href('', 'api/lms/check-conditions/{course}/{module}/{activity}');
+        $output .= '<br />The following code :<br />';
+        $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
+        $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
+        $output .= '<code>['.ActivityConditionsManager::STATUS_LABEL.':true/false,<br />';
+        $output .= ActivityConditionsManager::URL_LABEL.':null|"https://...",<br />';
+        $output .= ActivityConditionsManager::MESSAGE_LABEL.':"html code"]</code><br />';
         return $output;
     }
 }
