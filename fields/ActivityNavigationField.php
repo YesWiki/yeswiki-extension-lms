@@ -33,6 +33,7 @@ class ActivityNavigationField extends LmsField
     protected $dateManager;
     protected $moduleModal;
     protected $courseManager;
+    protected $conditionsActivated;
 
     public function __construct(array $values, ContainerInterface $services)
     {
@@ -48,6 +49,10 @@ class ActivityNavigationField extends LmsField
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
+
+        // activation of conditions
+        $this->conditionsActivated = (isset($this->config['lms_config']['use_activity_conditions']) &&
+            ($this->config['lms_config']['use_activity_conditions'] == true));
     }
 
     // Render the show view of the field
@@ -125,14 +130,15 @@ class ActivityNavigationField extends LmsField
 
     protected function renderInput($entry)
     {
-        return $this->render("@lms/inputs/activity-navigation.twig", [
+        return ($this->conditionsActivated) ?$this->render("@lms/inputs/activity-navigation.twig", [
             'value' => $this->getValue($entry),
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [
                 self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_CONDITION_REACTION_NEEDED'),
                 self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE')
             ]
-        ]);
+        ])
+        : null;
     }
 
     // Format input values before save
