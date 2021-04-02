@@ -1,0 +1,34 @@
+.activity-navigation-border {
+  border-color:var(--secondary-color-2);
+  border-style: solid;
+  border-radius: 0.5rem;
+  border-width: 0.2rem;
+  padding: 15px 5px 5px 5px;
+}
+.activity-navigation-condition-container{
+  margin:5px;
+  border-color:var(--primary-color);
+  border-style: solid;
+  border-radius: 0.3rem;
+  border-width: 0.15rem;
+  padding: 3px;
+  display:flex;
+  flex-wrap: none;
+  align-items: center;
+}
+.activity-navigation-btn{
+  flex-grow: 0;
+}
+.activity-navigation-condition-content{
+  flex-grow: 10;
+}
+.activity-navigation-header {
+  display:flex;
+  flex-wrap: none;
+  align-items: center;
+}
+.activity-navigation-header-select{
+  flex-grow: 10;
+  width: initial;
+  margin-right: 10px;
+}

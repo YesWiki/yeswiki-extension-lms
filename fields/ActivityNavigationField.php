@@ -135,7 +135,7 @@ class ActivityNavigationField extends LmsField
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [
                 self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_CONDITION_REACTION_NEEDED'),
-                self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE')
+                // self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE') //not ready
             ]
         ])
         : null;
@@ -168,7 +168,6 @@ class ActivityNavigationField extends LmsField
 
     protected function getValue($entry)
     {
-        // TODO see if it is necessary to look for $_REQUEST
         return $entry[$this->propertyName] ?? $_REQUEST[$this->propertyName] ?? $this->default;
     }
 }
