@@ -148,6 +148,18 @@
     border: 1px solid var(--primary-color);
 }
 
+/* fix bootstrap */
+.pager .disabled > a, .pager .disabled > a:focus, .pager .disabled > a:hover, .pager .disabled > span {
+    background-color: initial;
+}
+
+/* managing conditions */
+.pager .wait-cursor > a, .pager .wait-cursor > a:focus, .pager .wait-cursor > a:hover, .pager .wait-cursor > span,
+.wait-cursor,
+.wait-cursor:hover {
+    cursor: wait !important;
+}
+
 /**
  * Comments
  ---------------------------*/
