@@ -54,3 +54,8 @@
     {% endif %}
   </ul>
 </nav>
+{% if nextActivity and conditionsActivated and not conditionsPassed %}
+  <script>
+    var checkActivityConditionsURL = '{{ url({tag:'api',handler:'lms/check-conditions/'}) }}';
+  </script>
+{% endif %}
