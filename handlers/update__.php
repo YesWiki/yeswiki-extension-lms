@@ -236,14 +236,6 @@ if (!empty($oldaction)) {
     $output .= '✅ Done !<br />';
 }
 
-
-// add button to return to previous page
-$output .= '<div>
-    <a class="btn btn-sm btn-secondary-1" href="'.$this->Href().'">
-        <i class="fas fa-arrow-left"></i>' . _t('GO_BACK') . '
-    </a>
-</div>';
-
 // add the content before footer
 $plugin_output_new = str_replace(
     '<!-- end handler /update -->',
