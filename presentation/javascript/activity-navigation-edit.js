@@ -64,17 +64,19 @@ function activity_navigation_remove_condition(elem){
 
 function activity_navigation_init(listInit){
 
-    console.log(listInit);
-    listInit.forEach(function (item,index){
-        var id = index;
-        console.log('id :'+id);
-        item.forEach(function (conditionObject){
-            let condition = conditionObject.condition ;
-            if (condition){
-                console.log('add condition :'+contition+' for id:'+id);
-                activity_navigation_add_element(id,condition);
-            }
-        });
+    listInit.forEach(function (item){
+        var id = item.id;
+        let value = item.value;
+        if (value && Array.isArray(value)){
+            value.forEach(function (conditionObject){
+                let condition = conditionObject.condition ;
+                if (condition){
+                    activity_navigation_add_element(id,condition);
+                }
+            });
+        } 
     });
 }
-activity_navigation_init(activityNavigationInit);
+if (activityNavigationInit){
+    activity_navigation_init(activityNavigationInit);
+}
