@@ -8,6 +8,7 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\ActivityConditionsManager;
 
 /**
  * @Field({"navigationactivite","activitynavigation"})
@@ -31,6 +32,7 @@ class ActivityNavigationField extends LmsField
     protected $config;
     protected $entryManager;
     protected $dateManager;
+    protected $activityConditionsManager;
     protected $moduleModal;
     protected $courseManager;
     protected $conditionsActivated;
@@ -46,6 +48,7 @@ class ActivityNavigationField extends LmsField
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         $this->courseManager = $services->get(CourseManager::class);
+        $this->activityConditionsManager = $services->get(ActivityConditionsManager::class);
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
@@ -114,6 +117,13 @@ class ActivityNavigationField extends LmsField
             } else {
                 // otherwise, the current activity is not the last of the module and the next link is set to the next activity
                 $nextActivity = $module->getNextActivity($activity->getTag());
+                if ($this->conditionsActivated) {
+                    // check conditions
+                    $conditions = $this->activityConditionsManager
+                        ->checkActivityConditions($course, $module, $activity, $this->getValue($entry)) ;
+                    $conditionsPassed = $conditions[ActivityConditionsManager::STATUS_LABEL] ?? false;
+                    $conditionsMessage = $conditions[ActivityConditionsManager::MESSAGE_LABEL] ?? null;
+                }
             }
 
             $output = $this->render("@lms/fields/activity-navigation.twig", [
@@ -123,6 +133,9 @@ class ActivityNavigationField extends LmsField
                 'previousActivity' => $previousActivity ?? null,
                 'nextModule' => $nextModule ?? null,
                 'nextActivity' => $nextActivity ?? null,
+                'conditionsActivated' => $this->conditionsActivated,
+                'conditionsPassed' => $conditionsPassed ?? false,
+                'conditionsMessage' => $conditionsMessage ?? null,
             ]);
         }
         return $output;
