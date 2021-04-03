@@ -65,11 +65,11 @@ class ExtraActivityAction extends YesWikiAction
                 return $this->edit();
                 break ;
             case 'edit':
-                $extraActivity = $this->extraActivityManager->getExtraActivityLog(
+                $extraActivityLog = $this->extraActivityManager->getExtraActivityLog(
                     $this->arguments['tag']
                 );
                 return $this->edit(
-                    ($extraActivity) ? ['extraActivity' => $extraActivity] : []
+                    ($extraActivityLog) ? ['extraActivityLog' => $extraActivityLog] : []
                 );
                 break ;
             case 'save':
@@ -112,7 +112,7 @@ class ExtraActivityAction extends YesWikiAction
     }
 
     /**
-     * render the save extraactivity
+     * render the save extraActivityLog
      * @return string html to display
      */
     private function save(): string

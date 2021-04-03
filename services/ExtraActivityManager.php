@@ -75,14 +75,14 @@ class ExtraActivityManager
 
         // === START check tag ====
         if (!empty($data['tag'])) {
-            $extraActivities = $this->getExtraActivityLogsFromLike('%"tag":"' . $data['tag'] . '"%');
-            if (!$extraActivities->has($data['tag'])) {
+            $extraActivityLogs = $this->getExtraActivityLogsFromLike('%"tag":"' . $data['tag'] . '"%');
+            if (!$extraActivityLogs->has($data['tag'])) {
                 if ($debug) {
                     throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>');
                 }
                 return false;
             } else {
-                $oldExtraActivity = $extraActivities->get($data['tag']);
+                $oldExtraActivity = $extraActivityLogs->get($data['tag']);
             }
         } else {
             // define new Tag
@@ -90,14 +90,14 @@ class ExtraActivityManager
         
             // check if tag is a pageName or already exists for this course
             // get all extra-activities
-            $extraActivities = $this->getExtraActivityLogsFromLike('');
+            $extraActivityLogs = $this->getExtraActivityLogsFromLike('');
 
             $i = 1 ;
             do {
                 $tag = genere_nom_wiki($tmptag, $i);
                 ++$i;
-            } while ($i < 1000 && $extraActivities->has($tag)) ;
-            if ($extraActivities->has($tag)) {
+            } while ($i < 1000 && $extraActivityLogs->has($tag)) ;
+            if ($extraActivityLogs->has($tag)) {
                 if ($debug) {
                     throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>');
                 }
@@ -120,7 +120,7 @@ class ExtraActivityManager
         }
         $elapsedTime = $date->diffAsCarbonInterval($endDate, false) ;
         $elapsedTime->invert = false; // to have only positive without warning
-        $extraActivity = new ExtraActivityLog(
+        $extraActivityLog = new ExtraActivityLog(
             $this->dateManager,
             $data['tag'],
             $data['title'],
@@ -145,7 +145,7 @@ class ExtraActivityManager
                                 $learnerName,
                                 self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
                                 $result['value'],
-                                json_encode($extraActivity),
+                                json_encode($extraActivityLog),
                                 '',
                                 ''
                             ), [0,3])) {// update
@@ -168,7 +168,7 @@ class ExtraActivityManager
                 } elseif ($this->tripleStore->create(
                     $learnerName,
                     self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
-                    json_encode($extraActivity),
+                    json_encode($extraActivityLog),
                     '',
                     ''
                 ) > 0) {// create
@@ -237,9 +237,9 @@ class ExtraActivityManager
      * @param Course @course
      * @param Module @module (optional)
      * @param Learner @learner (optional)
-     * @return ExtraActivityLogs the courseStructure's extraActivities
+     * @return ExtraActivityLogs the courseStructure's extraActivityLogs
      */
-    public function getExtraActivitiesLogs(Course $course, Module $module = null, Learner $learner = null): ExtraActivityLogs
+    public function getExtraActivityLogs(Course $course, Module $module = null, Learner $learner = null): ExtraActivityLogs
     {
         $like = '%"course":"' . $course->getTag() . '"';
         if (!is_null($module)) {
@@ -261,15 +261,15 @@ class ExtraActivityManager
             return null;
         }
         $like = '%"tag":"' . $tag . '"%';
-        $extraActivities = $this->getExtraActivityLogsFromLike($like) ;
-        return $extraActivities->get($tag) ;
+        $extraActivityLogs = $this->getExtraActivityLogsFromLike($like) ;
+        return $extraActivityLogs->get($tag) ;
     }
 
     /**
      * Get extra-activitylogs from like query
      * @param string $like query to send to TripleStore->getMatching
      * @param string $learnerName
-     * @return ExtraActivityLogs the courseStructure's extraActivities
+     * @return ExtraActivityLogs the courseStructure's extraActivityLogs
      */
     private function getExtraActivityLogsFromLike(string $like, string $learnerName = ''):ExtraActivityLogs
     {
@@ -282,24 +282,24 @@ class ExtraActivityManager
             'LIKE'
         );
 
-        $extraActivities = new ExtraActivityLogs() ;
+        $extraActivityLogs = new ExtraActivityLogs() ;
         if ($results) {
             foreach ($results as $result) {
-                $extraActivity = ExtraActivityLog::createFromJSON(
+                $extraActivityLog = ExtraActivityLog::createFromJSON(
                     $result['value'],
                     $this->courseManager,
                     $this->dateManager
                 );
-                if ($extraActivity) {
-                    if (!$extraActivities->add($extraActivity)) {
+                if ($extraActivityLog) {
+                    if (!$extraActivityLogs->add($extraActivityLog)) {
                         // already present
-                        $extraActivity = $extraActivities->get($extraActivity->getTag());
+                        $extraActivityLog = $extraActivityLogs->get($extraActivityLog->getTag());
                     };
-                    $extraActivity->addLearnerName($result['resource']) ;
+                    $extraActivityLog->addLearnerName($result['resource']) ;
                 }
             }
         }
-        return $extraActivities ;
+        return $extraActivityLogs ;
     }
 
     

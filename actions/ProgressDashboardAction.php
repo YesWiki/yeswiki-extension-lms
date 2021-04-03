@@ -104,7 +104,7 @@ class ProgressDashboardAction extends YesWikiAction
             'module' => $module,
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
-            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
         ]);
     }
@@ -122,7 +122,7 @@ class ProgressDashboardAction extends YesWikiAction
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
-            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
         ]);
     }
@@ -164,7 +164,7 @@ class ProgressDashboardAction extends YesWikiAction
         
         
         if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
-            $module->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, $module));
+            $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module));
         }
         // $finishedUsernames contains now the usernames which have finished the module
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
@@ -192,7 +192,7 @@ class ProgressDashboardAction extends YesWikiAction
         }
         
         if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
-            $course->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course));
+            $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course));
         }
         // $finishedUsernames contains now the usernames which have finished the course
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);

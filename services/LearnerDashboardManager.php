@@ -67,7 +67,7 @@ class LearnerDashboardManager
         foreach ($courses as $course) {
             // extra activity part
             if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
-                $course->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, null, $learner));
+                $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, null, $learner));
             }
             $modulesStat = $this->processModulesStat($course, $learner);
 
@@ -90,8 +90,8 @@ class LearnerDashboardManager
                     $duration->add($moduleStat['elapsedTime']);
                 }
             }
-            foreach ($course->getExtraActivitiesLogs() as $extraActivity) {
-                $duration->add($extraActivity->getElapsedTime());
+            foreach ($course->getExtraActivityLogs() as $extraActivityLog) {
+                $duration->add($extraActivityLog->getElapsedTime());
             }
             $courseDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
 
@@ -127,7 +127,7 @@ class LearnerDashboardManager
         foreach ($modules as $module) {
             // extra activity part
             if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
-                $module->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, $module, $learner));
+                $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module, $learner));
             }
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);
             // get progress
@@ -175,8 +175,8 @@ class LearnerDashboardManager
                         $duration->add($activityStat['elapsedTime']);
                     }
                 }
-                foreach ($module->getExtraActivitiesLogs() as $extraActivity) {
-                    $duration->add($extraActivity->getElapsedTime());
+                foreach ($module->getExtraActivityLogs() as $extraActivityLog) {
+                    $duration->add($extraActivityLog->getElapsedTime());
                 }
                 $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
             }

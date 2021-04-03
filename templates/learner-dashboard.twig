@@ -47,9 +47,9 @@
       {{ include('@lms/learner-dashboard-module.twig') }}
   {% endfor %}
 
-  {% if course.extraActivities|length > 0 %}
+  {% if course.extraActivityLogs|length > 0 %}
     <h3 class="dashboard-module">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h3>
-    {% for extraActivity in course.extraActivities %}
+    {% for extraActivityLog in course.extraActivityLogs %}
         {{ include('@lms/learner-dashboard-extra-activity.twig',{level:'module'}) }}
     {% endfor %}
   {% endif %}

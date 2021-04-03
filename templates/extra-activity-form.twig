@@ -10,7 +10,7 @@
         'type':'text',
         'label':  _t('LMS_EXTRA_ACTIVITY_TITLE')
         },
-        'value':extraActivity.title}) }}
+        'value':extraActivityLog.title}) }}
     {{ include('@bazar/inputs/text.twig', {'field': {
         'name':'relatedLink',
         'maxChars':'256',
@@ -18,16 +18,16 @@
         'type':'url',
         'label':  _t('LMS_EXTRA_ACTIVITY_RELATED_LINK')
         },
-        'value':extraActivity.relatedLink}) }}
+        'value':extraActivityLog.relatedLink}) }}
     {{ include_javascript('tools/bazar/libs/vendor/bootstrap-datepicker.js')}}
     {{ include('@bazar/inputs/date.twig', {'field': {
             'name':'bf_date_debut_evenement',
             'required':true,
             'label':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE')
             },        
-        'day': (extraActivity ? extraActivity.date:date())|date("Y-m-d"),
-        'hour': extraActivity ? extraActivity.date|date("H"):12,
-        'minute': extraActivity ? extraActivity.date|date("i"):0,
+        'day': (extraActivityLog ? extraActivityLog.date:date())|date("Y-m-d"),
+        'hour': extraActivityLog ? extraActivityLog.date|date("H"):12,
+        'minute': extraActivityLog ? extraActivityLog.date|date("i"):0,
         'hasTime':true
         }) }}
     {{ include('@bazar/inputs/date.twig', {'field': {
@@ -35,9 +35,9 @@
             'required':true,
             'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
             },        
-        'day': (extraActivity ? extraActivity.endDate:date())|date("Y-m-d"),
-        'hour': extraActivity ? extraActivity.endDate|date("H"):14,
-        'minute': extraActivity ? extraActivity.endDate|date("i"):0,
+        'day': (extraActivityLog ? extraActivityLog.endDate:date())|date("Y-m-d"),
+        'hour': extraActivityLog ? extraActivityLog.endDate|date("H"):14,
+        'minute': extraActivityLog ? extraActivityLog.endDate|date("i"):0,
         'hasTime':true
         }) }}
     {{ include('@bazar/fields/text.twig',{'field': {
@@ -64,11 +64,11 @@
             },        
         'value': module,
         'options': learners,
-        'selectedOptionsId': extraActivity.registeredLearnerNames,
+        'selectedOptionsId': extraActivityLog.registeredLearnerNames,
         'formName': _t('LMS_EXTRA_ACTIVITY_LEARNERS'),
         'name': _t('BAZ_DRAG_n_DROP_CHECKBOX_LIST') ~ _t('LMS_EXTRA_ACTIVITY_D') ~ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
         }) }}
-    <input type="hidden" id="tag" name="tag" value="{{ extraActivity.tag }}">
+    <input type="hidden" id="tag" name="tag" value="{{ extraActivityLog.tag }}">
     <input type="hidden" id="extra_activity_mode" name="extra_activity_mode" value="save">
     <div class="form-actions form-group">
         <div class="col-sm-9 col-sm-offset-3">

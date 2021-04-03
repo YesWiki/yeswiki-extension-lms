@@ -3,28 +3,28 @@
 <div class="panel panel-lms-dashboard dashboard-{{ level }}-frame">
   <div class="panel-heading">
     <div class="panel-title">
-        {% if extraActivity.relatedLink %}            
+        {% if extraActivityLog.relatedLink %}            
             <a class="no-collapsable" href="
-            {{- (extraActivity.relatedLink starts with 'http')
-                    ? extraActivity.relatedLink
-                    : url({tag: extraActivity.relatedLink})
+            {{- (extraActivityLog.relatedLink starts with 'http')
+                    ? extraActivityLog.relatedLink
+                    : url({tag: extraActivityLog.relatedLink})
             -}}"
             title="{{ _t('LMS_EXTRA_ACTIVITY_LINK') }}">
-                {{ extraActivity.title }}
+                {{ extraActivityLog.title }}
             </a>
         {% else %}
-            {{ extraActivity.title }}
+            {{ extraActivityLog.title }}
         {% endif %}
         {% if user_is_admin %}
-            {{ extraActivityMode ? include('@lms/extra-activity-link.twig', {mode:'remove',learner:learner.username}) }}
+            {{ extraActivityEnabled ? include('@lms/extra-activity-link.twig', {mode:'remove',learner:learner.username}) }}
         {% endif %}
                                     
     </div>
     <div class="estimated-time">
       <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
         <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
-          {% if extraActivity.elapsedTime %}
-            {{ displayTime(extraActivity.elapsedTime) }}
+          {% if extraActivityLog.elapsedTime %}
+            {{ displayTime(extraActivityLog.elapsedTime) }}
           {% else %}
               ----
           {% endif %}
@@ -33,7 +33,7 @@
     <div class="first-access">
         <span title="{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}">
             <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
-            {{ displayDate(extraActivity.date) }}
+            {{ displayDate(extraActivityLog.date) }}
         </span>
     </div>
   </div>

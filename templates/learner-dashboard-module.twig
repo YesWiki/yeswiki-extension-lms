@@ -58,9 +58,9 @@
                 {% set activitiesStat =  modulesStat[module.tag].activitiesStat %}
                 {{ include('@lms/learner-dashboard-activity.twig') }}
             {% endfor %}
-            {% if module.extraActivities|length > 0 %}
+            {% if module.extraActivityLogs|length > 0 %}
                 <h4 class="dashboard-activity">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h4>
-                {% for extraActivity in module.extraActivities %}
+                {% for extraActivityLog in module.extraActivityLogs %}
                     {{ include('@lms/learner-dashboard-extra-activity.twig',{level:'activity'}) }}
                 {% endfor %}
             {% endif %}
