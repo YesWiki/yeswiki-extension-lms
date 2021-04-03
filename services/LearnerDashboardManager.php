@@ -67,7 +67,7 @@ class LearnerDashboardManager
         foreach ($courses as $course) {
             // extra activity part
             if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
-                $course->setExtraActivities($this->extraActivityManager->getExtraActivities($course, null, $learner));
+                $course->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, null, $learner));
             }
             $modulesStat = $this->processModulesStat($course, $learner);
 
@@ -90,7 +90,7 @@ class LearnerDashboardManager
                     $duration->add($moduleStat['elapsedTime']);
                 }
             }
-            foreach ($course->getExtraActivities() as $extraActivity) {
+            foreach ($course->getExtraActivitiesLogs() as $extraActivity) {
                 $duration->add($extraActivity->getElapsedTime());
             }
             $courseDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
@@ -127,7 +127,7 @@ class LearnerDashboardManager
         foreach ($modules as $module) {
             // extra activity part
             if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
-                $module->setExtraActivities($this->extraActivityManager->getExtraActivities($course, $module, $learner));
+                $module->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, $module, $learner));
             }
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);
             // get progress
@@ -175,7 +175,7 @@ class LearnerDashboardManager
                         $duration->add($activityStat['elapsedTime']);
                     }
                 }
-                foreach ($module->getExtraActivities() as $extraActivity) {
+                foreach ($module->getExtraActivitiesLogs() as $extraActivity) {
                     $duration->add($extraActivity->getElapsedTime());
                 }
                 $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();

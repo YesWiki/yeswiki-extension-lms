@@ -163,7 +163,7 @@ class ProgressDashboardAction extends YesWikiAction
         
         
         if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
-            $module->setExtraActivities($this->extraActivityManager->getExtraActivities($course, $module));
+            $module->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, $module));
         }
         // $finishedUsernames contains now the usernames which have finished the module
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
@@ -191,7 +191,7 @@ class ProgressDashboardAction extends YesWikiAction
         }
         
         if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
-            $course->setExtraActivities($this->extraActivityManager->getExtraActivities($course));
+            $course->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course));
         }
         // $finishedUsernames contains now the usernames which have finished the course
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);

@@ -16,7 +16,7 @@
             {{ extraActivity.title }}
         {% endif %}
         {% if user_is_admin %}
-            {{ include('@lms/extra-activity-link.twig', {mode:'remove',learner:learner.username}) }}
+            {{ extraActivityMode ? include('@lms/extra-activity-link.twig', {mode:'remove',learner:learner.username}) }}
         {% endif %}
                                     
     </div>

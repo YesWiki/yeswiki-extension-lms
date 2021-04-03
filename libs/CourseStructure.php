@@ -97,7 +97,7 @@ abstract class CourseStructure
      *
      * @return ExtraActivityLogs the courseStructure's extraActivities
      */
-    public function getExtraActivities(): ExtraActivityLogs
+    public function getExtraActivitiesLogs(): ExtraActivityLogs
     {
         return $this->extraActivities;
     }
@@ -108,7 +108,7 @@ abstract class CourseStructure
      *
      * @param ExtraActivityLogs the courseStructure's extraActivities
      */
-    public function setExtraActivities(ExtraActivityLogs $extraActivities)
+    public function setExtraActivitiesLogs(ExtraActivityLogs $extraActivities)
     {
         $this->extraActivities = $extraActivities;
     }

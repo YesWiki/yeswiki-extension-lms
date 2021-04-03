@@ -43,6 +43,7 @@ class ExtraActivityManager
         $this->wiki = $wiki;
     }
 
+    // TODO : cut in smaller functions
     /**
      * Save a Extra-activity
      * @param array $data $_POST data to save
@@ -56,8 +57,7 @@ class ExtraActivityManager
             || empty($data['bf_date_debut_evenement'])
             || empty($data['bf_date_fin_evenement'])
             || empty($data['course'])
-            || !isset($data['registeredLearnerNames'])
-            || count($data['registeredLearnerNames']) == 0) ;
+            || empty($data['registeredLearnerNames'])) ;
         if ($error) {
             if ($debug) {
                 $output = 'Errors in '. get_class($this) . ' :<br>' ;
@@ -231,7 +231,7 @@ class ExtraActivityManager
      * @param Learner @learner (optional)
      * @return ExtraActivityLogs the courseStructure's extraActivities
      */
-    public function getExtraActivities(Course $course, Module $module = null, Learner $learner = null): ExtraActivityLogs
+    public function getExtraActivitiesLogs(Course $course, Module $module = null, Learner $learner = null): ExtraActivityLogs
     {
         $like = '%"course":"' . $course->getTag() . '"';
         if (!is_null($module)) {
@@ -247,7 +247,7 @@ class ExtraActivityManager
      * @param string $tag tag of the ExtraActivityLog
      * @return ExtraActivityLog|null return null if empty tag
      */
-    public function getExtraActivity(string $tag): ?ExtraActivityLog
+    public function getExtraActivityLog(string $tag): ?ExtraActivityLog
     {
         if (empty($tag)) {
             return null;

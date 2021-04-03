@@ -41,5 +41,5 @@
         {{ include('@lms/progress-dashboard-included-extra-activity.twig') }}
     {% endfor %}
 {% else %}
-    {{ include('@lms/extra-activity-link.twig') }}
+    {{ extraActivityMode ? include('@lms/extra-activity-link.twig') }}
 {% endif %}

@@ -1,7 +1,6 @@
 <?php
 
 use YesWiki\Core\YesWikiAction;
-use YesWiki\Wiki;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\ExtraActivityLog;
 use YesWiki\Lms\Module;
@@ -67,7 +66,7 @@ class ExtraActivityAction extends YesWikiAction
                 return $this->edit();
                 break ;
             case 'edit':
-                $extraActivity = $this->extraActivityManager->getExtraActivity(
+                $extraActivity = $this->extraActivityManager->getExtraActivityLog(
                     $this->arguments['tag']
                 );
                 return $this->edit(
