@@ -3,13 +3,11 @@
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
-use YesWiki\Lms\Controller\ExtraActivityController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Lms\Service\LearnerManager;
-use YesWiki\Wiki;
 
 class ProgressDashboardAction extends YesWikiAction
 {
@@ -17,7 +15,6 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
-    protected $extraActivityController;
     protected $extraActivityManager;
 
     // the progresses related to the current course for all users
@@ -50,6 +47,7 @@ class ProgressDashboardAction extends YesWikiAction
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
+        $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
 
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
@@ -68,13 +66,12 @@ class ProgressDashboardAction extends YesWikiAction
         // the learners for this course, we count all users which have already a progress
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
         
-        /* * Manage extra activity * */
-        $this->extraActivityController = $this->getService(ExtraActivityController::class);
-        $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
-        $this->extraActivityController->setArguments($this->arguments);
-        $result = $this->extraActivityController->run($this->learners);
-        if (!empty($result)) {
-            return $result ;
+        /* * Switch to extra activity if needed * */
+        if ($message = $this->callAction(
+            'extraactivity',
+            $this->arguments + ['learners' => $this->learners]
+        )) {
+            return $message ;
         };
         /* *************************** */
 

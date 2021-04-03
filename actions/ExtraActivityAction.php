@@ -1,94 +1,76 @@
 <?php
 
-namespace YesWiki\Lms\Controller;
-
-use YesWiki\Core\YesWikiController;
+use YesWiki\Core\YesWikiAction;
 use YesWiki\Wiki;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\ExtraActivityLog;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ExtraActivityManager;
+use YesWiki\Lms\Service\LearnerManager;
 
-class ExtraActivityController extends YesWikiController
+class ExtraActivityAction extends YesWikiAction
 {
     protected $arguments;
     protected $courseManager;
     protected $extraActivityManager;
-    protected $wiki;
-
-    /**
-     * ExtraActivityController constructor
-     * @param CourseManager $courseManager the injected CourseManager instance
-     * @param ExtraActivityManager $extraActivityManager the injected ExtraActivityManager instance
-     * @param Wiki $wiki
-     */
-    public function __construct(
-        CourseManager $courseManager,
-        ExtraActivityManager $extraActivityManager,
-        Wiki $wiki
-    ) {
-        $this->courseManager = $courseManager;
-        $this->extraActivityManager = $extraActivityManager;
-        $this->arguments = [] ;
-        $this->wiki = $wiki;
-    }
-
+    protected $learnerManager;
     
-    /**
-     * Setter for the arguments property
-     * @param array $arguments
-     */
-    public function setArguments(array &$arguments): void
-    {
-        $this->arguments = $this->formatArguments($arguments);
-    }
-
     /**
      * format arguments property
      * @param array $arguments
-     * @return string html to display
+     * @return array args
      */
     protected function formatArguments($arg)
     {
         return [
-            'mode' => (!empty($_GET['mode'])) ? $_GET['mode']
-                        : (
-                            (!empty($_POST['mode'])) ? $_POST['mode']
-                            : ((!empty($arg['mode'])) ? $arg['mode']: null)
-                        ) ,
+            'mode' => $_REQUEST['mode'] ?? null ,
             'extra_activity_mode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
-            'course' => (!empty($_GET['course'])) ? $_GET['course']
-                    : (
-                        (!empty($_POST['course'])) ? $_POST['course']
-                        : ((!empty($arg['course'])) ? $arg['course']: null)
-                    ) ,
+            'course' => $_REQUEST['course'] ?? null ,
             'module' => $_REQUEST['module'] ?? null ,
             'tag' => $_REQUEST['tag'] ?? null ,
             'learner' => $_REQUEST['learner'] ?? null ,
             'confirm' => $_REQUEST['confirm'] ?? null ,
+            'learners' => $arg['learners'] ?? [],
         ];
     }
     
     /**
      * run the controller
-     * @param array $learners ['username1','username2',...]
+     * @return string|null null if nothing to do
      */
-    public function run(array $learners): ?string
+    public function run(): ?string
     {
         if (!$this->arguments['extra_activity_mode']) {
             return null;
         }
+
+        $this->courseManager = $this->getService(CourseManager::class);
+        $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
+        $this->learnerManager = $this->getService(LearnerManager::class);
+
+        $currentLearner = $this->learnerManager->getLearner();
+        if (!$currentLearner || !$currentLearner->isAdmin()) {
+            if (empty($this->arguments['calledBy'])) {
+                // reserved only to the admins
+                return $this->render("@templates/alert-message.twig", [
+                    'type' => 'danger',
+                    'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' (extraactivity)'
+                ]);
+            } else {
+                return null;
+            }
+        }
+
         switch ($this->arguments['mode']) {
             case 'add':
-                return $this->edit($learners);
+                return $this->edit();
                 break ;
             case 'edit':
                 $extraActivity = $this->extraActivityManager->getExtraActivity(
                     $this->arguments['tag']
                 );
                 return $this->edit(
-                    $learners,
                     ($extraActivity) ? ['extraActivity' => $extraActivity] : []
                 );
                 break ;
@@ -191,11 +173,10 @@ class ExtraActivityController extends YesWikiController
 
     /**
      * render the edit form
-     * @param array $learners ['username1','username2',...]
      * @param array $params ['index' => 'value','other_index'=>'value'] whould be merged with default
      * @return string html to display
      */
-    private function edit(array $learners, array $params = []): string
+    private function edit(array $params = []): string
     {
         $course = $this->courseManager->getCourse($this->arguments['course']) ;
         $modules = [];
@@ -210,7 +191,7 @@ class ExtraActivityController extends YesWikiController
                 'modules' => $modules,
                 'learners' => array_map(function ($learner) {
                     return $learner->getFullName() ;
-                }, $learners),
+                }, $this->arguments['learners']),
             ], $params)
         );
     }

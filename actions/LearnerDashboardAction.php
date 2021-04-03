@@ -2,7 +2,6 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiAction;
-use YesWiki\Lms\Controller\ExtraActivityController;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\LearnerManager;
@@ -45,12 +44,12 @@ class LearnerDashboardAction extends YesWikiAction
             ]);
         }
         
-        /* * Manage extra activity * */
-        $this->extraActivityController = $this->getService(ExtraActivityController::class);
-        $this->extraActivityController->setArguments($this->arguments);
-        $result = $this->extraActivityController->run([$this->learner]);
-        if (!empty($result)) {
-            return $result ;
+        /* * Switch to extra activity if needed * */
+        if ($message = $this->callAction(
+            'extraactivity',
+            $this->arguments + ['learners' => [$this->learner]]
+        )) {
+            return $message ;
         };
         /* *************************** */
 
