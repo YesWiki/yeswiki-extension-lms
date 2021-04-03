@@ -67,7 +67,7 @@ class ExtraActivityManager
                 $output .= (empty($data['course'])) ? 'empty($data[\'course\'])<br>' : '' ;
                 $output .= (!isset($data['registeredLearnerNames'])) ? 'not isset($data[\'registeredLearnerNames\'])<br>' : '' ;
                 $output .= (isset($data['registeredLearnerNames']) && count($data['registeredLearnerNames']) == 0) ? 'count($data[\'registeredLearnerNames\']) == 0<br>' : '' ;
-                echo $output;
+                throw new \Exception($output, 1);
             }
             return false ;
         }
@@ -78,7 +78,7 @@ class ExtraActivityManager
             $extraActivities = $this->getExtraActivityLogsFromLike('%"tag":"' . $data['tag'] . '"%');
             if (!$extraActivities->has($data['tag'])) {
                 if ($debug) {
-                    echo 'Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>' ;
+                    throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>', 1);
                 }
                 return false;
             } else {
@@ -99,7 +99,7 @@ class ExtraActivityManager
             } while ($i < 1000 && $extraActivities->has($tag)) ;
             if ($extraActivities->has($tag)) {
                 if ($debug) {
-                    echo 'Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>' ;
+                    throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>', 1);
                 }
                 return false;
             } else {
@@ -132,6 +132,7 @@ class ExtraActivityManager
         );
         // === END format data ====
     
+        $errorMessage = '' ;
         foreach ($data['registeredLearnerNames'] as $learnerName => $value) {
             if ($value == 1) {
                 $previousTripples = $this->getTripplesForLearner($learnerName, $data['tag']);
@@ -149,7 +150,7 @@ class ExtraActivityManager
                                 ''
                             ), [0,3])) {// update
                                 if ($debug) {
-                                    echo 'Errors in '. get_class($this) . ' when updating '.$data['tag'].' for '.$learnerName .'<br>' ;
+                                    $errorMessage .= 'Errors in '. get_class($this) . ' when updating '.$data['tag'].' for '.$learnerName .'<br>' ;
                                 }
                                 $error = true;
                             }
@@ -172,7 +173,7 @@ class ExtraActivityManager
                     ''
                 ) > 0) {// create
                     if ($debug) {
-                        echo 'Errors in '. get_class($this) . ' when creating '.$data['tag'].' for '.$learnerName .'<br>';
+                        $errorMessage .= 'Errors in '. get_class($this) . ' when creating '.$data['tag'].' for '.$learnerName .'<br>';
                     }
                     $error = true;
                 }
@@ -184,13 +185,20 @@ class ExtraActivityManager
         // remove old
         if (isset($oldExtraActivity)) {
             foreach ($oldExtraActivity->getRegisteredLearnerNames() as $learnerName) {
-                if (!$this->deleteExtraActivity($data['tag'], $learnerName)) {
+                try {
+                    if (!$this->deleteExtraActivity($data['tag'], $learnerName)) {
+                        throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].' for '.$learnerName .'<br>', 1);
+                    }
+                } catch (Throwable $t) {
                     if ($debug) {
-                        echo 'Errors in '. get_class($this) . ' when deleting '.$data['tag'].' for '.$learnerName .'<br>';
+                        $errorMessage .= $t->getMessage();
                     }
                     $error = true;
                 }
             }
+        }
+        if ($error && $debug) {
+            throw new \Exception($errorMessage, 1);
         }
         return !$error;
     }
@@ -315,12 +323,13 @@ class ExtraActivityManager
 
         if (!$results) {
             if ($debug) {
-                echo 'Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing'  ;
+                throw new \Exception('Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing', 1);
             }
             return false ;
         }
 
         $log = true ;
+        $errorMessage = '';
         foreach ($results as $result) {
             if ($this->tripleStore->delete(
                 $result['resource'],
@@ -331,9 +340,12 @@ class ExtraActivityManager
             ) != 0) {
                 $log = false ;
                 if ($debug) {
-                    echo 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStroe'  ;
+                    $errorMessage .= 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStroe'  ;
                 }
             };
+        }
+        if (!$log && $debug) {
+            throw new \Exception($errorMessage, 1);
         }
         return $log ;
     }
