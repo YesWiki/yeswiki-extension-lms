@@ -95,7 +95,7 @@ class LearnerDashboardAction extends YesWikiAction
             'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time'],
             'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time'],
             'user_is_admin' => $this->wiki->UserIsAdmin(),
-            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
+            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
         ]);
     }
 

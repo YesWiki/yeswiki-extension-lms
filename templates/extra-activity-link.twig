@@ -4,7 +4,7 @@
         href="{{ url({tag: '',
                 params:{course:course.tag, 
                     module:module.tag, 
-                    mode:mode
+                    extra_activity_mode:mode
                     }
                 }) }}">
         <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY_ADD') }}
@@ -14,7 +14,7 @@
         href="{{ url({tag: '',
                 params:{course:course.tag, 
                     module:module.tag, 
-                    mode:'add'
+                    extra_activity_mode:'add'
                     }
                 }) }}">
         <i class="fas fa-plus"></i>
@@ -25,7 +25,7 @@
                 params:{course:course.tag, 
                     module:module.tag,
                     tag:extraActivity.tag, 
-                    mode:mode
+                    extra_activity_mode:mode
                     }
                 }) }}">
         <i class="fas fa-edit"></i>
@@ -34,7 +34,7 @@
     <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_REMOVE') }}"
         href="{{ url({tag: '',
                 params:{tag:extraActivity.tag, 
-                    mode:mode,
+                    extra_activity_mode:mode,
                     learner:learner,
                     course:course.tag, 
                     module:module.tag
@@ -46,7 +46,7 @@
     <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_EXTRA_ACTIVITY_DELETE') }}"
         href="{{ url({tag: '',
                 params:{tag:extraActivity.tag, 
-                    mode:mode,
+                    extra_activity_mode:mode,
                     course:course.tag, 
                     module:module.tag
                     }

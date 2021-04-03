@@ -66,7 +66,7 @@ class LearnerDashboardManager
         $coursesStat = [];
         foreach ($courses as $course) {
             // extra activity part
-            if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+            if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
                 $course->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, null, $learner));
             }
             $modulesStat = $this->processModulesStat($course, $learner);
@@ -126,7 +126,7 @@ class LearnerDashboardManager
 
         foreach ($modules as $module) {
             // extra activity part
-            if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+            if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
                 $module->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, $module, $learner));
             }
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);

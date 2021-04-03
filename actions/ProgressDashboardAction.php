@@ -103,7 +103,7 @@ class ProgressDashboardAction extends YesWikiAction
             'module' => $module,
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
-            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
+            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
         ]);
     }
@@ -121,7 +121,7 @@ class ProgressDashboardAction extends YesWikiAction
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
-            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
+            'extraActivityMode' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
         ]);
     }
@@ -162,7 +162,7 @@ class ProgressDashboardAction extends YesWikiAction
         }
         
         
-        if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+        if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
             $module->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course, $module));
         }
         // $finishedUsernames contains now the usernames which have finished the module
@@ -190,7 +190,7 @@ class ProgressDashboardAction extends YesWikiAction
             }
         }
         
-        if ($this->wiki->config['lms_config']['extra_activity_mode'] ?? false) {
+        if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
             $course->setExtraActivitiesLogs($this->extraActivityManager->getExtraActivitiesLogs($course));
         }
         // $finishedUsernames contains now the usernames which have finished the course

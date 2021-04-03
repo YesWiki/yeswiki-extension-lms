@@ -19,7 +19,7 @@ parameters:
     use_only_custom_elapsed_time: true
     display_activity_elapsed_time: false
     # test mode for extra-actity
-    extra_activity_mode: false
+    extra_activity_enabled: false
 
 services:
   _defaults:

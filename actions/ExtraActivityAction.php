@@ -10,7 +10,6 @@ use YesWiki\Lms\Service\LearnerManager;
 
 class ExtraActivityAction extends YesWikiAction
 {
-    protected $arguments;
     protected $courseManager;
     protected $extraActivityManager;
     protected $learnerManager;
@@ -23,8 +22,8 @@ class ExtraActivityAction extends YesWikiAction
     protected function formatArguments($arg)
     {
         return [
-            'mode' => $_REQUEST['mode'] ?? null ,
-            'extra_activity_mode' => $this->wiki->config['lms_config']['extra_activity_mode'] ?? false,
+            'mode' => $_REQUEST['extra_activity_mode'] ?? null ,
+            'extra_activity_enabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'course' => $_REQUEST['course'] ?? null ,
             'module' => $_REQUEST['module'] ?? null ,
             'tag' => $_REQUEST['tag'] ?? null ,
@@ -40,7 +39,7 @@ class ExtraActivityAction extends YesWikiAction
      */
     public function run(): ?string
     {
-        if (!$this->arguments['extra_activity_mode']) {
+        if (!$this->arguments['extra_activity_enabled']) {
             return null;
         }
 
