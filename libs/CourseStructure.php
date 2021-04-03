@@ -45,7 +45,7 @@ abstract class CourseStructure
         $this->config = $config;
         $this->entryManager = $entryManager;
         $this->dateManager = $dateManager;
-        $this->extraActivities = new ExtraActivityLogs([]) ;
+        $this->extraActivities = new ExtraActivityLogs() ;
     }
 
     /**

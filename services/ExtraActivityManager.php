@@ -67,7 +67,7 @@ class ExtraActivityManager
                 $output .= (empty($data['course'])) ? 'empty($data[\'course\'])<br>' : '' ;
                 $output .= (!isset($data['registeredLearnerNames'])) ? 'not isset($data[\'registeredLearnerNames\'])<br>' : '' ;
                 $output .= (isset($data['registeredLearnerNames']) && count($data['registeredLearnerNames']) == 0) ? 'count($data[\'registeredLearnerNames\']) == 0<br>' : '' ;
-                throw new \Exception($output, 1);
+                throw new \Exception($output);
             }
             return false ;
         }
@@ -78,7 +78,7 @@ class ExtraActivityManager
             $extraActivities = $this->getExtraActivityLogsFromLike('%"tag":"' . $data['tag'] . '"%');
             if (!$extraActivities->has($data['tag'])) {
                 if ($debug) {
-                    throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>', 1);
+                    throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>');
                 }
                 return false;
             } else {
@@ -99,7 +99,7 @@ class ExtraActivityManager
             } while ($i < 1000 && $extraActivities->has($tag)) ;
             if ($extraActivities->has($tag)) {
                 if ($debug) {
-                    throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>', 1);
+                    throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>');
                 }
                 return false;
             } else {
@@ -187,7 +187,7 @@ class ExtraActivityManager
             foreach ($oldExtraActivity->getRegisteredLearnerNames() as $learnerName) {
                 try {
                     if (!$this->deleteExtraActivity($data['tag'], $learnerName)) {
-                        throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].' for '.$learnerName .'<br>', 1);
+                        throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].' for '.$learnerName .'<br>');
                     }
                 } catch (Throwable $t) {
                     if ($debug) {
@@ -198,7 +198,7 @@ class ExtraActivityManager
             }
         }
         if ($error && $debug) {
-            throw new \Exception($errorMessage, 1);
+            throw new \Exception($errorMessage);
         }
         return !$error;
     }
@@ -247,7 +247,7 @@ class ExtraActivityManager
         } else {
             $like .= '}%';
         }
-        return $this->getExtraActivityLogsFromLike($like, (!is_null($learner))?$learner->getUsername():'') ;
+        return $this->getExtraActivityLogsFromLike($like, ($learner)?$learner->getUsername():'') ;
     }
 
     /**
@@ -282,7 +282,7 @@ class ExtraActivityManager
             'LIKE'
         );
 
-        $extraActivities = new ExtraActivityLogs([]) ;
+        $extraActivities = new ExtraActivityLogs() ;
         if ($results) {
             foreach ($results as $result) {
                 $extraActivity = ExtraActivityLog::createFromJSON(
@@ -323,12 +323,12 @@ class ExtraActivityManager
 
         if (!$results) {
             if ($debug) {
-                throw new \Exception('Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing', 1);
+                throw new \Exception('Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing');
             }
             return false ;
         }
 
-        $log = true ;
+        $error = false ;
         $errorMessage = '';
         foreach ($results as $result) {
             if ($this->tripleStore->delete(
@@ -338,15 +338,16 @@ class ExtraActivityManager
                 '',
                 ''
             ) != 0) {
-                $log = false ;
+                $error = true ;
+                // but continue deleting others before throwing error
                 if ($debug) {
                     $errorMessage .= 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStroe'  ;
                 }
             };
         }
-        if (!$log && $debug) {
-            throw new \Exception($errorMessage, 1);
+        if ($error && $debug) {
+            throw new \Exception($errorMessage);
         }
-        return $log ;
+        return !$error ;
     }
 }

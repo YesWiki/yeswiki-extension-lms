@@ -8,7 +8,7 @@ class ExtraActivityLogs extends TimeLogs implements \Countable, \Iterator
     protected $values;
     private $position = 0;
 
-    public function __construct(array $values)
+    public function __construct(array $values = [])
     {
         parent::__construct($values);
         $this->position = 0;

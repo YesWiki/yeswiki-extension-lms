@@ -67,10 +67,11 @@ class ProgressDashboardAction extends YesWikiAction
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
         
         /* * Switch to extra activity if needed * */
-        if ($message = $this->callAction(
-            'extraactivity',
-            $this->arguments + ['learners' => $this->learners]
-        )) {
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) &&
+            $message = $this->callAction(
+                'extraactivity',
+                $this->arguments + ['learners' => $this->learners]
+            )) {
             return $message ;
         };
         /* *************************** */

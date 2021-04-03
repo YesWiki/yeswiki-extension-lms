@@ -45,10 +45,11 @@ class LearnerDashboardAction extends YesWikiAction
         }
         
         /* * Switch to extra activity if needed * */
-        if ($message = $this->callAction(
-            'extraactivity',
-            $this->arguments + ['learners' => [$this->learner]]
-        )) {
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) &&
+            $message = $this->callAction(
+                'extraactivity',
+                $this->arguments + ['learners' => [$this->learner]]
+            )) {
             return $message ;
         };
         /* *************************** */

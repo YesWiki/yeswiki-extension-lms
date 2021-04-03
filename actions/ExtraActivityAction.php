@@ -124,7 +124,7 @@ class ExtraActivityAction extends YesWikiAction
                     'module' => $this->arguments['module']
                 ], false));
             } else {
-                throw new Exception("", 1);
+                throw new Exception("");
             }
         } catch (Throwable $t) {
             return $this->render(
@@ -132,7 +132,7 @@ class ExtraActivityAction extends YesWikiAction
                 [
                     'type' => 'danger',
                     'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') .
-                       ($_POST['title'] ?? !!!'$_POST[\'title\'] not set!!!') . '<br>'
+                       ($_POST['title'] ?? '!!!$_POST[\'title\'] not set!!!') . '<br>'
                        .$t->getMessage()
                 ]
             )
@@ -174,7 +174,7 @@ class ExtraActivityAction extends YesWikiAction
                         'learner' => $this->arguments['learner']
                     ], false));
                 } else {
-                    throw new Exception("", 1);
+                    throw new Exception("");
                 }
             } catch (Throwable $t) {
                 return $this->render(
@@ -182,9 +182,9 @@ class ExtraActivityAction extends YesWikiAction
                     [
                         'type' => 'danger',
                         'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE')
-                        .'"'.($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!').'"'
+                        .'"'.($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!!').'"'
                         ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
-                        .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!').'" <br>'.
+                        .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!').'" <br>'.
                         $t->getMessage()
                     ]
                 )
@@ -217,7 +217,7 @@ class ExtraActivityAction extends YesWikiAction
                         'module' => $this->arguments['module']
                     ], false));
                 } else {
-                    throw new Exception("", 1);
+                    throw new Exception("");
                 }
             } catch (Throwable $t) {
                 return $this->render(
@@ -225,7 +225,7 @@ class ExtraActivityAction extends YesWikiAction
                     [
                         'type' => 'danger',
                         'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
-                            ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!') . '<br>'
+                            ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '<br>'
                             . $t->getMessage()
                     ]
                 )
