@@ -97,6 +97,7 @@ class LearnerDashboardAction extends YesWikiAction
             'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time'],
             'user_is_admin' => $this->wiki->UserIsAdmin(),
             'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
+            'debug' => isset($_GET['debug']),
         ]);
     }
 

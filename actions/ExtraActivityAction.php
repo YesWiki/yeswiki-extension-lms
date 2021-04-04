@@ -107,6 +107,7 @@ class ExtraActivityAction extends YesWikiAction
                 'learners' => array_map(function ($learner) {
                     return $learner->getFullName() ;
                 }, $this->arguments['learners']),
+                'debug' => isset($_GET['debug']),
             ], $params)
         );
     }
@@ -133,7 +134,11 @@ class ExtraActivityAction extends YesWikiAction
                     'type' => 'danger',
                     'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') .
                        ($_POST['title'] ?? '!!!$_POST[\'title\'] not set!!!') . '<br>'
-                       .$t->getMessage()
+                       . (($this->wiki->GetConfigValue('debug')=='yes')
+                         ? $t->getMessage().'<br>'
+                         .'in file:'.$t->getFile().'<br>'
+                         . 'at line:'.$t->getLine().'<br>'
+                         :'')
                 ]
             )
             . $this->render('@lms/extra-activity-backlink.twig', [
@@ -163,6 +168,7 @@ class ExtraActivityAction extends YesWikiAction
                     'tag' => $this->arguments['tag'],
                     'learner' => $this->arguments['learner'],
                     'mode' => $this->arguments['mode'],
+                    'debug' => isset($_GET['debug']),
                 ]
             );
         } else {
@@ -184,8 +190,12 @@ class ExtraActivityAction extends YesWikiAction
                         'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE')
                         .'"'.($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!!').'"'
                         ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
-                        .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!').'" <br>'.
-                        $t->getMessage()
+                        .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!').'" <br>'
+                        . (($this->wiki->GetConfigValue('debug')=='yes')
+                         ? $t->getMessage().'<br>'
+                         .'in file:'.$t->getFile().'<br>'
+                         . 'at line:'.$t->getLine().'<br>'
+                         :'')
                     ]
                 )
                 . $this->render('@lms/extra-activity-backlink.twig', [
@@ -207,6 +217,7 @@ class ExtraActivityAction extends YesWikiAction
                     'module' => $this->arguments['module'],
                     'tag' => $this->arguments['tag'],
                     'mode' => $this->arguments['mode'],
+                    'debug' => isset($_GET['debug']),
                 ]
             );
         } else {
@@ -226,7 +237,11 @@ class ExtraActivityAction extends YesWikiAction
                         'type' => 'danger',
                         'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
                             ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '<br>'
-                            . $t->getMessage()
+                            . (($this->wiki->GetConfigValue('debug')=='yes')
+                            ? $t->getMessage().'<br>'
+                            .'in file:'.$t->getFile().'<br>'
+                            . 'at line:'.$t->getLine().'<br>'
+                            :'')
                     ]
                 )
                 . $this->render('@lms/extra-activity-backlink.twig', [

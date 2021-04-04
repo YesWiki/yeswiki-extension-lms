@@ -1,7 +1,7 @@
 {{ include_javascript('tools/bazar/libs/bazar.js') }}
 
 <h3>{{ _t('LMS_EXTRA_ACTIVITY_ADD') }}</h3>
-<form action="{{ url({tag:''}) }}"
+<form action="{{ url({tag:'',params:{debug: debug ? 'yes':null}}) }}"
     method="POST" name="formulaire" id="formulaire" enctype="multipart/form-data" class="form-horizontal">
     {{ include('@bazar/inputs/text.twig',{'field': {
         'name':'title',

@@ -51,25 +51,20 @@ class ExtraActivityManager
      */
     public function saveExtraActivity(array $data): bool
     {
-        $debug = ($this->wiki->GetConfigValue('debug')=='yes');
         // === START validate data ====
-        $error = (empty($data['title'])
-            || empty($data['bf_date_debut_evenement'])
-            || empty($data['bf_date_fin_evenement'])
-            || empty($data['course'])
-            || empty($data['registeredLearnerNames'])) ;
-        if ($error) {
-            if ($debug) {
-                $output = 'Errors in '. get_class($this) . ' :<br>' ;
-                $output .= (empty($data['title'])) ? 'empty($data[\'title\'])<br>' : '' ;
-                $output .= (empty($data['bf_date_debut_evenement'])) ? 'empty($data[\'bf_date_debut_evenement\'])<br>' : '' ;
-                $output .= (empty($data['bf_date_fin_evenement'])) ? 'empty($data[\'bf_date_fin_evenement\'])<br>' : '' ;
-                $output .= (empty($data['course'])) ? 'empty($data[\'course\'])<br>' : '' ;
-                $output .= (!isset($data['registeredLearnerNames'])) ? 'not isset($data[\'registeredLearnerNames\'])<br>' : '' ;
-                $output .= (isset($data['registeredLearnerNames']) && count($data['registeredLearnerNames']) == 0) ? 'count($data[\'registeredLearnerNames\']) == 0<br>' : '' ;
-                throw new \Exception($output);
-            }
-            return false ;
+        if (empty($data['title'])
+                || empty($data['bf_date_debut_evenement'])
+                || empty($data['bf_date_fin_evenement'])
+                || empty($data['course'])
+                || empty($data['registeredLearnerNames'])) {
+            $output = 'Errors in '. get_class($this) . ' :<br>' ;
+            $output .= (empty($data['title'])) ? 'empty($data[\'title\'])<br>' : '' ;
+            $output .= (empty($data['bf_date_debut_evenement'])) ? 'empty($data[\'bf_date_debut_evenement\'])<br>' : '' ;
+            $output .= (empty($data['bf_date_fin_evenement'])) ? 'empty($data[\'bf_date_fin_evenement\'])<br>' : '' ;
+            $output .= (empty($data['course'])) ? 'empty($data[\'course\'])<br>' : '' ;
+            $output .= (!isset($data['registeredLearnerNames'])) ? 'not isset($data[\'registeredLearnerNames\'])<br>' : '' ;
+            $output .= (isset($data['registeredLearnerNames']) && count($data['registeredLearnerNames']) == 0) ? 'count($data[\'registeredLearnerNames\']) == 0<br>' : '' ;
+            throw new \Exception($output);
         }
         // === END validate data ====
 
@@ -77,12 +72,7 @@ class ExtraActivityManager
         if (!empty($data['tag'])) {
             $extraActivityLogs = $this->getExtraActivityLogsFromLike('%"tag":"' . $data['tag'] . '"%');
             if (!$extraActivityLogs->has($data['tag'])) {
-                if ($debug) {
-                    throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>');
-                }
-                return false;
-            } else {
-                $oldExtraActivity = $extraActivityLogs->get($data['tag']);
+                throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>');
             }
         } else {
             // define new Tag
@@ -98,10 +88,7 @@ class ExtraActivityManager
                 ++$i;
             } while ($i < 1000 && $extraActivityLogs->has($tag)) ;
             if ($extraActivityLogs->has($tag)) {
-                if ($debug) {
-                    throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>');
-                }
-                return false;
+                throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>');
             } else {
                 $data['tag'] = $tag ;
             }
@@ -131,76 +118,32 @@ class ExtraActivityManager
             $module
         );
         // === END format data ====
+
+        // === START remove previous data ====
+        if (!$this->deleteExtraActivity($data['tag'])) {
+            throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].'<br>');
+        }
+        // === END remove previous data ====
     
+        // === START save new data ====
         $errorMessage = '' ;
         foreach ($data['registeredLearnerNames'] as $learnerName => $value) {
-            if ($value == 1) {
-                $previousTripples = $this->getTripplesForLearner($learnerName, $data['tag']);
-                if (!empty($previousTripples)) {
-                    $first = true;
-                    foreach ($previousTripples as $result) {
-                        if ($first) {
-                            $first = false;
-                            if (!in_array($this->tripleStore->update(
-                                $learnerName,
-                                self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
-                                $result['value'],
-                                json_encode($extraActivityLog),
-                                '',
-                                ''
-                            ), [0,3])) {// update
-                                if ($debug) {
-                                    $errorMessage .= 'Errors in '. get_class($this) . ' when updating '.$data['tag'].' for '.$learnerName .'<br>' ;
-                                }
-                                $error = true;
-                            }
-                        } else {
-                            // clean data
-                            $this->tripleStore->delete(
-                                $learnerName,
-                                self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
-                                $result['value'],
-                                '',
-                                ''
-                            );
-                        }
-                    }
-                } elseif ($this->tripleStore->create(
-                    $learnerName,
-                    self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
-                    json_encode($extraActivityLog),
-                    '',
-                    ''
-                ) > 0) {// create
-                    if ($debug) {
-                        $errorMessage .= 'Errors in '. get_class($this) . ' when creating '.$data['tag'].' for '.$learnerName .'<br>';
-                    }
-                    $error = true;
-                }
-                if (isset($oldExtraActivity)) {
-                    $oldExtraActivity->removeLearnerName($learnerName);
-                }
+            if ($value == 1 && (($this->tripleStore->create(
+                $learnerName,
+                self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
+                json_encode($extraActivityLog),
+                '',
+                ''
+            ) > 0))) {// create
+                $errorMessage .= 'Errors in '. get_class($this) . ' when creating '.$data['tag'].' for '.$learnerName .'<br>';
             }
         }
-        // remove old
-        if (isset($oldExtraActivity)) {
-            foreach ($oldExtraActivity->getRegisteredLearnerNames() as $learnerName) {
-                try {
-                    if (!$this->deleteExtraActivity($data['tag'], $learnerName)) {
-                        throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].' for '.$learnerName .'<br>');
-                    }
-                } catch (Throwable $t) {
-                    if ($debug) {
-                        $errorMessage .= $t->getMessage();
-                    }
-                    $error = true;
-                }
-            }
-        }
-        if ($error && $debug) {
+        if (!empty($errorMessage)) {
             throw new \Exception($errorMessage);
         }
-        return !$error;
+        
+        // === END save new data ====
+        return true;
     }
 
     private function getDateFromData(string $prefix, array $data): ?Carbon
@@ -211,25 +154,6 @@ class ExtraActivityManager
             $date .=  ($data[$prefix.'_minutes'] ?? '00'). ':00' ;
         }
         return new Carbon($date) ;
-    }
-
-    /**
-     * Get the triples for a learner and a tag
-     * @param string $learnerName
-     * @param string $tag tag of the ExtraActivityLog
-     * @return array results from TripleStore->getMatching
-     */
-    private function getTripplesForLearner(string $learnerName, string $tag)
-    {
-        $like = '%"tag":"' . $tag . '"%';
-        return $this->tripleStore->getMatching(
-            $learnerName,
-            self::LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY,
-            $like,
-            '=',
-            '=',
-            'LIKE'
-        );
     }
 
     /**
@@ -322,13 +246,9 @@ class ExtraActivityManager
         );
 
         if (!$results) {
-            if ($debug) {
-                throw new \Exception('Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing');
-            }
-            return false ;
+            throw new \Exception('Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing <br>');
         }
 
-        $error = false ;
         $errorMessage = '';
         foreach ($results as $result) {
             if ($this->tripleStore->delete(
@@ -338,16 +258,13 @@ class ExtraActivityManager
                 '',
                 ''
             ) != 0) {
-                $error = true ;
-                // but continue deleting others before throwing error
-                if ($debug) {
-                    $errorMessage .= 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStroe'  ;
-                }
+                // error but continue deleting others before throwing error
+                $errorMessage .= 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStore<br>'  ;
             };
         }
-        if ($error && $debug) {
+        if (!empty($errorMessage)) {
             throw new \Exception($errorMessage);
         }
-        return !$error ;
+        return true ;
     }
 }

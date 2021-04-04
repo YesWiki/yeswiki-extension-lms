@@ -4,7 +4,8 @@
         href="{{ url({tag: '',
                 params:{course:course.tag, 
                     module:module.tag, 
-                    extra_activity_mode:mode
+                    extra_activity_mode:mode,                    
+                    debug: debug ? 'yes':null
                     }
                 }) }}">
         <i class="fas fa-plus"></i> {{ _t('LMS_EXTRA_ACTIVITY_ADD') }}
@@ -14,7 +15,8 @@
         href="{{ url({tag: '',
                 params:{course:course.tag, 
                     module:module.tag, 
-                    extra_activity_mode:'add'
+                    extra_activity_mode:'add',                    
+                    debug: debug ? 'yes':null
                     }
                 }) }}">
         <i class="fas fa-plus"></i>
@@ -25,7 +27,8 @@
                 params:{course:course.tag, 
                     module:module.tag,
                     tag:extraActivityLog.tag, 
-                    extra_activity_mode:mode
+                    extra_activity_mode:mode,                    
+                    debug: debug ? 'yes':null
                     }
                 }) }}">
         <i class="fas fa-edit"></i>
@@ -37,7 +40,8 @@
                     extra_activity_mode:mode,
                     learner:learner,
                     course:course.tag, 
-                    module:module.tag
+                    module:module.tag,
+                    debug: debug ? 'yes':null
                     }
                 }) }}">
         <i class="fas fa-user-minus"></i>
@@ -48,7 +52,8 @@
                 params:{tag:extraActivityLog.tag, 
                     extra_activity_mode:mode,
                     course:course.tag, 
-                    module:module.tag
+                    module:module.tag,
+                    debug: debug ? 'yes':null
                     }
                 }) }}">
         <i class="fas fa-trash-alt"></i>

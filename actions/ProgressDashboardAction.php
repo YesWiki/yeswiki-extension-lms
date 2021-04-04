@@ -66,7 +66,8 @@ class ProgressDashboardAction extends YesWikiAction
         // the learners for this course, we count all users which have already a progress
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
         
-        /* * Switch to extra activity if needed * */
+        /* * Switch to extra activity if needed *
+        *   but after getProgressesForAllLearners to have set learners* */
         if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) &&
             $message = $this->callAction(
                 'extraactivity',
@@ -106,6 +107,7 @@ class ProgressDashboardAction extends YesWikiAction
             'modulesStat' => $this->modulesStat,
             'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
+            'debug' => isset($_GET['debug']),
         ]);
     }
 
@@ -124,6 +126,7 @@ class ProgressDashboardAction extends YesWikiAction
             'courseStat' => $this->coursesStat,
             'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
+            'debug' => isset($_GET['debug']),
         ]);
     }
 

@@ -6,14 +6,16 @@
         module: module,
         tag:tag,
         learner: learner,
-        confirm:'yes'} }) }}"
+        confirm:'yes',
+        debug: debug ? 'yes':null} }) }}"
       class="btn btn-danger btn-sm">
       {{ _t('LMS_YES') }}
     </a>
     <a href="{{ url({params: {
         course: course,
         module: module,
-        learner: learner} }) }}"
+        learner: learner,
+        debug: debug ? 'yes':null} }) }}"
       class="btn btn-primary btn-sm" >
       {{ _t('LMS_NO') }}
     </a>
