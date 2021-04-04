@@ -1,6 +1,6 @@
 {# display the status #}
 <small class="module-status"><em>{{ statusMsg }}</em></small>
-<nav aria-label="navigation" {{ field.name ? 'data-id="' ~ field.name ~ '"' : ''}}>
+<nav class="module-nav" aria-label="navigation" {{ field.name ? 'data-id="' ~ field.name ~ '"' }}>
   <div class="module-launch">
     <a class="btn btn-primary btn-block launch-module {{ disabledLink ? 'disabled' : '' }}"
       {% if not disabledLink %} href="{{ url({tag:module.firstActivityTag,params:{course:course.tag,module:module.tag}}) }}"{% endif %}}>

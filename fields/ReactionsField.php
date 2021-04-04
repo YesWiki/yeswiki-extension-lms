@@ -91,11 +91,6 @@ class ReactionsField extends BazarField
         require_once LMS_PATH . 'libs/lms.lib.php';
     }
 
-    protected function getAllReactions($pageTag, $ids, $user)
-    {
-        return getAllReactions($pageTag, $ids, $user);
-    }
-
     // Render the show view of the field
     protected function renderStatic($entry)
     {
@@ -107,7 +102,7 @@ class ReactionsField extends BazarField
         }
 
         // get reactions numbers for templating later
-        $r = $this->getAllReactions($entry['id_fiche'], $this->ids, $this->wiki->getUsername());
+        $r = getAllReactions($entry['id_fiche'], $this->ids, $this->wiki->getUsername());
 
         $reactions = [];
 

@@ -96,11 +96,4 @@ class ActivityNavigationField extends LmsField
         }
         return $output;
     }
-
-    protected function renderInput($entry)
-    {
-        return $this->render("@lms/inputs/activity-navigation.twig", [
-            'value' => $this->getValue($entry)
-        ]);
-    }
 }
