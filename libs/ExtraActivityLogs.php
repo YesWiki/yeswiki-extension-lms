@@ -41,15 +41,6 @@ class ExtraActivityLogs extends TimeLogs implements \Countable, \Iterator
         return true ;
     }
 
-    public function remove(string $tag): bool
-    {
-        if (!$this->has($tag)) {
-            return false ;
-        }
-        unset($this->values[$tag]) ;
-        return true ;
-    }
-
     /* Iterator functions */
     public function current(): ?ExtraActivityLog
     {
