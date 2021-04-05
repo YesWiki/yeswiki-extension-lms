@@ -5,8 +5,7 @@ namespace YesWiki\Lms\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\YesWikiController;
-use YesWiki\Lms\Service\ActivityConditionsManager;
-use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\QuizManager;
 
 class ApiController extends YesWikiController
 {
@@ -17,7 +16,8 @@ class ApiController extends YesWikiController
     public function getQuizzToken($course, $module, $activity)
     {
         return new ApiResponse(
-            ['status' => false,'token' => "1234A"]
+            $this->getService(QuizManager::class)
+                ->getQuizToken($course, $module, $activity)
         );
     }
     
