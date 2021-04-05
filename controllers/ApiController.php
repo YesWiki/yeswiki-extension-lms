@@ -14,12 +14,21 @@ class ApiController extends YesWikiController
      * Get quiz's results for a user, course, module, activity and quizId
      * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"GET"},options={"acl":{"public","+"}})
      */
-    public function getQuizResultsForAUserAndAQuizz($userId, $courseId, $moduleId, $activityId, $quizId)
+    public function getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
     {
         return new ApiResponse(
             $this->getService(QuizManager::class)
-                ->getQuizResultsForAUserAndAQuizz($userId, $courseId, $moduleId, $activityId, $quizId)
+                ->getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
         );
+    }
+
+    /**
+     * Get quiz's results for a user, course, module, activity and quizId
+     * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAQuizz($courseId, $moduleId, $activityId, $quizId)
+    {
+        return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, $quizId);
     }
     
     /**
@@ -77,6 +86,12 @@ class ApiController extends YesWikiController
         $output .= '"'.QuizManager::MESSAGE_LABEL.'":"error message of needed",]</code><br />';
         $output .= '<b>You must sent cookies to be connected as learner or admin.</b><br />';
 
+        $output .= '<br />GET <a href="';
+        $output .= $this->wiki->Href('lms/quizresults/test-course/test-module/test-activity/test-id', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $output .= '</code></a><br />';
+        $output .= 'Same as previous but for current connected leaner<br />';
         
         $urlSaveQuizzResult = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '<br />The following code :<br />';
@@ -87,6 +102,11 @@ class ApiController extends YesWikiController
         $output .= QuizManager::STATUS_CODE_ERROR.' = error,<br />';
         $output .= '"message":"error message"]</code><br />';
         $output .= '<b>You must sent cookies to be connected as learner or admin.</b><br />';
+        
+        $output .= '<br />POST <b><code>';
+        $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $output .= '</code></b><br />';
+        $output .= 'Same as previous but for current connected leaner<br />';
         return $output;
     }
 }

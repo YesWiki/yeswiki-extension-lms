@@ -56,7 +56,7 @@ class QuizManager
 
     /**
      * method that return an array giving results for the selected quiz
-     * @param string $userId, id of the concerned learner
+     * @param string|null $userId, id of the concerned learner, if null current learner
      * @param string $courseId, id of the concerned course
      * @param string $moduleId, id of the concerned module
      * @param string $activityId, id of the concerned activity
@@ -64,13 +64,17 @@ class QuizManager
      * @return array [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
      *      (RESULTS_LABEL=>float in %,'message'=>'error message')]
      */
-    public function getQuizResultsForAUserAndAQuizz(
-        string $userId,
+    public function getQuizResultsForAUserAndAQuiz(
+        ?string $userId = null,
         string $courseId,
         string $moduleId,
         string $activityId,
         string $quizId
     ): array {
+        if (is_null($userId)) {
+            // get current user
+            $userId = $this->learnerManager->getLearner()->getUsername();
+        }
         /* check params */
         $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
         if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
@@ -79,7 +83,7 @@ class QuizManager
             unset($data[self::STATUS_LABEL]);
         }
         /* find results */
-        if (empty($results = $this->findResultsForALearnerAnActivityAndAQuizz($data))) {
+        if (empty($results = $this->findResultsForALearnerAnActivityAndAQuiz($data))) {
             return [self::STATUS_LABEL => self::STATUS_CODE_NO_RESULT,
                 self::MESSAGE_LABEL => 'No results'];
         }
@@ -97,7 +101,7 @@ class QuizManager
      * @param string $quizId, id of the concerned quiz
      * @return null ['status'=>false/true,('message'=>'error message',
      *                'course'=>$course,'module'=>$module, 'activity'=>$activity,
-     *                'learner'=>$leaner,'quizzId'=>$quizzId]
+     *                'learner'=>$leaner,'quizId'=>$quizId]
      */
     private function checkParams(
         string $userId,
@@ -158,10 +162,10 @@ class QuizManager
 
     /**
      * Method that find the results for a specific user, activity and quizId, null if not existing
-     * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizzId'=>$quizzId]
+     * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizId'=>$quizId]
      * @return null|array null if no result then [{"log_time"=>...,"result"=>"10"},{"log_time"...}]
      */
-    private function findResultsForALearnerAnActivityAndAQuizz($data): ?array
+    private function findResultsForALearnerAnActivityAndAQuiz($data): ?array
     {
         $like = '%"course":"' . $data['course']->getTag() . '"%';
         $like .= '%"module":"' . $data['module']->getTag() . '"%';
