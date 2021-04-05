@@ -12,9 +12,9 @@ class ApiController extends YesWikiController
 {
     /**
      * Give a token for POST quiz results, can only be called if connected
-     * @Route("/api/lms/quizzes/{quizId}/token",methods={"GET"},options={"acl":{"public","+"}})
+     * @Route("/api/lms/{course}/{module}/{activity}/quiz/token",methods={"GET"},options={"acl":{"public","+"}})
      */
-    public function getQuizzToken($quizId)
+    public function getQuizzToken($course, $module, $activity)
     {
         return new ApiResponse(
             ['status' => false,'token' => "1234A"]
@@ -22,12 +22,12 @@ class ApiController extends YesWikiController
     }
     
     /**
-     * @Route("/api/lms/quizzes/{quizId}",methods={"POST"},options={"acl":{"public"}})
+     * @Route("/api/lms/{course}/{module}/{activity}/quiz",methods={"POST"},options={"acl":{"public"}})
      *
      * Save quiz results for a learner with a token given by getQuizzToken in $_POST['token']
      * and results in json in $_POST['results']
      */
-    public function saveQuizzResult($quizId)
+    public function saveQuizzResult($course, $module, $activity)
     {
         /* check $_POST */
         if (empty($_POST['token'])||empty($_POST['results'])) {
@@ -40,7 +40,7 @@ class ApiController extends YesWikiController
 
         return new ApiResponse(
             ['status' => false,
-            'message' => 'test for quiz '.$quizId.'__token :'.$_POST['token'] ]
+            'message' => 'test for quiz '.$activity.'__token :'.$_POST['token'] ]
         );
     }
 
@@ -53,9 +53,9 @@ class ApiController extends YesWikiController
     {
         $output = '<h2>Extension LMS</h2>';
 
-        $urlGetQuizzToken = $this->wiki->Href('lms/quizzes/{quizId}/token', 'api');
-        $fullUrlGetQuizzToken = $this->wiki->Href('lms/quizzes/my-quizz/token', 'api');
-        $urlSaveQuizzResult = $this->wiki->Href('lms/quizzes/{quizId}', 'api');
+        $urlGetQuizzToken = $this->wiki->Href('lms/{course}/{module}/{activity}/quiz/token', 'api');
+        $fullUrlGetQuizzToken = $this->wiki->Href('lms/test-course/test-module/test-activity/quiz/token', 'api');
+        $urlSaveQuizzResult = $this->wiki->Href('lms/{course}/{module}/{activity}/quiz', 'api');
 
         $output .= 'The following code :<br />';
         $output .= 'GET <a href="'. $fullUrlGetQuizzToken .'"><code>'.$urlGetQuizzToken.'</code></a><br />';
