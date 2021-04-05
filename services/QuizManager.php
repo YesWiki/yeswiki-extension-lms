@@ -78,9 +78,13 @@ class QuizManager
         } else {
             unset($data[self::STATUS_LABEL]);
         }
+        if (!$results = $this->findResultsForALearnerAnActivityAndAQuizz($data)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_NO_RESULT,
+                self::MESSAGE_LABEL => 'No results'];
+        }
 
-        return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-            self::MESSAGE_LABEL => 'api not ready'];
+        return [self::STATUS_LABEL => self::STATUS_CODE_OK,
+            self::RESULTS_LABEL => $results];
     }
 
     /**
@@ -148,5 +152,30 @@ class QuizManager
             'activity'=>$activity,
             'quizId'=>$quizId,
         ];
+    }
+
+    /**
+     * Method that find the results for a specific user, activity and quizId, null if not existing
+     * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizzId'=>$quizzId]
+     * @return null|float result in %
+     */
+    private function findResultsForALearnerAnActivityAndAQuizz($data): ?float
+    {
+        $like = '%"course":"' . $data['course']->getTag() . '"%';
+        $like .= '%"module":"' . $data['module']->getTag() . '"%';
+        $like .= '%"activity":"' . $data['activity']->getTag() . '"%';
+        $like .= '%"quizId":"' . $data['quizId'] . '"%';
+        $results = $this->tripleStore->getMatching(
+            $data['learner']->getUsername(),
+            self::LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT,
+            $like,
+            '=',
+            '=',
+            'LIKE'
+        );
+        if (!isset($results[0])) {
+            return null;
+        }
+        return json_decode($results[0]['value'], true)[self::RESULTS_LABEL] ?? 0;
     }
 }
