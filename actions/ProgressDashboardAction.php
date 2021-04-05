@@ -61,20 +61,34 @@ class ProgressDashboardAction extends YesWikiAction
         // the course for which we want to display the dashboard
         $course = $this->courseController->getContextualCourse();
 
+        /* * Switch to extra activity if needed */
+        /* before costly method getProgressesForAllLearners if not add or not save */
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
+                && isset($_REQUEST['extra_activity_mode'])
+                && !in_array($_REQUEST['extra_activity_mode'], ['add','edit'])
+                && $message = $this->callAction('extraactivity', $this->arguments)
+            ) {
+            return $message ;
+        }
+        /* *************************** */
+
         // the progresses we are going to process
         $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
         // the learners for this course, we count all users which have already a progress
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
         
-        /* * Switch to extra activity if needed *
-        *   but after getProgressesForAllLearners to have set learners* */
-        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) &&
-            $message = $this->callAction(
-                'extraactivity',
-                $this->arguments + ['learners' => $this->learners]
-            )) {
+        /* * Switch to extra activity if needed */
+        /* aftert costly method getProgressesForAllLearners for add or save */
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
+                && isset($_REQUEST['extra_activity_mode'])
+                && in_array($_REQUEST['extra_activity_mode'], ['add','edit'])
+                && $message = $this->callAction(
+                    'extraactivity',
+                    $this->arguments+['learners' => $this->learners]
+                )
+            ) {
             return $message ;
-        };
+        }
         /* *************************** */
 
         // check if a GET module parameter is defined
