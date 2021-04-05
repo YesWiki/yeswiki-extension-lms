@@ -26,7 +26,7 @@ class ApiController extends YesWikiController
      * Get quiz's results for a user, course, module, activity and quizId
      * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"GET"},options={"acl":{"public","+"}})
      */
-    public function getQuizResultsForAQuizz($courseId, $moduleId, $activityId, $quizId)
+    public function getQuizResultsForAQuiz($courseId, $moduleId, $activityId, $quizId)
     {
         return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, $quizId);
     }
@@ -73,11 +73,11 @@ class ApiController extends YesWikiController
     {
         $output = '<h2>Extension LMS</h2>';
 
-        $urlGetQuizResultsForAUserAndAQuizz = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
-        $fullUrlGetQuizResultsForAUserAndAQuizz = $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module/test-activity/test-id', 'api');
+        $urlGetQuizResultsForAUserAndAQuiz = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $fullUrlGetQuizResultsForAUserAndAQuiz = $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module/test-activity/test-id', 'api');
 
         $output .= 'The following code :<br />';
-        $output .= 'GET <a href="'. $fullUrlGetQuizResultsForAUserAndAQuizz .'"><code>'.$urlGetQuizResultsForAUserAndAQuizz.'</code></a><br />';
+        $output .= 'GET <a href="'. $fullUrlGetQuizResultsForAUserAndAQuiz .'"><code>'.$urlGetQuizResultsForAUserAndAQuiz.'</code></a><br />';
         $output .= 'gives a json with token results for the {quizId} quiz of activity {activityId} and for user {userId}<br />';
         $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_OK.' = OK/';
         $output .= QuizManager::STATUS_CODE_ERROR.' = error/'.QuizManager::STATUS_CODE_NO_RESULT.' = no results,<br />';
@@ -93,9 +93,9 @@ class ApiController extends YesWikiController
         $output .= '</code></a><br />';
         $output .= 'Same as previous but for current connected leaner<br />';
         
-        $urlSaveQuizzResult = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $urlSaveQuizResult = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '<br />The following code :<br />';
-        $output .= 'POST <b><code>'.$urlSaveQuizzResult.'</code></b><br />';
+        $output .= 'POST <b><code>'.$urlSaveQuizResult.'</code></b><br />';
         $output .= 'saves data float value sent in $_POST[\'result\'] for the specified user<br />';
         $output .= 'Return:<br />';
         $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_OK.' = OK/';

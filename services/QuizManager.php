@@ -62,7 +62,7 @@ class QuizManager
      * @param string $activityId, id of the concerned activity
      * @param string $quizId, id of the concerned quiz
      * @return array [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
-     *      (RESULTS_LABEL=>float in %,'message'=>'error message')]
+     *      (self::RESULTS_LABEL=>[{"log_time"=>...,"result"=>"10"},{"log_time"...}],'message'=>'error message')]
      */
     public function getQuizResultsForAUserAndAQuiz(
         ?string $userId = null,
@@ -163,7 +163,7 @@ class QuizManager
     /**
      * Method that find the results for a specific user, activity and quizId, null if not existing
      * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizId'=>$quizId]
-     * @return null|array null if no result then [{"log_time"=>...,"result"=>"10"},{"log_time"...}]
+     * @return null|array null if no result otherwise [{"log_time"=>...,"result"=>"10"},{"log_time"...}]
      */
     private function findResultsForALearnerAnActivityAndAQuiz($data): ?array
     {
