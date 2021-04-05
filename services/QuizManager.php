@@ -3,6 +3,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use Carbon\Carbon;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Wiki;
@@ -14,6 +15,7 @@ class QuizManager
     protected const LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT =  'https://yeswiki.net/vocabulary/lms-quiz-results' ;
     public const STATUS_LABEL =  'status' ;
     public const RESULTS_LABEL =  'results' ;
+    public const RESULT_LABEL =  'result' ;
     public const MESSAGE_LABEL =  'message' ;
     public const STATUS_CODE_OK =  0 ;
     public const STATUS_CODE_ERROR =  1 ;
@@ -22,6 +24,7 @@ class QuizManager
     protected $tripleStore;
     protected $wiki;
     protected $courseManager;
+    protected $dateManager;
     protected $learnerManager;
     protected $userManager;
 
@@ -31,6 +34,7 @@ class QuizManager
      * @param TripleStore $tripleStore the injected TripleStore instance
      * @param Wiki $wiki
      * @param CourseManager $courseManager
+     * @param DateManager $dateManager
      * @param LearnerManager $learnerManager
      * @param UserManager $userManager
      */
@@ -39,13 +43,15 @@ class QuizManager
         Wiki $wiki,
         CourseManager $courseManager,
         LearnerManager $learnerManager,
-        UserManager $userManager
+        UserManager $userManager,
+        DateManager $dateManager
     ) {
         $this->tripleStore = $tripleStore;
         $this->wiki = $wiki;
         $this->courseManager = $courseManager;
         $this->learnerManager = $learnerManager;
         $this->userManager = $userManager;
+        $this->dateManager = $dateManager;
     }
 
     /**
@@ -66,19 +72,14 @@ class QuizManager
         string $quizId
     ): array {
         /* check params */
-        $data = $this->checkParamsForgetQuizResultsForAUserAndAQuizz(
-            $userId,
-            $courseId,
-            $moduleId,
-            $activityId,
-            $quizId
-        );
+        $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
         if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
             return $data;
         } else {
             unset($data[self::STATUS_LABEL]);
         }
-        if (!$results = $this->findResultsForALearnerAnActivityAndAQuizz($data)) {
+        /* find results */
+        if (empty($results = $this->findResultsForALearnerAnActivityAndAQuizz($data))) {
             return [self::STATUS_LABEL => self::STATUS_CODE_NO_RESULT,
                 self::MESSAGE_LABEL => 'No results'];
         }
@@ -95,9 +96,10 @@ class QuizManager
      * @param string $activityId, id of the concerned activity
      * @param string $quizId, id of the concerned quiz
      * @return null ['status'=>false/true,('message'=>'error message',
-     *                'course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizzId'=>$quizzId]
+     *                'course'=>$course,'module'=>$module, 'activity'=>$activity,
+     *                'learner'=>$leaner,'quizzId'=>$quizzId]
      */
-    private function checkParamsForgetQuizResultsForAUserAndAQuizz(
+    private function checkParams(
         string $userId,
         string $courseId,
         string $moduleId,
@@ -157,9 +159,9 @@ class QuizManager
     /**
      * Method that find the results for a specific user, activity and quizId, null if not existing
      * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizzId'=>$quizzId]
-     * @return null|float result in %
+     * @return null|array null if no result then [{"log_time"=>...,"result"=>"10"},{"log_time"...}]
      */
-    private function findResultsForALearnerAnActivityAndAQuizz($data): ?float
+    private function findResultsForALearnerAnActivityAndAQuizz($data): ?array
     {
         $like = '%"course":"' . $data['course']->getTag() . '"%';
         $like .= '%"module":"' . $data['module']->getTag() . '"%';
@@ -173,9 +175,79 @@ class QuizManager
             '=',
             'LIKE'
         );
-        if (!isset($results[0])) {
+        if (!$results) {
             return null;
         }
-        return json_decode($results[0]['value'], true)[self::RESULTS_LABEL] ?? 0;
+        return array_map(function ($result) {
+            $values = json_decode($result['value'], true);
+            return ['log_time' => $values['log_time'],
+                self::RESULT_LABEL => $values[self::RESULT_LABEL] ?? 0];
+        }, $results);
+    }
+
+    /**
+     * method that saves result for the selected quiz
+     * @param string|null $userId, id of the concerned learner, null if it is the current user
+     * @param string $courseId, id of the concerned course
+     * @param string $moduleId, id of the concerned module
+     * @param string $activityId, id of the concerned activity
+     * @param string $quizId, id of the concerned quiz
+     * @param float $results, results in percent
+     * @return array [self::STATUS_LABEL=>0(OK)/1(error),
+     *      ('message'=>'error message')]
+     */
+    public function saveQuizResultForAUserAndAQuiz(
+        ?string $userId = null,
+        string $courseId,
+        string $moduleId,
+        string $activityId,
+        string $quizId,
+        float $result
+    ): array {
+        if (is_null($userId)) {
+            // get current user
+            $userId = $this->learnerManager->getLearner()->getUsername();
+        }
+        
+        /* check params */
+        $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
+        if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
+            return $data;
+        } else {
+            unset($data[self::STATUS_LABEL]);
+        }
+
+        /* save result */
+        $codeStatus = $this->tripleStore->create(
+            $data['learner']->getUsername(),
+            self::LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT,
+            json_encode(['course' => $data['course']->getTag(),
+                         'module' => $data['module']->getTag(),
+                         'activity' => $data['activity']->getTag(),
+                         'quizId' => $data['quizId'],
+                         'log_time' => $this->dateManager->formatDatetime(Carbon::now()),
+                         self::RESULT_LABEL => $result,
+                        ]),
+            '',
+            ''
+        );
+
+        switch ($codeStatus) {
+            case 0:
+                return [self::STATUS_LABEL => self::STATUS_CODE_OK];
+                break;
+            case 3:
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
+                    self::MESSAGE_LABEL => 'Error when saving results: '.$results.'% for quiz \''
+                        .$data['quizId'].'\' in activity \''.$data['activity']->getTag()
+                        .'\' for user: '.$data['learner']->getUsername().', triple already existing!'];
+            case 1:
+            default:
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
+                    self::MESSAGE_LABEL => 'Error when saving results: '.$results.'% for quiz \''
+                        .$data['quizId'].'\' in activity \''.$data['activity']->getTag()
+                        .'\' for user: '.$data['learner']->getUsername().'!'];
+                break;
+        }
     }
 }
