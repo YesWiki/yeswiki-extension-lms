@@ -3,6 +3,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\Service\TripleStore;
 use YesWiki\Wiki;
 use YesWiki\Lms\Service\CourseManager;
@@ -22,6 +23,7 @@ class QuizManager
     protected $wiki;
     protected $courseManager;
     protected $learnerManager;
+    protected $userManager;
 
     /**
      * QuizManager constructor
@@ -30,17 +32,20 @@ class QuizManager
      * @param Wiki $wiki
      * @param CourseManager $courseManager
      * @param LearnerManager $learnerManager
+     * @param UserManager $userManager
      */
     public function __construct(
         TripleStore $tripleStore,
         Wiki $wiki,
         CourseManager $courseManager,
-        LearnerManager $learnerManager
+        LearnerManager $learnerManager,
+        UserManager $userManager
     ) {
         $this->tripleStore = $tripleStore;
         $this->wiki = $wiki;
         $this->courseManager = $courseManager;
         $this->learnerManager = $learnerManager;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -121,11 +126,18 @@ class QuizManager
                 return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {activityId}: '.$activityId];
             }
         }
-        if (!$learner = $this->learnerManager->getLearner()) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'You should be connected as learner !'];
+        if (empty($userId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{userId} shoud not be empty !'];
+        }
+        if (empty($this->userManager->getOneByName($userId)) || !$learner = $this->learnerManager->getLearner($userId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{$userId}: '.$userId.'is not existing !'];
+        }
+        $currentUser = $this->learnerManager->getLearner(); // current learner
+        if (!$currentUser->isAdmin() && $currentUser->getUsername() != $learner->getUsername()) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'You can not read results for other learner than you !'];
         }
         if (empty($quizId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activity} shoud not be empty !'];
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{quizId} shoud not be empty !'];
         }
 
         return [
