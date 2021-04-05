@@ -119,8 +119,8 @@ class ExtraActivityManager
         );
         // === END format data ====
 
-        // === START remove previous data ====
-        if (!$this->deleteExtraActivity($data['tag'])) {
+        // === START remove previous data if existing ====
+        if ($this->getExtraActivityLog($data['tag']) && !$this->deleteExtraActivity($data['tag'])) {
             throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].'<br>');
         }
         // === END remove previous data ====
