@@ -9,15 +9,16 @@ use YesWiki\Lms\Service\QuizManager;
 
 class ApiController extends YesWikiController
 {
+    
     /**
-     * Give a token for POST quiz results, can only be called if connected
-     * @Route("/api/lms/{course}/{module}/{activity}/quiz/token",methods={"GET"},options={"acl":{"public","+"}})
+     * Get quizz's results for a user, course,module, activity and quizId
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"GET"},options={"acl":{"public","+"}})
      */
-    public function getQuizzToken($course, $module, $activity)
+    public function getQuizResultsForAUserAndAQuizz($userId, $courseId, $moduleId, $activityId, $quizId)
     {
         return new ApiResponse(
             $this->getService(QuizManager::class)
-                ->getQuizToken($course, $module, $activity)
+                ->getQuizResultsForAUserAndAQuizz($userId, $courseId, $moduleId, $activityId, $quizId)
         );
     }
     
@@ -53,21 +54,23 @@ class ApiController extends YesWikiController
     {
         $output = '<h2>Extension LMS</h2>';
 
-        $urlGetQuizzToken = $this->wiki->Href('lms/{course}/{module}/{activity}/quiz/token', 'api');
-        $fullUrlGetQuizzToken = $this->wiki->Href('lms/test-course/test-module/test-activity/quiz/token', 'api');
-        $urlSaveQuizzResult = $this->wiki->Href('lms/{course}/{module}/{activity}/quiz', 'api');
+        $urlGetQuizResultsForAUserAndAQuizz = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $fullUrlGetQuizResultsForAUserAndAQuizz = $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module/test-activity/test-id', 'api');
 
         $output .= 'The following code :<br />';
-        $output .= 'GET <a href="'. $fullUrlGetQuizzToken .'"><code>'.$urlGetQuizzToken.'</code></a><br />';
-        $output .= 'gives a json with token needed for <code>'.$urlSaveQuizzResult.'</code><br />';
-        $output .= '<code>["status":true/false,<br />';
-        $output .= '"token":"66HF867FHHF9JH"]</code><br />';
-        $output .= '<b>You must sent cookies to be connected as learner.</b><br />';
+        $output .= 'GET <a href="'. $fullUrlGetQuizResultsForAUserAndAQuizz .'"><code>'.$urlGetQuizResultsForAUserAndAQuizz.'</code></a><br />';
+        $output .= 'gives a json with token results for the {quizId} quiz of activity {activityId} and for user {userId}<br />';
+        $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_OK.' = OK/';
+        $output .= QuizManager::STATUS_CODE_ERROR.' = error/'.QuizManager::STATUS_CODE_NO_RESULT.' = no results,<br />';
+        $output .= '"'.QuizManager::RESULTS_LABEL.'":"23", // value in percent<br />';
+        $output .= '"'.QuizManager::MESSAGE_LABEL.'":"error message of needed",]</code><br />';
+        $output .= '<b>You must sent cookies to be connected as learner or admin.</b><br />';
 
+        
+        $urlSaveQuizzResult = $this->wiki->Href('lms/{course}/{module}/{activity}/quiz', 'api');
         $output .= '<br />The following code :<br />';
         $output .= 'POST <b><code>'.$urlSaveQuizzResult.'</code></b><br />';
         $output .= 'saves data sent in json in $_POST[\'results\'] with token in $_POST[\'token\']<br />';
-        $output .= 'Token obtains with <code>'.$urlGetQuizzToken.'</code><br />';
         $output .= 'Return:<br />';
         $output .= '<code>["status":true/false,<br />';
         $output .= '"message":"error message"]</code><br />';

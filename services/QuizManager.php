@@ -10,11 +10,13 @@ use YesWiki\Lms\Service\LearnerManager;
 
 class QuizManager
 {
-    protected const LMS_TRIPLE_PROPERTY_NAME_QUIZ_TOKEN =  'https://yeswiki.net/vocabulary/lms-quiz-token' ;
     protected const LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT =  'https://yeswiki.net/vocabulary/lms-quiz-results' ;
     public const STATUS_LABEL =  'status' ;
-    public const TOKEN_LABEL =  'token' ;
+    public const RESULTS_LABEL =  'results' ;
     public const MESSAGE_LABEL =  'message' ;
+    public const STATUS_CODE_OK =  0 ;
+    public const STATUS_CODE_ERROR =  1 ;
+    public const STATUS_CODE_NO_RESULT =  2 ;
 
     protected $tripleStore;
     protected $wiki;
@@ -42,72 +44,97 @@ class QuizManager
     }
 
     /**
-     * method that return an array giving token for the selected activity
-     * @param string $courseTag, tag of the concerned course
-     * @param string $moduleTag, tag of the concerned module
-     * @param string $activityTag, tag of the concerned activity
-     * @return array ['status'=>true/false,('token'=>'token','message'=>'error message')]
+     * method that return an array giving results for the selected quiz
+     * @param string $userId, id of the concerned learner
+     * @param string $courseId, id of the concerned course
+     * @param string $moduleId, id of the concerned module
+     * @param string $activityId, id of the concerned activity
+     * @param string $quizId, id of the concerned quiz
+     * @return array [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
+     *      (RESULTS_LABEL=>float in %,'message'=>'error message')]
      */
-    public function getQuizToken(string $courseTag, string $moduleTag, string $activityTag): array
-    {
+    public function getQuizResultsForAUserAndAQuizz(
+        string $userId,
+        string $courseId,
+        string $moduleId,
+        string $activityId,
+        string $quizId
+    ): array {
         /* check params */
-        $data = $this->checkParamsForGetQuizToken($courseTag, $moduleTag, $activityTag);
-        if (!$data[self::STATUS_LABEL]) {
+        $data = $this->checkParamsForgetQuizResultsForAUserAndAQuizz(
+            $userId,
+            $courseId,
+            $moduleId,
+            $activityId,
+            $quizId
+        );
+        if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
             return $data;
         } else {
             unset($data[self::STATUS_LABEL]);
         }
 
-        return [self::STATUS_LABEL => false,
+        return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
             self::MESSAGE_LABEL => 'api not ready'];
     }
 
     /**
      * method that return an array giving values checked for the selected activity quiz
-     * @param string $courseTag, tag of the concerned course
-     * @param string $moduleTag, tag of the concerned module
-     * @param string $activityTag, tag of the concerned activity
+     * @param string $userId, id of the concerned learner
+     * @param string $courseId, id of the concerned course
+     * @param string $moduleId, id of the concerned module
+     * @param string $activityId, id of the concerned activity
+     * @param string $quizId, id of the concerned quiz
      * @return null ['status'=>false/true,('message'=>'error message',
-     *                'course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner]
+     *                'course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizzId'=>$quizzId]
      */
-    private function checkParamsForGetQuizToken(string $courseTag, string $moduleTag, string $activityTag): array
-    {
-        if (empty($courseTag)) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => '{course} shoud not be empty !'];
+    private function checkParamsForgetQuizResultsForAUserAndAQuizz(
+        string $userId,
+        string $courseId,
+        string $moduleId,
+        string $activityId,
+        string $quizId
+    ): array {
+        if (empty($courseId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{courseId} shoud not be empty !'];
         }
-        if (!$course = $this->courseManager->getCourse($courseTag)) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => 'Not existing {course} :'.$courseTag];
+        if (!$course = $this->courseManager->getCourse($courseId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {courseId}: '.$courseId];
         }
-        if (empty($moduleTag)) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => '{module} shoud not be empty !'];
+        if (empty($moduleId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{moduleId} shoud not be empty !'];
         }
-        if (!$course->hasModule($moduleTag)) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => '{module} :'.$moduleTag.' is not a module of the {course} :'.$courseTag];
+        if (!$course->hasModule($moduleId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{moduleId}: '.$moduleId.' is not a module of the {courseId}: '.$courseId];
         } else {
-            if (!$module = $this->courseManager->getModule($moduleTag)) {
-                return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => 'Not existing {module} :'.$moduleTag];
+            if (!$module = $this->courseManager->getModule($moduleId)) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {moduleId}: '.$moduleId];
             }
         }
-        if (empty($activityTag)) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => '{activity} shoud not be empty !'];
+        if (empty($activityId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activityId} shoud not be empty !'];
         }
-        if (!$module->hasActivity($activityTag)) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => '{activity} :'.$activityTag.' is not an activity of the {module} :'.$moduleTag];
+        if (!$module->hasActivity($activityId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activityId}: '.$activityId.' is not an activity of the {moduleId}: '.$moduleId];
         } else {
-            if (!$activity = $this->courseManager->getActivity($activityTag)) {
-                return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => 'Not existing {activity} :'.$activityTag];
+            if (!$activity = $this->courseManager->getActivity($activityId)) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {activityId}: '.$activityId];
             }
         }
         if (!$learner = $this->learnerManager->getLearner()) {
-            return [self::STATUS_LABEL => false, self::MESSAGE_LABEL => 'You should be connected as learner !'];
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'You should be connected as learner !'];
+        }
+        if (empty($quizId)) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activity} shoud not be empty !'];
         }
 
         return [
-            self::STATUS_LABEL=>true,
+            self::STATUS_LABEL=>self::STATUS_CODE_OK,
+            'learner'=>$learner,
             'course'=>$course,
             'module'=>$module,
             'activity'=>$activity,
-            'learner'=>$learner,
+            'quizId'=>$quizId,
         ];
     }
 }
