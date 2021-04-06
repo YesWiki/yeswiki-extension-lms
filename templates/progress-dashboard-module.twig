@@ -34,3 +34,12 @@
 {% for activity in module.activities %}
     {{ include('@lms/progress-dashboard-included-activity.twig') }}
 {% endfor %}
+
+{% if module.extraActivityLogs|length > 0 %}
+    <h3 class="dashboard-activity">{{ _t('LMS_EXTRA_ACTIVITIES')}}{{ include('@lms/extra-activity-link.twig', {mode:'add-light'}) }}</h3>
+    {% for extraActivityLog in module.extraActivityLogs %}
+        {{ include('@lms/progress-dashboard-included-extra-activity.twig') }}
+    {% endfor %}
+{% else %}
+    {{ extraActivityEnabled ? include('@lms/extra-activity-link.twig') }}
+{% endif %}

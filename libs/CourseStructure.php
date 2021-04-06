@@ -12,6 +12,7 @@ abstract class CourseStructure
 
     // the next fields are lazy loaded : don't use direct access to them, call the getters instead
     protected $fields; // entry fields of the object
+    protected $extraActivityLogs; // extraActivityLogs of the CourseStructure
 
     // the configuration parameters of YesWiki
     protected $config;
@@ -44,6 +45,7 @@ abstract class CourseStructure
         $this->config = $config;
         $this->entryManager = $entryManager;
         $this->dateManager = $dateManager;
+        $this->extraActivityLogs = new ExtraActivityLogs() ;
     }
 
     /**
@@ -87,5 +89,27 @@ abstract class CourseStructure
     public function getTitle(): ?string
     {
         return $this->getField('bf_titre');
+    }
+
+    
+    /**
+     * Get the Extra-activities of the courseStructure
+     *
+     * @return ExtraActivityLogs the courseStructure's extraActivityLogs
+     */
+    public function getExtraActivityLogs(): ExtraActivityLogs
+    {
+        return $this->extraActivityLogs;
+    }
+
+    
+    /**
+     * Set the Extra-activities of the courseStructure
+     *
+     * @param ExtraActivityLogs the courseStructure's extraActivityLogs
+     */
+    public function setExtraActivityLogs(ExtraActivityLogs $extraActivityLogs)
+    {
+        $this->extraActivityLogs = $extraActivityLogs;
     }
 }

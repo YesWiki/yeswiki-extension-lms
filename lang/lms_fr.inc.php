@@ -54,8 +54,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_VIEW_LEARNER_DASHBOARD' => 'Voir le détail de l\'activité de l\'apprenant',
         'LMS_FINISHED_RATIO' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s / Nombre d\'apprenant⋅e⋅s',
         'LMS_ESTIMATED_TIME_DETAILLED' => 'Temps estimé par les formateurs',
-        'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s',
-        'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé⋅e⋅s',
+        'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
+        'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
 
         // For Learner Dashboard
@@ -95,5 +95,33 @@ $GLOBALS['translations'] = array_merge(
         'LMS_IMPORT_TOKEN' => 'Token du site distant',
         'LMS_IMPORT_URL' => 'URL à importer',
         'LMS_IMPORT' => 'Importer',
+
+        // extra activities
+        'LMS_EXTRA_ACTIVITY_ADD' => 'Ajouter une activité supplémentaire (atelier, webinaire, séminaire, ...)',
+        'LMS_EXTRA_ACTIVITY_REMOVE' => 'Retirer cet utilisateur',
+        'LMS_EXTRA_ACTIVITY_DELETE' => 'Supprimer l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_EDIT' => 'Modifier l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITIES' => 'Webinaires, ateliers, séminaires, autres activités',
+        'LMS_EXTRA_ACTIVITY_TITLE' => 'Titre de l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_RELATED_LINK' => 'Lien ou pageTag vers des détails sur l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_LINK' => 'Détails sur l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_BEGIN_DATE' => 'Date de démarrage de l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_DATE' => 'Date',
+        'LMS_EXTRA_ACTIVITY_END_DATE' => 'Date de fin de l\'activité supplémentaire',
+        'LMS_EXTRA_ACTIVITY_ASSOCIATED_COURSE' => 'Cours associé',
+        'LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE' => 'Module associé',
+        'LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS' => 'Inscrit⋅e⋅s',
+        'LMS_EXTRA_ACTIVITY_D' => ' d\' ',
+        'LMS_EXTRA_ACTIVITY_LEARNERS' => 'Apprenant⋅e⋅s',
+        'LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE' => 'Erreur lors de la sauvegarde de l\'activité supplémentaire : ',
+        'LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE' => 'Erreur lors de la suppresion de l\'activité supplémentaire : ',
+        'LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE' => 'Erreur lors du retrait de l\'apprenant⋅e : ',
+        'LMS_EXTRA_ACTIVITY_DELETE' => 'Confirmer la suppression de l\'activité supplémentaire : ',
+        'LMS_EXTRA_ACTIVITY_REMOVE_LEARNER' => 'Confirmer le retrait de l\'apprenant⋅e : ',
+        'LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END' => ', de l\'activité supplémentaire : ',
+        'LMS_YES' => 'Oui',
+        'LMS_NO' => 'Non',
+        'LMS_BACK_TO_PROGRESSES_DASHBOARD' => 'Retour au tableau de bord',
+
     )
 );

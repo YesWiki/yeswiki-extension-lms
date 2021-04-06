@@ -6,8 +6,8 @@ use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Lms\Service\LearnerManager;
-use YesWiki\Wiki;
 
 class ProgressDashboardAction extends YesWikiAction
 {
@@ -15,6 +15,7 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
+    protected $extraActivityManager;
 
     // the progresses related to the current course for all users
     protected $progresses;
@@ -46,6 +47,7 @@ class ProgressDashboardAction extends YesWikiAction
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
+        $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
 
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
@@ -59,10 +61,35 @@ class ProgressDashboardAction extends YesWikiAction
         // the course for which we want to display the dashboard
         $course = $this->courseController->getContextualCourse();
 
+        /* * Switch to extra activity if needed */
+        /* before costly method getProgressesForAllLearners if not add or not save */
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
+                && isset($_REQUEST['extra_activity_mode'])
+                && !in_array($_REQUEST['extra_activity_mode'], ['add','edit'])
+                && $message = $this->callAction('extraactivity', $this->arguments)
+            ) {
+            return $message ;
+        }
+        /* *************************** */
+
         // the progresses we are going to process
         $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
         // the learners for this course, we count all users which have already a progress
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
+        
+        /* * Switch to extra activity if needed */
+        /* aftert costly method getProgressesForAllLearners for add or save */
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
+                && isset($_REQUEST['extra_activity_mode'])
+                && in_array($_REQUEST['extra_activity_mode'], ['add','edit'])
+                && $message = $this->callAction(
+                    'extraactivity',
+                    $this->arguments+['learners' => $this->learners]
+                )
+            ) {
+            return $message ;
+        }
+        /* *************************** */
 
         // check if a GET module parameter is defined
         $moduleParam = isset($_GET['module']) ? $_GET['module'] : null;
@@ -85,13 +112,16 @@ class ProgressDashboardAction extends YesWikiAction
         }
 
         $this->processActivitiesAndModuleStat($course, $module);
+        
         // render the dashboard for a module
         return $this->render('@lms/progress-dashboard-module.twig', [
             'course' => $course,
             'module' => $module,
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
+            'debug' => isset($_GET['debug']),
         ]);
     }
 
@@ -108,7 +138,9 @@ class ProgressDashboardAction extends YesWikiAction
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
             'learners' => $this->learners,
+            'debug' => isset($_GET['debug']),
         ]);
     }
 
@@ -146,6 +178,11 @@ class ProgressDashboardAction extends YesWikiAction
                 );
             }
         }
+        
+        
+        if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
+            $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module));
+        }
         // $finishedUsernames contains now the usernames which have finished the module
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
         ksort($finishedUsernames);
@@ -170,6 +207,10 @@ class ProgressDashboardAction extends YesWikiAction
                 );
             }
         }
+        
+        if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
+            $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course));
+        }
         // $finishedUsernames contains now the usernames which have finished the course
         $notFinishedUsernames = array_diff(array_keys($this->learners), $finishedUsernames);
         ksort($finishedUsernames);
@@ -185,7 +226,7 @@ class ProgressDashboardAction extends YesWikiAction
     private function setLearnersFromUsernames($usernames): void
     {
         $this->learners = [];
-        foreach ($usernames as $username){
+        foreach ($usernames as $username) {
             $learner = $this->learnerManager->getLearner($username);
             $this->learners[$username] = $learner;
         }

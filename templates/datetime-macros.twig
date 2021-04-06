@@ -1,8 +1,8 @@
 {% macro displayTime(dateInterval) %}
     {% if dateInterval is null %}
         -
-    {% elseif dateInterval.h > 0 or dateInterval.d > 0 or dateInterval.i > 60 %}
-        {{ dateInterval.format('%hh%I') }}
+    {% elseif dateInterval.totalHours >= 1 %}
+        {{ dateInterval.totalHours|round(0, 'floor') ~ 'h' ~ dateInterval.format('%I') }}
     {% else %}
         {{ dateInterval.format('%i min') }}
     {% endif %}

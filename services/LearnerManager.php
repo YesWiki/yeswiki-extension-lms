@@ -17,7 +17,6 @@ use YesWiki\Wiki;
 
 class LearnerManager
 {
-    protected const LMS_TRIPLE_PROPERTY_NAME_EXTRA_ACTIVITY =  'https://yeswiki.net/vocabulary/lms-extra-activity' ;
     protected const LMS_TRIPLE_PROPERTY_NAME_PROGRESS =  'https://yeswiki.net/vocabulary/progress' ;
 
     protected $config;

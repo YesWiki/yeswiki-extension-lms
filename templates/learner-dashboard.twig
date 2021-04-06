@@ -46,6 +46,13 @@
       {% set modulesStat =  coursesStat[course.tag].modulesStat %}
       {{ include('@lms/learner-dashboard-module.twig') }}
   {% endfor %}
+
+  {% if course.extraActivityLogs|length > 0 %}
+    <h3 class="dashboard-module">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h3>
+    {% for extraActivityLog in course.extraActivityLogs %}
+        {{ include('@lms/learner-dashboard-extra-activity.twig',{level:'module'}) }}
+    {% endfor %}
+  {% endif %}
 {% endfor %}
 <div class="panel panel-lms-dashboard dashboard-legend-frame">
  <div class="panel-heading">

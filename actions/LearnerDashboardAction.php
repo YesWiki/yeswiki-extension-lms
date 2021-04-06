@@ -43,6 +43,17 @@ class LearnerDashboardAction extends YesWikiAction
                 'message' => _t('LOGGED_USERS_ONLY_ACTION') . ' (learnerdashboard)'
             ]);
         }
+        
+        /* * Switch to extra activity if needed * */
+        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) &&
+            $message = $this->callAction(
+                'extraactivity',
+                $this->arguments + ['learners' => [$this->learner]]
+            )) {
+            return $message ;
+        };
+        /* *************************** */
+
         if ($this->wiki->UserIsAdmin()
             && (empty($this->wiki->GetParameter('selectuser')) || $this->wiki->GetParameter('selectuser') == 'true')
             && empty($learnerNameOption)
@@ -83,7 +94,10 @@ class LearnerDashboardAction extends YesWikiAction
             'courses' => $courses,
             'coursesStat' => $coursesStat,
             'display_activity_elapsed_time' => $this->wiki->config['lms_config']['display_activity_elapsed_time'],
-            'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time']
+            'use_only_custom_elapsed_time' => $this->wiki->config['lms_config']['use_only_custom_elapsed_time'],
+            'user_is_admin' => $this->wiki->UserIsAdmin(),
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
+            'debug' => isset($_GET['debug']),
         ]);
     }
 

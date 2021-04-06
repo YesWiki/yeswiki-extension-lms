@@ -53,11 +53,17 @@
     <div id="collapse_{{ course.tag ~ '_' ~ module.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ course.tag ~ '_' ~ module.tag }}" aria-expanded="false">
         <div>
-            <h4 class="dashboard-module">{{ module.activities|length == 0 ?  _t('LMS_NO_ACTIVITY')  : _t('LMS_ACTIVITIES')}}</h3>
+            <h4 class="dashboard-activity">{{ module.activities|length == 0 ?  _t('LMS_NO_ACTIVITY')  : _t('LMS_ACTIVITIES')}}</h3>
             {% for activity in module.activities %}
                 {% set activitiesStat =  modulesStat[module.tag].activitiesStat %}
                 {{ include('@lms/learner-dashboard-activity.twig') }}
             {% endfor %}
+            {% if module.extraActivityLogs|length > 0 %}
+                <h4 class="dashboard-activity">{{ _t('LMS_EXTRA_ACTIVITIES')}}</h4>
+                {% for extraActivityLog in module.extraActivityLogs %}
+                    {{ include('@lms/learner-dashboard-extra-activity.twig',{level:'activity'}) }}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>
