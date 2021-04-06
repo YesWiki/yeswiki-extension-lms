@@ -56,25 +56,25 @@ class QuizManager
 
     /**
      * method that return an array giving results for the selected quiz
-     * @param string|null $userId, id of the concerned learner, if null current learner
-     * @param string $courseId, id of the concerned course
-     * @param string $moduleId, id of the concerned module
-     * @param string $activityId, id of the concerned activity
-     * @param string $quizId, id of the concerned quiz
-     * @return array [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
-     *      (self::RESULTS_LABEL=>[{"log_time"=>...,"result"=>"10"},{"log_time"...}],'message'=>'error message')]
+     * @param string|null $userId, id of the concerned learner, if all learners for admin or current learner
+     * @param string|null $courseId, id of the concerned course, null = all courses
+     * @param string|null $moduleId, id of the concerned module, null = all modules
+     * @param string|null $activityId, id of the concerned activity, null = all activities
+     * @param string|null $quizId, id of the concerned quiz, null = all quizzes
+     * @return arra|null [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
+     *      (self::RESULTS_LABEL=>[{"learner"=>"userId", "course"=>"courseId,
+     *       "module"=>"moduleId, "activity"=>"activityId, "quizId"=>"quizId",
+     *       "log_time"=>...,"result"=>"10"},{"log_time"...}]
+     *      ,'message'=>'error message')]
      */
-    public function getQuizResultsForAUserAndAQuiz(
+    public function getQuizResults(
         ?string $userId = null,
-        string $courseId,
-        string $moduleId,
-        string $activityId,
-        string $quizId
+        ?string $courseId = null,
+        ?string $moduleId = null,
+        ?string $activityId = null,
+        ?string $quizId = null
     ): array {
-        if (is_null($userId)) {
-            // get current user
-            $userId = $this->learnerManager->getLearner()->getUsername();
-        }
+
         /* check params */
         $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
         if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
@@ -83,7 +83,7 @@ class QuizManager
             unset($data[self::STATUS_LABEL]);
         }
         /* find results */
-        if (empty($results = $this->findResultsForALearnerAnActivityAndAQuiz($data))) {
+        if (empty($results = $this->findResults($data))) {
             return [self::STATUS_LABEL => self::STATUS_CODE_NO_RESULT,
                 self::MESSAGE_LABEL => 'No results'];
         }
@@ -94,85 +94,85 @@ class QuizManager
 
     /**
      * method that return an array giving values checked for the selected activity quiz
-     * @param string $userId, id of the concerned learner
-     * @param string $courseId, id of the concerned course
-     * @param string $moduleId, id of the concerned module
-     * @param string $activityId, id of the concerned activity
-     * @param string $quizId, id of the concerned quiz
+     * @param string|null $userId, id of the concerned learner
+     * @param string|null $courseId, id of the concerned course
+     * @param string|null $moduleId, id of the concerned module
+     * @param string|null $activityId, id of the concerned activity
+     * @param string|null $quizId, id of the concerned quiz
      * @return null ['status'=>false/true,('message'=>'error message',
      *                'course'=>$course,'module'=>$module, 'activity'=>$activity,
      *                'learner'=>$leaner,'quizId'=>$quizId]
      */
     private function checkParams(
-        string $userId,
-        string $courseId,
-        string $moduleId,
-        string $activityId,
-        string $quizId
+        ?string $userId = null,
+        ?string $courseId = null,
+        ?string $moduleId = null,
+        ?string $activityId = null,
+        ?string $quizId = null
     ): array {
-        if (empty($courseId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{courseId} shoud not be empty !'];
-        }
-        if (!$course = $this->courseManager->getCourse($courseId)) {
+        if (!empty($courseId) && !$course = $this->courseManager->getCourse($courseId)) {
             return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {courseId}: '.$courseId];
         }
-        if (empty($moduleId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{moduleId} shoud not be empty !'];
-        }
-        if (!$course->hasModule($moduleId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{moduleId}: '.$moduleId.' is not a module of the {courseId}: '.$courseId];
-        } else {
-            if (!$module = $this->courseManager->getModule($moduleId)) {
-                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {moduleId}: '.$moduleId];
+        if (!empty($courseId) && !empty($moduleId)) {
+            if (!$course->hasModule($moduleId)) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{moduleId}: '.$moduleId.' is not a module of the {courseId}: '.$courseId];
+            } else {
+                if (!$module = $this->courseManager->getModule($moduleId)) {
+                    return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {moduleId}: '.$moduleId];
+                }
             }
         }
-        if (empty($activityId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activityId} shoud not be empty !'];
-        }
-        if (!$module->hasActivity($activityId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activityId}: '.$activityId.' is not an activity of the {moduleId}: '.$moduleId];
-        } else {
-            if (!$activity = $this->courseManager->getActivity($activityId)) {
-                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {activityId}: '.$activityId];
+        if (!empty($courseId) && !empty($moduleId) && !empty($activityId)) {
+            if (!$module->hasActivity($activityId)) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activityId}: '.$activityId.' is not an activity of the {moduleId}: '.$moduleId];
+            } else {
+                if (!$activity = $this->courseManager->getActivity($activityId)) {
+                    return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {activityId}: '.$activityId];
+                }
             }
-        }
-        if (empty($userId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{userId} shoud not be empty !'];
-        }
-        if (empty($this->userManager->getOneByName($userId)) || !$learner = $this->learnerManager->getLearner($userId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{$userId}: '.$userId.'is not existing !'];
-        }
-        $currentUser = $this->learnerManager->getLearner(); // current learner
-        if (!$currentUser->isAdmin() && $currentUser->getUsername() != $learner->getUsername()) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'You can not read results for other learner than you !'];
-        }
-        if (empty($quizId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{quizId} shoud not be empty !'];
         }
 
+        /* set learner from $userId */
+        $currentUser = $this->learnerManager->getLearner(); // current user
+        if (!empty($userId)) {
+            if (empty($this->userManager->getOneByName($userId)) || !$learner = $this->learnerManager->getLearner($userId)) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{$userId}: '.$userId.'is not existing !'];
+            }
+            if (!$currentUser->isAdmin() && $currentUser->getUsername() != $learner->getUsername()) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'You can not read results for other learner than you !'];
+            }
+        } elseif (!$currentUser->isAdmin()) {
+            $learner = $this->learnerManager->getLearner(); // current user
+        }
+        
         return [
             self::STATUS_LABEL=>self::STATUS_CODE_OK,
-            'learner'=>$learner,
-            'course'=>$course,
-            'module'=>$module,
-            'activity'=>$activity,
-            'quizId'=>$quizId,
+            'learner'=>$learner ?? null,
+            'course'=>$course ?? null,
+            'module'=>$module ?? null,
+            'activity'=>$activity ?? null,
+            'quizId'=>$quizId ?? null,
         ];
     }
 
     /**
      * Method that find the results for a specific user, activity and quizId, null if not existing
-     * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizId'=>$quizId]
-     * @return null|array null if no result otherwise [{"log_time"=>...,"result"=>"10"},{"log_time"...}]
+     * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizId'=>$quizId] ; null = all
+     * @return null|array null if no result otherwise [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
+     *      (self::RESULTS_LABEL=>[{"learner"=>"userId", "course"=>"courseId,
+     *       "module"=>"moduleId, "activity"=>"activityId, "quizId"=>"quizId",
+     *       "log_time"=>...,"result"=>"10"},{"log_time"...}]
+     *      ,'message'=>'error message')]
      */
-    private function findResultsForALearnerAnActivityAndAQuiz($data): ?array
+    private function findResults($data): ?array
     {
-        $like = '%"course":"' . $data['course']->getTag() . '"%';
-        $like .= '%"module":"' . $data['module']->getTag() . '"%';
-        $like .= '%"activity":"' . $data['activity']->getTag() . '"%';
-        $like .= '%"quizId":"' . $data['quizId'] . '"%';
+        $like = $data['course'] ? '%"course":"' . $data['course']->getTag() . '"%' : '';
+        $like .= $data['module'] ? '%"module":"' . $data['module']->getTag() . '"%' : '';
+        $like .= $data['activity'] ? '%"activity":"' . $data['activity']->getTag() . '"%' : '';
+        $like .= $data['quizId'] ? '%"quizId":"' . $data['quizId'] . '"%' : '';
+        $like = empty($like) ? '%' : $like ;
         $results = $this->tripleStore->getMatching(
-            $data['learner']->getUsername(),
+            $data['learner'] ? $data['learner']->getUsername() : null,
             self::LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT,
             $like,
             '=',
@@ -184,8 +184,15 @@ class QuizManager
         }
         return array_map(function ($result) {
             $values = json_decode($result['value'], true);
-            return ['log_time' => $values['log_time'],
-                self::RESULT_LABEL => $values[self::RESULT_LABEL] ?? 0];
+            return [
+                'learner' => $result['resource'],
+                'course' => $values['course'],
+                'module' => $values['module'],
+                'activity' => $values['activity'],
+                'quizId' => $values['quizId'],
+                'log_time' => $values['log_time'],
+                self::RESULT_LABEL => $values[self::RESULT_LABEL]
+            ];
         }, $results);
     }
 
@@ -208,17 +215,19 @@ class QuizManager
         string $quizId,
         float $result
     ): array {
-        if (is_null($userId)) {
-            // get current user
-            $userId = $this->learnerManager->getLearner()->getUsername();
-        }
         
         /* check params */
+        foreach (['courseId','moduleId','activityId','quizId'] as $varName) {
+            if (empty($$varName)) {
+                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{'.$varName.'} should be defined'];
+            }
+        }
         $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
         if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
             return $data;
         } else {
             unset($data[self::STATUS_LABEL]);
+            $data['learner'] = $data['learner'] ?? $this->learnerManager->getLearner(); // current user
         }
 
         /* save result */

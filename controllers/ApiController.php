@@ -18,17 +18,116 @@ class ApiController extends YesWikiController
     {
         return new ApiResponse(
             $this->getService(QuizManager::class)
-                ->getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
+                ->getQuizResults($userId, $courseId, $moduleId, $activityId, $quizId)
         );
     }
 
     /**
-     * Get quiz's results for a user, course, module, activity and quizId
+     * Get quizzes' results for a user, course, module, activity
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAUserAndAnActivity($userId, $courseId, $moduleId, $activityId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults($userId, $courseId, $moduleId, $activityId, null)
+        );
+    }
+    
+    /**
+     * Get quizzes' results for a user, course, module
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAUserAndAModule($userId, $courseId, $moduleId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults($userId, $courseId, $moduleId, null, null)
+        );
+    }
+    
+    /**
+     * Get quizzes' results for a user, course
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAUserAndACourse($userId, $courseId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults($userId, $courseId, null, null, null)
+        );
+    }
+    
+    /**
+     * Get quizzes' results for a user, course
+     * @Route("/api/lms/users/{userId}/quizresults",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAUser($userId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults($userId, null, null, null, null)
+        );
+    }
+
+    /**
+     * Get quiz's results for a course, module, activity and quizId (all users for admins otherwise only for current user)
      * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"GET"},options={"acl":{"public","+"}})
      */
     public function getQuizResultsForAQuiz($courseId, $moduleId, $activityId, $quizId)
     {
-        return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, $quizId);
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults(null, $courseId, $moduleId, $activityId, $quizId)
+        );
+    }
+    
+    /**
+     * Get quiz's results for a course, module, activity (all users for admins otherwise only for current user)
+     * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAnActivity($courseId, $moduleId, $activityId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults(null, $courseId, $moduleId, $activityId, null)
+        );
+    }
+    
+    /**
+     * Get quiz's results for a course, module (all users for admins otherwise only for current user)
+     * @Route("/api/lms/quizresults/{courseId}/{moduleId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForAModule($courseId, $moduleId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults(null, $courseId, $moduleId, null, null)
+        );
+    }
+
+    /**
+     * Get quiz's results for a course (all users for admins otherwise only for current user)
+     * @Route("/api/lms/quizresults/{courseId}",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResultsForACourse($courseId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults(null, $courseId, null, null, null)
+        );
+    }
+
+    /**
+     * Get quiz's results  (all users for admins otherwise only for current user)
+     * @Route("/api/lms/quizresults",methods={"GET"},options={"acl":{"public","+"}})
+     */
+    public function getQuizResults()
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->getQuizResults(null, null, null, null, null)
+        );
     }
     
     /**
@@ -73,17 +172,50 @@ class ApiController extends YesWikiController
     {
         $output = '<h2>Extension LMS</h2>';
 
-        $urlGetQuizResultsForAUserAndAQuiz = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
-        $fullUrlGetQuizResultsForAUserAndAQuiz = $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module/test-activity/test-id', 'api');
-
-        $output .= 'The following code :<br />';
-        $output .= 'GET <a href="'. $fullUrlGetQuizResultsForAUserAndAQuiz .'"><code>'.$urlGetQuizResultsForAUserAndAQuiz.'</code></a><br />';
-        $output .= 'gives a json with token results for the {quizId} quiz of activity {activityId} and for user {userId}<br />';
-        $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_OK.' = OK/';
-        $output .= QuizManager::STATUS_CODE_ERROR.' = error/'.QuizManager::STATUS_CODE_NO_RESULT.' = no results,<br />';
-        $output .= '"'.QuizManager::RESULTS_LABEL.'":"[{"log_time":"2021-01-01 01:23:22","'.QuizManager::RESULT_LABEL.'":"23"}, // value in percent<br />';
-        $output .= '{"log_time":"2021-01-01 01:24:22","'.QuizManager::RESULT_LABEL.'":"32"}]", // value in percent<br />';
-        $output .= '"'.QuizManager::MESSAGE_LABEL.'":"error message of needed",]</code><br />';
+        $output .= 'The following codes give quiz\'s results:<br />';
+        $output .= 'GET <a href="';
+        $output .= $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module/test-activity/test-id', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $output .= '</code></a> for a quiz<br />';
+        $output .= 'GET <a href="';
+        $output .= $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module/test-activity', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}', 'api');
+        $output .= '</code></a> for all quizzes of an activity<br />';
+        $output .= 'GET <a href="';
+        $output .= $this->wiki->Href('lms/users/TestUser/quizresults/test-course/test-module', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}', 'api');
+        $output .= '</code></a> for all quizzes of all activities of a module<br />';
+        $output .= 'GET <a href="';
+        $output .= $this->wiki->Href('lms/users/TestUser/quizresults/test-course', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}', 'api');
+        $output .= '</code></a> for all quizzes of all modules of a course<br />';
+        $output .= 'GET <a href="';
+        $output .= $this->wiki->Href('lms/users/TestUser/quizresults', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults', 'api');
+        $output .= '</code></a> for all quizzes for the user<br />';
+        $output .= '<br /><b>All routes can be used without \'/users/{userId}/\' to get all quizzes for all users<br>';
+        $output .= 'if connected as admin (otherwise current user)</b>. Example:<br />';
+        $output .= 'GET <a href="';
+        $output .= $this->wiki->Href('lms/quizresults/test-course/test-module/test-activity', 'api');
+        $output .= '"><code>';
+        $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}', 'api');
+        $output .= '</code></a> for all quizzes of an activity for all users<br />';
+        $output .= '<br />Results in json<br />';
+        $output .= 'Error:<br />';
+        $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_ERROR.',';
+        $output .= '"'.QuizManager::MESSAGE_LABEL.'":"error message if needed"]</code><br />';
+        $output .= 'Success:<br />';
+        $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_OK.',';
+        $output .= '"'.QuizManager::RESULTS_LABEL.'":[{...},{...},<br>';
+        $output .= '{"learner":"userId","course":"courseId","module":"moduleId","activity":"activityId",<br>';
+        $output .= '"quizId":"quizId","log_time":"2021-01-01 01:23:22","'.QuizManager::RESULT_LABEL.'":"32"}]]// value in percent</code><br />';
+        $output .= 'No results:<br />';
+        $output .= '<code>["'.QuizManager::STATUS_LABEL.'":'.QuizManager::STATUS_CODE_NO_RESULT.']</code><br />';
         $output .= '<b>You must sent cookies to be connected as learner or admin.</b><br />';
 
         $output .= '<br />GET <a href="';
