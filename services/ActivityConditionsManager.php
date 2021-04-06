@@ -28,7 +28,7 @@ class ActivityConditionsManager
     }
 
     /**
-     * checkActivityConditions
+     * checkActivityNavigationConditions
      *
      * @param Course $course the concerned course
      * @param Module $module the concerned module
@@ -36,7 +36,7 @@ class ActivityConditionsManager
      * @param mixed|null $value the value of conditions for the activity (if available)
      * @return [self::STATUS_LABEL => true|false,self::URL_LABEL => "https://...",self::MESSAGE_LABEL => <html for meesage>]
      */
-    public function checkActivityConditions(
+    public function checkActivityNavigationConditions(
         ?Course $course,
         ?Module $module,
         ?Activity $activity,

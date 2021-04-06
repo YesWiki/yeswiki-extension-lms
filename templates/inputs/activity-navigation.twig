@@ -5,7 +5,7 @@
     {% if field.hint %}
         <img class="tooltip_aide" title="{{ field.hint|raw('html') }}" src="tools/bazar/presentation/images/aide.png" width="16" height="16" alt="image aide" />
     {% endif %}
-    {{ _t('LMS_ACTIVITY_CONDITIONS') }}         
+    {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS') }}         
 {%- endblock -%}
 
 {% set id = field.propertyName %}
@@ -49,13 +49,13 @@
   <div id="{{ id }}_reaction_needed_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
       <input type="hidden" name="{{ field.propertyName }}[reaction_needed]" value="1" disabled>
-      {{ _t('LMS_ACTIVITY_CONDITION_REACTION_NEEDED') }}
+      {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED') }}
     </div>
   </div>
   <div id="{{ id }}_quizz_done_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
       <input type="hidden" name="{{ field.propertyName }}[quizz_done]" value="1" disabled>
-      {{ _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE') }}
+      {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZZ_DONE') }}
     </div>
   </div>
   <button id="{{ id }}_remove_button_template"

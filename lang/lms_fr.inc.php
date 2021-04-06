@@ -57,7 +57,6 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
-        'LMS_ACTIVITY_CONDITIONS' => 'Conditions de passage',
 
         // For Learner Dashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
@@ -132,9 +131,10 @@ $GLOBALS['translations'] = array_merge(
         'LMS_QUIZ_DELETE_WARNING' => 'Attention! Toutes les données enregistrées seront perdues.. Etes-vous sûrs de vouloir ',
         'LMS_QUIZ_FILTER_ON_THIS_USER' => 'Filtrer les résultats pour cet utilisateur',
         'LMS_QUIZ_FILTER_ON_THIS_QUIZID' => 'Filtrer les résultats pour ce quiz',
-        
-        // activity navigation condition
-        'LMS_ACTIVITY_CONDITION_REACTION_NEEDED' => 'Réaction demandée',
-        'LMS_ACTIVITY_CONDITION_QUIZZ_DONE' => 'Quizz fait',
+
+        // activity navigation conditions
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED' => 'Réaction demandée',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZZ_DONE' => 'Quizz fait',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
     )
 );

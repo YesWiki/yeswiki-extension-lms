@@ -332,7 +332,7 @@ class ApiController extends YesWikiController
         $courseManager = $this->getService(CourseManager::class);
         return new ApiResponse(
             $this->getService(ActivityConditionsManager::class)
-                ->checkActivityConditions(
+                ->checkActivityNavigationConditions(
                     $courseManager->getCourse($course),
                     $courseManager->getCourse($module),
                     $courseManager->getCourse($activity),

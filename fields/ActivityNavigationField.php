@@ -35,7 +35,7 @@ class ActivityNavigationField extends LmsField
     protected $activityConditionsManager;
     protected $moduleModal;
     protected $courseManager;
-    protected $conditionsActivated;
+    protected $conditionsEnabled;
 
     public function __construct(array $values, ContainerInterface $services)
     {
@@ -54,8 +54,8 @@ class ActivityNavigationField extends LmsField
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
 
         // activation of conditions
-        $this->conditionsActivated = (isset($this->config['lms_config']['use_activity_conditions']) &&
-            ($this->config['lms_config']['use_activity_conditions'] == true));
+        $this->conditionsEnabled = (isset($this->config['lms_config']['activity_navigation_conditions_enabled']) &&
+            ($this->config['lms_config']['activity_navigation_conditions_enabled'] == true));
     }
 
     // Render the show view of the field
@@ -117,10 +117,10 @@ class ActivityNavigationField extends LmsField
             } else {
                 // otherwise, the current activity is not the last of the module and the next link is set to the next activity
                 $nextActivity = $module->getNextActivity($activity->getTag());
-                if ($this->conditionsActivated) {
+                if ($this->conditionsEnabled) {
                     // check conditions
                     $conditions = $this->activityConditionsManager
-                        ->checkActivityConditions($course, $module, $activity, $this->getValue($entry)) ;
+                        ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
                     $conditionsPassed = $conditions[ActivityConditionsManager::STATUS_LABEL] ?? false;
                     $conditionsMessage = $conditions[ActivityConditionsManager::MESSAGE_LABEL] ?? null;
                 }
@@ -133,7 +133,7 @@ class ActivityNavigationField extends LmsField
                 'previousActivity' => $previousActivity ?? null,
                 'nextModule' => $nextModule ?? null,
                 'nextActivity' => $nextActivity ?? null,
-                'conditionsActivated' => $this->conditionsActivated,
+                'conditionsEnabled' => $this->conditionsEnabled,
                 'conditionsPassed' => $conditionsPassed ?? false,
                 'conditionsMessage' => $conditionsMessage ?? null,
             ]);
@@ -143,12 +143,12 @@ class ActivityNavigationField extends LmsField
 
     protected function renderInput($entry)
     {
-        return ($this->conditionsActivated) ?$this->render("@lms/inputs/activity-navigation.twig", [
+        return ($this->conditionsEnabled) ?$this->render("@lms/inputs/activity-navigation.twig", [
             'value' => $this->getValue($entry),
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [
-                self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_CONDITION_REACTION_NEEDED'),
-                // self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_CONDITION_QUIZZ_DONE') //not ready
+                self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED'),
+                // self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZZ_DONE') //not ready
             ]
         ])
         : null;

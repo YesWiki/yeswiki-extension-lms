@@ -24,7 +24,7 @@ parameters:
     # show activities without context when one course is scripted (false = to be sure no activity is readable)
     show_activities_without_context_when_scripted: false
     # for activity navigation conditions
-    use_activity_conditions: true
+    activity_navigation_conditions_enabled: true
 
 services:
   _defaults:
