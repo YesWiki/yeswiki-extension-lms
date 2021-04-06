@@ -6,7 +6,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\QuizManager;
-use YesWiki\Lms\Service\ActivityConditionsManager;
+use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
 use YesWiki\Lms\Service\CourseManager; // TODO to move to ActivityConditionsManager
 
 class ApiController extends YesWikiController
@@ -327,11 +327,11 @@ class ApiController extends YesWikiController
     /**
      * @Route("/api/lms/check-conditions/{course}/{module}/{activity}")
      */
-    public function checkConditions($course, $module, $activity)
+    public function checkActivityNavigationConditions($course, $module, $activity)
     {
         $courseManager = $this->getService(CourseManager::class);
         return new ApiResponse(
-            $this->getService(ActivityConditionsManager::class)
+            $this->getService(ActivityNavigationConditionsManager::class)
                 ->checkActivityNavigationConditions(
                     $courseManager->getCourse($course),
                     $courseManager->getCourse($module),
@@ -443,9 +443,9 @@ class ApiController extends YesWikiController
         $output .= '<br />The following code :<br />';
         $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
         $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
-        $output .= '<code>['.ActivityConditionsManager::STATUS_LABEL.':true/false,<br />';
-        $output .= ActivityConditionsManager::URL_LABEL.':null|"https://...",<br />';
-        $output .= ActivityConditionsManager::MESSAGE_LABEL.':"html code"]</code><br />';
+        $output .= '<code>['.ActivityNavigationConditionsManager::STATUS_LABEL.':true/false,<br />';
+        $output .= ActivityNavigationConditionsManager::URL_LABEL.':null|"https://...",<br />';
+        $output .= ActivityNavigationConditionsManager::MESSAGE_LABEL.':"html code"]</code><br />';
         return $output;
     }
 }

@@ -8,7 +8,7 @@ use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 
-class ActivityConditionsManager
+class ActivityNavigationConditionsManager
 {
     public const STATUS_LABEL = 'conditions_passed';
     public const URL_LABEL = 'url';

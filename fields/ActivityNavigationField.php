@@ -8,7 +8,7 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Lms\Service\ActivityConditionsManager;
+use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
 
 /**
  * @Field({"navigationactivite","activitynavigation"})
@@ -32,7 +32,7 @@ class ActivityNavigationField extends LmsField
     protected $config;
     protected $entryManager;
     protected $dateManager;
-    protected $activityConditionsManager;
+    protected $ActivityNavigationConditionsManager;
     protected $moduleModal;
     protected $courseManager;
     protected $conditionsEnabled;
@@ -48,7 +48,7 @@ class ActivityNavigationField extends LmsField
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         $this->courseManager = $services->get(CourseManager::class);
-        $this->activityConditionsManager = $services->get(ActivityConditionsManager::class);
+        $this->ActivityNavigationConditionsManager = $services->get(ActivityNavigationConditionsManager::class);
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
@@ -119,10 +119,10 @@ class ActivityNavigationField extends LmsField
                 $nextActivity = $module->getNextActivity($activity->getTag());
                 if ($this->conditionsEnabled) {
                     // check conditions
-                    $conditions = $this->activityConditionsManager
+                    $conditions = $this->ActivityNavigationConditionsManager
                         ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
-                    $conditionsPassed = $conditions[ActivityConditionsManager::STATUS_LABEL] ?? false;
-                    $conditionsMessage = $conditions[ActivityConditionsManager::MESSAGE_LABEL] ?? null;
+                    $conditionsPassed = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
+                    $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
                 }
             }
 
