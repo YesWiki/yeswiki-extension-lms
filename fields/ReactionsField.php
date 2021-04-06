@@ -21,6 +21,7 @@ class ReactionsField extends BazarField
     protected $images;
 
     protected $linkedFieldName ;
+    protected $wiki;
 
     /*
      * Display the possible reactions to comment an activity.
