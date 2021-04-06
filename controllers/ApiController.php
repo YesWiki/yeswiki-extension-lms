@@ -325,7 +325,7 @@ class ApiController extends YesWikiController
     }
 
     /**
-     * @Route("/api/lms/check-conditions/{course}/{module}/{activity}")
+     * @Route("/api/lms/activity-navigation-conditions/{courseId}/{moduleId}/{activityId}",options={"acl":{"public","+"}})
      */
     public function checkActivityNavigationConditions($course, $module, $activity)
     {
@@ -439,7 +439,7 @@ class ApiController extends YesWikiController
         $output .= '</code> for all quizzes of all user<br />';
         $output .= '<b>You must sent cookies to be connected as admin.</b><br />';
 
-        $urlCheckConditions = $this->wiki->Href('', 'api/lms/check-conditions/{course}/{module}/{activity}');
+        $urlCheckConditions = $this->wiki->Href('', 'api/lms/activity-navigation-conditions/{course}/{module}/{activity}');
         $output .= '<br />The following code :<br />';
         $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
         $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';

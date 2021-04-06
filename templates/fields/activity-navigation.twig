@@ -56,6 +56,6 @@
 </nav>
 {% if nextActivity and conditionsEnabled and not conditionsPassed %}
   <script>
-    var checkActivityNavigationConditionsURL = '{{ url({tag:'api',handler:'lms/check-conditions/'}) }}';
+    var checkActivityNavigationConditionsURL = '{{ url({tag:'api',handler:'lms/activity-navigation-conditions/'}) }}';
   </script>
 {% endif %}
