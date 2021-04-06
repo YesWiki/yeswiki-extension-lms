@@ -164,6 +164,123 @@ class ApiController extends YesWikiController
     }
 
     /**
+     * delete quiz's result for a user and for course, module, activity and quizId
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults($userId, $courseId, $moduleId, $activityId, $quizId)
+        );
+    }
+
+    /**
+     * delete quiz's result for a user and for course, module, activity
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAUserAndAnActivity($userId, $courseId, $moduleId, $activityId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults($userId, $courseId, $moduleId, $activityId, null)
+        );
+    }
+    /**
+     * delete quiz's result for a user and for course, module
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAUserAndAModule($userId, $courseId, $moduleId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults($userId, $courseId, $moduleId, null, null)
+        );
+    }
+    /**
+     * delete quiz's result for a user and for course
+     * @Route("/api/lms/users/{userId}/quizresults/{courseId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAUserAndACourse($userId, $courseId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults($userId, $courseId, null, null, null)
+        );
+    }
+    /**
+     * delete quiz's result for a user
+     * @Route("/api/lms/users/{userId}/quizresults",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAUser($userId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults($userId, null, null, null, null)
+        );
+    }
+
+    /**
+     * delete quiz's result for all users and for course, module, activity and quizId
+     * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAQuiz($courseId, $moduleId, $activityId, $quizId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults(null, $courseId, $moduleId, $activityId, $quizId)
+        );
+    }
+
+    /**
+     * delete quiz's result for all users and for course, module, activity
+     * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAnActivity($courseId, $moduleId, $activityId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults(null, $courseId, $moduleId, $activityId, null)
+        );
+    }
+
+    /**
+     * delete quiz's result for all users and for course, module
+     * @Route("/api/lms/quizresults/{courseId}/{moduleId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForAModule($courseId, $moduleId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults(null, $courseId, $moduleId, null, null)
+        );
+    }
+
+    /**
+     * delete quiz's result for all users and for course
+     * @Route("/api/lms/quizresults/{courseId}",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResultsForACourse($courseId)
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults(null, $courseId, null, null, null)
+        );
+    }
+
+    /**
+     * delete quiz's result for all users
+     * @Route("/api/lms/quizresults",methods={"DELETE"},options={"acl":{"+"}})
+     */
+    public function deleteQuizResults()
+    {
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->deleteQuizResults(null, null, null, null, null)
+        );
+    }
+
+    /**
      * Display lms api documentation
      *
      * @return string
@@ -239,6 +356,28 @@ class ApiController extends YesWikiController
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></b><br />';
         $output .= 'Same as previous but for current connected leaner<br />';
+
+        
+        $output .= '<br />The following codes delete quiz\'s results:<br />';
+        $output .= 'DELETE <code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
+        $output .= '</code> for a quiz<br />';
+        $output .= 'DELETE <code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}', 'api');
+        $output .= '</code> for all quizzes of an activity<br />';
+        $output .= 'DELETE <code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}', 'api');
+        $output .= '</code> for all quizzes of a module<br />';
+        $output .= 'DELETE <code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}', 'api');
+        $output .= '</code> for all quizzes of a course<br />';
+        $output .= 'DELETE <code>';
+        $output .= $this->wiki->Href('lms/users/{userId}/quizresults', 'api');
+        $output .= '</code> for all quizzes of a user<br />';
+        $output .= 'DELETE <code>';
+        $output .= $this->wiki->Href('lms/quizresults', 'api');
+        $output .= '</code> for all quizzes of all user<br />';
+        $output .= '<b>You must sent cookies to be connected as admin.</b><br />';
         return $output;
     }
 }

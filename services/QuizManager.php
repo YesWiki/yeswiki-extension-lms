@@ -61,7 +61,7 @@ class QuizManager
      * @param string|null $moduleId, id of the concerned module, null = all modules
      * @param string|null $activityId, id of the concerned activity, null = all activities
      * @param string|null $quizId, id of the concerned quiz, null = all quizzes
-     * @return arra|null [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
+     * @return array|null [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
      *      (self::RESULTS_LABEL=>[{"learner"=>"userId", "course"=>"courseId,
      *       "module"=>"moduleId, "activity"=>"activityId, "quizId"=>"quizId",
      *       "log_time"=>...,"result"=>"10"},{"log_time"...}]
@@ -158,13 +158,14 @@ class QuizManager
     /**
      * Method that find the results for a specific user, activity and quizId, null if not existing
      * @param array $data ['course'=>$course,'module'=>$module, 'activity'=>$activity, 'learner'=>$leaner,'quizId'=>$quizId] ; null = all
+     * @param bool $withRaw put raw data (for deleting)
      * @return null|array null if no result otherwise [self::STATUS_LABEL=>0(OK)/1(error)/2(no result),
      *      (self::RESULTS_LABEL=>[{"learner"=>"userId", "course"=>"courseId,
      *       "module"=>"moduleId, "activity"=>"activityId, "quizId"=>"quizId",
      *       "log_time"=>...,"result"=>"10"},{"log_time"...}]
      *      ,'message'=>'error message')]
      */
-    private function findResults($data): ?array
+    private function findResults($data, bool $withRaw = false): ?array
     {
         $like = $data['course'] ? '%"course":"' . $data['course']->getTag() . '"%' : '';
         $like .= $data['module'] ? '%"module":"' . $data['module']->getTag() . '"%' : '';
@@ -182,7 +183,7 @@ class QuizManager
         if (!$results) {
             return null;
         }
-        return array_map(function ($result) {
+        return array_map(function ($result) use ($withRaw) {
             $values = json_decode($result['value'], true);
             return [
                 'learner' => $result['resource'],
@@ -192,7 +193,7 @@ class QuizManager
                 'quizId' => $values['quizId'],
                 'log_time' => $values['log_time'],
                 self::RESULT_LABEL => $values[self::RESULT_LABEL]
-            ];
+            ] + ($withRaw ? ['raw' => $result['value']]:[]);
         }, $results);
     }
 
@@ -262,5 +263,76 @@ class QuizManager
                         .'\' for user: '.$data['learner']->getUsername().'!'];
                 break;
         }
+    }
+
+    
+    /**
+     * method that delete results for the selected quiz
+     * @param string|null $userId, id of the concerned learner, if all learners for admin
+     * @param string|null $courseId, id of the concerned course, null = all courses
+     * @param string|null $moduleId, id of the concerned module, null = all modules
+     * @param string|null $activityId, id of the concerned activity, null = all activities
+     * @param string|null $quizId, id of the concerned quiz, null = all quizzes
+     * @return array|null [self::STATUS_LABEL=>0(OK)/1(error)/2(not existing)
+     *      (,'message'=>'error message')]
+     */
+    public function deleteQuizResults(
+        ?string $userId = null,
+        ?string $courseId = null,
+        ?string $moduleId = null,
+        ?string $activityId = null,
+        ?string $quizId = null
+    ): array {
+
+        /* Check if admin */
+        if (!$this->learnerManager->getLearner()->isAdmin()) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'DELETE only authorized for admins!'];
+        }
+
+        /* check params */
+        $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
+        if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
+            return $data;
+        } else {
+            unset($data[self::STATUS_LABEL]);
+        }
+        /* find results to delete */
+        if (empty($results = $this->findResults($data, true))) {
+            return [self::STATUS_LABEL => self::STATUS_CODE_NO_RESULT,
+                self::MESSAGE_LABEL => 'No results'];
+        }
+
+        if (empty($data['learner'])) {
+            /* delete without value : faster */
+            $learners = array_unique(array_map(function ($result) {
+                return $result['learner'];
+            }, $results));
+            foreach ($learners as $learner) {
+                if ($this->tripleStore->delete(
+                    $learner,
+                    self::LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT,
+                    null,
+                    '',
+                    ''
+                ) > 0) {
+                    return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
+                    self::MESSAGE_LABEL => 'Error when deleting quiz\'results for '.$learner];
+                }
+            }
+        } else {
+            foreach ($results as $result) {
+                if ($this->tripleStore->delete(
+                    $result['learner'],
+                    self::LMS_TRIPLE_PROPERTY_NAME_QUIZ_RESULT,
+                    $result['raw'],
+                    '',
+                    ''
+                ) > 0) {
+                    return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
+                    self::MESSAGE_LABEL => 'Error when deleting quiz\'results for '.$learner];
+                }
+            }
+        }
+        return [self::STATUS_LABEL => self::STATUS_CODE_OK];
     }
 }
