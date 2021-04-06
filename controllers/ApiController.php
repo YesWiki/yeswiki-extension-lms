@@ -66,7 +66,7 @@ class ApiController extends YesWikiController
     {
         return new ApiResponse(
             $this->getService(QuizManager::class)
-                ->getQuizResults($userId, null, null, null, null)
+                ->getQuizResults($userId, $_GET['course'] ?? null, $_GET['module'] ??  null, $_GET['activity'] ?? null, null)
         );
     }
 
@@ -126,7 +126,7 @@ class ApiController extends YesWikiController
     {
         return new ApiResponse(
             $this->getService(QuizManager::class)
-                ->getQuizResults(null, null, null, null, null)
+                ->getQuizResults(null, $_GET['course'] ?? null, $_GET['module'] ??  null, $_GET['activity'] ?? null, null)
         );
     }
     
@@ -149,6 +149,48 @@ class ApiController extends YesWikiController
         return new ApiResponse(
             $this->getService(QuizManager::class)
                 ->saveQuizResultForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId, floatval($_POST['result']))
+        );
+    }
+
+    /**
+     * save quiz's result for a user, course, module, activity and quizId
+     * @Route("/api/lms/users/{userId}/quizresults/{quizId}",methods={"POST"},options={"acl":{"public","+"}})
+     *
+     * Save quiz result for a learner with result as percent in float in $_POST['result']
+     */
+    public function saveQuizResultForAUserAndAQuizByPost($userId, $quizId)
+    {
+        /* check $_POST */
+        if (empty($_POST[QuizManager::RESULT_LABEL])) {
+            return new ApiResponse(
+                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
+                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\''.QuizManager::RESULT_LABEL.'\']']
+            );
+        }
+        if (empty($_POST['course'])) {
+            return new ApiResponse(
+                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
+                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\'course\']']
+            );
+        }
+        
+        if (empty($_POST['module'])) {
+            return new ApiResponse(
+                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
+                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\'module\']']
+            );
+        }
+        
+        if (empty($_POST['activity'])) {
+            return new ApiResponse(
+                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
+                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\'activity\']']
+            );
+        }
+
+        return new ApiResponse(
+            $this->getService(QuizManager::class)
+                ->saveQuizResultForAUserAndAQuiz($userId, $_POST['course'], $_POST['module'], $_POST['activity'], $quizId, floatval($_POST[QuizManager::RESULT_LABEL]))
         );
     }
     
