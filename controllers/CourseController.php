@@ -144,7 +144,7 @@ class CourseController extends YesWikiController
         if ($this->config['lms_config']['use_tabs']) {
             $parentActivityTag = preg_replace('/[0-9]*$/', '', $activity->getTag());
             if ($parentActivityTag != $activity->getTag()) {
-                return $this->courseManager->getActivity($parentActivityTag);
+                return $this->courseManager->getActivity($parentActivityTag) ?? $activity;
             } else {
                 return $activity;
             }
