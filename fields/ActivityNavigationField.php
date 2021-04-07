@@ -120,7 +120,7 @@ class ActivityNavigationField extends LmsField
                 if ($this->conditionsEnabled) {
                     // check conditions
                     $conditions = $this->ActivityNavigationConditionsManager
-                        ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
+                        ->checkActivityNavigationConditions($course, $module, $activity, $entry) ;
                     $conditionsPassed = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
                     $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
                 }

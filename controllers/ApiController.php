@@ -7,7 +7,6 @@ use YesWiki\Core\ApiResponse;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\QuizManager;
 use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
-use YesWiki\Lms\Service\CourseManager; // TODO to move to ActivityConditionsManager
 
 class ApiController extends YesWikiController
 {
@@ -327,16 +326,11 @@ class ApiController extends YesWikiController
     /**
      * @Route("/api/lms/activity-navigation-conditions/{courseId}/{moduleId}/{activityId}",options={"acl":{"public","+"}})
      */
-    public function checkActivityNavigationConditions($course, $module, $activity)
+    public function checkActivityNavigationConditions($courseId, $moduleId, $activityId)
     {
-        $courseManager = $this->getService(CourseManager::class);
         return new ApiResponse(
             $this->getService(ActivityNavigationConditionsManager::class)
-                ->checkActivityNavigationConditions(
-                    $courseManager->getCourse($course),
-                    $courseManager->getCourse($module),
-                    $courseManager->getCourse($activity),
-                )
+                ->checkActivityNavigationConditions($courseId, $moduleId, $activityId)
         );
     }
 
@@ -439,7 +433,7 @@ class ApiController extends YesWikiController
         $output .= '</code> for all quizzes of all user<br />';
         $output .= '<b>You must sent cookies to be connected as admin.</b><br />';
 
-        $urlCheckConditions = $this->wiki->Href('', 'api/lms/activity-navigation-conditions/{course}/{module}/{activity}');
+        $urlCheckConditions = $this->wiki->Href('', 'api/lms/activity-navigation-conditions/{courseId}/{moduleId}/{activityId}');
         $output .= '<br />The following code :<br />';
         $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
         $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
