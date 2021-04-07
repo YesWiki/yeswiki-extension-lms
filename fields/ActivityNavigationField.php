@@ -15,8 +15,8 @@ use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
  */
 class ActivityNavigationField extends LmsField
 {
-    protected const LABEL_REACTION_NEEDED = 'reaction_needed';
-    protected const LABEL_QUIZZ_DONE = 'quizz_done';
+    public const LABEL_REACTION_NEEDED = 'reaction_needed';
+    public const LABEL_QUIZZ_DONE = 'quizz_done';
     protected const LABEL_NEW_VALUES = 'new_values';
 
     protected const FIELD_MODAL = 2;
@@ -107,6 +107,21 @@ class ActivityNavigationField extends LmsField
             }
 
             // display the next button
+            if ($nextCourseStructure = $this->ActivityNavigationConditionsManager
+                    ->getNextActivityOrModule($course, $module, $activity) instanceof Module) {
+                $nextModule = $nextCourseStructure;
+            } else {
+                $nextActivity = $nextCourseStructure;
+            }
+            
+            // check conditions
+            if ($this->conditionsEnabled) {
+                $conditions = $this->ActivityNavigationConditionsManager
+                    ->checkActivityNavigationConditions($course, $module, $activity, $entry) ;
+                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
+                $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
+            }
+
             if ($activity->getTag() == $module->getLastActivityTag()) {
                 if ($module->getTag() != $course->getLastModuleTag()) {
                     $nextModule = $course->getNextModule($module->getTag());

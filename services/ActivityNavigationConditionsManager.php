@@ -4,10 +4,13 @@
 namespace YesWiki\Lms\Service;
 
 use YesWiki\Bazar\Service\FormManager;
+use YesWiki\Lms\CourseStructure;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
+use YesWiki\Lms\Field\ActivityNavigationField;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Wiki;
 
 class ActivityNavigationConditionsManager
 {
@@ -20,19 +23,23 @@ class ActivityNavigationConditionsManager
 
     protected $courseManager;
     protected $formManager;
+    protected $wiki;
 
     /**
      * LearnerManager constructor
      *
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param FormManager $formManager the injected CourseManager instance
+     * @param Wiki $wiki
      */
     public function __construct(
         CourseManager $courseManager,
-        FormManager $formManager
+        FormManager $formManager,
+        Wiki $wiki
     ) {
         $this->courseManager = $courseManager;
         $this->formManager = $formManager;
+        $this->wiki = $wiki;
     }
 
     /**
@@ -46,6 +53,7 @@ class ActivityNavigationConditionsManager
      */
     public function checkActivityNavigationConditions($course, $module, $activity, array $conditions = []): array
     {
+        /* check params */
         $data = $this->checkParams($course, $module, $activity, $conditions);
         if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
             // error
@@ -53,20 +61,64 @@ class ActivityNavigationConditionsManager
         }
         unset($data[self::STATUS_LABEL]);
 
-        /* set $conditions */
+        /* get $conditions */
         if (empty($data['conditions'])) {
-            $data = $this->findConditions($data);
+            $data = $this->getConditions($data);
             if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
                 // error
                 return $data;
             }
         }
 
-        return [
-                self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::URL_LABEL => "",
-                self::MESSAGE_LABEL => '<div>No Message</div>',
+        /* clean $data['conditions'] */
+        $data['conditions'] = array_filter($data['conditions'], function ($item) {
+            return isset($item['condition']);
+        });
+        /* check conditions */
+        $result = [
+            self::STATUS_LABEL => self::STATUS_CODE_OK,
+            self::URL_LABEL => '',
+            self::MESSAGE_LABEL => ''
         ];
+        if (!empty($data['conditions'])) {
+            foreach ($data['conditions'] as $condition) {
+                switch ($condition['condition']) {
+                    case ActivityNavigationField::LABEL_REACTION_NEEDED:
+                        $result = $this->checkReactionNeeded($data, $result);
+                        break;
+                    case ActivityNavigationField::LABEL_QUIZZ_DONE:
+                    default:
+                        // unknown condition
+                        $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
+                        $result[self::MESSAGE_LABEL] .= '<div>condition:\''.$condition['condition'].'\' is unknown  in activity: \''.
+                            $data['activity']->getTag().'\'!</div>';
+                        break;
+                }
+            }
+        }
+
+        if ($result[self::STATUS_LABEL] == self::STATUS_CODE_OK) {
+            if ($nextStructure = $this->getNextActivityOrModule(
+                $data['course'],
+                $data['module'],
+                $data['activity']
+            )) {
+                $result[self::URL_LABEL] = $this->wiki->Href(
+                    '',
+                    $nextStructure->getTag(),
+                    ['course' => $data['course']->getTag()]+
+                        (($nextStructure instanceof Activity)
+                            ?['module' => $data['module']->getTag()]:[]),
+                    false
+                );
+            } else {
+                $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
+                $result[self::MESSAGE_LABEL] .= '<div>Next activity or module not found in getNextActivityOrModule() in activity: \''.
+                    $data['activity']->getTag().'\'!</div>';
+            }
+        }
+
+        return $result;
     }
 
     /** checks params
@@ -131,11 +183,11 @@ class ActivityNavigationConditionsManager
         ];
     }
 
-    /** Find conditions
+    /** Get conditions
      * @param array $data ['course'=>$course,'module=>$module,'activity'=>$activity]
     * @param array ['course'=>$course,'module=>$module,'activity'=>$activity, 'conditions'=>$conditions]
      */
-    private function findConditions(array $data): array
+    private function getConditions(array $data): array
     {
         $formId = $data['activity']->getField('id_typeannonce');
         if (!$form = $this->formManager->getOne($formId)) {
@@ -151,8 +203,40 @@ class ActivityNavigationConditionsManager
             }
         }
         $data['conditions'] = (isset($propertyName)) ? ($data['activity']->getField($propertyName) ?? []):[];
-        
+
         $data[self::STATUS_LABEL] = self::STATUS_CODE_OK ;
         return $data;
+    }
+
+    /** getNextActivityOrModule
+     * @param Course $course
+     * @param Module $module
+     * @param Activity $activity
+     * @return CourseStructure next activity or module
+     */
+    public function getNextActivityOrModule(Course $course, Module $module, Activity $activity): ?CourseStructure
+    {
+        if ($activity->getTag() == $module->getLastActivityTag()) {
+            if ($module->getTag() != $course->getLastModuleTag()) {
+                return $course->getNextModule($module->getTag());
+                // if the current page is the last activity of the module and the module is not the last one,
+                // the next link is to the next module entry
+                // (no next button is showed for the last activity of the last module)
+            }
+        } else {
+            // otherwise, the current activity is not the last of the module and the next link is set to the next activity
+            return $module->getNextActivity($activity->getTag());
+        }
+        return null;
+    }
+
+    /** checkReactionNeeded
+     * @param array $data
+     * @param array $result
+     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     */
+    private function checkReactionNeeded(array $data, array $result): array
+    {
+        return $result;
     }
 }
