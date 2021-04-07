@@ -39,7 +39,7 @@
       {% if nextActivity %}
         {# otherwise, the current activity is not the last of the module and the next link is set to the next activity #}
         <li class="next">
-          {% if not conditionsEnabled or (conditionsEnabled and conditionsPassed) %}
+          {% if not conditionsEnabled or (conditionsEnabled and conditionsStatus == 0) %}
             <a href="{{ url({tag:nextActivity.tag,params:{course:course.tag,module:module.tag}}) }}">
           {% else %}
             {{ include_javascript('tools/lms/presentation/javascript/activity-navigation-view.js') }}
@@ -54,7 +54,7 @@
     {% endif %}
   </ul>
 </nav>
-{% if nextActivity and conditionsEnabled and not conditionsPassed %}
+{% if nextActivity and conditionsEnabled and conditionsStatus != 0 %}
   <script>
     var checkActivityNavigationConditionsURL = '{{ url({tag:'api',handler:'lms/activity-navigation-conditions/'}) }}';
   </script>

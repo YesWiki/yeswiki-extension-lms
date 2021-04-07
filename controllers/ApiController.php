@@ -437,9 +437,12 @@ class ApiController extends YesWikiController
         $output .= '<br />The following code :<br />';
         $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
         $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
-        $output .= '<code>['.ActivityNavigationConditionsManager::STATUS_LABEL.':true/false,<br />';
+        $output .= '<code>['.ActivityNavigationConditionsManager::STATUS_LABEL.':STATUS_CODE,<br />';
         $output .= ActivityNavigationConditionsManager::URL_LABEL.':null|"https://...",<br />';
         $output .= ActivityNavigationConditionsManager::MESSAGE_LABEL.':"html code"]</code><br />';
+        $output .= 'STATUS_CODE: '.ActivityNavigationConditionsManager::STATUS_CODE_OK.' = OK; ';
+        $output .= ActivityNavigationConditionsManager::STATUS_CODE_ERROR.' = ERROR; ';
+        $output .= ActivityNavigationConditionsManager::STATUS_CODE_NOT_OK.' = NOT OK; <br />';
         return $output;
     }
 }

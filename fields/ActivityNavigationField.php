@@ -121,7 +121,7 @@ class ActivityNavigationField extends LmsField
                     // check conditions
                     $conditions = $this->ActivityNavigationConditionsManager
                         ->checkActivityNavigationConditions($course, $module, $activity, $entry) ;
-                    $conditionsPassed = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
+                    $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
                     $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
                 }
             }
@@ -134,7 +134,7 @@ class ActivityNavigationField extends LmsField
                 'nextModule' => $nextModule ?? null,
                 'nextActivity' => $nextActivity ?? null,
                 'conditionsEnabled' => $this->conditionsEnabled,
-                'conditionsPassed' => $conditionsPassed ?? false,
+                'conditionsStatus' => $conditionsStatus ?? false,
                 'conditionsMessage' => $conditionsMessage ?? null,
             ]);
         }
