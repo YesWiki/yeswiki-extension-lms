@@ -141,7 +141,7 @@ class CourseController extends YesWikiController
      */
     public function getParentTabActivity(Activity $activity): Activity
     {
-        if ($this->config['lms_config']['use_tabs']) {
+        if ($this->config['lms_config']['tabs_enabled']) {
             $parentActivityTag = preg_replace('/[0-9]*$/', '', $activity->getTag());
             if ($parentActivityTag != $activity->getTag()) {
                 return $this->courseManager->getActivity($parentActivityTag) ?? $activity;

@@ -2,7 +2,8 @@ parameters:
   # display composant feature for LMS Activities's bf_contenu
   actionbuilder_textarea_name: 'bf_contenu'
   lms_config:
-    use_tabs: true
+    # if true, tabs can be used in LMS activities (MyActivity2, MyActivity3... refer to the parent activity MyActivity)
+    tabs_enabled: true
     # if true, the activity title is automatically added at the begin of the entry page
     display_activity_title: true
     # if you change activitie_form_id, module_form_id or course_form_id, you have also to rename the corresponding
@@ -18,7 +19,7 @@ parameters:
     # for learner dashboard
     use_only_custom_elapsed_time: true
     display_activity_elapsed_time: false
-    # test mode for extra-actity
+    # if true, the extra activities can be added to the courses
     extra_activity_enabled: false
 
 services:
