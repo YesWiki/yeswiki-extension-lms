@@ -135,6 +135,7 @@ $GLOBALS['translations'] = array_merge(
         // activity navigation conditions
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED' => 'Réaction demandée',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP' => 'Veuillez donner une réaction',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP_ALERT' => 'Veuillez sélectionner au moins une réaction',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZZ_DONE' => 'Quizz fait',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
     )

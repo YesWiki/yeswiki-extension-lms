@@ -20,10 +20,13 @@ function checkActivityNavigationConditionsRun(elem,courseTag, moduleTag, activit
         } else if (data.status == undefined )  {
             checkActivityNavigationConditionsError(elem,'No status in result calling url: '+url+', data:'+JSON.stringify(data));
         } else if (data.status == 0) {
-            // TODO block js for reactions after ckech
             checkActivityNavigationConditionsRight(elem,data.url);
         } else if (data.status == 2) {
             checkActivityNavigationConditionsWrong(elem,data.message);
+        } else if (data.status == 3) {
+            // reaction needed block remove
+            blockReactionRemove = true;
+            checkActivityNavigationConditionsRight(elem,data.url);
         } else {
             checkActivityNavigationConditionsError(elem,'Error when calling url: '+url+';'+data.message);
         }

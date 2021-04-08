@@ -21,6 +21,7 @@ class ActivityNavigationConditionsManager
     public const STATUS_CODE_OK =  0 ;
     public const STATUS_CODE_ERROR =  1 ;
     public const STATUS_CODE_NOT_OK =  2 ;
+    public const STATUS_CODE_OK_REACTIONS_NEEDED =  3 ;
 
     protected $courseManager;
     protected $learnerManager;
@@ -105,7 +106,7 @@ class ActivityNavigationConditionsManager
             foreach ($data['conditions'] as $condition) {
                 switch ($condition['condition']) {
                     case ActivityNavigationField::LABEL_REACTION_NEEDED:
-                        $result = $this->checkReactionNeeded($data, $result, !empty($conditions));
+                        $result = $this->checkReactionNeeded($data, $result);
                         break;
                     case ActivityNavigationField::LABEL_QUIZZ_DONE:
                     default:
@@ -118,7 +119,7 @@ class ActivityNavigationConditionsManager
             }
         }
 
-        if ($result[self::STATUS_LABEL] == self::STATUS_CODE_OK) {
+        if (in_array($result[self::STATUS_LABEL], [self::STATUS_CODE_OK,self::STATUS_CODE_OK_REACTIONS_NEEDED])) {
             if ($nextStructure = $this->getNextActivityOrModule(
                 $data['course'],
                 $data['module'],
@@ -261,17 +262,13 @@ class ActivityNavigationConditionsManager
      * @param array $result
      * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
      */
-    private function checkReactionNeeded(array $data, array $result, bool $conditionsGiven = false): array
+    private function checkReactionNeeded(array $data, array $result): array
     {
         // get Reactions
         $reactions = getUserReactionOnPage($data['activity']->getTag(), $this->learnerManager->getLearner()->getUserName());
-        if (empty($reactions)) {
-            $result[self::MESSAGE_LABEL] .= '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>';
-        }
-        if ($conditionsGiven || empty($reactions)) {
-            // force test when called from field because reactions can be undone before click on next button
-            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ? self::STATUS_CODE_NOT_OK : $result[self::STATUS_LABEL];
-        }
+        $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
+            ((empty($reactions))? self::STATUS_CODE_NOT_OK : self::STATUS_CODE_OK_REACTIONS_NEEDED) : $result[self::STATUS_LABEL];
+        $result[self::MESSAGE_LABEL] .= (empty($reactions))? '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>':'';
         return $result;
     }
 }

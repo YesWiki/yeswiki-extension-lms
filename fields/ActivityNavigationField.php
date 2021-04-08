@@ -30,6 +30,7 @@ class ActivityNavigationField extends LmsField
      * modal box.
      */
 
+    protected $wiki;
     protected $config;
     protected $entryManager;
     protected $dateManager;
@@ -46,7 +47,8 @@ class ActivityNavigationField extends LmsField
         $this->label = null;
         $this->default = [];
         
-        $this->config = $services->get(Wiki::class)->config ;
+        $this->wiki = $services->get(Wiki::class) ;
+        $this->config = $this->wiki->config ;
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         $this->courseManager = $services->get(CourseManager::class);
@@ -117,13 +119,19 @@ class ActivityNavigationField extends LmsField
                 $nextActivity = $nextCourseStructure;
             }
             
-            
             // check conditions
             if ($this->conditionsEnabled) {
                 $conditions = $this->ActivityNavigationConditionsManager
                     ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
-                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? ActivityNavigationConditionsManager:: STATUS_CODE_NOT_OK;
+                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? ActivityNavigationConditionsManager:: STATUS_CODE_ERROR;
+                if ($conditionsStatus == ActivityNavigationConditionsManager::STATUS_CODE_OK_REACTIONS_NEEDED) {
+                    $conditionsStatus = ActivityNavigationConditionsManager::STATUS_CODE_OK;
+                    $reactionNeeded = true ;
+                }
                 $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
+                if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsStatus == ActivityNavigationConditionsManager:: STATUS_CODE_ERROR) {
+                    trigger_error($conditionsMessage);
+                }
             }
 
             $output = $this->render("@lms/fields/activity-navigation.twig", [
@@ -136,6 +144,7 @@ class ActivityNavigationField extends LmsField
                 'conditionsEnabled' => $this->conditionsEnabled,
                 'conditionsStatus' => $conditionsStatus ?? false,
                 'conditionsMessage' => $conditionsMessage ?? null,
+                'reactionNeeded' => $reactionNeeded ?? false,
             ]);
         }
         return $output;

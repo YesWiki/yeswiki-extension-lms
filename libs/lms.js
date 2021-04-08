@@ -17,10 +17,18 @@ $(document).ready(function () {
     var url = $(this).attr("href")
     var nb = $(this).find(".reaction-numbers")
     var nbInit = parseInt(nb.text())
+    let doAjax = true;
     if (url !== "#") {
       if ($(this).hasClass("user-reaction")) {
-        nb.text(nbInit - 1)
-        $(this).removeClass("user-reaction")
+        if(typeof blockReactionRemove !== 'undefined' && blockReactionRemove){
+          if (blockReactionRemoveMessage) {
+            alert(blockReactionRemoveMessage)
+          }
+          doAjax = false
+        } else {
+          nb.text(nbInit - 1)
+          $(this).removeClass("user-reaction")
+        }
       } else {
         var previous = $(this).parents(".reactions-flex").find(".user-reaction")
         previous.removeClass("user-reaction")
@@ -28,15 +36,17 @@ $(document).ready(function () {
         nb.text(nbInit + 1)
         $(this).addClass("user-reaction")
       }
-      $.ajax({
-        method: "GET",
-        url: url,
-      }).done(function (data) {
-        if (data.state == "error") {
-          alert(data.errorMessage)
-          nb.text(nbInit)
-        }
-      })
+      if (doAjax){        
+        $.ajax({
+          method: "GET",
+          url: url,
+        }).done(function (data) {
+          if (data.state == "error") {
+            alert(data.errorMessage)
+            nb.text(nbInit)
+          }
+        })
+      }
     }
     return false
   })

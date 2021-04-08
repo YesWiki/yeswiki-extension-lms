@@ -54,8 +54,10 @@
     {% endif %}
   </ul>
 </nav>
-{% if nextActivity and conditionsEnabled and conditionsStatus != 0 %}
-  <script>
+<script>
+  {% if nextActivity and conditionsEnabled and conditionsStatus != 0 %}
     var checkActivityNavigationConditionsURL = '{{ url({tag:'api',handler:'lms/activity-navigation-conditions/'}) }}';
-  </script>
-{% endif %}
+  {% endif %}
+  var blockReactionRemove = {{ reactionNeeded ? 'true': 'false' }};
+  var blockReactionRemoveMessage = '{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP_ALERT') }}';
+</script>

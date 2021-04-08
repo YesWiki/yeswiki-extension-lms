@@ -77,6 +77,6 @@ function activity_navigation_init(listInit){
         } 
     });
 }
-if (activityNavigationInit){
+if (typeof activityNavigationInit !== 'undefined'){
     activity_navigation_init(activityNavigationInit);
 }
