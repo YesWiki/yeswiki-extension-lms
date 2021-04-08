@@ -341,4 +341,28 @@ class QuizManager
         }
         return [self::STATUS_LABEL => self::STATUS_CODE_OK];
     }
+
+    /** keepOnlyBestResult
+     * @param array $results
+     * @return array $results
+     */
+    public function keepOnlyBestResult($results):array
+    {
+        // create unique key
+        $results_with_unique_id = array_map(function ($result) {
+            $result['unique_id'] = $result['learner'] . '_' . $result['course'] . '_' . $result['module'] . '_' . $result['activity'] . '_' . $result['quizId'];
+            return $result;
+        }, $results);
+
+        $results_with_unique_id = array_filter($results_with_unique_id, function ($result) use ($results_with_unique_id) {
+            $currentUniqueId = $result['unique_id'];
+            $currentResult = $result['result'];
+            $higher_results_same_unique_ids = array_filter($results_with_unique_id, function ($previous_result) use ($currentUniqueId, $currentResult) {
+                return $previous_result['unique_id'] == $currentUniqueId && $previous_result['result'] > $currentResult;
+            });
+            return empty($higher_results_same_unique_ids);
+        });
+
+        return $results_with_unique_id;
+    }
 }

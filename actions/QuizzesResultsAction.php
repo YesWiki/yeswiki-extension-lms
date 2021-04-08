@@ -27,6 +27,7 @@ class QuizzesResultsAction extends YesWikiAction
             'quizId' => $_REQUEST['quizId'] ?? $args['quizId']  ?? null ,
             'learner' => $_REQUEST['learner'] ?? $args['learner']  ?? null ,
             'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, false) ,
+            'onlybest' => $this->formatBoolean($_REQUEST['onlybest'] ?? $args['onlybest']  ?? null, false) ,
         ];
     }
     /**
@@ -76,6 +77,9 @@ class QuizzesResultsAction extends YesWikiAction
                 break;
         }
 
+        if ($this->arguments['onlybest']) {
+            $results = $this->quizManager->keepOnlyBestResult($results);
+        }
         if (!$this->arguments['rawdata']) {
             // put objects in results
             $coursesCached = [];
