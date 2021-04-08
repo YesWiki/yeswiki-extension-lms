@@ -71,8 +71,20 @@ class ActivityNavigationConditionsManager
         }
 
         /* clean $data['conditions'] */
-        $data['conditions'] = array_filter($data['conditions'], function ($item) {
-            return isset($item['condition']);
+        $data['conditions'] = array_filter($data['conditions'], function ($item) use ($data) {
+            return isset($item['condition']) && (
+                !isset($item['scope']) || !is_array($item['scope']) || (
+                    !empty(array_filter(
+                        $item['scope'],
+                        function ($scope_item) use ($data) {
+                            return isset($scope_item['course']) && $scope_item['course'] == $data['course']->getTag() &&
+                                (!isset($scope_item['module'])||(
+                                    $scope_item['module'] == $data['module']->getTag()
+                                ));
+                        }
+                    ))
+                )
+            );
         });
         /* check conditions */
         $result = [
@@ -203,6 +215,7 @@ class ActivityNavigationConditionsManager
             }
         }
         $data['conditions'] = (isset($propertyName)) ? ($data['activity']->getField($propertyName) ?? []):[];
+        $data['conditions'] = !is_array($data['conditions']) ? [] : $data['conditions'];
 
         $data[self::STATUS_LABEL] = self::STATUS_CODE_OK ;
         return $data;
