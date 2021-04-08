@@ -123,5 +123,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_NO' => 'Non',
         'LMS_BACK_TO_PROGRESSES_DASHBOARD' => 'Retour au tableau de bord',
 
+        // QUIZ
+        'LMS_QUIZ_RESULTS' => 'Résultats',
+        'LMS_QUIZ_RESULTS_TITLE' => 'Résultats de quiz',
     )
 );
