@@ -86,6 +86,7 @@ class ActivityNavigationConditionsManager
                 )
             );
         });
+        
         /* check conditions */
         $result = [
             self::STATUS_LABEL => self::STATUS_CODE_OK,
@@ -96,7 +97,7 @@ class ActivityNavigationConditionsManager
             foreach ($data['conditions'] as $condition) {
                 switch ($condition['condition']) {
                     case ActivityNavigationField::LABEL_REACTION_NEEDED:
-                        $result = $this->checkReactionNeeded($data, $result);
+                        $result = $this->checkReactionNeeded($data, $result, !empty($conditions));
                         break;
                     case ActivityNavigationField::LABEL_QUIZZ_DONE:
                     default:
@@ -248,8 +249,13 @@ class ActivityNavigationConditionsManager
      * @param array $result
      * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
      */
-    private function checkReactionNeeded(array $data, array $result): array
+    private function checkReactionNeeded(array $data, array $result, bool $conditionsGiven = false): array
     {
+        if ($conditionsGiven) {
+            // force test when called from field because reactions can be undone before click on next button
+            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ? self::STATUS_CODE_NOT_OK : $result[self::STATUS_LABEL];
+            $result[self::MESSAGE_LABEL] .= '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>';
+        }
         return $result;
     }
 }
