@@ -27,9 +27,15 @@
         the next link is to the next module entry
         (no next button is showed for the last activity of the last module) #}
         <li class="next">
-          <a href="{{ url({tag:nextModule.tag,params:{course:course.tag}}) }}"
-          {%- if field.moduleModal %} class="bazar-entry modalbox"{% endif -%}
-          >
+          {% if not conditionsEnabled or (conditionsEnabled and conditionsStatus == 0) %}
+            <a href="{{ url({tag:nextModule.tag,params:{course:course.tag}}) }}"
+            {%- if field.moduleModal %} class="bazar-entry modalbox"{% endif -%}
+            >
+          {% else %}
+            {{ include_javascript('tools/lms/presentation/javascript/activity-navigation-view.js') }}
+            <a class="disabled wait-cursor"
+              onmouseover="checkActivityNavigationConditions(this,'{{ course.tag }}','{{ module.tag }}','{{ activity.tag }}')">
+          {% endif %}
             {{- _t('LMS_NEXT') -}}
             &nbsp;<span aria-hidden="true">&rarr;</span>
           </a>
@@ -55,7 +61,7 @@
   </ul>
 </nav>
 <script>
-  {% if nextActivity and conditionsEnabled and conditionsStatus != 0 %}
+  {% if (nextActivity or nextModule) and conditionsEnabled and conditionsStatus != 0 %}
     var checkActivityNavigationConditionsURL = '{{ url({tag:'api',handler:'lms/activity-navigation-conditions/'}) }}';
   {% endif %}
   var blockReactionRemove = {{ reactionNeeded ? 'true': 'false' }};

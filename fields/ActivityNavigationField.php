@@ -19,6 +19,8 @@ class ActivityNavigationField extends LmsField
     public const LABEL_REACTION_NEEDED = 'reaction_needed';
     public const LABEL_QUIZ_PASSED = 'quiz_passed';
     public const LABEL_QUIZ_ID = 'quizId';
+    public const LABEL_FORM_FILLED = 'form_filled';
+    public const LABEL_FORM_ID = 'formId';
     protected const LABEL_NEW_VALUES = 'new_values';
 
     protected const FIELD_MODAL = 2;
@@ -158,7 +160,8 @@ class ActivityNavigationField extends LmsField
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [
                 self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED'),
-                self::LABEL_QUIZ_PASSED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED')
+                self::LABEL_QUIZ_PASSED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED'),
+                self::LABEL_FORM_FILLED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED')
             ]
         ])
         : null;
@@ -180,6 +183,10 @@ class ActivityNavigationField extends LmsField
             if (isset($value[self::LABEL_QUIZ_PASSED]) && isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID])) {
                 $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
                     self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID]];
+            }
+            if (isset($value[self::LABEL_FORM_FILLED]) && isset($value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID])) {
+                $data[] = ['condition' => self::LABEL_FORM_FILLED,
+                    self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID]];
             }
             $value = $data ;
         }

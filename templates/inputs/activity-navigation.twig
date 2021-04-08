@@ -55,10 +55,21 @@
   <div id="{{ id }}_quiz_passed_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
       <input type="hidden" name="{{ field.propertyName }}[quiz_passed][head]" value="1" disabled>
-      <div class="input-group quiz-passed">
+      <div class="input-group with-text">
         <span class="item-title">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED') }}</span>
         <input type="text" name="{{ field.propertyName }}[quiz_passed][quizId]"
           value="" maxlength="256" placeholder="quizId" class="form-control input-xxlarge" disabled/>
+      </div>
+    </div>
+  </div>
+  <div id="{{ id }}_form_filled_template_container" style="display:none;" class="activity-navigation-condition-container">
+    <div class="activity-navigation-condition-content">
+      <input type="hidden" name="{{ field.propertyName }}[form_filled][head]" value="1" disabled>
+      <div class="input-group with-text">
+        <span class="item-title">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED') 
+            ~ ' ' ~ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM') ~ ':'}}</span>
+        <input type="text" name="{{ field.propertyName }}[form_filled][formId]"
+          value="" maxlength="256" placeholder="formId" class="form-control input-xxlarge" disabled/>
       </div>
     </div>
   </div>

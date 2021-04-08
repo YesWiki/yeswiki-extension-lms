@@ -3,6 +3,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Lms\CourseStructure;
 use YesWiki\Lms\Activity;
@@ -27,6 +28,7 @@ class ActivityNavigationConditionsManager
     protected $courseManager;
     protected $learnerManager;
     protected $quizManager;
+    protected $entryManager;
     protected $formManager;
     protected $wiki;
 
@@ -34,6 +36,7 @@ class ActivityNavigationConditionsManager
      * LearnerManager constructor
      *
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param EntryManager $entryManager the injected EntryManager instance
      * @param FormManager $formManager the injected CourseManager instance
      * @param LearnerManager $learnerManager the injected CourseManager instance
      * @param QuizManager $quizManager the injected QuizManager instance
@@ -41,12 +44,14 @@ class ActivityNavigationConditionsManager
      */
     public function __construct(
         CourseManager $courseManager,
+        EntryManager $entryManager,
         FormManager $formManager,
         LearnerManager $learnerManager,
         QuizManager $quizManager,
         Wiki $wiki
     ) {
         $this->courseManager = $courseManager;
+        $this->entryManager = $entryManager;
         $this->formManager = $formManager;
         $this->learnerManager = $learnerManager;
         $this->quizManager = $quizManager;
@@ -115,6 +120,9 @@ class ActivityNavigationConditionsManager
                         break;
                     case ActivityNavigationField::LABEL_QUIZ_PASSED:
                         $result = $this->checkQuizPassed($data, $result, $condition[ActivityNavigationField::LABEL_QUIZ_ID]);
+                        break;
+                    case ActivityNavigationField::LABEL_FORM_FILLED:
+                        $result = $this->checkFormFilled($data, $result, $condition[ActivityNavigationField::LABEL_FORM_ID]);
                         break;
                     default:
                         // unknown condition
@@ -308,6 +316,28 @@ class ActivityNavigationConditionsManager
                 $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
                 $result[self::MESSAGE_LABEL] .= $quizResults[QuizManager::MESSAGE_LABEL];
                 break;
+        }
+        return $result;
+    }
+
+    /** checkFormFilled
+     * @param array $data
+     * @param array $result
+     * @param array $formId
+     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     */
+    private function checkFormFilled(array $data, array $result, string $formId): array
+    {
+        // get entries
+        $entries = $this->entryManager->search([
+            'formsIds' => [$formId],
+            'user' => $this->learnerManager->getLearner()->getUserName()
+        ]);
+        if (empty($entries)) {
+            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
+                self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
+            $result[self::MESSAGE_LABEL] .= '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP')
+                    .' \''.$formId.'\'</div>';
         }
         return $result;
     }

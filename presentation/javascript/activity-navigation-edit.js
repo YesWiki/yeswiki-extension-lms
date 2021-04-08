@@ -33,7 +33,7 @@ function activity_navigation_add_element(id,value,defaultValue = null){
             let end = input.length;
             for (let i=0;i<end;++i){
                 input[i].removeAttribute('disabled');
-                // set default value
+                // set default value TODO only set for concerned input
                 if (defaultValue != null){
                     input[i].value = defaultValue ;
                 }
@@ -82,9 +82,12 @@ function activity_navigation_init(listInit){
                     let defaultValue = null;
                     if (condition == 'quiz_passed'){
                         defaultValue = conditionObject.quizId;
-                        if (typeof defaultValue == "undefined"){
-                            defaultValue = null;
-                        }
+                    }
+                    if (condition == 'form_filled'){
+                        defaultValue = conditionObject.formId;
+                    }
+                    if (typeof defaultValue == "undefined"){
+                        defaultValue = null;
                     }
                     activity_navigation_add_element(id,condition,defaultValue);
                 }

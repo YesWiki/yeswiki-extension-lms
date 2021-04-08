@@ -39,11 +39,11 @@
   margin-right: 10px;
 }
 
-.input-group.quiz-passed{
+.input-group.with-text{
   display:flex;
 }
 
-.input-group.quiz-passed .item-title{
+.input-group.with-text .item-title{
   flex-shrink: 0;
   padding-right: 3px;
 }
