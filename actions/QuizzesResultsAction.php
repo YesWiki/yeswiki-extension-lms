@@ -28,6 +28,7 @@ class QuizzesResultsAction extends YesWikiAction
             'learner' => $_REQUEST['learner'] ?? $args['learner']  ?? null ,
             'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, false) ,
             'onlybest' => $this->formatBoolean($_REQUEST['onlybest'] ?? $args['onlybest']  ?? null, false) ,
+            'noadmins' => $this->formatBoolean($_REQUEST['noadmins'] ?? $args['noadmins']  ?? null, false) ,
             'quizzes_results_mode' => $this->formatBoolean($_REQUEST, false, 'quizzes_results_mode') ,
         ];
     }
@@ -115,6 +116,16 @@ class QuizzesResultsAction extends YesWikiAction
                 $result['log_time'] = $this->dateManager->createDatetimeFromString($result['log_time']);
                 return $result;
             }, $results);
+
+            if ($this->arguments['noadmins']) {
+                $results = array_filter($results, function ($result) {
+                    return !($result['learner']->isAdmin());
+                });
+            }
+        } elseif ($this->arguments['noadmins']) {
+            $results = array_filter($results, function ($result) {
+                return !($this->learnerManager->getLearner($result['learner'])->isAdmin());
+            });
         }
 
         return $this->render(
