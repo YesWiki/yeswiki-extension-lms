@@ -20,11 +20,12 @@ function checkActivityNavigationConditionsRun(elem,courseTag, moduleTag, activit
         } else if (data.status == undefined )  {
             checkActivityNavigationConditionsError(elem,'No status in result calling url: '+url+', data:'+JSON.stringify(data));
         } else if (data.status == 0) {
+            // TODO block js for reactions after ckech
             checkActivityNavigationConditionsRight(elem,data.url);
         } else if (data.status == 2) {
             checkActivityNavigationConditionsWrong(elem,data.message);
         } else {
-            checkActivityNavigationConditionsError(elem,data.message);
+            checkActivityNavigationConditionsError(elem,'Error when calling url: '+url+';'+data.message);
         }
     });
 }
@@ -39,6 +40,7 @@ function checkActivityNavigationConditionsError(elem,message){
 function checkActivityNavigationConditionsWrong(elem,message){
     //remove wait cursor
     elem.classList.remove("wait-cursor");
+    console.log(message);
     checkActivityNavigationConditionsRunning  = false;
 }
 

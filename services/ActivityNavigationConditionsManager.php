@@ -10,6 +10,7 @@ use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Field\ActivityNavigationField;
 use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
 class ActivityNavigationConditionsManager
@@ -22,6 +23,7 @@ class ActivityNavigationConditionsManager
     public const STATUS_CODE_NOT_OK =  2 ;
 
     protected $courseManager;
+    protected $learnerManager;
     protected $formManager;
     protected $wiki;
 
@@ -30,16 +32,22 @@ class ActivityNavigationConditionsManager
      *
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param FormManager $formManager the injected CourseManager instance
+     * @param LearnerManager $learnerManager the injected CourseManager instance
      * @param Wiki $wiki
      */
     public function __construct(
         CourseManager $courseManager,
         FormManager $formManager,
+        LearnerManager $learnerManager,
         Wiki $wiki
     ) {
         $this->courseManager = $courseManager;
         $this->formManager = $formManager;
+        $this->learnerManager = $learnerManager;
         $this->wiki = $wiki;
+
+        // load the lms lib
+        require_once LMS_PATH . 'libs/lms.lib.php';
     }
 
     /**
@@ -202,7 +210,7 @@ class ActivityNavigationConditionsManager
 
     /** Get conditions
      * @param array $data ['course'=>$course,'module=>$module,'activity'=>$activity]
-    * @param array ['course'=>$course,'module=>$module,'activity'=>$activity, 'conditions'=>$conditions]
+     * @return array ['course'=>$course,'module=>$module,'activity'=>$activity, 'conditions'=>$conditions]
      */
     private function getConditions(array $data): array
     {
@@ -255,10 +263,14 @@ class ActivityNavigationConditionsManager
      */
     private function checkReactionNeeded(array $data, array $result, bool $conditionsGiven = false): array
     {
-        if ($conditionsGiven) {
+        // get Reactions
+        $reactions = getUserReactionOnPage($data['activity']->getTag(), $this->learnerManager->getLearner()->getUserName());
+        if (empty($reactions)) {
+            $result[self::MESSAGE_LABEL] .= '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>';
+        }
+        if ($conditionsGiven || empty($reactions)) {
             // force test when called from field because reactions can be undone before click on next button
             $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ? self::STATUS_CODE_NOT_OK : $result[self::STATUS_LABEL];
-            $result[self::MESSAGE_LABEL] .= '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>';
         }
         return $result;
     }
