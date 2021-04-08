@@ -6,6 +6,7 @@ use Psr\Container\ContainerInterface;
 use YesWiki\Wiki;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
+use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
@@ -43,6 +44,7 @@ class ActivityNavigationField extends LmsField
 
         
         $this->label = null;
+        $this->default = [];
         
         $this->config = $services->get(Wiki::class)->config ;
         $this->entryManager = $services->get(EntryManager::class);
@@ -107,38 +109,21 @@ class ActivityNavigationField extends LmsField
             }
 
             // display the next button
-            if ($nextCourseStructure = $this->ActivityNavigationConditionsManager
-                    ->getNextActivityOrModule($course, $module, $activity) instanceof Module) {
+            $nextCourseStructure = $this->ActivityNavigationConditionsManager
+                    ->getNextActivityOrModule($course, $module, $activity);
+            if ($nextCourseStructure instanceof Module) {
                 $nextModule = $nextCourseStructure;
             } else {
                 $nextActivity = $nextCourseStructure;
             }
             
+            
             // check conditions
             if ($this->conditionsEnabled) {
                 $conditions = $this->ActivityNavigationConditionsManager
-                    ->checkActivityNavigationConditions($course, $module, $activity, $entry) ;
-                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
+                    ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
+                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? ActivityNavigationConditionsManager:: STATUS_CODE_NOT_OK;
                 $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
-            }
-
-            if ($activity->getTag() == $module->getLastActivityTag()) {
-                if ($module->getTag() != $course->getLastModuleTag()) {
-                    $nextModule = $course->getNextModule($module->getTag());
-                    // if the current page is the last activity of the module and the module is not the last one,
-                    // the next link is to the next module entry
-                    // (no next button is showed for the last activity of the last module)
-                }
-            } else {
-                // otherwise, the current activity is not the last of the module and the next link is set to the next activity
-                $nextActivity = $module->getNextActivity($activity->getTag());
-                if ($this->conditionsEnabled) {
-                    // check conditions
-                    $conditions = $this->ActivityNavigationConditionsManager
-                        ->checkActivityNavigationConditions($course, $module, $activity, $entry) ;
-                    $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? false;
-                    $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
-                }
             }
 
             $output = $this->render("@lms/fields/activity-navigation.twig", [

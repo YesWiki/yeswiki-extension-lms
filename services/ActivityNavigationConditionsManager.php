@@ -48,10 +48,10 @@ class ActivityNavigationConditionsManager
      * @param mixed $course, $course object or coursetag or null
      * @param mixed $module, $module object or moduletag or null
      * @param mixed $activity, $activity object or activitytag or null
-     * @param array $conditions, when called from field to avoid infinite loop
+     * @param mixed $conditions, when called from field to avoid infinite loop
      * @return [self::STATUS_LABEL => true|false,self::URL_LABEL => "https://...",self::MESSAGE_LABEL => <html for meesage>]
      */
-    public function checkActivityNavigationConditions($course, $module, $activity, array $conditions = []): array
+    public function checkActivityNavigationConditions($course, $module, $activity, $conditions = []): array
     {
         /* check params */
         $data = $this->checkParams($course, $module, $activity, $conditions);
@@ -138,10 +138,10 @@ class ActivityNavigationConditionsManager
      * @param mixed $course, $course object or coursetag or null
      * @param mixed $module, $module object or moduletag or null
      * @param mixed $activity, $activity object or activitytag or null
-     * @param array $conditions, when called from field to avoid infinite loop
+     * @param mixed $conditions, when called from field to avoid infinite loop
      * @return [] [self::STATUS_LABEL=>0(OK)/1(error)/2(NOT OK),'course'=>$course,'module=>$module,'activity'=>$activity]
      */
-    private function checkParams($course, $module, $activity, array $conditions):array
+    private function checkParams($course, $module, $activity, $conditions):array
     {
         if (!$course) {
             return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
@@ -185,6 +185,10 @@ class ActivityNavigationConditionsManager
         } elseif (!$module->hasActivity($activity->getTag())) {
             return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
                 self::MESSAGE_LABEL => '{activity} \''.$activity->getTag().'\' is not an activity of the {module} \''.$module->getTag().'\' !'];
+        }
+
+        if (!is_array($conditions)) {
+            $conditions = [];
         }
 
         return [
