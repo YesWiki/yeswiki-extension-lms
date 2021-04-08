@@ -28,6 +28,7 @@ class QuizzesResultsAction extends YesWikiAction
             'learner' => $_REQUEST['learner'] ?? $args['learner']  ?? null ,
             'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, false) ,
             'onlybest' => $this->formatBoolean($_REQUEST['onlybest'] ?? $args['onlybest']  ?? null, false) ,
+            'quizzes_results_mode' => $this->formatBoolean($_REQUEST, false, 'quizzes_results_mode') ,
         ];
     }
     /**
@@ -43,11 +44,19 @@ class QuizzesResultsAction extends YesWikiAction
 
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
-            // reserved only to the admins
-            return $this->render("@templates/alert-message.twig", [
-                'type' => 'danger',
-                'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' ('.get_class($this).')'
-            ]);
+            if (empty($this->arguments['calledBy'])) {
+                // reserved only to the admins
+                return $this->render("@templates/alert-message.twig", [
+                    'type' => 'danger',
+                    'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' ('.get_class($this).')'
+                ]);
+            } else {
+                return null;
+            }
+        }
+
+        if (!empty($this->arguments['calledBy']) && !$this->arguments['quizzes_results_mode']) {
+            return null;
         }
 
         $rawResults = $this->quizManager->getQuizResults(

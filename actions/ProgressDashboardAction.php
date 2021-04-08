@@ -91,6 +91,12 @@ class ProgressDashboardAction extends YesWikiAction
         }
         /* *************************** */
 
+        /* * Switch to quizzesresults if needed */
+        if ($message = $this->callAction('quizzesresults', $this->arguments)) {
+            return $message ;
+        }
+        /* *************************** */
+
         // check if a GET module parameter is defined
         $moduleParam = isset($_GET['module']) ? $_GET['module'] : null;
 
