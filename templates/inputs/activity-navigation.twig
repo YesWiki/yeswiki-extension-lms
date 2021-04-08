@@ -73,5 +73,9 @@
       id:'{{ id }}',
       value:{{ value|json_encode()|raw }}
     });
+    // if function already define, run it
+    if (typeof activity_navigation_init === 'function') {
+      activity_navigation_init(activityNavigationInit);
+    }
   </script>
 {% endblock %}
