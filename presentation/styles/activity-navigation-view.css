@@ -1,0 +1,9 @@
+.activity-navigation-conditions-helper {
+  float: right;
+  border-color: var(--primary-color);
+  border-style: solid;
+  border-radius: 0.5rem;
+  border-width: 0.2rem;
+  padding: 5px;
+  margin-right: 5px;
+}

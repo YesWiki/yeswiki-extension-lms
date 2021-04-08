@@ -32,13 +32,25 @@
             {%- if field.moduleModal %} class="bazar-entry modalbox"{% endif -%}
             >
           {% else %}
-            {{ include_javascript('tools/lms/presentation/javascript/activity-navigation-view.js') }}
-            <a class="disabled wait-cursor"
-              onmouseover="checkActivityNavigationConditions(this,'{{ course.tag }}','{{ module.tag }}','{{ activity.tag }}')">
+            {% block conditionLink %}
+              {{ include_javascript('tools/lms/presentation/javascript/activity-navigation-view.js') }}
+              <a class="disabled wait-cursor"
+                onmouseover="checkActivityNavigationConditions(this,'{{ course.tag }}','{{ module.tag }}','{{ activity.tag }}')"
+                data-id="{{ field.propertyName }}">
+            {% endblock %}
           {% endif %}
             {{- _t('LMS_NEXT') -}}
             &nbsp;<span aria-hidden="true">&rarr;</span>
           </a>
+          {% if conditionsEnabled and conditionsStatus != 0 %}
+            {% block helpContainer %}          
+              {# Add CSS definition #}
+              {{ include_css('tools/lms/presentation/styles/activity-navigation-view.css') }}
+              <div id="{{ field.propertyName }}_conditionLink_help_container"
+                class="activity-navigation-conditions-helper" style="display:none;">
+              </div>
+            {% endblock %}
+          {% endif %}
         </li>
       {% endif %}
     {% else %}
@@ -48,18 +60,35 @@
           {% if not conditionsEnabled or (conditionsEnabled and conditionsStatus == 0) %}
             <a href="{{ url({tag:nextActivity.tag,params:{course:course.tag,module:module.tag}}) }}">
           {% else %}
-            {{ include_javascript('tools/lms/presentation/javascript/activity-navigation-view.js') }}
-            <a class="disabled wait-cursor"
-              onmouseover="checkActivityNavigationConditions(this,'{{ course.tag }}','{{ module.tag }}','{{ activity.tag }}')">
+            {{ block('conditionLink') }}
           {% endif %}
               {{- _t('LMS_NEXT') -}}
               &nbsp;<span aria-hidden="true">&rarr;</span>
             </a>
+          {% if conditionsEnabled and conditionsStatus != 0 %}
+            {{ block('helpContainer') }}
+          {% endif %}
         </li>
       {% endif %}
     {% endif %}
   </ul>
 </nav>
+{% if (nextActivity or nextModule) and conditionsEnabled and conditionsStatus != 0 %}
+  {# Templates for javascript #}
+  <div id="{{ field.propertyName }}_error_icon"
+      type="button"
+      class="btn btn-danger btn-icon activity-navigation-btn pull-left" style="display:none;">
+    <i class="fas fa-exclamation-triangle"></i>
+  </div>
+  <div id="{{ field.propertyName }}_success_icon"
+      type="button"
+      class="btn btn-success btn-icon activity-navigation-btn pull-left" style="display:none;">
+    <i class="fas fa-check"></i>
+  </div>
+  <div id="{{ field.propertyName }}_error_message" style="display:none;">
+    {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR') }}
+  </div>
+{% endif %}
 <script>
   {% if (nextActivity or nextModule) and conditionsEnabled and conditionsStatus != 0 %}
     var checkActivityNavigationConditionsURL = '{{ url({tag:'api',handler:'lms/activity-navigation-conditions/'}) }}';

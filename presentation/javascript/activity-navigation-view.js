@@ -37,13 +37,39 @@ function checkActivityNavigationConditionsError(elem,message){
     //remove wait cursor
     elem.classList.remove("wait-cursor");
     console.log(message);
+    let id = elem.getAttribute('data-id');
+    if(id){
+        let container = getContainer(id)
+        // clean helper container
+        cleanHelperContainer(container);
+        // add error icon
+        addErrorIconToHelperContainer(container,id)
+        // add error text
+        addErrorTextToHelperContainer(container,id)
+        // display container
+        container.removeAttribute("style");
+    }
     checkActivityNavigationConditionsRunning  = false;
 }
+
 
 function checkActivityNavigationConditionsWrong(elem,message){
     //remove wait cursor
     elem.classList.remove("wait-cursor");
-    console.log(message);
+    let id = elem.getAttribute('data-id');
+    if(id){
+        let container = getContainer(id)
+        // clean helper container
+        cleanHelperContainer(container);
+        // add error icon
+        addErrorIconToHelperContainer(container,id)
+        // add error message
+        let messageDiv = document.createElement('div');
+        messageDiv.innerHTML = message;
+        container.appendChild(messageDiv);
+        // display container
+        container.removeAttribute("style");
+    }
     checkActivityNavigationConditionsRunning  = false;
 }
 
@@ -58,7 +84,63 @@ function checkActivityNavigationConditionsRight(elem,url){
         event.stopPropagation();
         window.location.href = this.getAttribute("href");
     });
+    
+    let id = elem.getAttribute('data-id');
+    if(id){
+        let container = getContainer(id)
+        // clean helper container
+        cleanHelperContainer(container);
+        // add success icon
+        addSuccessIconToHelperContainer(container,id)
+        // display container
+        container.removeAttribute("style");
+        // hide container
+        // container.setAttribute("style","display:none;");
+    }
     checkActivityNavigationConditionsRunning  = false;
+}
+
+function getContainer(id){
+    var container = document.getElementById(id+'_conditionLink_help_container') ;
+    return container;
+}
+
+function cleanHelperContainer(container){
+    if (typeof container != "undefined"){
+        container.innerHTML = "";
+    }
+    return container;
+}
+
+function addErrorIconToHelperContainer(container,id){
+    if (typeof container != "undefined"){
+        let icon = document.getElementById(id+'_error_icon') ;
+        if (typeof icon != "undefined"){
+            let cloneIcon = icon.cloneNode(true);
+            cloneIcon.removeAttribute("style");
+            container.appendChild(cloneIcon);
+        }
+    }
+}
+function addSuccessIconToHelperContainer(container,id){
+    if (typeof container != "undefined"){
+        let icon = document.getElementById(id+'_success_icon') ;
+        if (typeof icon != "undefined"){
+            let cloneIcon = icon.cloneNode(true);
+            cloneIcon.removeAttribute("style");
+            container.appendChild(cloneIcon);
+        }
+    }
+}
+
+function addErrorTextToHelperContainer(container,id){
+    if (typeof container != "undefined"){
+        let textContainer = document.getElementById(id+'_error_message') ;
+        if (typeof textContainer != "undefined"){
+            let textNode = document.createTextNode(textContainer.innerText);
+            container.appendChild(textNode);
+        }
+    }
 }
 
 var checkActivityNavigationConditionsRunning = false;

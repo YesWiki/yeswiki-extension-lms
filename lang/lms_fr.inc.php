@@ -141,6 +141,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED' => 'Fiche complétée',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP' => 'Veuillez ajouter une fiche au formulaire',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM' => 'Formulaire',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR' => 'Une erreur est survenue lors de la vérification.<br>Veuillez contacter un administrateur du site !',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
     )
 );
