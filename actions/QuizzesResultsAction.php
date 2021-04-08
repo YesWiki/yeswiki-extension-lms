@@ -1,6 +1,8 @@
 <?php
 
 use YesWiki\Core\YesWikiAction;
+use YesWiki\Lms\Service\CourseManager;
+use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Lms\Service\QuizManager;
 
@@ -8,6 +10,8 @@ class QuizzesResultsAction extends YesWikiAction
 {
     protected $learnerManager;
     protected $quizManager;
+    protected $courseManager;
+    protected $dateManager;
     
     /**
      * format arguments property
@@ -22,7 +26,7 @@ class QuizzesResultsAction extends YesWikiAction
             'activity' => $_REQUEST['activity'] ?? $args['activity']  ?? null ,
             'quizId' => $_REQUEST['quizId'] ?? $args['quizId']  ?? null ,
             'learner' => $_REQUEST['learner'] ?? $args['learner']  ?? null ,
-            'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, true) ,
+            'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, false) ,
         ];
     }
     /**
@@ -31,8 +35,10 @@ class QuizzesResultsAction extends YesWikiAction
      */
     public function run(): ?string
     {
+        $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->quizManager = $this->getService(QuizManager::class);
+        $this->dateManager = $this->getService(DateManager::class);
 
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
@@ -77,7 +83,24 @@ class QuizzesResultsAction extends YesWikiAction
             $activitiesCached = [];
             $learnersCached = [];
             $results = array_map(function ($result) use ($coursesCached, $modulesCached, $activitiesCached, $learnersCached) {
-                $result['course'] = $coursesCached[$result['course']] ?? $this->courseManager->getCourse($result['course']);
+                if (!isset($coursesCached[$result['course']])) {
+                    $coursesCached[$result['course']] = $this->courseManager->getCourse($result['course']);
+                }
+                $result['course'] = $coursesCached[$result['course']];
+                if (!isset($modulesCached[$result['module']])) {
+                    $modulesCached[$result['module']] = $this->courseManager->getModule($result['module']);
+                }
+                $result['module'] = $modulesCached[$result['module']];
+                if (!isset($activitiesCached[$result['activity']])) {
+                    $activitiesCached[$result['activity']] = $this->courseManager->getActivity($result['activity']);
+                }
+                $result['activity'] = $activitiesCached[$result['activity']];
+                if (!isset($learnersCached[$result['learner']])) {
+                    $learnersCached[$result['learner']] = $this->learnerManager->getLearner($result['learner']);
+                }
+                $result['learner'] = $learnersCached[$result['learner']];
+                $result['log_time'] = $this->dateManager->createDatetimeFromString($result['log_time']);
+                return $result;
             }, $results);
         }
 

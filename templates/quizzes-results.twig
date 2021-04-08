@@ -1,3 +1,5 @@
+{% from "@lms/datetime-macros.twig" import displayDate %}
+
 {{ include_javascript('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.js') }}
 {{ include_javascript('tools/templates/libs/vendor/datatables/jquery.dataTables.min.js') }}
 {{ include_css('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.css') }}
@@ -9,25 +11,37 @@
     <thead>
       <tr>
         <th>{{ _t('LMS_COURSE') }}</th>
-        <th style="width:100px;">{{ _t('LMS_MODULE') }}</th>
-        <th style="width:100px;">{{ _t('LMS_ACTIVITY') }}</th>
-        <th style="width:40px;">{{ _t('LMS_QUIZID') }}</th>
-        <th style="width:100px;">{{ _t('LMS_EXTRA_ACTIVITY_LEARNERS') }}</th>
-        <th style="width:220px;">{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}</th>
-        <th style="width:40px;">{{ _t('LMS_QUIZ_RESULTS') }}</th>
+        <th>{{ _t('LMS_MODULE') }}</th>
+        <th>{{ _t('LMS_ACTIVITY') }}</th>
+        <th>quizId</th>
+        <th>{{ _t('LMS_EXTRA_ACTIVITY_LEARNERS') }}</th>
+        <th>{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}</th>
+        <th>{{ _t('LMS_QUIZ_RESULTS') }}</th>
       </tr>
     </thead>
     <tbody>
       {% for key, result in results %}
-        <tr>
-          <td>{{ result.course }}</td>
-          <td>{{ result.module }}</td>
-          <td>{{ result.activity }}</td>
-          <td>{{ result.quizId }}</td>
-          <td>{{ result.learner }}</td>
-          <td>{{ result.log_time }}</td>
-          <td>{{ result.result ?? 0 }} %</td>
-        </tr>
+        {% if rawdata %}
+          <tr>
+            <td>{{ result.course }}</td>
+            <td>{{ result.module }}</td>
+            <td>{{ result.activity }}</td>
+            <td>{{ result.quizId }}</td>
+            <td>{{ result.learner }}</td>
+            <td>{{ result.log_time }}</td>
+            <td>{{ result.result ?? 0 }} %</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td>{{ result.course.title }}</td>
+            <td>{{ result.module.title }}</td>
+            <td>{{ result.activity.title }}</td>
+            <td>{{ result.quizId }}</td>
+            <td>{{ result.learner.fullName }}</td>
+            <td>{{ displayDate(result.log_time) }}</td>
+            <td>{{ result.result ?? 0 }} %</td>
+          </tr>
+        {% endif %}
       {% endfor %}
     </tbody>
   </table>
