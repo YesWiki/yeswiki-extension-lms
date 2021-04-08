@@ -14,7 +14,7 @@ function activity_navigation_add_button(elem){
     }
 }
 
-function activity_navigation_add_element(id,value){
+function activity_navigation_add_element(id,value,defaultValue = null){
     // find associated template
     let template_container = document.getElementById(id+'_'+value+'_template_container') ;
     if (!template_container) {
@@ -26,11 +26,19 @@ function activity_navigation_add_element(id,value){
         let new_id = id+'_'+value+'_'+now.getTime();
         clone.setAttribute("id",new_id);
         // enable input
-        let input = clone.getElementsByTagName('input');
+        let input = clone.querySelectorAll('input');
         if (!input || input.length == 0){
             console.log(new_id+' : not input tag');
         } else {
-            input[0].removeAttribute('disabled');
+            let end = input.length;
+            for (let i=0;i<end;++i){
+                input[i].removeAttribute('disabled');
+                // set default value
+                if (defaultValue != null){
+                    input[i].value = defaultValue ;
+                }
+            }
+
             // Add remove button
             let removeBtn = document.getElementById(id+'_remove_button_template') ;
             if (!template_container) {
@@ -71,7 +79,14 @@ function activity_navigation_init(listInit){
             value.forEach(function (conditionObject){
                 let condition = conditionObject.condition ;
                 if (condition){
-                    activity_navigation_add_element(id,condition);
+                    let defaultValue = null;
+                    if (condition == 'quiz_passed'){
+                        defaultValue = conditionObject.quizId;
+                        if (typeof defaultValue == "undefined"){
+                            defaultValue = null;
+                        }
+                    }
+                    activity_navigation_add_element(id,condition,defaultValue);
                 }
             });
         } 

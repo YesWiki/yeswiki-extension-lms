@@ -11,6 +11,7 @@ use YesWiki\Lms\Module;
 use YesWiki\Lms\Field\ActivityNavigationField;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
+use YesWiki\Lms\Service\QuizManager;
 use YesWiki\Wiki;
 
 class ActivityNavigationConditionsManager
@@ -25,6 +26,7 @@ class ActivityNavigationConditionsManager
 
     protected $courseManager;
     protected $learnerManager;
+    protected $quizManager;
     protected $formManager;
     protected $wiki;
 
@@ -34,17 +36,20 @@ class ActivityNavigationConditionsManager
      * @param CourseManager $courseManager the injected CourseManager instance
      * @param FormManager $formManager the injected CourseManager instance
      * @param LearnerManager $learnerManager the injected CourseManager instance
+     * @param QuizManager $quizManager the injected QuizManager instance
      * @param Wiki $wiki
      */
     public function __construct(
         CourseManager $courseManager,
         FormManager $formManager,
         LearnerManager $learnerManager,
+        QuizManager $quizManager,
         Wiki $wiki
     ) {
         $this->courseManager = $courseManager;
         $this->formManager = $formManager;
         $this->learnerManager = $learnerManager;
+        $this->quizManager = $quizManager;
         $this->wiki = $wiki;
 
         // load the lms lib
@@ -108,7 +113,9 @@ class ActivityNavigationConditionsManager
                     case ActivityNavigationField::LABEL_REACTION_NEEDED:
                         $result = $this->checkReactionNeeded($data, $result);
                         break;
-                    case ActivityNavigationField::LABEL_QUIZZ_DONE:
+                    case ActivityNavigationField::LABEL_QUIZ_PASSED:
+                        $result = $this->checkQuizPassed($data, $result, $condition[ActivityNavigationField::LABEL_QUIZ_ID]);
+                        break;
                     default:
                         // unknown condition
                         $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
@@ -269,6 +276,39 @@ class ActivityNavigationConditionsManager
         $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
             ((empty($reactions))? self::STATUS_CODE_NOT_OK : self::STATUS_CODE_OK_REACTIONS_NEEDED) : $result[self::STATUS_LABEL];
         $result[self::MESSAGE_LABEL] .= (empty($reactions))? '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>':'';
+        return $result;
+    }
+    
+    /** checkQuizPassed
+     * @param array $data
+     * @param array $result
+     * @param array $quizId
+     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     */
+    private function checkQuizPassed(array $data, array $result, string $quizId): array
+    {
+        // get quizResults
+        $quizResults = $this->quizManager->getQuizResults(
+            $this->learnerManager->getLearner()->getUserName(),
+            $data['course']->getTag(),
+            $data['module']->getTag(),
+            $data['activity']->getTag(),
+            $quizId
+        );
+        switch ($quizResults[QuizManager::STATUS_LABEL]) {
+            case QuizManager::STATUS_CODE_OK:
+                break;
+            case QuizManager::STATUS_CODE_NO_RESULT:
+                $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
+                    self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
+                    $result[self::MESSAGE_LABEL] .= '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\'</div>';
+                break;
+            case QuizManager::STATUS_CODE_ERROR:
+            default:
+                $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
+                $result[self::MESSAGE_LABEL] .= $quizResults[QuizManager::MESSAGE_LABEL];
+                break;
+        }
         return $result;
     }
 }

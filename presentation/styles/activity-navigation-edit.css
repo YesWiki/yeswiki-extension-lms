@@ -32,3 +32,18 @@
   width: initial;
   margin-right: 10px;
 }
+
+.activity-navigation-header-select{
+  flex-grow: 10;
+  width: initial;
+  margin-right: 10px;
+}
+
+.input-group.quiz-passed{
+  display:flex;
+}
+
+.input-group.quiz-passed .item-title{
+  flex-shrink: 0;
+  padding-right: 3px;
+}

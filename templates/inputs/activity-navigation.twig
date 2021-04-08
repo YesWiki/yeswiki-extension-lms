@@ -52,10 +52,14 @@
       {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED') }}
     </div>
   </div>
-  <div id="{{ id }}_quizz_done_template_container" style="display:none;" class="activity-navigation-condition-container">
+  <div id="{{ id }}_quiz_passed_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
-      <input type="hidden" name="{{ field.propertyName }}[quizz_done]" value="1" disabled>
-      {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZZ_DONE') }}
+      <input type="hidden" name="{{ field.propertyName }}[quiz_passed][head]" value="1" disabled>
+      <div class="input-group quiz-passed">
+        <span class="item-title">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED') }}</span>
+        <input type="text" name="{{ field.propertyName }}[quiz_passed][quizId]"
+          value="" maxlength="256" placeholder="quizId" class="form-control input-xxlarge" disabled/>
+      </div>
     </div>
   </div>
   <button id="{{ id }}_remove_button_template"

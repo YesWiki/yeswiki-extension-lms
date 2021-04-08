@@ -17,7 +17,8 @@ use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
 class ActivityNavigationField extends LmsField
 {
     public const LABEL_REACTION_NEEDED = 'reaction_needed';
-    public const LABEL_QUIZZ_DONE = 'quizz_done';
+    public const LABEL_QUIZ_PASSED = 'quiz_passed';
+    public const LABEL_QUIZ_ID = 'quizId';
     protected const LABEL_NEW_VALUES = 'new_values';
 
     protected const FIELD_MODAL = 2;
@@ -157,7 +158,7 @@ class ActivityNavigationField extends LmsField
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [
                 self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED'),
-                // self::LABEL_QUIZZ_DONE => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZZ_DONE') //not ready
+                self::LABEL_QUIZ_PASSED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED')
             ]
         ])
         : null;
@@ -176,8 +177,9 @@ class ActivityNavigationField extends LmsField
             if (isset($value[self::LABEL_REACTION_NEEDED])) {
                 $data[] = ['condition' => self::LABEL_REACTION_NEEDED];
             }
-            if (isset($value[self::LABEL_QUIZZ_DONE])) {
-                $data[] = ['condition' => self::LABEL_QUIZZ_DONE];
+            if (isset($value[self::LABEL_QUIZ_PASSED]) && isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID])) {
+                $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
+                    self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID]];
             }
             $value = $data ;
         }
