@@ -12,6 +12,13 @@
                href="{{ url({tag: module.tag}) }}">
                 <i class="fas fa-eye"></i>
             </a>
+            {% if modulesStat[module.tag].hasQuizzesResults %}
+                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_QUIZ_RESULTS_TITLE') }}"
+                href="{{ url({handler:'render',params:{content:"{{quizzesresults}}",
+                        course:course.tag,module:module.tag,onlybest:true,noadmins:true}}) }}">
+                    <i class="fas fa-poll"></i>
+                </a>
+            {% endif %}
         </div>
         <div class="finished-ratio">
             <span title="{{ _t('LMS_FINISHED_RATIO') }}">

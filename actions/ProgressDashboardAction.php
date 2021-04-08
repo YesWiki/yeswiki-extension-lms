@@ -197,6 +197,11 @@ class ProgressDashboardAction extends YesWikiAction
         ksort($notFinishedUsernames);
         $this->modulesStat[$module->getTag()]['finished'] = $finishedUsernames;
         $this->modulesStat[$module->getTag()]['notFinished'] = $notFinishedUsernames;
+        if ($this->quizManager->getQuizResults(null, $course->getTag(), $module->getTag())[
+            QuizManager::STATUS_LABEL
+        ] == QuizManager::STATUS_CODE_OK) {
+            $this->modulesStat[$module->getTag()]['hasQuizzesResults'] = true;
+        }
     }
 
     private function processCourseStat(Course $course)
