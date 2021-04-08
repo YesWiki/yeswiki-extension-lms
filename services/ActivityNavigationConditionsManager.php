@@ -280,7 +280,8 @@ class ActivityNavigationConditionsManager
     private function checkReactionNeeded(array $data, array $result): array
     {
         // get Reactions
-        $reactions = getUserReactionOnPage($data['activity']->getTag(), $this->learnerManager->getLearner()->getUserName());
+        $currentLearner = $this->learnerManager->getLearner();
+        $reactions = $currentLearner ? getUserReactionOnPage($data['activity']->getTag(), $currentLearner->getUserName()) : null;
         $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
             ((empty($reactions))? self::STATUS_CODE_NOT_OK : self::STATUS_CODE_OK_REACTIONS_NEEDED) : $result[self::STATUS_LABEL];
         $result[self::MESSAGE_LABEL] .= (empty($reactions))? '<div>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</div>':'';
