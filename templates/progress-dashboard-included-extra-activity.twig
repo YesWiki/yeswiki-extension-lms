@@ -1,0 +1,61 @@
+{% from "@lms/datetime-macros.twig" import displayTime, displayDate %}
+{% set level = (level ?? 'activity') %}
+<div class="panel panel-lms-dashboard dashboard-{{ level }}-frame collapsed">
+    <div id="heading_{{ extraActivityLog.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
+         href="#collapse_{{ extraActivityLog.tag }}" aria-expanded="false" aria-controls="collapse_{{ extraActivityLog.tag }}">
+        <div class="panel-title">
+            <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
+            {% if extraActivityLog.relatedLink %}            
+                <a class="no-collapsable" href="
+                {{- (extraActivityLog.relatedLink starts with 'http')
+                     ? extraActivityLog.relatedLink
+                     : url({tag: extraActivityLog.relatedLink})
+                -}}"
+                title="{{ _t('LMS_EXTRA_ACTIVITY_LINK') }}">
+                    {{ extraActivityLog.title }}
+                </a>
+            {% else %}
+                {{ extraActivityLog.title }}
+            {% endif %}
+            {{ include('@lms/extra-activity-link.twig', {mode:'edit'}) }}
+            {{ include('@lms/extra-activity-link.twig', {mode:'delete'}) }}
+        </div>
+        <div class="finished-ratio">
+            <span title="{{ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS') }}">
+                <span class="label-icon"><i class="fas fa-user"></i></span>
+                {{ extraActivityLog.registeredLearnerNames | length }}
+            </span>
+        </div>
+        <div class="estimated-time">
+            <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
+                <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
+                {{ displayTime(extraActivityLog.elapsedTime) }}
+            </span>
+        </div>
+        <div class="first-access">
+            <span title="{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}">
+                <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
+                {{ displayDate(extraActivityLog.date) }}
+            </span>
+        </div>
+    </div>
+    <div id="collapse_{{ extraActivityLog.tag }}" class="panel-collapse collapse" role="tabpanel"
+         aria-labelledby="heading_{{ extraActivityLog.tag }}" aria-expanded="false">
+        <div class="learners-groups emulated-flex-gap">
+            <div class="learners-group fieldset-group dashboard-activity-frame">
+                <label><i class="fas fa-user"></i></label>
+                    <ul class="learner-details">
+                        {% for username in extraActivityLog.registeredLearnerNames %}
+                            <li>
+                                {{ include('@lms/progress-dashboard-user.twig') }}
+                                {{ include('@lms/extra-activity-link.twig', {mode:'remove',
+                                    learner:username}) }}
+                            </li>
+                        {%  endfor %}
+                    </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ include_javascript('tools/lms/presentation/javascript/collapsible-panel.js') }}

@@ -1,5 +1,4 @@
 {% block course_menu %}
-    <div id="menu-content" class="collapse">
     {% for currentModule in modulesDisplayed %}
         <div class="panel-group panel-group-menu-lms" role="tablist">
             <div class="panel panel-primary panel-menu-lms status-{{ currentModule.status(course) }}">
@@ -30,5 +29,4 @@
             </div>
         </div>
     {% endfor %}
-    </div>
 {% endblock %}

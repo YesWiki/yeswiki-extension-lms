@@ -1,3 +1,4 @@
+{% from "@lms/datetime-macros.twig" import displayTime %}
 <h1 class="dashboard-title">{{ _t('LMS_PROGRESS_DASHBOARD') }}</h1>
 
 <h3 class="dashboard-course course-back">
@@ -22,7 +23,7 @@
     </div>
     <div class="estimated-time">
         <span title="{{ _t('LMS_ESTIMATED_TIME_DETAILLED') }}">
-            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ formatter.formatDuration(course.duration) }}
+            <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i> est.</span>{{ displayTime(course.duration) }}
         </span>
     </div>
 </div>
@@ -31,3 +32,12 @@
 {% for module in course.modules %}
     {{ include('@lms/progress-dashboard-included-module.twig') }}
 {% endfor %}
+
+{% if course.extraActivityLogs|length > 0 %}
+    <h3 class="dashboard-module">{{ _t('LMS_EXTRA_ACTIVITIES')}}{{ include('@lms/extra-activity-link.twig', {mode:'add-light'}) }}</h3>
+    {% for extraActivityLog in course.extraActivityLogs %}
+        {{ include('@lms/progress-dashboard-included-extra-activity.twig',{level:'module'}) }}
+    {% endfor %}
+{% else %}
+    {{ extraActivityEnabled ? include('@lms/extra-activity-link.twig') }}
+{% endif %}

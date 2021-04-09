@@ -10,9 +10,9 @@
   <input id="elapsedtime" name="elapsedtime" class="form-control"
     value="{{ activity ? 
       (coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime ?
-    coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime.totalMinutes : activity.duration) :
+    coursesStat[course.tag].modulesStat[module.tag].activitiesStat[activity.tag].elapsedTime.totalMinutes : activity.duration.totalMinutes) :
       (coursesStat[course.tag].modulesStat[module.tag].elapsedTime ?
-          coursesStat[course.tag].modulesStat[module.tag].elapsedTime.totalMinutes : module.duration) }}"
+          coursesStat[course.tag].modulesStat[module.tag].elapsedTime.totalMinutes : module.duration.totalMinutes) }}"
     min="0" type="text">
   </input> {{ _t('LMS_UPDATE_ELAPSED_TIME_MINUTES') }}
   <hidden >

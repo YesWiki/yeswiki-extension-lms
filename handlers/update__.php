@@ -230,19 +230,11 @@ if ($GLOBALS['wiki']->config['lms_config']['course_form_id'] != '5003' && !empty
 }
 // replace the action {{menuparcours}} by {{courseparcours}}
 $oldaction = $this->LoadAll('SELECT * FROM `'.$this->config['table_prefix'].'pages` WHERE latest = \'Y\' AND comment_on=\'\' AND body not LIKE \'{"%\' AND body LIKE \'%{{menuparcours}}%\'');
-if (!empty($oldaction)){
+if (!empty($oldaction)) {
     $output .= 'ℹ️ Updating {{menuparcours}} action to its successor : {{coursemenu}}<br/>';
     $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body`, \'{{menuparcours}}\', \'{{coursemenu}}\') WHERE latest = \'Y\' AND comment_on=\'\' AND body not LIKE \'{"%\' AND body LIKE \'%{{menuparcours}}%\'');
     $output .= '✅ Done !<br />';
 }
-
-
-// add button to return to previous page
-$output .= '<div>
-    <a class="btn btn-sm btn-secondary-1" href="javascript:history.back()">
-        <i class="fas fa-arrow-left"></i>' . _t('GO_BACK') . '
-    </a>
-</div>';
 
 // add the content before footer
 $plugin_output_new = str_replace(

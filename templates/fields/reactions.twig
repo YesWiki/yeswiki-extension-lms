@@ -1,0 +1,36 @@
+<hr />
+<div class="reactions-container">
+  <h5>{% if connected -%}
+        {{ _t('LMS_SHARE_YOUR_REACTION') }}
+      {%- else -%}
+        {{ _t('LMS_TO_ALLOW_REACTION') }}, <a href="#LoginModal" class="btn btn-primary" data-toggle="modal">
+        {{- _t('LMS_PLEASE_LOGIN') }}</a>
+      {%- endif %}</h5>
+  <div class="reactions-flex">
+    {% for reaction in reactions %}
+      <div class="reaction-content">
+        {% if connected -%}
+          <a href="{{ url({handler:'reaction',params:{id:reaction.id,course:course,module:module}}) }}"
+            class="add-reaction{{ (userReaction and reaction.id == userReaction) ? ' user-reaction' : '' }}">
+            {% block reactionBlock %}
+              {% if reaction.image %}
+                <img class="reaction-img" alt="icon {{ reaction.id }}" src="{{ reaction.image }}" />
+              {%- else -%}
+                <div class="alert alert-danger">Image non trouvée...</div>
+              {%- endif -%}
+              <h6 class="reaction-title">{{ reaction.title }}</h6>
+              <div class="reaction-numbers">{{ reaction.nbReactions }}</div>
+            {% endblock %}
+          </a>
+        {%- else -%}
+          <a href="#" onclick="return false;" title="' . _t('LMS_LOGIN_TO_REACT') . '" class="disabled add-reaction">
+            {{- block('reactionBlock') -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {% endfor %}
+  </div>
+  {%- if connected -%}
+    <em>{{ _t('LMS_SHARE_YOUR_COMMENT') }}</em>
+  {%- endif -%}
+</div>

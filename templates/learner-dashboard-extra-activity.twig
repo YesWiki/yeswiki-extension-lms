@@ -1,0 +1,40 @@
+{% from "@lms/datetime-macros.twig" import displayTime,displayDate %}
+{% set level = (level ?? 'activity') %}
+<div class="panel panel-lms-dashboard dashboard-{{ level }}-frame">
+  <div class="panel-heading">
+    <div class="panel-title">
+        {% if extraActivityLog.relatedLink %}            
+            <a class="no-collapsable" href="
+            {{- (extraActivityLog.relatedLink starts with 'http')
+                    ? extraActivityLog.relatedLink
+                    : url({tag: extraActivityLog.relatedLink})
+            -}}"
+            title="{{ _t('LMS_EXTRA_ACTIVITY_LINK') }}">
+                {{ extraActivityLog.title }}
+            </a>
+        {% else %}
+            {{ extraActivityLog.title }}
+        {% endif %}
+        {% if user_is_admin %}
+            {{ extraActivityEnabled ? include('@lms/extra-activity-link.twig', {mode:'remove',learner:learner.username}) }}
+        {% endif %}
+                                    
+    </div>
+    <div class="estimated-time">
+      <span title="{{ _t('LMS_DASHBOARD_ELAPSEDTIME') }}">
+        <span class="label-icon"><i class="fas fa-hourglass-half fa-fw"></i></span>
+          {% if extraActivityLog.elapsedTime %}
+            {{ displayTime(extraActivityLog.elapsedTime) }}
+          {% else %}
+              ----
+          {% endif %}
+      </span> 
+    </div>
+    <div class="first-access">
+        <span title="{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}">
+            <span class="label-icon"><i class="fas fa-calendar-alt"></i></span>
+            {{ displayDate(extraActivityLog.date) }}
+        </span>
+    </div>
+  </div>
+</div>

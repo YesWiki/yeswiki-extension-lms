@@ -12,6 +12,8 @@ use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
+use YesWiki\Lms\Service\LearnerManager;
+use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Wiki;
 
 class LearnerDashboardManager
@@ -20,24 +22,32 @@ class LearnerDashboardManager
     protected $userManager;
     protected $courseManager;
     protected $dateManager;
+    protected $learnerManager;
+    protected $extraActivityManager;
 
     /**
      * LearnerDashboardManager constructor
      * @param Wiki $wiki the injected Wiki instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
+     * @param LearnerManager $learnerManager the injected LearnerManager instance
      * @param DateManager $dateManager the injected DateManager instance
+     * @param ExtraActivityManager $extraActivityManager the injected ExtraActivityManager instance
      */
     public function __construct(
         Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
-        DateManager $dateManager
+        LearnerManager $learnerManager,
+        DateManager $dateManager,
+        ExtraActivityManager $extraActivityManager
     ) {
         $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
+        $this->learnerManager = $learnerManager;
         $this->dateManager = $dateManager;
+        $this->extraActivityManager = $extraActivityManager;
     }
 
     /**
@@ -55,6 +65,10 @@ class LearnerDashboardManager
     {
         $coursesStat = [];
         foreach ($courses as $course) {
+            // extra activity part
+            if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
+                $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, null, $learner));
+            }
             $modulesStat = $this->processModulesStat($course, $learner);
 
             $started = !empty(array_filter($modulesStat, function ($moduleStat) {
@@ -72,18 +86,21 @@ class LearnerDashboardManager
 
             $duration = CarbonInterval::minutes(0);
             foreach ($modulesStat as $moduleStat) {
-                if (isset($moduleStat['elapsedTime']) && $moduleStat['finished']) {
+                if (isset($moduleStat['elapsedTime'])) {
                     $duration->add($moduleStat['elapsedTime']);
                 }
             }
-            $courseDuration = ($duration->totalMinutes == 0) ? null : $duration;
+            foreach ($course->getExtraActivityLogs() as $extraActivityLog) {
+                $duration->add($extraActivityLog->getElapsedTime());
+            }
+            $courseDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
 
             $coursesStat[$course->getTag()] = [
                 "started" => $started, // bool
                 "finished" => $finished, //bool
                 "progressRatio" => $progressRatio, // int between 0 and 100 in pourcent
-                "elapsedTime" => $courseDuration, // CarbonInterval object,
-                "firstAccessDate" => $this->findFirstAccessDate($modulesStat), // Carbon object,
+                "elapsedTime" => $courseDuration, // CarbonInterval object
+                "firstAccessDate" => $this->findFirstAccessDate($modulesStat), // Carbon object
                 "modulesStat" => $modulesStat
             ];
         }
@@ -105,9 +122,13 @@ class LearnerDashboardManager
     {
         $modulesStat = [];
         $modules = $course->getModules();
-        $progresses = $learner->getAllProgresses();
+        $progresses = $this->learnerManager->getAllProgressesForLearner($learner);
 
         foreach ($modules as $module) {
+            // extra activity part
+            if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
+                $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module, $learner));
+            }
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);
             // get progress
             $progress = $progresses->getProgressForActivityOrModuleForLearner(
@@ -118,8 +139,8 @@ class LearnerDashboardManager
             );
 
             $started = $progress || !empty(array_filter($activitiesStat, function ($activityStat) {
-                    return $activityStat['started'];
-                }));
+                return $activityStat['started'];
+            }));
 
             $nbActivities = count($activitiesStat);
             if ($nbActivities > 0) {
@@ -136,7 +157,7 @@ class LearnerDashboardManager
 
             // the first access date displayed is the earliest log_time between the module and all its activities
             $firstAccessDate = !empty($progress['log_time']) ?
-                $this->dateManager->createDateFromString($progress['log_time'])
+                $this->dateManager->createDatetimeFromString($progress['log_time'])
                 : null;
             $firstActivityAccessDate = $this->findFirstAccessDate($activitiesStat);
             if (($firstActivityAccessDate && $firstActivityAccessDate->lessThan($firstAccessDate))
@@ -154,7 +175,10 @@ class LearnerDashboardManager
                         $duration->add($activityStat['elapsedTime']);
                     }
                 }
-                $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration;
+                foreach ($module->getExtraActivityLogs() as $extraActivityLog) {
+                    $duration->add($extraActivityLog->getElapsedTime());
+                }
+                $moduleDuration = ($duration->totalMinutes == 0) ? null : $duration->cascade();
             }
 
             $modulesStat[$module->getTag()] = [
@@ -206,11 +230,11 @@ class LearnerDashboardManager
                     $this->dateManager->createIntervalFromString($progress['elapsed_time'])
                     : null;
             } else {
-                $activityDuration = $this->dateManager->createIntervalFromMinutes($activity->getDuration());
+                $activityDuration = $activity->getDuration();
             }
 
             $firstAccessDate = !empty($progress['log_time']) ?
-                $this->dateManager->createDateFromString($progress['log_time'])
+                $this->dateManager->createDatetimeFromString($progress['log_time'])
                 : null;
 
             $activitiesStat[$activity->getTag()] = [

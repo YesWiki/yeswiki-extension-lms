@@ -590,60 +590,102 @@
     /*min-width: 200px;*/
 }
 
-.toggle-menu {
+/** Index menu button in small screen size **/
+/* Begin - Burger Style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
+.open-main-nav {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+.open-main-nav:focus {
+    outline: none;
+}
+.burger {
+    position: relative;
     display: block;
-    position: -webkit-sticky;
-    position: sticky;
-    top: 1rem;
-    margin-bottom: 1em;
-    z-index: 10;
+    width: 28px;
+    height: 4px;
+    margin: 0 auto;
+    background: #5A3B5D;
+    transform: skew(5deg);
+    transition: all .275s;
 }
-.btn-menu {
-  background: white;
-  border: 1px solid var(--neutral-color);
-}
-.toggle-menu .btn[aria-expanded="true"] {
-  float:right;
-  border:none;
-}
-.toggle-menu .btn .fa-times {
-  display:none;
-}
-.toggle-menu .btn[aria-expanded="true"] .fa-times {
-  display:block;
-}
-.toggle-menu .btn[aria-expanded="true"] .menu-label {
-  display:none;
-}
-.toggle-menu .btn[aria-expanded="true"] .fa-bars {
-  display:none;
-}
-.lms-menu .include {
+.burger:after,
+.burger:before {
+    content: '';
+    display: block;
     height: 100%;
+    background: #5A3B5D;
+    transition: all .275s;
 }
+.burger:after {
+    transform: translateY(-12px) translateX(-2px) skew(-20deg);
+}
+.burger:before {
+    transform: translateY(-16px) skew(-10deg);
+}
+/* Toggle State part */
+.is-open .burger {
+    transform: skew(5deg) translateY(-8px) rotate(-45deg);
+}
+.is-open .burger:before {
+    transform: translateY(0px) skew(-10deg) rotate(75deg);
+}
+.is-open .burger:after {
+    transform: translateY(-12px) translateX(10px) skew(-20deg);
+    opacity: 0;
+}
+/* MENU Text part */
+.burger-text {
+    display: block;
+    font-size: .675rem;
+    letter-spacing: .05em;
+    margin-top: .5em;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+    color: #5A3B5D;
+}
+/* End - Burger Style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
 .lms-menu {
-    position: -webkit-sticky;
-    position: sticky;
-    top:1rem; 
-    background: white;
-    z-index: 1;
+    display: none;
 }
-#menu-content.collapse.in {
-    position: -webkit-sticky;
-    position: sticky;
-    top:0;
-    padding-top: 2.5rem;
-}
-
-@media (min-width:992px) {
-
-    #menu-content {
-        display:block;
+@media (max-width:991px) {
+    #burger.is-open ~ .lms-menu {
+        display: block;
     }
-    .toggle-menu {
+    #burger.is-open ~ .lms-content {
         display: none;
     }
-    #menu-content.collapse.in {
-        padding-top: 0rem;
+    /*#burger.is-open ~ .lms-container ~ * {*/
+    /*    display: none;*/
+    /*}*/
+    #burger:not(.is-open) ~ .lms-menu {
+        display: none;
+    }
+    #burger:not(.is-open) ~ .lms-content {
+        display: block;
+    }
+    /*#burger:not(.is-open) ~ .lms-container ~ * {*/
+    /*    display: block;*/
+    /*}*/
+    .lms-menu>:first-child, .lms-content>:first-child {
+        margin-top: 40px;
     }
 }
+@media (min-width:992px) {
+    #burger {
+        display: none;
+    }
+    .lms-menu {
+        display: block;
+    }
+    .lms-content {
+        display: block;
+    }
+}
+/** End - Index menu button in small screen size **/

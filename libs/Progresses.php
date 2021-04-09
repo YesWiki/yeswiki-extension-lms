@@ -2,30 +2,12 @@
 
 namespace YesWiki\Lms;
 
-class Progresses
+class Progresses extends TimeLogs
 {
     // an array which have a value for the following keys : 'username', 'course', 'module', 'activity', 'log_time'
     // the 'activity' key can be unset, on this case the progress relates to the module
     // 'elapsed_time' can also be filled out for 'module' only ('activity' is then unset)
     protected $values;
-
-    /**
-     * Progresses constructor
-     * @param $values
-     */
-    public function __construct(array $values)
-    {
-        $this->values = $values;
-    }
-
-    /**
-     * The values which represents the progresses
-     * @return array the values
-     */
-    public function getValues(): array
-    {
-        return $this->values;
-    }
 
     /**
      * Return all usernames of the learner with no duplicates
@@ -120,9 +102,7 @@ class Progresses
                     );
                 }
             }
-
         }
         return $progresses ? $progresses->getAllUsernames() : [];
     }
-
 }
