@@ -20,8 +20,8 @@
         <th>
           <a href="{{ url({handler:handler,params:urlParams|merge({quizzes_results_mode:'delete',urlParams:urlParams|keys|join(',')})}) }}"
             class="btn btn-danger btn-xs"
-            title="{{  _t('LMS_QUIZ_DELETE_DELETE_ALL') }}" 
-            onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE_DELETE_ALL') }}');">
+            title="{{  _t('LMS_QUIZ_DELETE_ALL') }}" 
+            onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE_ALL') }}');">
             <i class="fa fa-trash"></i>
           </a>
         </th>
@@ -34,8 +34,18 @@
             <td>{{ result.course }}</td>
             <td>{{ result.module }}</td>
             <td>{{ result.activity }}</td>
-            <td>{{ result.quizId }}</td>
-            <td>{{ result.learner }}</td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  quizId:result.quizId})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_QUIZID') }}">
+                {{ result.quizId }}
+              </a>
+            </td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  learner:result.learner})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_USER') }}">
+                {{ result.learner }}
+              </a>
+            </td>
             <td>{{ result.log_time }}</td>
             <td>{{ result.result ?? 0 }} %</td>
             <td>
@@ -50,8 +60,8 @@
                   urlParams:urlParams|keys|join(','),
                   })}) }}"{% block deleteLine %}
                 class="btn btn-danger btn-xs"
-                title="{{  _t('LMS_QUIZ_DELETE_DELETE') }}" 
-                onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE_DELETE') }}');">
+                title="{{  _t('LMS_QUIZ_DELETE') }}" 
+                onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE') }}');">
                 <i class="fa fa-trash"></i>
               </a>
             </td>{% endblock %}
@@ -61,8 +71,18 @@
             <td>{{ result.course.title }}</td>
             <td>{{ result.module.title }}</td>
             <td>{{ result.activity.title }}</td>
-            <td>{{ result.quizId }}</td>
-            <td>{{ result.learner.fullName }}</td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  quizId:result.quizId})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_QUIZID') }}">
+                {{ result.quizId }}
+              </a>
+            </td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  learner:result.learner.userName})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_USER') }}">
+                {{ result.learner.fullName }}
+              </a>
+            </td>
             <td>{{ displayDate(result.log_time) }}</td>
             <td>{{ result.result ?? 0 }} %</td>
             <td>

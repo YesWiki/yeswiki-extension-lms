@@ -126,8 +126,10 @@ $GLOBALS['translations'] = array_merge(
         // QUIZ
         'LMS_QUIZ_RESULTS' => 'Résultats',
         'LMS_QUIZ_RESULTS_TITLE' => 'Résultats de quiz',
-        'LMS_QUIZ_DELETE_DELETE_ALL' => 'supprimer tous les résultats affichés ?',
-        'LMS_QUIZ_DELETE_DELETE' => 'supprimer les résultats de cette ligne ?',
+        'LMS_QUIZ_DELETE_ALL' => 'supprimer tous les résultats affichés ?',
+        'LMS_QUIZ_DELETE' => 'supprimer les résultats de cette ligne ?',
         'LMS_QUIZ_DELETE_WARNING' => 'Attention! Toutes les données enregistrées seront perdues.. Etes-vous sûrs de vouloir ',
+        'LMS_QUIZ_FILTER_ON_THIS_USER' => 'Filtrer les résultats pour cet utilisateur',
+        'LMS_QUIZ_FILTER_ON_THIS_QUIZID' => 'Filtrer les résultats pour ce quiz',
     )
 );
