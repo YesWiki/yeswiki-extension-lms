@@ -371,4 +371,23 @@ class QuizManager
 
         return $results_with_unique_id;
     }
+
+    /**
+     * check if a specific request as quizzes' results
+     * @param string|null $userId, id of the concerned learner, if all learners for admin or current learner
+     * @param string|null $courseId, id of the concerned course, null = all courses
+     * @param string|null $moduleId, id of the concerned module, null = all modules
+     * @param string|null $activityId, id of the concerned activity, null = all activities
+     * @param string|null $quizId, id of the concerned quiz, null = all quizzes
+     * @return bool
+     */
+    public function hasQuizResults(
+        ?string $userId = null,
+        ?string $courseId = null,
+        ?string $moduleId = null,
+        ?string $activityId = null,
+        ?string $quizId = null
+    ): bool {
+        return ($this->getQuizResults($userId, $courseId, $moduleId, $activityId, $quizId)[self::STATUS_LABEL] == self::STATUS_CODE_OK);
+    }
 }

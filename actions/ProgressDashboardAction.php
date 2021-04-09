@@ -160,10 +160,8 @@ class ProgressDashboardAction extends YesWikiAction
             $this->activitiesStat[$activity->getTag()] = [];
             $this->activitiesStat[$activity->getTag()]['finished'] = $finishedUsernames;
             $this->activitiesStat[$activity->getTag()]['notFinished'] = $notFinishedUsernames;
-            if ($this->quizManager->getQuizResults(null, $course->getTag(), $module->getTag(), $activity->getTag())[
-                QuizManager::STATUS_LABEL
-            ] == QuizManager::STATUS_CODE_OK) {
-                $this->activitiesStat[$activity->getTag()]['hasQuizzesResults'] = true;
+            if ($this->quizManager->hasQuizResults(null, $course->getTag(), $module->getTag(), $activity->getTag())) {
+                $this->activitiesStat[$activity->getTag()]['hasQuizResults'] = true;
             }
         }
     }
@@ -197,10 +195,8 @@ class ProgressDashboardAction extends YesWikiAction
         ksort($notFinishedUsernames);
         $this->modulesStat[$module->getTag()]['finished'] = $finishedUsernames;
         $this->modulesStat[$module->getTag()]['notFinished'] = $notFinishedUsernames;
-        if ($this->quizManager->getQuizResults(null, $course->getTag(), $module->getTag())[
-            QuizManager::STATUS_LABEL
-        ] == QuizManager::STATUS_CODE_OK) {
-            $this->modulesStat[$module->getTag()]['hasQuizzesResults'] = true;
+        if ($this->quizManager->hasQuizResults(null, $course->getTag(), $module->getTag())) {
+            $this->modulesStat[$module->getTag()]['hasQuizResults'] = true;
         }
     }
 

@@ -6,7 +6,7 @@ use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Lms\Service\QuizManager;
 
-class QuizzesResultsAction extends YesWikiAction
+class QuizResultsAction extends YesWikiAction
 {
     protected $learnerManager;
     protected $quizManager;
@@ -21,18 +21,18 @@ class QuizzesResultsAction extends YesWikiAction
     protected function formatArguments($args)
     {
         return [
-            'course' => $_REQUEST['course'] ?? $args['course'] ?? null ,
-            'module' => $_REQUEST['module'] ?? $args['module']  ?? null ,
-            'activity' => $_REQUEST['activity'] ?? $args['activity']  ?? null ,
-            'quizId' => $_REQUEST['quizId'] ?? $args['quizId']  ?? null ,
-            'learner' => $_REQUEST['learner'] ?? $args['learner']  ?? null ,
-            'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, false) ,
-            'onlybest' => $this->formatBoolean($_REQUEST['onlybest'] ?? $args['onlybest']  ?? null, false) ,
-            'noadmins' => $this->formatBoolean($_REQUEST['noadmins'] ?? $args['noadmins']  ?? null, false) ,
-            'log_time' => $_REQUEST['log_time'] ??  null ,
-            'urlParams' => $this->formatArray($_REQUEST['urlParams'] ?? null),
-            'quizzes_results_mode' => $_REQUEST['quizzes_results_mode'] ?? $args['quizzes_results_mode']  ?? null ,
-            'content' => ($this->wiki->GetMethod() == 'render') ? '{{quizzesresults}}' : null ,
+            'course' => $_GET['course'] ?? $args['course'] ?? null ,
+            'module' => $_GET['module'] ?? $args['module']  ?? null ,
+            'activity' => $_GET['activity'] ?? $args['activity']  ?? null ,
+            'quizId' => $_GET['quizId'] ?? $args['quizId']  ?? null ,
+            'learner' => $_GET['learner'] ?? $args['learner']  ?? null ,
+            'rawdata' => $this->formatBoolean($_GET['rawdata'] ?? $args['rawdata']  ?? null, false) ,
+            'onlybest' => $this->formatBoolean($_GET['onlybest'] ?? $args['onlybest']  ?? null, false) ,
+            'noadmins' => $this->formatBoolean($_GET['noadmins'] ?? $args['noadmins']  ?? null, false) ,
+            'log_time' => $_GET['log_time'] ??  null ,
+            'urlParams' => $this->formatArray($_GET['urlParams'] ?? null),
+            'quiz_results_mode' => $_GET['quiz_results_mode'] ?? $args['quiz_results_mode']  ?? null ,
+            'content' => ($this->wiki->GetMethod() == 'render') ? '{{quizresults}}' : null ,
         ];
     }
     /**
@@ -46,24 +46,29 @@ class QuizzesResultsAction extends YesWikiAction
         $this->quizManager = $this->getService(QuizManager::class);
         $this->dateManager = $this->getService(DateManager::class);
 
+        // reserved only to the admins
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
             if (empty($this->arguments['calledBy'])) {
-                // reserved only to the admins
+                // not called from other action : display message
                 return $this->render("@templates/alert-message.twig", [
                     'type' => 'danger',
                     'message' => _t('ACLS_RESERVED_FOR_ADMINS') . ' ('.get_class($this).')'
                 ]);
             } else {
+                // called from other action : do nothing be quiet
                 return null;
             }
         }
 
-        if (!empty($this->arguments['calledBy']) && empty($this->arguments['quizzes_results_mode'])) {
+        // when called from other action and quiz_results_mode not set :
+        // do nothing be quiet to not change the behaviour of the parent action
+        if (!empty($this->arguments['calledBy']) && empty($this->arguments['quiz_results_mode'])) {
             return null;
         }
 
-        if ($this->arguments['quizzes_results_mode'] == 'delete') {
+        // special mode for delete
+        if ($this->arguments['quiz_results_mode'] == 'delete') {
             $this->delete();
         }
 
@@ -144,7 +149,7 @@ class QuizzesResultsAction extends YesWikiAction
         }
 
         return $this->render(
-            '@lms/quizzes-results.twig',
+            '@lms/quiz-results.twig',
             [
                 'results' => $results,
                 'rawdata' => $this->arguments['rawdata'] ,
@@ -170,7 +175,7 @@ class QuizzesResultsAction extends YesWikiAction
         );
         // reset GET params
 
-        foreach (['course','module','activity','quizId','learner','log_time','content','quizzes_results_mode'] as $key) {
+        foreach (['course','module','activity','quizId','learner','log_time','content','quiz_results_mode'] as $key) {
             if (!in_array($key, $this->arguments['urlParams'])) {
                 $this->arguments[$key] = null;
             }

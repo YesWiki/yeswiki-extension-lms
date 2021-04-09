@@ -18,7 +18,7 @@
         <th>{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}</th>
         <th>{{ _t('LMS_QUIZ_RESULTS') }}</th>
         <th>
-          <a href="{{ url({handler:handler,params:urlParams|merge({quizzes_results_mode:'delete',urlParams:urlParams|keys|join(',')})}) }}"
+          <a href="{{ url({handler:handler,params:urlParams|merge({quiz_results_mode:'delete',urlParams:urlParams|keys|join(',')})}) }}"
             class="btn btn-danger btn-xs"
             title="{{  _t('LMS_QUIZ_DELETE_ALL') }}" 
             onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE_ALL') }}');">
@@ -50,7 +50,7 @@
             <td>{{ result.result ?? 0 }} %</td>
             <td>
               <a href="{{ url({handler:handler,params:urlParams|merge({
-                  quizzes_results_mode:'delete',
+                  quiz_results_mode:'delete',
                   course:result.course,
                   module:result.module,
                   activity:result.activity,
@@ -87,7 +87,7 @@
             <td>{{ result.result ?? 0 }} %</td>
             <td>
               <a href="{{ url({handler:handler,params:urlParams|merge({
-                  quizzes_results_mode:'delete',
+                  quiz_results_mode:'delete',
                   course:result.course.tag,
                   module:result.module.tag,
                   activity:result.activity.tag,
