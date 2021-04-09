@@ -10,7 +10,7 @@
                 <i class="fas fa-eye"></i>
             </a>
             {% if activitiesStat[activity.tag].hasQuizzesResults %}
-                <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_QUIZ_RESULTS_TITLE') }}"
+                <a class="btn btn-default btn-xs modalbox" data-iframe="1" data-size="modal-lg" title="{{ _t('LMS_QUIZ_RESULTS_TITLE') }}"
                 href="{{ url({handler:'render',params:{content:"{{quizzesresults}}",
                         course:course.tag,module:module.tag,activity:activity.tag,onlybest:true,noadmins:true}}) }}">
                     <i class="fas fa-poll"></i>
