@@ -177,6 +177,7 @@ class QuizManager
         $like .= $data['module'] ? '%"module":"' . $data['module']->getTag() . '"%' : '';
         $like .= $data['activity'] ? '%"activity":"' . $data['activity']->getTag() . '"%' : '';
         $like .= $data['quizId'] ? '%"quizId":"' . $data['quizId'] . '"%' : '';
+        $like .= isset($data['log_time']) ? '%"log_time":"' . $data['log_time'] . '"%' : '';
         $like = empty($like) ? '%' : $like ;
         $results = $this->tripleStore->getMatching(
             $data['learner'] ? $data['learner']->getUsername() : null,
@@ -279,6 +280,7 @@ class QuizManager
      * @param string|null $moduleId, id of the concerned module, null = all modules
      * @param string|null $activityId, id of the concerned activity, null = all activities
      * @param string|null $quizId, id of the concerned quiz, null = all quizzes
+     * @param string|null $log_time, log_time of the concerned quiz, null = all quizzes
      * @return array|null [self::STATUS_LABEL=>0(OK)/1(error)/2(not existing)
      *      (,'message'=>'error message')]
      */
@@ -287,7 +289,8 @@ class QuizManager
         ?string $courseId = null,
         ?string $moduleId = null,
         ?string $activityId = null,
-        ?string $quizId = null
+        ?string $quizId = null,
+        ?string $log_time = null
     ): array {
 
         /* Check if admin */
@@ -301,6 +304,9 @@ class QuizManager
             return $data;
         } else {
             unset($data[self::STATUS_LABEL]);
+        }
+        if (!empty($log_time)) {
+            $data['log_time'] = $log_time;
         }
         /* find results to delete */
         if (empty($results = $this->findResults($data, true))) {

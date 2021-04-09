@@ -29,7 +29,10 @@ class QuizzesResultsAction extends YesWikiAction
             'rawdata' => $this->formatBoolean($_REQUEST['rawdata'] ?? $args['rawdata']  ?? null, false) ,
             'onlybest' => $this->formatBoolean($_REQUEST['onlybest'] ?? $args['onlybest']  ?? null, false) ,
             'noadmins' => $this->formatBoolean($_REQUEST['noadmins'] ?? $args['noadmins']  ?? null, false) ,
-            'quizzes_results_mode' => $this->formatBoolean($_REQUEST, false, 'quizzes_results_mode') ,
+            'log_time' => $_REQUEST['log_time'] ??  null ,
+            'urlParams' => $this->formatArray($_REQUEST['urlParams'] ?? null),
+            'quizzes_results_mode' => $_REQUEST['quizzes_results_mode'] ?? $args['quizzes_results_mode']  ?? null ,
+            'content' => ($this->wiki->GetMethod() == 'render') ? '{{quizzesresults}}' : null ,
         ];
     }
     /**
@@ -56,9 +59,14 @@ class QuizzesResultsAction extends YesWikiAction
             }
         }
 
-        if (!empty($this->arguments['calledBy']) && !$this->arguments['quizzes_results_mode']) {
+        if (!empty($this->arguments['calledBy']) && empty($this->arguments['quizzes_results_mode'])) {
             return null;
         }
+
+        if ($this->arguments['quizzes_results_mode'] == 'delete') {
+            $this->delete();
+        }
+
 
         $rawResults = $this->quizManager->getQuizResults(
             $this->arguments['learner'],
@@ -117,15 +125,22 @@ class QuizzesResultsAction extends YesWikiAction
                 return $result;
             }, $results);
 
-            if ($this->arguments['noadmins']) {
+            if ($this->arguments['noadmins'] && !$this->params->get('lms_config')['save_progress_for_admins']) {
                 $results = array_filter($results, function ($result) {
                     return !($result['learner']->isAdmin());
                 });
             }
-        } elseif ($this->arguments['noadmins']) {
+        } elseif ($this->arguments['noadmins'] && !$this->params->get('lms_config')['save_progress_for_admins']) {
             $results = array_filter($results, function ($result) {
                 return !($this->learnerManager->getLearner($result['learner'])->isAdmin());
             });
+        }
+
+        $urlParams = [];
+        foreach (['course','module','activity','quizId','learner','rawdata','onlybest','noadmins','content'] as $param) {
+            if (!empty($this->arguments[$param])) {
+                $urlParams[$param] = $this->arguments[$param];
+            }
         }
 
         return $this->render(
@@ -133,7 +148,36 @@ class QuizzesResultsAction extends YesWikiAction
             [
                 'results' => $results,
                 'rawdata' => $this->arguments['rawdata'] ,
+                'urlParams' => $urlParams,
+                'handler' => !empty($this->arguments['content']) ? 'render' : null,
             ]
         );
+    }
+
+    /** delete quiz results
+     *
+     */
+    private function delete()
+    {
+        $this->quizManager->deleteQuizResults(
+            $this->arguments['learner'],
+            $this->arguments['course'],
+            $this->arguments['module'],
+            $this->arguments['activity'],
+            $this->arguments['quizId'],
+            $this->arguments['log_time']
+        );
+        // reset GET params
+
+        foreach (['course','module','activity','quizId','learner','log_time','content','quizzes_results_mode'] as $key) {
+            if (!in_array($key, $this->arguments['urlParams'])) {
+                $this->arguments[$key] = null;
+            }
+        }
+        foreach (['rawdata','onlybest','noadmins'] as $key) {
+            if (!in_array($key, $this->arguments['urlParams'])) {
+                $this->arguments[$key] = false;
+            }
+        }
     }
 }
