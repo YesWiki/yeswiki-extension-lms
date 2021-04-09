@@ -40,18 +40,23 @@ Il est possible de créer un token d'API pour un wiki simplement en ajoutant les
   ],
 ```
 
-Depuis la racine du wiki, utiliser la commande suivante:
+Depuis la racine du wiki, utiliser la commande suivante :
+*(en étant identifié avec le bon utilisateur ou en prefixant les commandes avec par exemple pour le user www-data `sudo -u www-data `)*
+
 ```sh
-tools/lms/commands/console lms:import-courses URL-DISTANTE TOKEN
+php tools/lms/commands/console lms:import-courses URL-DISTANTE TOKEN
 ```
+
 Vous serez ensuite guidé interactivement
 
 Il existe d'autres options plus avancées, il est possible d'obtenir leur documentation
+
 ```sh
 php tools/lms/commands/console lms:import-courses -h
 ```
 
 Il est possible d'importer les vidéos vers une instance peertube, pour cela, il faut que les paramètres suivants soient renseignés dans le `wakka.config.php`
+
 ```php
 'peertube_url' => 'URL de l\'instance',
 'peertube_user' => 'Utilisateur',
