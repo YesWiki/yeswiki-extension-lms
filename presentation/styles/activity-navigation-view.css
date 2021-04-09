@@ -7,3 +7,13 @@
   padding: 5px;
   margin-right: 5px;
 }
+
+.activity-navigation-conditions-helper.no-border {
+  border-style: none;
+}
+
+.activity-navigation-view-icon {
+  flex-grow: 0;
+  cursor:initial;
+  float:left;
+}

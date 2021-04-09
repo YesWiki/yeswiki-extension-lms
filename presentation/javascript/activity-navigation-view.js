@@ -92,7 +92,8 @@ function checkActivityNavigationConditionsRight(elem,url){
         cleanHelperContainer(container);
         // add success icon
         addSuccessIconToHelperContainer(container,id)
-        // display container
+        // display container without border
+        container.classList.add("no-border");
         container.removeAttribute("style");
         // hide container
         // container.setAttribute("style","display:none;");
@@ -102,6 +103,7 @@ function checkActivityNavigationConditionsRight(elem,url){
 
 function getContainer(id){
     var container = document.getElementById(id+'_conditionLink_help_container') ;
+    container.classList.remove("no-border");
     return container;
 }
 
@@ -117,6 +119,7 @@ function addErrorIconToHelperContainer(container,id){
         let icon = document.getElementById(id+'_error_icon') ;
         if (typeof icon != "undefined"){
             let cloneIcon = icon.cloneNode(true);
+            cloneIcon.removeAttribute("id");
             cloneIcon.removeAttribute("style");
             container.appendChild(cloneIcon);
         }
@@ -127,6 +130,7 @@ function addSuccessIconToHelperContainer(container,id){
         let icon = document.getElementById(id+'_success_icon') ;
         if (typeof icon != "undefined"){
             let cloneIcon = icon.cloneNode(true);
+            cloneIcon.removeAttribute("id");
             cloneIcon.removeAttribute("style");
             container.appendChild(cloneIcon);
         }
@@ -137,7 +141,9 @@ function addErrorTextToHelperContainer(container,id){
     if (typeof container != "undefined"){
         let textContainer = document.getElementById(id+'_error_message') ;
         if (typeof textContainer != "undefined"){
-            let textNode = document.createTextNode(textContainer.innerText);
+            let textNode = textContainer.cloneNode(true);
+            textNode.removeAttribute("id");
+            textNode.removeAttribute("style");
             container.appendChild(textNode);
         }
     }

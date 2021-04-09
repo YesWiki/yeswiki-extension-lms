@@ -76,13 +76,11 @@
 {% if (nextActivity or nextModule) and conditionsEnabled and conditionsStatus != 0 %}
   {# Templates for javascript #}
   <div id="{{ field.propertyName }}_error_icon"
-      type="button"
-      class="btn btn-danger btn-icon activity-navigation-btn pull-left" style="display:none;">
+      class="btn btn-danger btn-icon activity-navigation-view-icon" style="display:none;">
     <i class="fas fa-exclamation-triangle"></i>
   </div>
   <div id="{{ field.propertyName }}_success_icon"
-      type="button"
-      class="btn btn-success btn-icon activity-navigation-btn pull-left" style="display:none;">
+      class="btn btn-success btn-icon activity-navigation-view-icon" style="display:none;">
     <i class="fas fa-check"></i>
   </div>
   <div id="{{ field.propertyName }}_error_message" style="display:none;">
