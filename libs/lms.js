@@ -22,7 +22,11 @@ $(document).ready(function () {
       if ($(this).hasClass("user-reaction")) {
         if(typeof blockReactionRemove !== 'undefined' && blockReactionRemove){
           if (blockReactionRemoveMessage) {
-            alert(blockReactionRemoveMessage)
+            if (typeof toastMessage == "function"){
+              toastMessage(blockReactionRemoveMessage,3000,'alert alert-warning');
+            } else {
+              alert(blockReactionRemoveMessage);
+            }
           }
           doAjax = false
         } else {
