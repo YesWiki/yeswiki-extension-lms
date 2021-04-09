@@ -93,7 +93,7 @@
                   activity:result.activity.tag,
                   quizId:result.quizId,
                   learner:result.learner.userName,
-                  log_time:result.log_time|date("Y-m-d H:i:s"),
+                  log_time:result.log_time|date(dateFormat),
                   urlParams:urlParams|keys|join(','),
                   })}) }}"{{ block('deleteLine') }}
           </tr>

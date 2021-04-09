@@ -150,6 +150,7 @@ class QuizzesResultsAction extends YesWikiAction
                 'rawdata' => $this->arguments['rawdata'] ,
                 'urlParams' => $urlParams,
                 'handler' => !empty($this->arguments['content']) ? 'render' : null,
+                'dateFormat'=>DateManager::DATETIME_FORMAT,
             ]
         );
     }
