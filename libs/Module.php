@@ -117,8 +117,20 @@ class Module extends CourseStructure
      */
     public function getLastActivityTag(): ?string
     {
+        $lastActivity = $this->getLastActivity();
+        return !empty($lastActivity) ?
+            $lastActivity->getTag()
+            : null;
+    }
+
+        /**
+     * Get the the module's last activity
+     * @return Activity|null return null if the activity list is empty, otherwise the last activity
+     */
+    public function getLastActivity(): ?Activity
+    {
         return !empty($this->getActivities()) ?
-            $this->getActivities()[array_key_last($this->getActivities())]->getTag()
+            $this->getActivities()[array_key_last($this->getActivities())]
             : null;
     }
 
@@ -167,10 +179,10 @@ class Module extends CourseStructure
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
                         // TODO finish the scenarisation
-                        //if (!$course->isModuleScripted()) {
-                        $this->status = ModuleStatus::OPEN;
-                        //} else {
-                        //}
+                        $this->status = (is_null($this->scriptedOpenedStatus) 
+                                || $this->scriptedOpenedStatus)
+                            ? ModuleStatus::OPEN
+                            : ModuleStatus::NOT_ACCESSIBLE;
                     }
                 }
             }

@@ -7,6 +7,7 @@ use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiService;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
+use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
 use YesWiki\Wiki;
 
@@ -19,6 +20,7 @@ class CourseManager
     protected $activityFormId;
     protected $moduleFormId;
     protected $courseFormId;
+    protected $learnerManager;
 
     /**
      * CourseManager constructor
@@ -26,17 +28,20 @@ class CourseManager
      * @param EntryManager $entryManager the injected EntryManager instance
      * @param UserManager $userManager the injected UserManager instance
      * @param DateManager $dateManager the injected UserManager instance
+     * @param LearnerManager $learnerManager the injected LearnerManager instance
      */
     public function __construct(
         Wiki $wiki,
         EntryManager $entryManager,
         UserManager $userManager,
-        DateManager $dateManager
+        DateManager $dateManager,
+        LearnerManager $learnerManager
     ) {
         $this->config = $wiki->config;
         $this->entryManager = $entryManager;
         $this->userManager = $userManager;
         $this->dateManager = $dateManager;
+        $this->learnerManager = $learnerManager;
         $this->activityFormId = $this->config['lms_config']['activity_form_id'];
         $this->moduleFormId = $this->config['lms_config']['module_form_id'];
         $this->courseFormId = $this->config['lms_config']['course_form_id'];
@@ -106,5 +111,22 @@ class CourseManager
                 },
                 $entries
             );
+    }
+    
+
+    /**
+     * set the module scriptedOpenedStatus for learner
+     * @param Learner $learner
+     * @param Course $course
+     * @param Module $module
+     */
+    public function setModuleScriptedOpenedStatus(Learner $learner,Course $course, Module $module)
+    {
+        $module->setScriptedOpenedStatus(
+            !$course->isModuleScripted()
+            || !($previousModule = $course->getPreviousModule($this->getTag()))
+            || !($previousActivity = $previousModule->getLastActivity())
+            || $this->learnerManager->isStarted($course, $previousModule, $previousActivity)
+        );
     }
 }
