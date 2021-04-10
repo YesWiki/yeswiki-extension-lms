@@ -124,7 +124,7 @@ class CourseManager
     {
         $module->setScriptedOpenedStatus(
             !$course->isModuleScripted()
-            || !($previousModule = $course->getPreviousModule($this->getTag()))
+            || !($previousModule = $course->getPreviousModule($module->getTag()))
             || !($previousActivity = $previousModule->getLastActivity())
             || $this->learnerManager->isStarted($course, $previousModule, $previousActivity,$learner)
         );
