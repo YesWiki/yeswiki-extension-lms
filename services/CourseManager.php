@@ -142,4 +142,23 @@ class CourseManager
         $this->setModuleScriptedOpenedStatus($learner,$course,$module);
         return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
     }
+
+    /**
+     * set the activity scriptedOpenedStatus for learner
+     * @param Learner|null $learner
+     * @param Course $course
+     * @param Module $module
+     * @param Activity $activity
+     */
+    public function setActivityScriptedOpenedStatus(?Learner $learner = null,Course $course, Module $module, Activity $activity)
+    {
+        $activity->setScriptedOpenedStatus(
+            !$course->isActivityScripted()
+            || (
+                !($previousActivity = $module->getPreviousActivity($activity->getTag()))
+                && $module->isAccessibleBy($learner, $course)
+            )
+            || $this->learnerManager->isStarted($course, $module, $previousActivity,$learner)
+        );
+    }
 }
