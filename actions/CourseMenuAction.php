@@ -46,6 +46,11 @@ class CourseMenuAction extends YesWikiAction
                 foreach($modulesDisplayed as $moduleDisplayed)
                 {                    
                     $courseManager->setModuleScriptedOpenedStatus($learner,$course,$moduleDisplayed);
+                    if ($moduleDisplayed->getTag() == $module->getTag()){
+                        foreach($moduleDisplayed->getActivities() as $modulesActivity){
+                            $courseManager->setActivityScriptedOpenedStatus($learner,$course,$moduleDisplayed,$modulesActivity);
+                        }
+                    }
                 }
             }
 
