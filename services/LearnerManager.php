@@ -258,4 +258,44 @@ class LearnerManager
     ): bool {
         return $this->saveElapsedTimeForLearner($learner, $course, $module, $activity, null);
     }
+
+    
+    /**
+     * Check if module or activity is started
+     * @param Course $course
+     * @param Module $module
+     * @param Activity|null $activity
+     * @param Learner|null $learner or current learner is null
+     * @param Progresses|null $progresses of current Learner if available
+     * @return bool
+     *
+     */
+    public function isStarted(
+        Course $course, 
+        Module $module, 
+        ?Activity $activity = null, 
+        ?Learner $learner = null, 
+        ?Progresses $progresses = null):bool
+    {
+        if (!$learner && !($learner = $this->getLearner())){
+            return false ;
+        }
+        if (!$progresses){
+            $progresses = $this->getAllProgressesForLearner($learner);
+        }
+        // get progress
+        $progress = $progresses->getProgressForActivityOrModuleForLearner(
+            $learner,
+            $course,
+            $module,
+            $activity
+        );
+
+        return !empty($progress) &&(
+            ($activity) || !empty(array_filter($module->getActivities(), 
+                function ($activity) use ($learner, $course, $module, $progresses) {
+                    return $this->isStarted($course, $module, $activity, $learner, $progresses);
+            }))
+        );
+    }
 }
