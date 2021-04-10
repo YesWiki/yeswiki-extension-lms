@@ -20,7 +20,9 @@ abstract class CourseStructure
     protected $entryManager;
     // manager used to format dates
     protected $dateManager;
-
+    // save the scripted opened status for leaner
+    protected $scriptedOpenedStatus;
+    
     /**
      * CourseStructure constructor
      * @param array $config the configuration parameters of YesWiki
@@ -75,9 +77,9 @@ abstract class CourseStructure
      * This is shortcut for ->getFields()[key].
      *
      * @param string $key the key field
-     * @return string|null the field value or null if not defined
+     * @return mixed|null the field value or null if not defined
      */
-    public function getField(string $key): ?string
+    public function getField(string $key)
     {
         return key_exists($key, $this->getFields()) ? $this->getFields()[$key] : null;
     }
@@ -111,5 +113,15 @@ abstract class CourseStructure
     public function setExtraActivityLogs(ExtraActivityLogs $extraActivityLogs)
     {
         $this->extraActivityLogs = $extraActivityLogs;
+    }
+    
+    public function setScriptedOpenedStatus(bool $scriptedOpenedStatus)
+    {
+        $this->scriptedOpenedStatus = $scriptedOpenedStatus;
+    }
+
+    public function getScriptedOpenedStatus():?bool
+    {
+        return $this->scriptedOpenedStatus;
     }
 }
