@@ -113,6 +113,7 @@ class CourseController extends YesWikiController
                 // if the current page refers to a module of the course, return it
                 $currentModule = $this->courseManager->getModule($activity->getTag());
                 if ($currentModule && $course->hasModule($activity->getTag())) {
+                    $this->courseManager->setModuleScriptedOpenedStatus(null,$course,$currentModule);
                     return $currentModule;
                 }
 
@@ -120,6 +121,7 @@ class CourseController extends YesWikiController
                 if ($course) {
                     foreach ($course->getModules() as $currentModule) {
                         if ($currentModule->hasActivity($activity->getTag())) {
+                            $this->courseManager->setModuleScriptedOpenedStatus(null,$course,$currentModule);
                             return $currentModule;
                         }
                     }
@@ -174,11 +176,8 @@ class CourseController extends YesWikiController
                 $imageSize,
                 'fit'
             );
-
-        // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
-
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
+        $disabledLink = $this->courseManager->isModuleDisabledLink($learner,$course,$module);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         if (!$disabledLink) {

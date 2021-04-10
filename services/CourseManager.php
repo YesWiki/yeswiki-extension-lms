@@ -8,6 +8,7 @@ use YesWiki\Core\YesWikiService;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Learner;
+use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Module;
 use YesWiki\Wiki;
 
@@ -112,21 +113,33 @@ class CourseManager
                 $entries
             );
     }
-    
 
     /**
      * set the module scriptedOpenedStatus for learner
-     * @param Learner $learner
+     * @param Learner|null $learner
      * @param Course $course
      * @param Module $module
      */
-    public function setModuleScriptedOpenedStatus(Learner $learner,Course $course, Module $module)
+    public function setModuleScriptedOpenedStatus(?Learner $learner = null,Course $course, Module $module)
     {
         $module->setScriptedOpenedStatus(
             !$course->isModuleScripted()
             || !($previousModule = $course->getPreviousModule($this->getTag()))
             || !($previousActivity = $previousModule->getLastActivity())
-            || $this->learnerManager->isStarted($course, $previousModule, $previousActivity)
+            || $this->learnerManager->isStarted($course, $previousModule, $previousActivity,$learner)
         );
+    }
+
+    /**
+     * check disabled link for module
+     * @param Learner|null $learner
+     * @param Course $course
+     * @param Module $module
+     * @return bool
+     */
+    public function isModuleDisabledLink(?Learner $learner = null,Course $course, Module $module):bool
+    {
+        $this->setModuleScriptedOpenedStatus($learner,$course,$module);
+        return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
     }
 }

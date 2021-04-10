@@ -47,11 +47,8 @@ class ModuleNavigationField extends LmsField
             // save the activity progress if not already exists for this user and activity
             $this->learnerManager->saveModuleProgress($course, $module);
 
-            // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
-
             $learner = $this->learnerManager->getLearner();
-            $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
-
+            $disabledLink = $this->courseManager->isModuleDisabledLink($learner,$course,$module);
             // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
             $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
                 _t('LMS_BEGIN_ONLY_ADMIN')
