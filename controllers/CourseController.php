@@ -22,6 +22,7 @@ class CourseController extends YesWikiController
     protected $learnerManager;
     protected $dateManager;
     protected $config;
+    protected $activitiesCanBeDisplayedWithoutContext;
 
     /**
      * CourseController constructor
@@ -237,5 +238,23 @@ class CourseController extends YesWikiController
                 return _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }
+    }
+
+    /**
+     * check if we can display activity without contextual course or module
+     * @return bool
+     */
+    public function activitiesCanBeDisplayedWithoutContext():bool
+    {
+        if (is_null($this->activitiesCanBeDisplayedWithoutContext)) {
+            $this->activitiesCanBeDisplayedWithoutContext = true ;
+            // true by default except if one course is scripted (module or activity)
+            foreach ($this->courseManager->getAllCourses() as $course) {
+                if ($course->isActivityScripted() || $course->isModuleScripted()) {
+                    $this->activitiesCanBeDisplayedWithoutContext = false ;
+                }
+            }
+        }
+        return $this->activitiesCanBeDisplayedWithoutContext;
     }
 }

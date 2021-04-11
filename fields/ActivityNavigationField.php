@@ -7,6 +7,7 @@ use YesWiki\Wiki;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Service\DateManager;
+use YesWiki\Lms\Service\CourseManager;
 
 /**
  * @Field({"navigationactivite","activitynavigation"})
@@ -27,6 +28,7 @@ class ActivityNavigationField extends LmsField
     protected $entryManager;
     protected $dateManager;
     protected $moduleModal;
+    protected $courseManager;
 
     public function __construct(array $values, ContainerInterface $services)
     {
@@ -38,6 +40,7 @@ class ActivityNavigationField extends LmsField
         $this->config = $services->get(Wiki::class)->config ;
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
+        $this->courseManager = $services->get(CourseManager::class);
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
@@ -64,8 +67,27 @@ class ActivityNavigationField extends LmsField
 
         $output = '';
         if ($course && $module && !empty($module->getActivities())) {
-            // save the activity progress if not already exists for this user and activity
-            $this->learnerManager->saveActivityProgress($course, $module, $activity);
+            $learner = $this->learnerManager->getLearner();
+            if ($learner
+                && $this->courseManager->setModuleCanBeOpenedByLearner(
+                    $learner,
+                    $course,
+                    $module
+                ) // module should be accessible
+                && ($referenceActivity = $module->getActivity($activity->getTag()))
+                 // activity should be in module
+                && !is_null($this->courseManager->setActivityCanBeOpenedByLearner(
+                    $learner,
+                    $course,
+                    $module,
+                    $referenceActivity
+                )) // set Activity Can be opened
+                && !is_null($activity->canBeOpenedBy($learner, $referenceActivity->canBeOpenedBy($learner)))
+                && $activity->isAccessibleBy($learner, $course, $module)
+            ) {
+                // save the activity progress if not already exists for this user and activity
+                $this->learnerManager->saveActivityProgress($course, $module, $activity);
+            }
 
             // display the previous button
             if ($activity->getTag() != $module->getFirstActivityTag()) {
