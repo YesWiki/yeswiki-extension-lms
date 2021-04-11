@@ -104,26 +104,23 @@ class CourseController extends YesWikiController
 
             if ($moduleTag) {
                 // if the module is specified in the GET parameter, return it if the tag corresponds
-                $module = $this->courseManager->getModule($moduleTag);
+                $module = $course->getModule($moduleTag);
 
-                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($activity->getTag())) ?
+                return ($module && $module->hasActivity($activity->getTag())) ?
                     $module
                     : null;
             } else {
                 // if the current page refers to a module of the course, return it
-                $currentModule = $this->courseManager->getModule($activity->getTag());
-                if ($currentModule && $course->hasModule($activity->getTag())) {
-                    $this->courseManager->setModuleScriptedOpenedStatus(null,$course,$currentModule);
-                    return $currentModule;
+                if ($module = $course->getModule($activity->getTag())) {
+                    $this->courseManager->setModuleScriptedOpenedStatus(null, $course, $module);
+                    return $module;
                 }
 
                 // find in the course modules, the first module which contains the activity
-                if ($course) {
-                    foreach ($course->getModules() as $currentModule) {
-                        if ($currentModule->hasActivity($activity->getTag())) {
-                            $this->courseManager->setModuleScriptedOpenedStatus(null,$course,$currentModule);
-                            return $currentModule;
-                        }
+                foreach ($course->getModules() as $currentModule) {
+                    if ($currentModule->hasActivity($activity->getTag())) {
+                        $this->courseManager->setModuleScriptedOpenedStatus(null, $course, $currentModule);
+                        return $currentModule;
                     }
                 }
             }
@@ -177,7 +174,7 @@ class CourseController extends YesWikiController
                 'fit'
             );
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = $this->courseManager->isModuleDisabledLink($learner,$course,$module);
+        $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         if (!$disabledLink) {
