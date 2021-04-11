@@ -161,7 +161,9 @@ class CourseManager
      */
     public function isModuleDisabledLink(?Learner $learner = null, Course $course, Module $module):bool
     {
-        $this->setModuleCanBeOpenedByLearner($learner, $course, $module);
+        if ($learner) {
+            $this->setModuleCanBeOpenedByLearner($learner, $course, $module);
+        }
         return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
     }
 
