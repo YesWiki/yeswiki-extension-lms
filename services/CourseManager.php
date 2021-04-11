@@ -22,6 +22,7 @@ class CourseManager
     protected $moduleFormId;
     protected $courseFormId;
     protected $learnerManager;
+    protected $coursesCache ;
 
     /**
      * CourseManager constructor
@@ -46,6 +47,7 @@ class CourseManager
         $this->activityFormId = $this->config['lms_config']['activity_form_id'];
         $this->moduleFormId = $this->config['lms_config']['module_form_id'];
         $this->courseFormId = $this->config['lms_config']['course_form_id'];
+        $this->coursesCache = [];
     }
 
     /**
@@ -88,9 +90,13 @@ class CourseManager
      */
     public function getCourse(string $entryTag, array $courseFields = null): ?Course
     {
+        if (isset($this->coursesCache[$entryTag])) {
+            return $this->coursesCache[$entryTag] ;
+        }
         $courseEntry = $this->entryManager->getOne($entryTag);
         if ($courseEntry && intval($courseEntry['id_typeannonce']) == $this->courseFormId) {
-            return new Course($this->config, $this->entryManager, $this->dateManager, $courseEntry['id_fiche'], $courseEntry);
+            $this->coursesCache[$entryTag] = new Course($this->config, $this->entryManager, $this->dateManager, $entryTag, $courseEntry);
+            return $this->coursesCache[$entryTag] ;
         } else {
             return null;
         }
@@ -108,7 +114,11 @@ class CourseManager
             [] :
             array_map(
                 function ($courseEntry) {
-                    return new Course($this->config, $this->entryManager, $this->dateManager, $courseEntry['id_fiche'], $courseEntry);
+                    if (isset($this->coursesCache[$courseEntry['id_fiche']])) {
+                        return $this->coursesCache[$courseEntry['id_fiche']] ;
+                    }
+                    $this->coursesCache[$courseEntry['id_fiche']] = new Course($this->config, $this->entryManager, $this->dateManager, $courseEntry['id_fiche'], $courseEntry);
+                    return $this->coursesCache[$courseEntry['id_fiche']] ;
                 },
                 $entries
             );
@@ -120,13 +130,13 @@ class CourseManager
      * @param Course $course
      * @param Module $module
      */
-    public function setModuleScriptedOpenedStatus(?Learner $learner = null,Course $course, Module $module)
+    public function setModuleScriptedOpenedStatus(?Learner $learner = null, Course $course, Module $module)
     {
         $module->setScriptedOpenedStatus(
             !$course->isModuleScripted()
             || !($previousModule = $course->getPreviousModule($module->getTag()))
             || !($previousActivity = $previousModule->getLastActivity())
-            || $this->learnerManager->isStarted($course, $previousModule, $previousActivity,$learner)
+            || $this->learnerManager->isStarted($course, $previousModule, $previousActivity, $learner)
         );
     }
 
@@ -137,9 +147,9 @@ class CourseManager
      * @param Module $module
      * @return bool
      */
-    public function isModuleDisabledLink(?Learner $learner = null,Course $course, Module $module):bool
+    public function isModuleDisabledLink(?Learner $learner = null, Course $course, Module $module):bool
     {
-        $this->setModuleScriptedOpenedStatus($learner,$course,$module);
+        $this->setModuleScriptedOpenedStatus($learner, $course, $module);
         return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
     }
 
@@ -150,7 +160,7 @@ class CourseManager
      * @param Module $module
      * @param Activity $activity
      */
-    public function setActivityScriptedOpenedStatus(?Learner $learner = null,Course $course, Module $module, Activity $activity)
+    public function setActivityScriptedOpenedStatus(?Learner $learner = null, Course $course, Module $module, Activity $activity)
     {
         $activity->setScriptedOpenedStatus(
             !$course->isActivityScripted()
@@ -158,7 +168,7 @@ class CourseManager
                 !($previousActivity = $module->getPreviousActivity($activity->getTag()))
                 && $module->isAccessibleBy($learner, $course)
             )
-            || $this->learnerManager->isStarted($course, $module, $previousActivity,$learner)
+            || $this->learnerManager->isStarted($course, $module, $previousActivity, $learner)
         );
     }
 }
