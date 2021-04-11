@@ -126,17 +126,29 @@ class CourseManager
 
     /**
      * set the module scriptedOpenedStatus for learner
-     * @param Learner|null $learner
+     * @param Learner $learner
      * @param Course $course
      * @param Module $module
+     * @return bool|null
      */
-    public function setModuleScriptedOpenedStatus(?Learner $learner = null, Course $course, Module $module)
+    public function setModuleCanBeOpenedByLearner(Learner $learner, Course $course, Module $module): ?bool
     {
-        $module->setScriptedOpenedStatus(
-            !$course->isModuleScripted()
-            || !($previousModule = $course->getPreviousModule($module->getTag()))
-            || !($previousActivity = $previousModule->getLastActivity())
-            || $this->learnerManager->hasBeenOpenedBy($course, $previousModule, $previousActivity, $learner)
+        if (!is_null($module->canBeOpenedBy($learner))) {
+            return $module->canBeOpenedBy($learner);
+        }
+
+        return $module->canBeOpenedBy(
+            $learner,
+            !$course->isModuleScripted() //no constraint
+            || !($previousModule = $course->getPreviousModule($module->getTag())) // or scripted but no previous module
+            || (
+                $this->learnerManager->hasBeenOpenedBy($course, $previousModule, null, $learner) // previous module should be opened
+                && (
+                    !($previousActivity = $previousModule->getLastActivity()) // scripted with empty but opened previous module
+                    || $this->learnerManager->hasBeenOpenedBy($course, $previousModule, $previousActivity, $learner)
+                        // or scripted and has started the last Activity of the previous module
+                )
+            )
         );
     }
 
@@ -149,26 +161,55 @@ class CourseManager
      */
     public function isModuleDisabledLink(?Learner $learner = null, Course $course, Module $module):bool
     {
-        $this->setModuleScriptedOpenedStatus($learner, $course, $module);
+        $this->setModuleCanBeOpenedByLearner($learner, $course, $module);
         return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
     }
 
     /**
      * set the activity scriptedOpenedStatus for learner
-     * @param Learner|null $learner
+     * @param Learner $learner
      * @param Course $course
      * @param Module $module
      * @param Activity $activity
      */
-    public function setActivityScriptedOpenedStatus(?Learner $learner = null, Course $course, Module $module, Activity $activity)
+    public function setActivityCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, Activity $activity)
     {
-        $activity->setScriptedOpenedStatus(
-            !$course->isActivityScripted()
-            || (
-                !($previousActivity = $module->getPreviousActivity($activity->getTag()))
-                && $module->isAccessibleBy($learner, $course)
+        if (!is_null($activity->canBeOpenedBy($learner))) {
+            return $activity->canBeOpenedBy($learner);
+        }
+
+        return $activity->canBeOpenedBy(
+            $learner,
+            (
+                !$course->isModuleScripted() //no constraint
+                || $module->isAccessibleBy($learner, $course) // module accessible if scripted
             )
-            || $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner)
+            && (
+                !$course->isActivityScripted() //no constraint
+                || !($previousActivity = $module->getPreviousActivity($activity->getTag())) // or scripted but no previous activity
+                || $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner) // previous activity should be opened
+            )
         );
+    }
+
+    /**
+     * set the recursively activity and modules scriptedOpenedStatus for learner
+     * @param Learner $learner
+     * @param Course $course
+     * @param Module[] $modules
+     */
+    public function setModulesScriptedOpenedStatus(Learner $learner, Course $course, array $modules)
+    {
+        foreach ($modules as $module) {
+            if ($this->setModuleCanBeOpenedByLearner($learner, $course, $module)) {
+                // define status only if can be opened
+                foreach ($module->getActivities() as $activity) {
+                    if (!$this->setActivityCanBeOpenedByLearner($learner, $course, $module, $activity)) {
+                        // do not check for followin of the module if one is false
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

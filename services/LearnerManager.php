@@ -285,7 +285,7 @@ class LearnerManager
         } else {
             $courseStructure = $module;
         }
-        $status = $courseStructure.hasBeenOpenedBy($learner) ;
+        $status = $courseStructure->hasBeenOpenedBy($learner) ;
         if (!is_null($status)) {
             return $status ;
         }
@@ -302,6 +302,6 @@ class LearnerManager
         );
 
         $status = !empty($progress);
-        return $courseStructure.hasBeenOpenedBy($learner, $status);
+        return $courseStructure->hasBeenOpenedBy($learner, $status);
     }
 }

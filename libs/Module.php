@@ -141,7 +141,7 @@ class Module extends CourseStructure
             : null;
     }
 
-        /**
+    /**
      * Get the the module's last activity
      * @return Activity|null return null if the activity list is empty, otherwise the last activity
      */
@@ -197,10 +197,7 @@ class Module extends CourseStructure
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
                         // TODO finish the scenarisation
-                        $this->status = (is_null($this->scriptedOpenedStatus) 
-                                || $this->scriptedOpenedStatus)
-                            ? ModuleStatus::OPEN
-                            : ModuleStatus::NOT_ACCESSIBLE;
+                        $this->status = ModuleStatus::OPEN;
                     }
                 }
             }
@@ -216,7 +213,8 @@ class Module extends CourseStructure
      */
     public function isAccessibleBy(?Learner $learner, Course $course): bool
     {
-        return ($learner && $learner->isAdmin()) || $this->getStatus($course) == ModuleStatus::OPEN;
+        return ($learner && $learner->isAdmin()) || ($this->getStatus($course) == ModuleStatus::OPEN
+            && $this->canBeOpenedBy($learner));
     }
 
     /**

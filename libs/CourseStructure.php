@@ -144,6 +144,9 @@ abstract class CourseStructure
         if (!is_null($newValue)) {
             $this->learnersWhoCanOpen[$learner->getUserName()] = $newValue;
         }
+        // if (!isset($this->learnersWhoCanOpen[$learner->getUserName()])) {
+        //     throw new \Exception('learnersWhoCanOpen not defined for '.$learner->getUserName().'!');
+        // }
         return $this->learnersWhoCanOpen[$learner->getUserName()] ?? null ;
     }
 }

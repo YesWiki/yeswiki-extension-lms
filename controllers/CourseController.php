@@ -112,14 +112,12 @@ class CourseController extends YesWikiController
             } else {
                 // if the current page refers to a module of the course, return it
                 if ($module = $course->getModule($activity->getTag())) {
-                    $this->courseManager->setModuleScriptedOpenedStatus(null, $course, $module);
                     return $module;
                 }
 
                 // find in the course modules, the first module which contains the activity
                 foreach ($course->getModules() as $currentModule) {
                     if ($currentModule->hasActivity($activity->getTag())) {
-                        $this->courseManager->setModuleScriptedOpenedStatus(null, $course, $currentModule);
                         return $currentModule;
                     }
                 }
