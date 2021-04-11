@@ -136,7 +136,7 @@ class CourseManager
             !$course->isModuleScripted()
             || !($previousModule = $course->getPreviousModule($module->getTag()))
             || !($previousActivity = $previousModule->getLastActivity())
-            || $this->learnerManager->isStarted($course, $previousModule, $previousActivity, $learner)
+            || $this->learnerManager->hasBeenOpenedBy($course, $previousModule, $previousActivity, $learner)
         );
     }
 
@@ -168,7 +168,7 @@ class CourseManager
                 !($previousActivity = $module->getPreviousActivity($activity->getTag()))
                 && $module->isAccessibleBy($learner, $course)
             )
-            || $this->learnerManager->isStarted($course, $module, $previousActivity, $learner)
+            || $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner)
         );
     }
 }

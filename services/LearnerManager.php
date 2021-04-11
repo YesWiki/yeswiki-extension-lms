@@ -261,7 +261,7 @@ class LearnerManager
 
     
     /**
-     * Check if module or activity is started
+     * Check if module or activity has been started by a learner
      * @param Course $course
      * @param Module $module
      * @param Activity|null $activity
@@ -270,17 +270,27 @@ class LearnerManager
      * @return bool
      *
      */
-    public function isStarted(
-        Course $course, 
-        Module $module, 
-        ?Activity $activity = null, 
-        ?Learner $learner = null, 
-        ?Progresses $progresses = null):bool
-    {
-        if (!$learner && !($learner = $this->getLearner())){
+    public function hasBeenOpenedBy(
+        Course $course,
+        Module $module,
+        ?Activity $activity = null,
+        ?Learner $learner = null,
+        ?Progresses $progresses = null
+    ):bool {
+        if (!$learner && !($learner = $this->getLearner())) {
             return false ;
         }
-        if (!$progresses){
+        if ($activity) {
+            $courseStructure = $activity;
+        } else {
+            $courseStructure = $module;
+        }
+        $status = $courseStructure.hasBeenOpenedBy($learner) ;
+        if (!is_null($status)) {
+            return $status ;
+        }
+
+        if (!$progresses) {
             $progresses = $this->getAllProgressesForLearner($learner);
         }
         // get progress
@@ -291,11 +301,7 @@ class LearnerManager
             $activity
         );
 
-        return !empty($progress) &&(
-            ($activity) || !empty(array_filter($module->getActivities(), 
-                function ($activity) use ($learner, $course, $module, $progresses) {
-                    return $this->isStarted($course, $module, $activity, $learner, $progresses);
-            }))
-        );
+        $status = !empty($progress);
+        return $courseStructure.hasBeenOpenedBy($learner, $status);
     }
 }
