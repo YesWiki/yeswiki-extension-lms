@@ -62,6 +62,18 @@
       </div>
     </div>
   </div>
+    <div id="{{ id }}_quiz_passed_minimum_level_template_container" style="display:none;" class="activity-navigation-condition-container">
+    <div class="activity-navigation-condition-content">
+      <input type="hidden" name="{{ field.propertyName }}[quiz_passed_minimum_level][head]" value="1" disabled>
+      <div class="input-group with-text">
+        <span class="item-title">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_WITH_MINIMUM_LEVEL') }}</span>
+        <input type="text" name="{{ field.propertyName }}[quiz_passed_minimum_level][quizId]"
+          value="" maxlength="256" placeholder="quizId {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_EMPTY') }}" class="form-control input-xxlarge" disabled/>
+      <input type="number" name="{{ field.propertyName }}[quiz_passed_minimum_level][quiz_minimum_level]"
+          value="" maxlength="256" placeholder="{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_LEVEL') }}" class="form-control input-xxlarge" disabled/>
+      </div>
+    </div>
+  </div>
   <div id="{{ id }}_form_filled_template_container" style="display:none;" class="activity-navigation-condition-container">
     <div class="activity-navigation-condition-content">
       <input type="hidden" name="{{ field.propertyName }}[form_filled][head]" value="1" disabled>

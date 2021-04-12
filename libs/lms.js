@@ -88,7 +88,7 @@ function activity_navigation_add_button(elem){
   }
 }
 
-function activity_navigation_add_element(id,value,defaultValue = null){
+function activity_navigation_add_element(id,value,conditionObject = null){
   // find associated template
   let template_container = document.getElementById(id+'_'+value+'_template_container') ;
   if (!template_container) {
@@ -107,9 +107,11 @@ function activity_navigation_add_element(id,value,defaultValue = null){
           let end = input.length;
           for (let i=0;i<end;++i){
               input[i].removeAttribute('disabled');
-              // set default value TODO only set for concerned input
-              if (defaultValue != null){
-                  input[i].value = defaultValue ;
+              // set default value
+              for (var key in conditionObject) {
+                if (input[i].name == id+'['+value+']['+key+']'){
+                  input[i].value = conditionObject[key];
+                }
               }
               // change name to be sure to be unique
               input[i].name += '['+activityNavigationConditionsEditUniqueId+']';
@@ -155,17 +157,7 @@ function activity_navigation_init(listInit){
           value.forEach(function (conditionObject){
               let condition = conditionObject.condition ;
               if (condition){
-                  let defaultValue = null;
-                  if (condition == 'quiz_passed'){
-                      defaultValue = conditionObject.quizId;
-                  }
-                  if (condition == 'form_filled'){
-                      defaultValue = conditionObject.formId;
-                  }
-                  if (typeof defaultValue == "undefined"){
-                      defaultValue = null;
-                  }
-                  activity_navigation_add_element(id,condition,defaultValue);
+                  activity_navigation_add_element(id,condition,conditionObject);
               }
           });
       } 

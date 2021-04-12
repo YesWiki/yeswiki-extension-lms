@@ -18,6 +18,8 @@ class ActivityNavigationField extends LmsField
 {
     public const LABEL_REACTION_NEEDED = 'reaction_needed';
     public const LABEL_QUIZ_PASSED = 'quiz_passed';
+    public const LABEL_QUIZ_PASSED_MINIMUM_LEVEL = 'quiz_passed_minimum_level';
+    public const LABEL_QUIZ_MINIMUM_LEVEL = 'quiz_minimum_level';
     public const LABEL_QUIZ_ID = 'quizId';
     public const LABEL_FORM_FILLED = 'form_filled';
     public const LABEL_FORM_ID = 'formId';
@@ -156,6 +158,7 @@ class ActivityNavigationField extends LmsField
             'options' => [
                 self::LABEL_REACTION_NEEDED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED'),
                 self::LABEL_QUIZ_PASSED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED'),
+                self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_WITH_MINIMUM_LEVEL'),
                 self::LABEL_FORM_FILLED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED')
             ]
         ])
@@ -180,6 +183,18 @@ class ActivityNavigationField extends LmsField
                     if (isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
                         self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]];
+                    }
+                }
+            }
+            if (isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL])
+                    && isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_ID])
+                    && isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL])) {
+                foreach ($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL]['head'] as $id => $val) {
+                    if (isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_ID][$id])
+                            && isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id])) {
+                        $data[] = ['condition' => self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL,
+                        self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_ID][$id],
+                        self::LABEL_QUIZ_MINIMUM_LEVEL => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id]];
                     }
                 }
             }
