@@ -408,7 +408,7 @@ class ActivityNavigationConditionsManager
                     $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
                         ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
                         : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).
-                        _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP').$QuizMinimumLevel.
+                        _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP').' '.$QuizMinimumLevel.' %'.
                         '</li>';
                 }
                 break;
