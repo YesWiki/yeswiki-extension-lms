@@ -130,6 +130,14 @@ class ActivityNavigationConditionsManager
                     case ActivityNavigationField::LABEL_QUIZ_PASSED:
                         $result = $this->checkQuizPassed($data, $result, $condition[ActivityNavigationField::LABEL_QUIZ_ID]);
                         break;
+                    case ActivityNavigationField::LABEL_QUIZ_PASSED_MINIMUM_LEVEL:
+                        $result = $this->checkQuizPassedMinimumLevel(
+                            $data,
+                            $result,
+                            $condition[ActivityNavigationField::LABEL_QUIZ_ID],
+                            $condition[ActivityNavigationField::LABEL_QUIZ_MINIMUM_LEVEL]
+                        );
+                        break;
                     case ActivityNavigationField::LABEL_FORM_FILLED:
                         $result = $this->checkFormFilled($data, $result, $condition[ActivityNavigationField::LABEL_FORM_ID]);
                         break;
@@ -336,7 +344,7 @@ class ActivityNavigationConditionsManager
     /** checkQuizPassed
      * @param array $data
      * @param array $result
-     * @param array $quizId
+     * @param string $quizId
      * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
      */
     private function checkQuizPassed(array $data, array $result, string $quizId): array
@@ -358,6 +366,58 @@ class ActivityNavigationConditionsManager
                     $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
                         ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
                         : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).'</li>';
+                break;
+            case QuizManager::STATUS_CODE_ERROR:
+            default:
+                $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
+                $result[self::MESSAGE_LABEL] .= $quizResults[QuizManager::MESSAGE_LABEL];
+                break;
+        }
+        return $result;
+    }
+
+    /** checkQuizPassedMinimumLevel
+     * @param array $data
+     * @param array $result
+     * @param string $quizId
+     * @param string $QuizMinimumLevel
+     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     */
+    private function checkQuizPassedMinimumLevel(array $data, array $result, string $quizId, string $QuizMinimumLevel): array
+    {
+        // get quizResults
+        $quizResults = $this->quizManager->getQuizResults(
+            $this->learnerManager->getLearner()->getUserName(),
+            $data['course']->getTag(),
+            $data['module']->getTag(),
+            $data['activity']->getTag(),
+            !empty($quizId) ? $quizId : null
+        );
+        switch ($quizResults[QuizManager::STATUS_LABEL]) {
+            case QuizManager::STATUS_CODE_OK:
+                // check level
+                $levelPassed= false;
+                foreach ($quizResults[QuizManager::RESULTS_LABEL] as $triple) {
+                    if (floatval($triple[QuizManager::RESULT_LABEL]) >= floatval($QuizMinimumLevel)) {
+                        $levelPassed=true;
+                    }
+                }
+                if (!$levelPassed) {
+                    $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
+                        self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
+                    $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
+                        ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
+                        : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).
+                        _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP').$QuizMinimumLevel.
+                        '</li>';
+                }
+                break;
+            case QuizManager::STATUS_CODE_NO_RESULT:
+                $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
+                    self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
+                $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
+                    ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
+                    : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).'</li>';
                 break;
             case QuizManager::STATUS_CODE_ERROR:
             default:
