@@ -144,73 +144,22 @@ class ImportCoursesCommand extends Command
             $bazarPage['bf_description'] = $replaced;
         }
 
-        // Handle Videos if a peertube location is configured
-        if (!empty($this->peertube_token)) {
-            $content = (!empty($content['bf_contenu']) ?
-              $content['bf_contenu']
-              : $content['bf_description'] ?? '');
-            $video_wiki_regex = '#{{video(?:\s*(?:id="(?<id>\S+)"|serveur="(?<serveur>peertube|vimeo|youtube)"|peertubeinstance="(?<peertubeinstance>\S+)"|ratio="(?<ratio>.+)"|largeurmax="(?<largeurmax>\d+)"|hauteurmax="(?<hauteurmax>\d+)"| class="(?<class>.+)"))+\s*}}#i';
-            preg_match_all(
-                $video_wiki_regex,
-                $content,
-                $video_wiki_matches
-            );
-
-            $video_html_regex = '#<iframe.+?(?:\s*width=["\'](?<width>[^"\']+)["\']|\s*height=["\'](?<height>[^\'"]+)["\']|\s*src=["\'](?<src>[^\'"]+["\']))+[^>]*>(<\/iframe>)?#mi';
-            preg_match_all(
-                $video_html_regex,
-                $content,
-                $video_html_matches
-            );
-
-            if (!empty($video_wiki_matches['id'])) {
-                foreach ($video_wiki_matches['id'] as $index => $videoId) {
-                    // trouver l'instance video entre youtube|vimeo|peertube
-                    // creer l'url de la video et la mettre dans $urlVideo
-                    if (empty($video_wiki_matches['serveur'][$index])) {
-                        if (strlen($videoId) == 11) {
-                            $video_wiki_matches['serveur'][$index] = 'youtube';
-                        } elseif (preg_match("/^\d+$/", $videoId)) {
-                            $video_wiki_matches['serveur'][$index] = 'vimeo';
-                        } else {
-                            $video_wiki_matches['serveur'][$index] = 'peertube';
-                        }
-                    }
-                    switch ($video_wiki_matches['serveur'][$index]) {
-                        case 'youtube':
-                            $urlVideo = 'https://youtu.be/'.$videoId;
-                            $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$urlVideo), true);
-                            $titleVideo = $video['title'];
-                            break;
-                        case 'vimeo':
-                            $urlVideo = 'https://vimeo.com/'.$videoId;
-                            $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$urlVideo), true);
-                            $titleVideo = $video['title'];
-                            break;
-                        case 'peertube':
-                            if (!empty($video_wiki_matches['peertubeinstance'][$index])) {
-                                $urlVideo = $video_wiki_matches['peertubeinstance'][$index].'/videos/watch/'.$videoId;
-                            } else {
-                                $urlVideo = 'https://video.colibris-outilslibres.org/videos/watch/'.$videoId;
-                            }
-                            $video = json_decode(file_get_contents(str_replace('videos/watch', 'api/v1/videos', $urlVideo)), true);
-                            $titleVideo = $video['name'];
-                            break;
-
-                        default:
-                            $output->writeln('<error>Something went very wrong determining which provider the video included by "'.$video_wiki_matches[0][$index].'" has.');
-                            die(1); // This part should never run, the switch should be handled by the cases above
-                    }
-                    $this->importToPeertube($urlVideo, $titleVideo, $output);
-                }
-            }
-
-            if (!empty($video_html_matches['src'])) {
-              // checker si l'url est une video youtube|vimeo|peertube
-              // uploader
-              echo 'TODO';
-            }
+      // Handle Videos if a peertube location is configured
+      if (!empty($this->peertube_token)) {
+        try {
+          $videos = $this->importManager->findVideos(
+              !empty($bazarPage['bf_contenu']) ?
+              $bazarPage['bf_contenu'] : $bazarPage['bf_description'] ?? ''
+          );
+        } catch (\Exception $e) {
+          $output->writeln('<error>'.$e->getMessage().'</>');
+          die(1);
         }
+
+        foreach ($videos as $video) {
+          $this->importToPeertube($video['url'], $video['title'], $output);
+        }
+      }
     }
 
     private function askWhenDuplicate($localEntry, $remoteEntry, InputInterface $input, OutputInterface $output)
