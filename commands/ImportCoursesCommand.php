@@ -74,15 +74,15 @@ class ImportCoursesCommand extends Command
 
     private function fetch_api($api_args, $log_name, OutputInterface $output)
     {
-      $output->writeln('<info>Fetching '.$log_name.'</>');
+        $output->writeln('<info>Fetching '.$log_name.'</>');
 
-      try {
-        $data = $this->importManager->fetchEntriesFromApi($this->remote_url, $this->remote_token, $api_args);
-      } catch (\Exception $e) {
-        $output->writeln('<error>Error: '.$e->getMessage().'</>');
-      }
+        try {
+            $data = $this->importManager->fetchEntriesFromApi($this->remote_url, $this->remote_token, $api_args);
+        } catch (\Exception $e) {
+            $output->writeln('<error>Error: '.$e->getMessage().'</>');
+        }
 
-      return $data;
+        return $data;
     }
 
     private function importToPeertube($url, $title, OutputInterface $output)
@@ -94,10 +94,10 @@ class ImportCoursesCommand extends Command
     private function cURLDownload($from, $to, $force, OutputInterface $output)
     {
         try {
-          $out = $this->importManager->cURLDownload($from, $to, $force);
+            $out = $this->importManager->cURLDownload($from, $to, $force);
         } catch (\Exception $e) {
-          $output->writeln('<error>'.$e->getMessage().'</>');
-          return;
+            $output->writeln('<error>'.$e->getMessage().'</>');
+            return;
         }
         $output->writeln('<info>'.$out.'</>');
     }
@@ -144,22 +144,22 @@ class ImportCoursesCommand extends Command
             $bazarPage['bf_description'] = $replaced;
         }
 
-      // Handle Videos if a peertube location is configured
-      if (!empty($this->peertube_token)) {
-        try {
-          $videos = $this->importManager->findVideos(
-              !empty($bazarPage['bf_contenu']) ?
-              $bazarPage['bf_contenu'] : $bazarPage['bf_description'] ?? ''
-          );
-        } catch (\Exception $e) {
-          $output->writeln('<error>'.$e->getMessage().'</>');
-          die(1);
-        }
+        // Handle Videos if a peertube location is configured
+        if (!empty($this->peertube_token)) {
+            try {
+                $videos = $this->importManager->findVideos(
+                    !empty($bazarPage['bf_contenu']) ?
+                    $bazarPage['bf_contenu'] : $bazarPage['bf_description'] ?? ''
+                );
+            } catch (\Exception $e) {
+                $output->writeln('<error>'.$e->getMessage().'</>');
+                die(1);
+            }
 
-        foreach ($videos as $video) {
-          $this->importToPeertube($video['url'], $video['title'], $output);
+            foreach ($videos as $video) {
+                $this->importToPeertube($video['url'], $video['title'], $output);
+            }
         }
-      }
     }
 
     private function askWhenDuplicate($localEntry, $remoteEntry, InputInterface $input, OutputInterface $output)
@@ -172,139 +172,139 @@ class ImportCoursesCommand extends Command
         $question = new ChoiceQuestion(
             'Would you like to',
             [
-          'l' => 'Keep local entry '.$this->wiki->href('', $localEntry['id_fiche']). ' last edited at ' . $localEntry['date_maj_fiche'],
-          'r' => 'Overwrite with remote entry '.$this->remote_url . '?' . $remoteEntry['id_fiche'] . ' last edited at ' . $remoteEntry['date_maj_fiche'],
-          'k' => 'Always keep original',
-          'o' => 'Always overwrite'
-        ],
+                'l' => 'Keep local entry '.$this->wiki->href('', $localEntry['id_fiche']). ' last edited at ' . $localEntry['date_maj_fiche'],
+                'r' => 'Overwrite with remote entry '.$this->remote_url . '?' . $remoteEntry['id_fiche'] . ' last edited at ' . $remoteEntry['date_maj_fiche'],
+                'k' => 'Always keep original',
+                'o' => 'Always overwrite'
+            ],
             'l'
         );
         $this->last_choice = $questionHelper->ask($input, $output, $question);
         switch ($this->last_choice) {
-        case 'o':
-          $this->force = true;
-          // no break
-        case 'r':
-          return true;
-          break;
-        case 'k':
-          $this->keep_original = true;
-          // no break
-        case 'l':
-          return false;
-          break;
-      }
+            case 'o':
+                $this->force = true;
+                // no break
+            case 'r':
+                return true;
+                break;
+            case 'k':
+                $this->keep_original = true;
+                // no break
+            case 'l':
+                return false;
+                break;
+        }
     }
 
     protected function importActivity($activityId, $activityData, InputInterface $input, OutputInterface $output)
     {
-      $entryManager = $this->wiki->services->get(EntryManager::class);
-      if (is_null($localActivity = $entryManager->getOne($activityId))) {
-          $output->writeln('<info>Importing activity "' . $activityId . '"</>');
-          $createActivity = true;
-      } elseif ($this->force || $this->askWhenDuplicate($localActivity, $activityData, $input, $output)) {
-          $output->writeln('<comment>Activity "' . $activityId . '" already exists, updating it</>');
-          $createActivity = false;
-      } else {
-          $output->writeln('<comment>Activity "' . $activityId . '" already exists, not importing</>');
-          return;
-      }
+        $entryManager = $this->wiki->services->get(EntryManager::class);
+        if (is_null($localActivity = $entryManager->getOne($activityId))) {
+            $output->writeln('<info>Importing activity "' . $activityId . '"</>');
+            $createActivity = true;
+        } elseif ($this->force || $this->askWhenDuplicate($localActivity, $activityData, $input, $output)) {
+            $output->writeln('<comment>Activity "' . $activityId . '" already exists, updating it</>');
+            $createActivity = false;
+        } else {
+            $output->writeln('<comment>Activity "' . $activityId . '" already exists, not importing</>');
+            return;
+        }
 
-      // Import activity here
-      $this->downloadAttachments($activityData, $output, $input->getOption('peertube-url'));
+        // Import activity here
+        $this->downloadAttachments($activityData, $output, $input->getOption('peertube-url'));
 
-      $activityData['antispam'] = 1;
-      if ($createActivity) {
-          $entryManager->create(1201, $activityData);
-      } else {
-          $this->wiki->SavePage(
-              $activityId,
-              json_encode($activityData),
-              '',
-              true
-          );
-      }
+        $activityData['antispam'] = 1;
+        if ($createActivity) {
+            $entryManager->create(1201, $activityData);
+        } else {
+            $this->wiki->SavePage(
+                $activityId,
+                json_encode($activityData),
+                '',
+                true
+            );
+        }
     }
 
     protected function importModule($moduleId, $moduleData, InputInterface $input, OutputInterface $output)
     {
-      $entryManager = $this->wiki->services->get(EntryManager::class);
-      if (is_null($localModule = $entryManager->getOne($moduleId))) {
-          $output->writeln('<info>Importing module "' . $moduleId . '"</>');
-          $createModule = true;
-      } elseif ($this->force || $this->askWhenDuplicate($localModule, $moduleData, $input, $output)) {
-          $output->writeln('<comment>Module "' . $moduleId . '" already exists, updating it</>');
-          $createModule = false;
-      } else {
-          $output->writeln('<comment>Module "' . $moduleId . '" already exists, not importing</>');
-          return;
-      }
+        $entryManager = $this->wiki->services->get(EntryManager::class);
+        if (is_null($localModule = $entryManager->getOne($moduleId))) {
+            $output->writeln('<info>Importing module "' . $moduleId . '"</>');
+            $createModule = true;
+        } elseif ($this->force || $this->askWhenDuplicate($localModule, $moduleData, $input, $output)) {
+            $output->writeln('<comment>Module "' . $moduleId . '" already exists, updating it</>');
+            $createModule = false;
+        } else {
+            $output->writeln('<comment>Module "' . $moduleId . '" already exists, not importing</>');
+            return;
+        }
 
-      $this->downloadAttachments($moduleData, $output, $input->getOption('peertube-url'));
+        $this->downloadAttachments($moduleData, $output, $input->getOption('peertube-url'));
 
-      $module_activities = explode(',', $moduleData['checkboxfiche1201bf_activites']);
+        $module_activities = explode(',', $moduleData['checkboxfiche1201bf_activites']);
 
 
-      foreach ($module_activities as $module_activity) {
-          $activity = $this->activities[$module_activity];
+        foreach ($module_activities as $module_activity) {
+            $activity = $this->activities[$module_activity];
 
-          $this->importActivity($module_activity, $activity, $input, $output);
-      }
+            $this->importActivity($module_activity, $activity, $input, $output);
+        }
 
-      // Import module here
+        // Import module here
 
-      $moduleData['antispam'] = 1;
-      $moduleData['checkboxfiche1201bf_activites_raw'] = $moduleData['checkboxfiche1201bf_activites'];
-      if ($createModule) {
-          $entryManager->create(1202, $moduleData);
-      } else {
-          $this->wiki->SavePage(
-              $moduleId,
-              json_encode($moduleData),
-              '',
-              true
-          );
-      }
+        $moduleData['antispam'] = 1;
+        $moduleData['checkboxfiche1201bf_activites_raw'] = $moduleData['checkboxfiche1201bf_activites'];
+        if ($createModule) {
+            $entryManager->create(1202, $moduleData);
+        } else {
+            $this->wiki->SavePage(
+                $moduleId,
+                json_encode($moduleData),
+                '',
+                true
+            );
+        }
     }
 
     protected function importCourse($courseId, $courseData, InputInterface $input, OutputInterface $output)
     {
-      $entryManager = $this->wiki->services->get(EntryManager::class);
-      if (is_null($localCourse = $entryManager->getOne($courseId))) {
-          $output->writeln('<info>Importing course "' . $courseId . '"</>');
-          $createCourse = true;
-      } elseif ($this->force || $this->askWhenDuplicate($localCourse, $courseData, $input, $output)) {
-          $output->writeln('<comment>Course "' . $courseId . '" already exists, updating it</>');
-          $createCourse = false;
-      } else {
-          $output->writeln('<comment>Course "' . $courseId . '" already exists, not importing</>');
-          return;
-      }
+        $entryManager = $this->wiki->services->get(EntryManager::class);
+        if (is_null($localCourse = $entryManager->getOne($courseId))) {
+            $output->writeln('<info>Importing course "' . $courseId . '"</>');
+            $createCourse = true;
+        } elseif ($this->force || $this->askWhenDuplicate($localCourse, $courseData, $input, $output)) {
+            $output->writeln('<comment>Course "' . $courseId . '" already exists, updating it</>');
+            $createCourse = false;
+        } else {
+            $output->writeln('<comment>Course "' . $courseId . '" already exists, not importing</>');
+            return;
+        }
 
-      $this->downloadAttachments($courseData, $output, $input->getOption('peertube-url'));
+        $this->downloadAttachments($courseData, $output, $input->getOption('peertube-url'));
 
-      $course_modules = explode(',', $courseData['checkboxfiche1202bf_modules']);
+        $course_modules = explode(',', $courseData['checkboxfiche1202bf_modules']);
 
-      foreach ($course_modules as $course_module) {
-          $module = $this->modules[$course_module];
+        foreach ($course_modules as $course_module) {
+            $module = $this->modules[$course_module];
 
-          $this->importModule($course_module, $module, $input, $output);
-      }
+            $this->importModule($course_module, $module, $input, $output);
+        }
 
-      // Import course here
+        // Import course here
 
-      $courseData['antispam'] = 1;
-      $courseData['checkboxfiche1202bf_modules_raw'] = $courseData['checkboxfiche1202bf_modules'];
-      if ($createCourse) {
-          $entryManager->create(1203, $courseData);
-      } else {
-          $this->wiki->SavePage(
-              $courseId,
-              json_encode($courseData),
-              '',
-              true
-          );
-      }
+        $courseData['antispam'] = 1;
+        $courseData['checkboxfiche1202bf_modules_raw'] = $courseData['checkboxfiche1202bf_modules'];
+        if ($createCourse) {
+            $entryManager->create(1203, $courseData);
+        } else {
+            $this->wiki->SavePage(
+                $courseId,
+                json_encode($courseData),
+                '',
+                true
+            );
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -325,9 +325,9 @@ class ImportCoursesCommand extends Command
 
         //initialise peertube token
         if (!empty($this->wiki->config['peertube_url'])
-          && !empty($this->wiki->config['peertube_user'])
-          && !empty($this->wiki->config['peertube_password'])
-          && !empty($this->wiki->config['peertube_channel'])
+            && !empty($this->wiki->config['peertube_user'])
+            && !empty($this->wiki->config['peertube_password'])
+            && !empty($this->wiki->config['peertube_channel'])
         ) {
             // get token from peertube
             $output->writeln('<info>Get Oauth client</>');
@@ -338,12 +338,12 @@ class ImportCoursesCommand extends Command
             if (!empty($token['client_id']) && !empty($token['client_secret'])) {
                 // Get user token
                 $data = [
-                  'client_id' => $token['client_id'],
-                  'client_secret' => $token['client_secret'],
-                  'grant_type' => 'password',
-                  'response_type' => 'code',
-                  'username' => $this->wiki->config['peertube_user'],
-                  'password' => $this->wiki->config['peertube_password'],
+                    'client_id' => $token['client_id'],
+                    'client_secret' => $token['client_secret'],
+                    'grant_type' => 'password',
+                    'response_type' => 'code',
+                    'username' => $this->wiki->config['peertube_user'],
+                    'password' => $this->wiki->config['peertube_password'],
                 ];
                 $opts = array(
                     'http'=>array(
@@ -366,8 +366,7 @@ class ImportCoursesCommand extends Command
                 $output->writeln('<error>Got no client credentials from : '.$apiUrl.'</>');
             }
         } else {
-            $output->writeln('<info>Configuration : "peertube_url", "peertube_user", "peertube_password" or "peertube_channel" were not set in configuration file :'
-              .' no local video imports.</>');
+            $output->writeln('<info>Configuration : "peertube_url", "peertube_user", "peertube_password" or "peertube_channel" were not set in configuration file : no local video imports.</>');
         }
 
         // Fetching all information needed

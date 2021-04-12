@@ -68,10 +68,10 @@ class ImportManager
     {
         //initialise peertube token
         if (!empty($this->wiki->config['peertube_url'])
-        && !empty($this->wiki->config['peertube_user'])
-        && !empty($this->wiki->config['peertube_password'])
-        && !empty($this->wiki->config['peertube_channel'])
-      ) {
+            && !empty($this->wiki->config['peertube_user'])
+            && !empty($this->wiki->config['peertube_password'])
+            && !empty($this->wiki->config['peertube_channel'])
+        ) {
             // get token from peertube
             $peertubeUrl = $this->wiki->config['peertube_url'];
             $apiUrl = $peertubeUrl.'/api/v1/oauth-clients/local';
@@ -81,20 +81,20 @@ class ImportManager
             if (!empty($token['client_id']) && !empty($token['client_secret'])) {
                 // Get user token
                 $data = [
-                'client_id' => $token['client_id'],
-                'client_secret' => $token['client_secret'],
-                'grant_type' => 'password',
-                'response_type' => 'code',
-                'username' => $this->wiki->config['peertube_user'],
-                'password' => $this->wiki->config['peertube_password'],
-              ];
+                    'client_id' => $token['client_id'],
+                    'client_secret' => $token['client_secret'],
+                    'grant_type' => 'password',
+                    'response_type' => 'code',
+                    'username' => $this->wiki->config['peertube_user'],
+                    'password' => $this->wiki->config['peertube_password'],
+                ];
                 $opts = array(
-                  'http'=>array(
-                      'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                      'method'  => 'POST',
-                      'content' => http_build_query($data)
-                  )
-              );
+                    'http' => array(
+                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method'  => 'POST',
+                        'content' => http_build_query($data)
+                    )
+                );
                 $context = stream_context_create($opts);
                 $apiUrl = $peertubeUrl.'/api/v1/users/token';
                 $dataStr = @file_get_contents($apiUrl, false, $context);
@@ -125,12 +125,12 @@ class ImportManager
         $channel = json_decode(file_get_contents($this->wiki->config['peertube_url'].'/api/v1/video-channels/'.$this->wiki->config['peertube_channel']), true);
 
         $data = [
-          'channelId' => $channel['id'],
-          'name' => $title,
-          'targetUrl' => $url,
+            'channelId' => $channel['id'],
+            'name' => $title,
+            'targetUrl' => $url,
         ];
         $opts = array(
-            'http'=>array(
+            'http' => array(
                 'header'  => "Content-type: application/x-www-form-urlencoded\r\n".
                              "Authorization: Bearer ".$this->peertubeToken."\r\n",
                 'method'  => 'POST',
@@ -267,8 +267,8 @@ class ImportManager
         preg_match_all(
             $wikiRegex,
             (!empty($content['bf_contenu']) ?
-              $content['bf_contenu']
-              : $content['bf_description'] ?? ''),
+                $content['bf_contenu']
+                : $content['bf_description'] ?? ''),
             $wikiMatches
         );
 
@@ -280,19 +280,19 @@ class ImportManager
 
     public function downloadAttachment($remoteUrl, $pageTag, $lastPageUpdate, $filename, $overwrite = false)
     {
-      if (!class_exists('attach')) {
-          require_once("tools/attach/libs/attach.lib.php");
-      }
+        if (!class_exists('attach')) {
+            require_once("tools/attach/libs/attach.lib.php");
+        }
 
-      $this->wiki->tag = $pageTag;
-      $this->wiki->page = array('tag'=>$pageTag, 'time'=> $lastPageUpdate);
+        $this->wiki->tag = $pageTag;
+        $this->wiki->page = array('tag'=>$pageTag, 'time'=> $lastPageUpdate);
 
-      $remoteFileUrl = $remoteUrl . '?' . $pageTag . '/download&file=' . $filename;
-      $att = new \attach($this->wiki);
-      $att->file = $filename;
-      $newFilename = $att->GetFullFilename(true);
+        $remoteFileUrl = $remoteUrl . '?' . $pageTag . '/download&file=' . $filename;
+        $att = new \attach($this->wiki);
+        $att->file = $filename;
+        $newFilename = $att->GetFullFilename(true);
 
-      $this->cURLDownload($remoteFileUrl, $newFilename, $overwrite);
+        $this->cURLDownload($remoteFileUrl, $newFilename, $overwrite);
     }
 
     /**
@@ -303,70 +303,70 @@ class ImportManager
      */
     public function findVideos($content)
     {
-      $videos = [];
-      $videoWikiRegex = '#{{video(?:\s*(?:id="(?<id>\S+)"|serveur="(?<serveur>peertube|vimeo|youtube)"|peertubeinstance="(?<peertubeinstance>\S+)"|ratio="(?<ratio>.+)"|largeurmax="(?<largeurmax>\d+)"|hauteurmax="(?<hauteurmax>\d+)"| class="(?<class>.+)"))+\s*}}#i';
-      preg_match_all(
-          $videoWikiRegex,
-          $content,
-          $videoWikiMatches
-      );
+        $videos = [];
+        $videoWikiRegex = '#{{video(?:\s*(?:id="(?<id>\S+)"|serveur="(?<serveur>peertube|vimeo|youtube)"|peertubeinstance="(?<peertubeinstance>\S+)"|ratio="(?<ratio>.+)"|largeurmax="(?<largeurmax>\d+)"|hauteurmax="(?<hauteurmax>\d+)"| class="(?<class>.+)"))+\s*}}#i';
+        preg_match_all(
+            $videoWikiRegex,
+            $content,
+            $videoWikiMatches
+        );
 
-      if (!empty($videoWikiMatches['id'])) {
-          foreach ($videoWikiMatches['id'] as $index => $videoId) {
-              // trouver l'instance video entre youtube|vimeo|peertube
-              // creer l'url de la video et la mettre dans $videos[$index]['url']
-              if (empty($videoWikiMatches['serveur'][$index])) {
-                  if (strlen($videoId) == 11) {
-                      $videoWikiMatches['serveur'][$index] = 'youtube';
-                  } elseif (preg_match("/^\d+$/", $videoId)) {
-                      $videoWikiMatches['serveur'][$index] = 'vimeo';
-                  } else {
-                      $videoWikiMatches['serveur'][$index] = 'peertube';
-                  }
-              }
-              switch ($videoWikiMatches['serveur'][$index]) {
-                  case 'youtube':
-                      $videos[$index]['url'] = 'https://youtu.be/'.$videoId;
-                      $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$videos[$index]['url']), true);
-                      $videos[$index]['title'] = $video['title'];
-                      break;
-                  case 'vimeo':
-                      $videos[$index]['url'] = 'https://vimeo.com/'.$videoId;
-                      $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$videos[$index]['url']), true);
-                      $videos[$index]['title'] = $video['title'];
-                      break;
-                  case 'peertube':
-                      if (!empty($videoWikiMatches['peertubeinstance'][$index])) {
-                          $videos[$index]['url'] = $videoWikiMatches['peertubeinstance'][$index].'/videos/watch/'.$videoId;
-                      } else {
-                          if (empty($peertubeSource)) {
-                              $peertubeSource = $this->wiki->config['attach-video-config']['default_peertube_instance'];
-                          }
-                          $videos[$index]['url'] = $peertubeSource.'/videos/watch/'.$videoId;
-                      }
-                      $video = json_decode(file_get_contents(str_replace('videos/watch', 'api/v1/videos', $videos[$index]['url'])), true);
-                      $videos[$index]['title'] = $video['name'];
-                      break;
+        if (!empty($videoWikiMatches['id'])) {
+            foreach ($videoWikiMatches['id'] as $index => $videoId) {
+                // trouver l'instance video entre youtube|vimeo|peertube
+                // creer l'url de la video et la mettre dans $videos[$index]['url']
+                if (empty($videoWikiMatches['serveur'][$index])) {
+                    if (strlen($videoId) == 11) {
+                        $videoWikiMatches['serveur'][$index] = 'youtube';
+                    } elseif (preg_match("/^\d+$/", $videoId)) {
+                        $videoWikiMatches['serveur'][$index] = 'vimeo';
+                    } else {
+                        $videoWikiMatches['serveur'][$index] = 'peertube';
+                    }
+                }
+                switch ($videoWikiMatches['serveur'][$index]) {
+                    case 'youtube':
+                        $videos[$index]['url'] = 'https://youtu.be/'.$videoId;
+                        $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$videos[$index]['url']), true);
+                        $videos[$index]['title'] = $video['title'];
+                        break;
+                    case 'vimeo':
+                        $videos[$index]['url'] = 'https://vimeo.com/'.$videoId;
+                        $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$videos[$index]['url']), true);
+                        $videos[$index]['title'] = $video['title'];
+                        break;
+                    case 'peertube':
+                        if (!empty($videoWikiMatches['peertubeinstance'][$index])) {
+                            $videos[$index]['url'] = $videoWikiMatches['peertubeinstance'][$index].'/videos/watch/'.$videoId;
+                        } else {
+                            if (empty($peertubeSource)) {
+                                $peertubeSource = $this->wiki->config['attach-video-config']['default_peertube_instance'];
+                            }
+                            $videos[$index]['url'] = $peertubeSource.'/videos/watch/'.$videoId;
+                        }
+                        $video = json_decode(file_get_contents(str_replace('videos/watch', 'api/v1/videos', $videos[$index]['url'])), true);
+                        $videos[$index]['title'] = $video['name'];
+                        break;
 
-                  default:
-                      throw new \Exception(_t('LMS_ERROR_PROVIDER').' "'.$videoWikiMatches[0][$index].'".');
-              }
-          }
-      }
+                    default:
+                        throw new \Exception(_t('LMS_ERROR_PROVIDER').' "'.$videoWikiMatches[0][$index].'".');
+                }
+            }
+        }
 
-      $videoHtmlRegex = '#<iframe.+?(?:\s*width=["\'](?<width>[^"\']+)["\']|\s*height=["\'](?<height>[^\'"]+)["\']|\s*src=["\'](?<src>[^\'"]+["\']))+[^>]*>(<\/iframe>)?#mi';
-      preg_match_all(
-          $videoHtmlRegex,
-          $content,
-          $videoHtmlMatches
-      );
+        $videoHtmlRegex = '#<iframe.+?(?:\s*width=["\'](?<width>[^"\']+)["\']|\s*height=["\'](?<height>[^\'"]+)["\']|\s*src=["\'](?<src>[^\'"]+["\']))+[^>]*>(<\/iframe>)?#mi';
+        preg_match_all(
+            $videoHtmlRegex,
+            $content,
+            $videoHtmlMatches
+        );
 
-      if (!empty($videoHtmlMatches['src'])) {
-          // checker si l'url est une video youtube|vimeo|peertube
-          // uploader
-          echo 'TODO';
-      }
-      return $videos;
+        if (!empty($videoHtmlMatches['src'])) {
+            // checker si l'url est une video youtube|vimeo|peertube
+            // uploader
+            echo 'TODO';
+        }
+        return $videos;
     }
 
     /**
@@ -385,7 +385,7 @@ class ImportManager
 
         if (count($images)) {
             foreach ($images as $image) {
-              $this->downloadImage($remoteUrl, $image, $overwrite);
+                $this->downloadImage($remoteUrl, $image, $overwrite);
             }
         }
 
@@ -394,7 +394,7 @@ class ImportManager
 
         if ($c = count($attachments)) {
             foreach ($attachments as $attachment) {
-              $this->downloadAttachment($remoteUrl, $content['id_fiche'], $content['date_maj_fiche'], $attachment, $overwrite);
+                $this->downloadAttachment($remoteUrl, $content['id_fiche'], $content['date_maj_fiche'], $attachment, $overwrite);
             }
         }
 
@@ -404,8 +404,8 @@ class ImportManager
             $wikiRegex,
             'url="'.$this->wiki->getBaseUrl().'/$1"',
             (!empty($content['bf_contenu']) ?
-              $content['bf_contenu']
-              : $content['bf_description'] ?? ''),
+                $content['bf_contenu']
+                : $content['bf_description'] ?? ''),
         );
         if (!empty($content['bf_contenu'])) {
             $content['bf_contenu'] = $replaced;
@@ -419,8 +419,8 @@ class ImportManager
         }
         if (!empty($this->peertubeToken)) {
             $content = (!empty($content['bf_contenu']) ?
-              $content['bf_contenu']
-              : $content['bf_description'] ?? '');
+                $content['bf_contenu']
+                : $content['bf_description'] ?? '');
             $videos = $this->findVideos($content);
             foreach ($videos as $video) {
                 $this->importToPeertube($video['url'], $video['title']);
