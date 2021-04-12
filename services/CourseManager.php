@@ -302,4 +302,34 @@ class CourseManager
         }
         return isset($lastOpenedActivity) ? $openableActivity->getTag() : $module->getFirstActivityTag() ;
     }
+
+    /**
+     * getLastAccessibleActivityTagAndLabelForLearner
+     * @param Learner|null $learner
+     * @param Course $course
+     * @param Module $module
+     * @return array ['tag' => "activity's tag",'label' => 'label']
+     */
+    public function getLastAccessibleActivityTagAndLabelForLearner(?Learner $learner = null, Course $course, Module $module): array
+    {
+        if ($learner) {
+            $nextActivityTag = $this->getLastAccessibleActivityTagForLearner($learner, $course, $module) ;
+            $isFinished = (
+                $module->getLastActivityTag() == $nextActivityTag
+                && ($nextModule = $course->getNextModule($module->getTag()))
+                && $this->learnerManager->hasBeenOpenedBy($course, $nextModule, null, $learner)
+            );
+        }
+        $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
+            _t('LMS_BEGIN_ONLY_ADMIN')
+            : (!$learner || ($module->getFirstActivityTag() == $nextActivityTag) ?  _t('LMS_BEGIN')
+                : ($isFinished ? _t('LMS_RESTART') : _t('LMS_RESUME')));
+        if (!$learner || $isFinished) {
+            $nextActivityTag = $module->getFirstActivityTag();
+        }
+        return [
+            'tag' => $nextActivityTag,
+            'label' => $labelStart
+        ];
+    }
 }

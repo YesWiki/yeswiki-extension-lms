@@ -61,19 +61,9 @@ class ModuleNavigationField extends LmsField
             }
 
             $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
-            $nextActivityTag = $this->courseManager->getLastAccessibleActivityTagForLearner($learner, $course, $module) ;
-            $isFinished = (
-                $module->getLastActivityTag() == $nextActivityTag
-                && ($nextModule = $course->getNextModule($module->getTag()))
-                && $this->learnerManager->hasBeenOpenedBy($course, $nextModule, null, $learner)
-            );
-            $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-                _t('LMS_BEGIN_ONLY_ADMIN')
-                : (($module->getFirstActivityTag() == $nextActivityTag) ?  _t('LMS_BEGIN')
-                    : ($isFinished ? _t('LMS_RESTART') : _t('LMS_RESUME')));
-            if ($isFinished) {
-                $nextActivityTag = $module->getFirstActivityTag();
-            }
+            $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
+            $nextActivityTag = $tmpData['tag'];
+            $labelStart = $tmpData['label'];
             if ($module->isAccessibleBy($learner, $course)) {
                 $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
             } else {
