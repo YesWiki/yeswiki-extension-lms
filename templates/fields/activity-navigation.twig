@@ -33,7 +33,7 @@
             >
           {% else %}
             {% block conditionLink %}
-              {{ include_javascript('tools/lms/presentation/javascript/activity-navigation-view.js') }}
+              {{ include_javascript('tools/lms/libs/lms.js') }}
               <a class="disabled wait-cursor"
                 onmouseover="checkActivityNavigationConditions(this,'{{ course.tag }}','{{ module.tag }}','{{ activity.tag }}')"
                 data-id="{{ field.propertyName }}">
