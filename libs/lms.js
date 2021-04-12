@@ -96,8 +96,8 @@ function activity_navigation_add_element(id,value,defaultValue = null){
   } else {
       let clone = template_container.cloneNode(true);
       clone.removeAttribute("style");
-      let now = new Date();
-      let new_id = id+'_'+value+'_'+now.getTime();
+      activityNavigationConditionsEditUniqueId = activityNavigationConditionsEditUniqueId +1;
+      let new_id = id+'_'+value+'_'+activityNavigationConditionsEditUniqueId;
       clone.setAttribute("id",new_id);
       // enable input
       let input = clone.querySelectorAll('input');
@@ -111,6 +111,8 @@ function activity_navigation_add_element(id,value,defaultValue = null){
               if (defaultValue != null){
                   input[i].value = defaultValue ;
               }
+              // change name to be sure to be unique
+              input[i].name += '['+activityNavigationConditionsEditUniqueId+']';
           }
 
           // Add remove button
@@ -169,6 +171,8 @@ function activity_navigation_init(listInit){
       } 
   });
 }
+
+var activityNavigationConditionsEditUniqueId = 0;
 if (typeof activityNavigationInit !== 'undefined'){
   activity_navigation_init(activityNavigationInit);
 }

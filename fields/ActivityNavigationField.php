@@ -176,12 +176,20 @@ class ActivityNavigationField extends LmsField
                 $data[] = ['condition' => self::LABEL_REACTION_NEEDED];
             }
             if (isset($value[self::LABEL_QUIZ_PASSED]) && isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID])) {
-                $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
-                    self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID]];
+                foreach ($value[self::LABEL_QUIZ_PASSED]['head'] as $id => $val) {
+                    if (isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id])) {
+                        $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
+                        self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]];
+                    }
+                }
             }
             if (isset($value[self::LABEL_FORM_FILLED]) && isset($value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID])) {
-                $data[] = ['condition' => self::LABEL_FORM_FILLED,
-                    self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID]];
+                foreach ($value[self::LABEL_FORM_FILLED]['head'] as $id => $val) {
+                    if (isset($value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id])) {
+                        $data[] = ['condition' => self::LABEL_FORM_FILLED,
+                        self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id]];
+                    }
+                }
             }
             $value = $data ;
         }
