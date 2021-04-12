@@ -347,7 +347,7 @@ class ActivityNavigationConditionsManager
             $data['course']->getTag(),
             $data['module']->getTag(),
             $data['activity']->getTag(),
-            $quizId
+            !empty($quizId) ? $quizId : null
         );
         switch ($quizResults[QuizManager::STATUS_LABEL]) {
             case QuizManager::STATUS_CODE_OK:
@@ -355,7 +355,9 @@ class ActivityNavigationConditionsManager
             case QuizManager::STATUS_CODE_NO_RESULT:
                 $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
                     self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                    $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\'</li>';
+                    $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
+                        ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
+                        : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).'</li>';
                 break;
             case QuizManager::STATUS_CODE_ERROR:
             default:

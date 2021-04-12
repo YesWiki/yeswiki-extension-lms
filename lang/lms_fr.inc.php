@@ -138,6 +138,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP_ALERT' => 'Veuillez sélectionner au moins une réaction',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED' => 'Quiz rempli',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP' => 'Veuillez répondre au quiz',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY' => 'Veuillez répondre à au moins un quiz',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_EMPTY' => '(vide = n\'importe quel test de l\'activité)',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED' => 'Fiche complétée',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP' => 'Veuillez ajouter une fiche au formulaire',
