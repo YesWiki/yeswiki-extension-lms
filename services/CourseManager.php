@@ -22,6 +22,7 @@ class CourseManager
     protected $moduleFormId;
     protected $courseFormId;
     protected $learnerManager;
+    protected $activityNavigationConditionsManager;
     protected $coursesCache ;
 
     /**
@@ -39,6 +40,7 @@ class CourseManager
         DateManager $dateManager,
         LearnerManager $learnerManager
     ) {
+        $this->wiki = $wiki;
         $this->config = $wiki->config;
         $this->entryManager = $entryManager;
         $this->userManager = $userManager;
@@ -139,7 +141,21 @@ class CourseManager
 
         return $module->canBeOpenedBy(
             $learner,
-            !$course->isModuleScripted() //no constraint
+            $this->checkModuleCanBeOpenedByLearner($learner, $course, $module)
+        );
+    }
+
+    /**
+     * checkModuleCanBeOpenedByLearner without checking condition and without save
+     * @param Learner $learner
+     * @param Course $course
+     * @param Module $module
+     * @param bool $checkConditions
+     * @return bool|null
+     */
+    public function checkModuleCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, bool $checkConditions= true): ?bool
+    {
+        return !$course->isModuleScripted() //no constraint
             || !($previousModule = $course->getPreviousModule($module->getTag())) // or scripted but no previous module
             || (
                 $this->learnerManager->hasBeenOpenedBy($course, $previousModule, null, $learner) // previous module should be opened
@@ -148,8 +164,7 @@ class CourseManager
                     || $this->learnerManager->hasBeenOpenedBy($course, $previousModule, $previousActivity, $learner)
                         // or scripted and has started the last Activity of the previous module
                 )
-            )
-        );
+            ) ;
     }
 
     /**
@@ -173,8 +188,9 @@ class CourseManager
      * @param Course $course
      * @param Module $module
      * @param Activity $activity
+     * @return bool|null
      */
-    public function setActivityCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, Activity $activity)
+    public function setActivityCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, Activity $activity):?bool
     {
         if (!is_null($activity->canBeOpenedBy($learner))) {
             return $activity->canBeOpenedBy($learner);
@@ -182,7 +198,25 @@ class CourseManager
 
         return $activity->canBeOpenedBy(
             $learner,
-            (
+            $this->checkActivityCanBeOpenedByLearner($learner, $course, $module, $activity)
+        );
+    }
+
+    /**
+     * checkActivityCanBeOpenedByLearner without checking condition and without save
+     * @param Learner $learner
+     * @param Course $course
+     * @param Module $module
+     * @param Activity $activity
+     * @param bool $checkConditions
+     * @return bool|null
+     */
+    public function checkActivityCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, Activity $activity, bool $checkConditions= true): ?bool
+    {
+        if (is_null($this->activityNavigationConditionsManager)) {
+            $this->activityNavigationConditionsManager = $this->wiki->services->get(ActivityNavigationConditionsManager::class);
+        }
+        return (
                 !$course->isModuleScripted() //no constraint
                 || (
                     $this->setModuleCanBeOpenedByLearner($learner, $course, $module) // set state for this module,
@@ -192,9 +226,15 @@ class CourseManager
             && (
                 !$course->isActivityScripted() //no constraint
                 || !($previousActivity = $module->getPreviousActivity($activity->getTag())) // or scripted but no previous activity
-                || $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner) // previous activity should be opened
-            )
-        );
+                || (
+                    $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner) // previous activity should be opened
+                    && (
+                        !$checkConditions ? true
+                        : $this->activityNavigationConditionsManager
+                            ->passActivityNavigationConditions($course, $module, $previousActivity, $activity)
+                    )
+                )
+            );
     }
 
     /**

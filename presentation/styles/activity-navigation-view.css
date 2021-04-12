@@ -6,6 +6,12 @@
   border-width: 0.2rem;
   padding: 5px;
   margin-right: 5px;
+  text-align: initial;
+}
+
+.activity-navigation-conditions-helper li {
+  display: list-item;
+  margin-left: 2px;
 }
 
 .activity-navigation-conditions-helper.no-border {

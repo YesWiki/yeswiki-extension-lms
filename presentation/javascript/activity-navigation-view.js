@@ -66,6 +66,7 @@ function checkActivityNavigationConditionsWrong(elem,message){
         // add error message
         let messageDiv = document.createElement('div');
         messageDiv.innerHTML = message;
+        messageDiv.setAttribute("style",'float:right;');
         container.appendChild(messageDiv);
         // display container
         container.removeAttribute("style");
@@ -144,6 +145,7 @@ function addErrorTextToHelperContainer(container,id){
             let textNode = textContainer.cloneNode(true);
             textNode.removeAttribute("id");
             textNode.removeAttribute("style");
+            textNode.setAttribute("style",'float:right;');
             container.appendChild(textNode);
         }
     }

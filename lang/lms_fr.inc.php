@@ -143,5 +143,9 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM' => 'Formulaire',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR' => 'Une erreur est survenue lors de la vérification.<br>Veuillez contacter un administrateur du site !',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_CLOSED' => 'Veuillez patienter, le prochain module est encore fermé.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN' => 'Veuillez patienter, le prochain module n\'est pas encore ouvert.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE' => 'Veuillez patienter, le prochain module n\'est pas accessible.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
     )
 );
