@@ -184,7 +184,10 @@ class CourseManager
             $learner,
             (
                 !$course->isModuleScripted() //no constraint
-                || $module->isAccessibleBy($learner, $course) // module accessible if scripted
+                || (
+                    $this->setModuleCanBeOpenedByLearner($learner, $course, $module) // set state for this module,
+                    && $module->isAccessibleBy($learner, $course) // module accessible if scripted
+                )
             )
             && (
                 !$course->isActivityScripted() //no constraint
