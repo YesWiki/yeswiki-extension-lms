@@ -40,7 +40,6 @@ class ActivityNavigationField extends LmsField
     protected $ActivityNavigationConditionsManager;
     protected $moduleModal;
     protected $courseManager;
-    protected $conditionsEnabled;
 
     public function __construct(array $values, ContainerInterface $services)
     {
@@ -59,10 +58,6 @@ class ActivityNavigationField extends LmsField
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
-
-        // activation of conditions
-        $this->conditionsEnabled = (isset($this->config['lms_config']['activity_navigation_conditions_enabled']) &&
-            ($this->config['lms_config']['activity_navigation_conditions_enabled'] == true));
     }
 
     // Render the show view of the field
@@ -123,7 +118,7 @@ class ActivityNavigationField extends LmsField
             }
             
             // check conditions
-            if ($this->conditionsEnabled) {
+            if ($this->courseManager->isConditionsEnabled()) {
                 $conditions = $this->ActivityNavigationConditionsManager
                     ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
                 $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? ActivityNavigationConditionsManager:: STATUS_CODE_ERROR;
@@ -144,7 +139,7 @@ class ActivityNavigationField extends LmsField
                 'previousActivity' => $previousActivity ?? null,
                 'nextModule' => $nextModule ?? null,
                 'nextActivity' => $nextActivity ?? null,
-                'conditionsEnabled' => $this->conditionsEnabled,
+                'conditionsEnabled' => $this->courseManager->isConditionsEnabled(),
                 'conditionsStatus' => $conditionsStatus ?? false,
                 'conditionsMessage' => $conditionsMessage ?? null,
                 'reactionNeeded' => $reactionNeeded ?? false,
@@ -155,7 +150,7 @@ class ActivityNavigationField extends LmsField
 
     protected function renderInput($entry)
     {
-        return ($this->conditionsEnabled) ?$this->render("@lms/inputs/activity-navigation.twig", [
+        return ($this->courseManager->isConditionsEnabled()) ? $this->render("@lms/inputs/activity-navigation.twig", [
             'value' => $this->getValue($entry),
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [

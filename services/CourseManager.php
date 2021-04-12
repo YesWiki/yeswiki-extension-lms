@@ -24,6 +24,7 @@ class CourseManager
     protected $learnerManager;
     protected $activityNavigationConditionsManager;
     protected $coursesCache ;
+    protected $conditionsEnabled ;
 
     /**
      * CourseManager constructor
@@ -256,5 +257,23 @@ class CourseManager
                 }
             }
         }
+    }
+
+    /**
+     * check if conditions are enabled (need at least one course or module scripted)
+     * @return bool
+     */
+    public function isConditionsEnabled(): bool
+    {
+        if (is_null($this->conditionsEnabled)) {
+            $this->conditionsEnabled = false ;
+            foreach ($this->getAllCourses() as $course) {
+                if ($course->isActivityScripted() || $course->isModuleScripted()) {
+                    $this->conditionsEnabled = true ;
+                    return true ;
+                }
+            }
+        }
+        return $this->conditionsEnabled;
     }
 }
