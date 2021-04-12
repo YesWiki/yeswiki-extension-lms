@@ -2,6 +2,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\PageManager;
 use YesWiki\Wiki;
@@ -119,8 +120,11 @@ class ImportManager
      * @param string $title target video title
      * @return array API answer
      */
-    private function importToPeertube($url, $title)
+    public function importToPeertube($url, $title)
     {
+        if ($this->peertubeToken === null) {
+            $this->initPeertubeToken();
+        }
         // Get channel id
         $channel = json_decode(file_get_contents($this->wiki->config['peertube_url'].'/api/v1/video-channels/'.$this->wiki->config['peertube_channel']), true);
 
@@ -208,77 +212,135 @@ class ImportManager
     }
 
     /**
-     * Get images from html output of a page or bazar entry
+     * Return fields that may contain attachments to import (body for wikipage, or textelong fields for bazar entries)
      *
-     * @param string $remoteUrl distant url
-     * @param array $content page or entry content as an array
-     * @return array images name
+     * @param array $wikiPage page or entry content as an array
+     * @return array keys of $wikiPage that may contain attachments to import
      */
-    public function findImages($remoteUrl, $content)
+    public function getTextFieldsFromWikiPage($wikiPage)
     {
-        preg_match_all(
-            '#(?:href|src)="'.preg_quote($remoteUrl, '#').'files/(.*)"#Ui',
-            $content['html_output'],
-            $inlineImages
-        );
-
-        $bazarImages = array_filter($content, function ($k) {
-            return str_starts_with($k, 'image');
-        }, ARRAY_FILTER_USE_KEY);
-
-        $images = array_merge($inlineImages[1], array_values($bazarImages));
-        $images = array_unique($images);
-
-        return $images;
+        $fields= [];
+        if (!empty($wikiPage['tag'])) { // classic wiki page
+            $fields[] ='body';
+        } elseif (!empty($wikiPage['id_fiche'])) { // bazar entry
+            $formManager = $this->wiki->services->get(FormManager::class);
+            $form = $formManager->getOne($wikiPage['id_typeannonce']);
+            // find fields that are textareas
+            foreach ($form['prepared'] as $field) {
+                if (get_class($field) === 'YesWiki\Bazar\Field\TextareaField') {
+                    $fields[] = $field->getName();
+                }
+            }
+        }
+        return $fields;
     }
 
     /**
-     * Generate distant image url and download to local image path
+     * Get attachements from html_output that use direct links to /files folder
+     * Also finds Bazar images
      *
-     * @param string $remoteUrl distant image url
-     * @param string $image local image path
+     * @param string $remoteUrl distant url
+     * @param array $wikiPage page or entry content as an array
+     * @param boolean $transform transform attachments urls for their new location (default:false)
+     * @return array attachments filenames
+     */
+    public function findDirectLinkAttachements($remoteUrl, &$wikiPage, $transform = false)
+    {
+        $regex = '#="'.preg_quote($remoteUrl, '#').'files/(?P<filename>.+)"#Ui';
+        preg_match_all(
+            $regex,
+            $wikiPage['html_output'],
+            $inlineAttachments
+        );
+
+        $bazarImages = array_filter($wikiPage
+        , function ($k) {
+            return str_starts_with($k, 'image');
+        }, ARRAY_FILTER_USE_KEY);
+
+        $attachments = array_merge($inlineAttachments['filename'], array_values($bazarImages));
+        $attachments = array_unique($attachments);
+
+        if ($transform) {
+            $contentKeys = $this->getTextFieldsFromWikiPage($wikiPage);
+            foreach ($contentKeys as $key) {
+                $wikiPage[$key] = preg_replace(
+                  $regex,
+                  '="'.$this->wiki->getBaseUrl().'files/${filename}"',
+                  $wikiPage[$key]
+                );
+            }
+        }
+
+        return $attachments;
+    }
+
+    /**
+     * Generate distant file url and download to local file path
+     *
+     * @param string $remoteUrl distant file url
+     * @param string $filename file name
      * @param boolean $overwrite overwrite existing file ? (default:false)
      * @return void
      */
-    public function downloadImage($remoteUrl, $image, $overwrite = false)
+    public function downloadDirectLinkAttachment($remoteUrl, $filename, $overwrite = false)
     {
-        $remoteFileUrl = $remoteUrl.'/files/'.$image;
-        $saveFileLoc = $this->getLocalFileUploadPath().'/'.$image;
+        $remoteFileUrl = $remoteUrl.'/files/'.$filename;
+        $saveFileLoc = $this->getLocalFileUploadPath().'/'.$filename;
 
         return $this->cURLDownload($remoteFileUrl, $saveFileLoc, $overwrite);
     }
 
     /**
      * Find file attachments in page or bazar entry
+     * It finds attachments linked with /download links
      *
      * @param string $remoteUrl distant url
-     * @param array $content page or entry content as an array
+     * @param array $wikiPage page or entry content as an array
+     * @param boolean $transform transform attachments urls for their new location (default:false)
      * @return array all file attachments
      */
-    public function findFileAttachments($remoteUrl, $content)
+    public function findHiddenAttachments($remoteUrl, &$wikiPage, $transform = false)
     {
         preg_match_all(
-            '#(?:href|src)="'.preg_quote($remoteUrl, '#').'\?.+/download&(?:amp;)?file=(.*)"#Ui',
-            $content['html_output'],
+            '#(?:href|src)="'.preg_quote($remoteUrl, '#').'\?.+/download&(?:amp;)?file=(?P<filename>.*)"#Ui',
+            $wikiPage['html_output'],
             $htmlMatches
         );
-        $wikiRegex = '#url="' . preg_quote($remoteUrl, '#')
-                    . '(\?.+/download&(?:amp;)?file=(.*))"#Ui';
-        preg_match_all(
-            $wikiRegex,
-            (!empty($content['bf_contenu']) ?
-                $content['bf_contenu']
-                : $content['bf_description'] ?? ''),
-            $wikiMatches
-        );
+        $attachments = $htmlMatches['filename'];
 
-        $attachments = array_merge($htmlMatches[1], $wikiMatches[2]);
+        $wikiRegex = '#="' . preg_quote($remoteUrl, '#')
+                    . '(?P<trail>\?.+/download&(?:amp;)?file=(?P<filename>.*))"#Ui';
+
+        $contentKeys = $this->getTextFieldsFromWikiPage($wikiPage);
+        foreach ($contentKeys as $key) {
+            preg_match_all($wikiRegex, $wikiPage[$key], $wikiMatches);
+            $attachments = array_merge($attachments, $wikiMatches['filename']);
+        }
+
         $attachments = array_unique($attachments);
+
+        if ($transform) {
+            foreach ($contentKeys as $key) {
+                $wikiPage[$key] = preg_replace($wikiRegex, '="'.$this->wiki->getBaseUrl().'${trail}"', $wikiPage[$key]);
+            }
+        }
 
         return $attachments;
     }
 
-    public function downloadAttachment($remoteUrl, $pageTag, $lastPageUpdate, $filename, $overwrite = false)
+    /**
+     * Generate local path and download hidden attachments
+     * It downloads attachments linked with /download links
+     *
+     * @param string $remoteUrl distant url
+     * @param string $pageTag page tag
+     * @param string $lastPageUpdate last update time
+     * @param string $filename file name
+     * @param boolean $overwrite overwrite existing file ? (default:false)
+     * @return array all file attachments
+     */
+    public function downloadHiddenAttachment($remoteUrl, $pageTag, $lastPageUpdate, $filename, $overwrite = false)
     {
         if (!class_exists('attach')) {
             require_once("tools/attach/libs/attach.lib.php");
@@ -298,33 +360,42 @@ class ImportManager
     /**
      * Find videos in page or bazar entry
      *
-     * @param string $content html content to parse
+     * @param string $wikiPage page or bazar entry
      * @return array all videos
      */
-    public function findVideos($content)
+    public function findVideos($wikiPage, $peertubeSource = '')
     {
         $videos = [];
         $videoWikiRegex = '#{{video(?:\s*(?:id="(?<id>\S+)"|serveur="(?<serveur>peertube|vimeo|youtube)"|peertubeinstance="(?<peertubeinstance>\S+)"|ratio="(?<ratio>.+)"|largeurmax="(?<largeurmax>\d+)"|hauteurmax="(?<hauteurmax>\d+)"| class="(?<class>.+)"))+\s*}}#i';
-        preg_match_all(
-            $videoWikiRegex,
-            $content,
-            $videoWikiMatches
-        );
+        $contentKeys = $this->getTextFieldsFromWikiPage($wikiPage);
+        $allVideoWikiMatches = [];
+        foreach ($contentKeys as $key) {
+            preg_match_all(
+              $videoWikiRegex,
+              $wikiPage[$key],
+              $videoWikiMatches
+            );
+            $allVideoWikiMatches = array_merge_recursive(
+              $allVideoWikiMatches,
+              $videoWikiMatches
+            );
+        }
 
-        if (!empty($videoWikiMatches['id'])) {
-            foreach ($videoWikiMatches['id'] as $index => $videoId) {
+        if (!empty($allVideoWikiMatches['id'])) {
+            foreach ($allVideoWikiMatches['id'] as $index => $videoId) {
                 // trouver l'instance video entre youtube|vimeo|peertube
                 // creer l'url de la video et la mettre dans $videos[$index]['url']
-                if (empty($videoWikiMatches['serveur'][$index])) {
+                $videos[$index] = [];
+                if (empty($allVideoWikiMatches['serveur'][$index])) {
                     if (strlen($videoId) == 11) {
-                        $videoWikiMatches['serveur'][$index] = 'youtube';
+                        $allVideoWikiMatches['serveur'][$index] = 'youtube';
                     } elseif (preg_match("/^\d+$/", $videoId)) {
-                        $videoWikiMatches['serveur'][$index] = 'vimeo';
+                        $allVideoWikiMatches['serveur'][$index] = 'vimeo';
                     } else {
-                        $videoWikiMatches['serveur'][$index] = 'peertube';
+                        $allVideoWikiMatches['serveur'][$index] = 'peertube';
                     }
                 }
-                switch ($videoWikiMatches['serveur'][$index]) {
+                switch ($allVideoWikiMatches['serveur'][$index]) {
                     case 'youtube':
                         $videos[$index]['url'] = 'https://youtu.be/'.$videoId;
                         $video = json_decode(file_get_contents('https://noembed.com/embed?url='.$videos[$index]['url']), true);
@@ -336,8 +407,8 @@ class ImportManager
                         $videos[$index]['title'] = $video['title'];
                         break;
                     case 'peertube':
-                        if (!empty($videoWikiMatches['peertubeinstance'][$index])) {
-                            $videos[$index]['url'] = $videoWikiMatches['peertubeinstance'][$index].'/videos/watch/'.$videoId;
+                        if (!empty($allVideoWikiMatches['peertubeinstance'][$index])) {
+                            $videos[$index]['url'] = $allVideoWikiMatches['peertubeinstance'][$index].'/videos/watch/'.$videoId;
                         } else {
                             if (empty($peertubeSource)) {
                                 $peertubeSource = $this->wiki->config['attach-video-config']['default_peertube_instance'];
@@ -349,19 +420,26 @@ class ImportManager
                         break;
 
                     default:
-                        throw new \Exception(_t('LMS_ERROR_PROVIDER').' "'.$videoWikiMatches[0][$index].'".');
+                        throw new \Exception(_t('LMS_ERROR_PROVIDER').' "'.$allVideoWikiMatches[0][$index].'".');
                 }
             }
         }
 
         $videoHtmlRegex = '#<iframe.+?(?:\s*width=["\'](?<width>[^"\']+)["\']|\s*height=["\'](?<height>[^\'"]+)["\']|\s*src=["\'](?<src>[^\'"]+["\']))+[^>]*>(<\/iframe>)?#mi';
-        preg_match_all(
-            $videoHtmlRegex,
-            $content,
-            $videoHtmlMatches
-        );
+        $allVideoHtmlMatches = [];
+        foreach ($contentKeys as $key) {
+            preg_match_all(
+              $videoHtmlRegex,
+              $wikiPage[$key],
+              $videoHtmlMatches
+            );
+            $allVideoHtmlMatches = array_merge_recursive(
+              $allVideoWikiMatches,
+              $videoHtmlMatches
+            );
+        }
 
-        if (!empty($videoHtmlMatches['src'])) {
+        if (!empty($allVideoHtmlMatches['src'])) {
             // checker si l'url est une video youtube|vimeo|peertube
             // uploader
             echo 'TODO';
@@ -371,46 +449,32 @@ class ImportManager
 
     /**
      * All type of attachment related to a page or a bazar entry
+     * UNUSED!!!
      *
      * @param string $remoteUrl distant url
-     * @param array $content page or entry content as an array
+     * @param array $wikiPage page or entry content as an array
      * @param boolean $overwrite overwrite existing file ? (default:false)
      * @return void
      */
-    public function downloadAttachments($remoteUrl, &$content, $overwrite = false, $peertubeSource = '')
+    public function downloadAttachments($remoteUrl, &$wikiPage, $overwrite = false, $peertubeSource = '')
     {
         // Handle Pictures and file attachments
         // Downloading images
-        $images = $this->findImages($remoteUrl, $content);
+        $images = $this->findDirectLinkAttachments($remoteUrl, $wikiPage, true);
 
         if (count($images)) {
             foreach ($images as $image) {
-                $this->downloadImage($remoteUrl, $image, $overwrite);
+                $this->downloadDirectLinkAttachment($remoteUrl, $image, $overwrite);
             }
         }
 
-        // Downloading other attachments
-        $attachments = $this->findFileAttachments($remoteUrl, $content);
+        // Downloading hidden attachments
+        $attachments = $this->findHiddenAttachments($remoteUrl, $wikiPage, true);
 
         if ($c = count($attachments)) {
             foreach ($attachments as $attachment) {
-                $this->downloadAttachment($remoteUrl, $content['id_fiche'], $content['date_maj_fiche'], $attachment, $overwrite);
+                $this->downloadHiddenAttachment($remoteUrl, $wikiPage['id_fiche'], $content['date_maj_fiche'], $attachment, $overwrite);
             }
-        }
-
-        // TODO : generic search on all textelong fields
-
-        $replaced = preg_replace(
-            $wikiRegex,
-            'url="'.$this->wiki->getBaseUrl().'/$1"',
-            (!empty($content['bf_contenu']) ?
-                $content['bf_contenu']
-                : $content['bf_description'] ?? ''),
-        );
-        if (!empty($content['bf_contenu'])) {
-            $content['bf_contenu'] = $replaced;
-        } elseif (!empty($content['bf_description'])) {
-            $content['bf_description'] = $replaced;
         }
 
         // Handle Videos if a peertube location is configured
@@ -418,10 +482,7 @@ class ImportManager
             $this->initPeertubeToken();
         }
         if (!empty($this->peertubeToken)) {
-            $content = (!empty($content['bf_contenu']) ?
-                $content['bf_contenu']
-                : $content['bf_description'] ?? '');
-            $videos = $this->findVideos($content);
+            $videos = $this->findVideos($wikiPage, $peertubeSource, true);
             foreach ($videos as $video) {
                 $this->importToPeertube($video['url'], $video['title']);
             }

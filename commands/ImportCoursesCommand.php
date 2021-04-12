@@ -24,7 +24,7 @@ class ImportCoursesCommand extends Command
     protected $force;
     protected $keep_original;
     protected $last_choice;
-    protected $peertube_token;
+    // protected $peertube_token;
 
     protected $courses;
     protected $modules;
@@ -34,7 +34,7 @@ class ImportCoursesCommand extends Command
     {
         parent::__construct();
         $this->wiki = $wiki;
-        $this->peertube_token = null;
+        // $this->peertube_token = null;
         $this->importManager = $this->wiki->services->get(ImportManager::class);
     }
 
@@ -102,24 +102,25 @@ class ImportCoursesCommand extends Command
         $output->writeln('<info>'.$out.'</>');
     }
 
-    private function downloadAttachments(&$bazarPage, OutputInterface $output)
+    private function downloadAttachments(&$bazarPage, OutputInterface $output, $peertubeSource = '')
     {
         // Handle Pictures and file attachments
         $force = $this->last_choice == 'r' || $this->last_choice == 'o';
         // Downloading images
-        $images = $this->importManager->findImages($this->remote_url, $bazarPage);
+        $attachments = $this->importManager->findDirectLinkAttachements($this->remote_url, $bazarPage, true);
 
-        if ($c = count($images)) {
+        if ($c = count($attachments)) {
             $output->writeln(
-                '<info>Downloading '.$c.' image'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>'
+                '<info>Downloading '.$c.' attachments'.(($c>1)?'s':'').' for '.$bazarPage['id_fiche'].'</>'
             );
-            foreach ($images as $image) {
-                $this->importManager->downloadImage($this->remote_url, $image, $force);
+            foreach ($attachments as $attachment) {
+                $output->writeln('<info>Downloading '.$attachment.'</>');
+                $this->importManager->downloadDirectLinkAttachment($this->remote_url, $attachment, $force);
             }
         }
 
         // Downloading other attachments
-        $attachments = $this->importManager->findFileAttachments($this->remote_url, $bazarPage);
+        $attachments = $this->importManager->findHiddenAttachments($this->remote_url, $bazarPage, true);
 
         if ($c = count($attachments)) {
             $output->writeln(
@@ -127,29 +128,23 @@ class ImportCoursesCommand extends Command
             );
 
             foreach ($attachments as $attachment) {
-                $this->importManager->downloadAttachment($this->remote_url, $bazarPage['id_fiche'], $bazarPage['date_maj_fiche'], $attachment, $force);
+                $output->writeln('<info>Downloading '.$attachment.'</>');
+                $this->importManager->downloadHiddenAttachment($this->remote_url, $bazarPage['id_fiche'], $bazarPage['date_maj_fiche'], $attachment, $force);
             }
         }
 
-        $wiki_regex = '#url="' . preg_quote($this->remote_url, '#')
-                    . '(\?.+/download&(?:amp;)?file=(.*))"#Ui';
-        $replaced = preg_replace(
-            $wiki_regex,
-            'url="'.$this->wiki->getBaseUrl().'/$1"',
-            (!empty($bazarPage['bf_contenu']) ? $bazarPage['bf_contenu'] : $bazarPage['bf_description'] ?? ''),
-        );
-        if (!empty($bazarPage['bf_contenu'])) {
-            $bazarPage['bf_contenu'] = $replaced;
-        } else {
-            $bazarPage['bf_description'] = $replaced;
-        }
-
         // Handle Videos if a peertube location is configured
-        if (!empty($this->peertube_token)) {
+        // if (!empty($this->peertube_token)) {
+        if (!empty($this->wiki->config['peertube_url'])
+            && !empty($this->wiki->config['peertube_user'])
+            && !empty($this->wiki->config['peertube_password'])
+            && !empty($this->wiki->config['peertube_channel'])
+        ) {
             try {
                 $videos = $this->importManager->findVideos(
                     !empty($bazarPage['bf_contenu']) ?
-                    $bazarPage['bf_contenu'] : $bazarPage['bf_description'] ?? ''
+                    $bazarPage['bf_contenu'] : $bazarPage['bf_description'] ?? '',
+                    $peertubeSource
                 );
             } catch (\Exception $e) {
                 $output->writeln('<error>'.$e->getMessage().'</>');
@@ -322,53 +317,7 @@ class ImportCoursesCommand extends Command
         if ($this->remote_url[-1] !== '/') {
             $this->remote_url .= '/';
         }
-
-        //initialise peertube token
-        if (!empty($this->wiki->config['peertube_url'])
-            && !empty($this->wiki->config['peertube_user'])
-            && !empty($this->wiki->config['peertube_password'])
-            && !empty($this->wiki->config['peertube_channel'])
-        ) {
-            // get token from peertube
-            $output->writeln('<info>Get Oauth client</>');
-            $apiUrl = $this->wiki->config['peertube_url'].'/api/v1/oauth-clients/local';
-            $data_str = @file_get_contents($apiUrl);
-            $token = json_decode($data_str, true);
-
-            if (!empty($token['client_id']) && !empty($token['client_secret'])) {
-                // Get user token
-                $data = [
-                    'client_id' => $token['client_id'],
-                    'client_secret' => $token['client_secret'],
-                    'grant_type' => 'password',
-                    'response_type' => 'code',
-                    'username' => $this->wiki->config['peertube_user'],
-                    'password' => $this->wiki->config['peertube_password'],
-                ];
-                $opts = array(
-                    'http'=>array(
-                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                        'method'  => 'POST',
-                        'content' => http_build_query($data)
-                    )
-                );
-                $context = stream_context_create($opts);
-                $apiUrl = $this->wiki->config['peertube_url'].'/api/v1/users/token';
-                $data_str = @file_get_contents($apiUrl, false, $context);
-                $token = json_decode($data_str, true);
-                if (!empty($token['access_token'])) {
-                    $this->peertube_token = $token['access_token'];
-                    $output->writeln('<fg=cyan>Got access token : '.$this->peertube_token.'</>');
-                } else {
-                    $output->writeln('<error>Got no access token from : '.$apiUrl.'</>');
-                }
-            } else {
-                $output->writeln('<error>Got no client credentials from : '.$apiUrl.'</>');
-            }
-        } else {
-            $output->writeln('<info>Configuration : "peertube_url", "peertube_user", "peertube_password" or "peertube_channel" were not set in configuration file : no local video imports.</>');
-        }
-
+        
         // Fetching all information needed
         if (false === $this->courses = $this->fetch_api('fiche/1203/html', 'courses', $output)) {
             return Command::FAILURE;
