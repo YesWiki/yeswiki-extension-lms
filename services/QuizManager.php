@@ -117,24 +117,16 @@ class QuizManager
             if (empty($courseId)) {
                 return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
                 self::MESSAGE_LABEL => '{courseId} should be defined when {moduleId} is defined !'];
-            } elseif (!$course->hasModule($moduleId)) {
+            } elseif (!$module = $course->getModule($moduleId)) {
                 return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{moduleId}: '.$moduleId.' is not a module of the {courseId}: '.$courseId];
-            } else {
-                if (!$module = $this->courseManager->getModule($moduleId)) {
-                    return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {moduleId}: '.$moduleId];
-                }
             }
         }
         if (!empty($activityId)) {
             if (empty($courseId) || empty($moduleId)) {
                 return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
                 self::MESSAGE_LABEL => '{courseId} and {moduleId} should be defined when {activityId} is defined !'];
-            } elseif (!$module->hasActivity($activityId)) {
+            } elseif (!$activity = $module->getActivity($activityId)) {
                 return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => '{activityId}: '.$activityId.' is not an activity of the {moduleId}: '.$moduleId];
-            } else {
-                if (!$activity = $this->courseManager->getActivity($activityId)) {
-                    return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'Not existing {activityId}: '.$activityId];
-                }
             }
         }
 
