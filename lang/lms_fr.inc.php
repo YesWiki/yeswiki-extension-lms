@@ -22,6 +22,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_BEGIN' => 'Commencer',
         'LMS_BEGIN_ONLY_ADMIN' => 'Accès admin',
         'LMS_RESUME' => 'Reprendre',
+        'LMS_RESTART' => 'Revoir',
         'LMS_RETURN_BUTTON' => 'Retour',
         'LMS_ADMIN_NO_MODULES' => 'Pas encore de modules associés à ce parcours, créez d\'abord des activités, puis des modules avec des activités dedans, puis associez les modules au parcours en l\'éditant à nouveau',
         'LMS_NO_MODULES' => 'Ce parcours ne contient pas encore de modules',

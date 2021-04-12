@@ -61,10 +61,19 @@ class ModuleNavigationField extends LmsField
             }
 
             $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
-            // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
+            $nextActivityTag = $this->courseManager->getLastAccessibleActivityTagForLearner($learner, $course, $module) ;
+            $isFinished = (
+                $module->getLastActivityTag() == $nextActivityTag
+                && ($nextModule = $course->getNextModule($module->getTag()))
+                && $this->learnerManager->hasBeenOpenedBy($course, $nextModule, null, $learner)
+            );
             $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
                 _t('LMS_BEGIN_ONLY_ADMIN')
-                : _t('LMS_BEGIN');
+                : (($module->getFirstActivityTag() == $nextActivityTag) ?  _t('LMS_BEGIN')
+                    : ($isFinished ? _t('LMS_RESTART') : _t('LMS_RESUME')));
+            if ($isFinished) {
+                $nextActivityTag = $module->getFirstActivityTag();
+            }
             if ($module->isAccessibleBy($learner, $course)) {
                 $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
             } else {
@@ -94,6 +103,7 @@ class ModuleNavigationField extends LmsField
                 'module' => $module,
                 'nextModule' => $nextModule ?? null,
                 'previousModule' => $previousModule ?? null,
+                'nextActivityTag' => $nextActivityTag ?? $module->getTag(),
             ]);
         }
         return $output;

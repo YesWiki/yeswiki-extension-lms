@@ -251,7 +251,7 @@ class CourseManager
                 // define status only if can be opened
                 foreach ($module->getActivities() as $activity) {
                     if (!$this->setActivityCanBeOpenedByLearner($learner, $course, $module, $activity)) {
-                        // do not check for followin of the module if one is false
+                        // do not check for following of the module if one is false
                         break;
                     }
                 }
@@ -275,5 +275,31 @@ class CourseManager
             }
         }
         return $this->conditionsEnabled;
+    }
+    /**
+     * getLastAccessibleActivityTagForLearner for a module
+     * @param Learner $learner
+     * @param Course $course
+     * @param Module $module
+     * @return string tag of the activity
+     */
+    public function getLastAccessibleActivityTagForLearner(Learner $learner, Course $course, Module $module):string
+    {
+        $openableActivities = [];
+        foreach ($module->getActivities() as $activity) {
+            if (!$this->setActivityCanBeOpenedByLearner($learner, $course, $module, $activity)) {
+                // do not check for followin of the module if one is false
+                break;
+            }
+            $openableActivities[] = $activity ;
+        }
+        foreach ($openableActivities as $openableActivity) {
+            if ($this->learnerManager->hasBeenOpenedBy($course, $module, $openableActivity, $learner)) {
+                $lastOpenedActivity = $openableActivity;
+            } else {
+                break;
+            }
+        }
+        return isset($lastOpenedActivity) ? $openableActivity->getTag() : $module->getFirstActivityTag() ;
     }
 }
