@@ -46,4 +46,18 @@ class Activity extends CourseStructure
         }
         return $this->duration;
     }
+
+    
+    /**
+     * Does the activity is accessible by the given learner ?
+     * @param Learner|null $learner the given learner or null if the current user is not logged
+     * @param Course $course the course for which the rights is checked
+     * @param Module $module the module for which the rights is checked
+     * @return bool the answer
+     */
+    public function isAccessibleBy(?Learner $learner, Course $course, Module $module): bool
+    {
+        return ($learner && $learner->isAdmin()) || ($module->getStatus($course) == ModuleStatus::OPEN
+            && ($learner && $this->canBeOpenedBy($learner)));
+    }
 }

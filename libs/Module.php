@@ -63,6 +63,24 @@ class Module extends CourseStructure
     }
 
     /**
+     * Get the activity of the activity with the given tag
+     * @param $activityTag the tag which specified the activity
+     * @return Activity|null return null if the activity specified is not found
+     */
+    public function getActivity($activityTag): ?Activity
+    {
+        $foundIndex = false;
+        foreach ($this->getActivities() as $index => $activity) {
+            if ($activity->getTag() == $activityTag) {
+                $foundIndex = $index;
+            }
+        }
+        return ($foundIndex === false) ?
+            null
+            : $this->getActivities()[$foundIndex];
+    }
+
+    /**
      * Get the previous activity of the activity with the given tag
      * @param $activityTag the tag which specified the activity
      * @return Activity|null return null if the activity specified is not found or is the first one, otherwise return
@@ -117,8 +135,20 @@ class Module extends CourseStructure
      */
     public function getLastActivityTag(): ?string
     {
+        $lastActivity = $this->getLastActivity();
+        return !empty($lastActivity) ?
+            $lastActivity->getTag()
+            : null;
+    }
+
+    /**
+     * Get the the module's last activity
+     * @return Activity|null return null if the activity list is empty, otherwise the last activity
+     */
+    public function getLastActivity(): ?Activity
+    {
         return !empty($this->getActivities()) ?
-            $this->getActivities()[array_key_last($this->getActivities())]->getTag()
+            $this->getActivities()[array_key_last($this->getActivities())]
             : null;
     }
 
@@ -167,10 +197,7 @@ class Module extends CourseStructure
                         $this->status = ModuleStatus::TO_BE_OPEN;
                     } else {
                         // TODO finish the scenarisation
-                        //if (!$course->isModuleScripted()) {
                         $this->status = ModuleStatus::OPEN;
-                        //} else {
-                        //}
                     }
                 }
             }
@@ -186,7 +213,8 @@ class Module extends CourseStructure
      */
     public function isAccessibleBy(?Learner $learner, Course $course): bool
     {
-        return ($learner && $learner->isAdmin()) || $this->getStatus($course) == ModuleStatus::OPEN;
+        return ($learner && $learner->isAdmin()) || ($this->getStatus($course) == ModuleStatus::OPEN
+            && ($learner && $this->canBeOpenedBy($learner)));
     }
 
     /**

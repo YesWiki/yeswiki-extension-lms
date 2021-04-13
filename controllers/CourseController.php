@@ -22,6 +22,7 @@ class CourseController extends YesWikiController
     protected $learnerManager;
     protected $dateManager;
     protected $config;
+    protected $activitiesCanBeDisplayedWithoutContext;
 
     /**
      * CourseController constructor
@@ -104,24 +105,21 @@ class CourseController extends YesWikiController
 
             if ($moduleTag) {
                 // if the module is specified in the GET parameter, return it if the tag corresponds
-                $module = $this->courseManager->getModule($moduleTag);
+                $module = $course->getModule($moduleTag);
 
-                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($activity->getTag())) ?
+                return ($module && $module->hasActivity($activity->getTag())) ?
                     $module
                     : null;
             } else {
                 // if the current page refers to a module of the course, return it
-                $currentModule = $this->courseManager->getModule($activity->getTag());
-                if ($currentModule && $course->hasModule($activity->getTag())) {
-                    return $currentModule;
+                if ($module = $course->getModule($activity->getTag())) {
+                    return $module;
                 }
 
                 // find in the course modules, the first module which contains the activity
-                if ($course) {
-                    foreach ($course->getModules() as $currentModule) {
-                        if ($currentModule->hasActivity($activity->getTag())) {
-                            return $currentModule;
-                        }
+                foreach ($course->getModules() as $currentModule) {
+                    if ($currentModule->hasActivity($activity->getTag())) {
+                        return $currentModule;
                     }
                 }
             }
@@ -174,11 +172,8 @@ class CourseController extends YesWikiController
                 $imageSize,
                 'fit'
             );
-
-        // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
-
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
+        $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         if (!$disabledLink) {
@@ -243,5 +238,27 @@ class CourseController extends YesWikiController
                 return _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }
+    }
+
+    /**
+     * check if we can display activity without contextual course or module
+     * @return bool
+     */
+    public function activitiesCanBeDisplayedWithoutContext():bool
+    {
+        if (is_null($this->activitiesCanBeDisplayedWithoutContext)) {
+            $this->activitiesCanBeDisplayedWithoutContext = true ;
+            if (!(isset($this->config['lms_config']['show_activities_without_context_when_scripted'])
+                && $this->config['lms_config']['show_activities_without_context_when_scripted'])) {
+            
+                // true by default except if one course is scripted (module or activity)
+                foreach ($this->courseManager->getAllCourses() as $course) {
+                    if ($course->isActivityScripted() || $course->isModuleScripted()) {
+                        $this->activitiesCanBeDisplayedWithoutContext = false ;
+                    }
+                }
+            }
+        }
+        return $this->activitiesCanBeDisplayedWithoutContext;
     }
 }
