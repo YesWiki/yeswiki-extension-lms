@@ -124,6 +124,28 @@ function activity_navigation_add_element(id,value,conditionObject = null){
                   console.log(id+'_container : not found');
               } else {
                   container.appendChild(clone);
+
+                  // add default params for scope
+                  if (conditionObject.scope)
+                  for (var key in conditionObject.scope) {
+                    let searchKey = '';
+                    if (conditionObject.scope[key].course){
+                      searchKey += conditionObject.scope[key].course ;
+                    } else {
+                      searchKey += '*';
+                    }
+                    searchKey += '/';
+                    if (conditionObject.scope[key].module){
+                      searchKey += conditionObject.scope[key].module ;
+                    } else {
+                      searchKey += '*';
+                    }
+                    let optionToActivate = clone.querySelector('.input-group.mb-3 select[name="'+id+'[scope_select]['
+                        +activityNavigationConditionsEditUniqueId+']"] option[value="'+searchKey+'"]');
+                    if(optionToActivate){
+                      activity_navigation_scopeSelect(optionToActivate,id);
+                    }
+                  }
               }
           }
       }
