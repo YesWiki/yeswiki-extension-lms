@@ -133,6 +133,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_QUIZ_FILTER_ON_THIS_QUIZID' => 'Filtrer les résultats pour ce quiz',
 
         // activity navigation conditions
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ADD' => 'Ajouter une condition',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED' => 'Réaction demandée',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP' => 'Veuillez donner une réaction',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP_ALERT' => 'Veuillez sélectionner au moins une réaction',

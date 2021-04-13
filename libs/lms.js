@@ -72,19 +72,11 @@ $('#burger').on('click', function(){
 
 /** == ==  Part for activity navigation edit == == */
 
-function activity_navigation_add_button(elem){
-  let id = elem.getAttribute('data-id');
-  if (!id) {
-      id = elem.id ;
-  }
-  let selectObject = document.getElementById(id+'_select');
-  if (!selectObject) {
-      console.log(id+'_select : not found');
-  } else {
-      let value = selectObject.value ;
-      if (value) {
-          activity_navigation_add_element(id, value);
-      }
+function activity_navigation_select(elem,id){
+  let value = elem.value ;
+  if (value) {
+    elem.parentNode.selectedIndex = "0"; // reset selection
+    activity_navigation_add_element(id, value);
   }
 }
 
@@ -139,7 +131,7 @@ function activity_navigation_add_element(id,value,conditionObject = null){
 }
 
 function activity_navigation_remove_condition(elem){
-  let id = elem.getAttribute('data-id');
+  let id = elem.parentNode.getAttribute('data-id');
   let conditionContainer = document.getElementById(id) ;
   if (!conditionContainer) {
       console.log(id+' : not found');

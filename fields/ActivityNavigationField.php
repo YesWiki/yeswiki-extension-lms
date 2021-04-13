@@ -169,10 +169,6 @@ class ActivityNavigationField extends LmsField
     public function formatValuesBeforeSave($entry)
     {
         $value = $this->getValue($entry);
-        $id_select = '';
-        if (isset($value['id'])) {
-            $id_select = $value['id'] . '_select';
-        }
         if ($this->canEdit($entry) && is_array($value) && isset($value[self::LABEL_NEW_VALUES])) {
             $data = [];
             if (isset($value[self::LABEL_REACTION_NEEDED])) {
@@ -208,11 +204,10 @@ class ActivityNavigationField extends LmsField
             }
             $value = $data ;
         }
-        return (empty($value) || count($value) == 0)
-            ? ['fields-to-remove' => ([$this->getPropertyName()] +
-                (!empty($id_select)?[$id_select]:[]))]
-            : ([$this->getPropertyName() => $value] +
-                (!empty($id_select) ?['fields-to-remove' => [$id_select]]:[]));
+        return (!(empty($value) || count($value) == 0)
+            ? [$this->getPropertyName() => $value] : [])
+            + ['fields-to-remove' => [$this->getPropertyName()]];
+        // to be sure to clean array before save new value if existing
     }
 
     protected function getValue($entry)
