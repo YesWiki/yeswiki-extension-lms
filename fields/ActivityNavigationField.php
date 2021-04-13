@@ -177,13 +177,17 @@ class ActivityNavigationField extends LmsField
         if ($this->canEdit($entry) && is_array($value) && isset($value[self::LABEL_NEW_VALUES])) {
             $data = [];
             if (isset($value[self::LABEL_REACTION_NEEDED])) {
-                $data[] = ['condition' => self::LABEL_REACTION_NEEDED];
+                foreach ($value[self::LABEL_REACTION_NEEDED] as $id => $val) {
+                    $data[] = ['condition' => self::LABEL_REACTION_NEEDED]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
+                }
             }
             if (isset($value[self::LABEL_QUIZ_PASSED]) && isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID])) {
                 foreach ($value[self::LABEL_QUIZ_PASSED]['head'] as $id => $val) {
                     if (isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
-                        self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]];
+                        self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
                     }
                 }
             }
@@ -195,7 +199,8 @@ class ActivityNavigationField extends LmsField
                             && isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id])) {
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL,
                         self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_ID][$id],
-                        self::LABEL_QUIZ_MINIMUM_LEVEL => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id]];
+                        self::LABEL_QUIZ_MINIMUM_LEVEL => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id]]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
                     }
                 }
             }
@@ -203,7 +208,8 @@ class ActivityNavigationField extends LmsField
                 foreach ($value[self::LABEL_FORM_FILLED]['head'] as $id => $val) {
                     if (isset($value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_FORM_FILLED,
-                        self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id]];
+                        self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id]]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
                     }
                 }
             }
@@ -218,5 +224,29 @@ class ActivityNavigationField extends LmsField
     protected function getValue($entry)
     {
         return $entry[$this->propertyName] ?? $_REQUEST[$this->propertyName] ?? $this->default;
+    }
+
+    private function extractScope($scope):?array
+    {
+        if (is_array($scope)) {
+            $results = [];
+            foreach ($scope as $value) {
+                $tmpRes = $this->extractScope($value);
+                if (!empty($tmpRes)) {
+                    $results[] = $tmpRes;
+                }
+            }
+            
+            return $results ;
+        } elseif (is_string($scope)) {
+            $extracted = explode('/', $scope);
+            if (count($extracted) < 2) {
+                return null;
+            }
+            $course = $extracted[0];
+            $module = $extracted[1];
+            $result = (($course == '*')?[]:['course' => $course]) + (($module == '*')?[]:['module' => $module]);
+            return empty($result) ? null : $result ;
+        }
     }
 }
