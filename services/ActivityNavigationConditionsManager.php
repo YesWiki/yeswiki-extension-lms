@@ -442,10 +442,11 @@ class ActivityNavigationConditionsManager
             'user' => $this->learnerManager->getLearner()->getUserName()
         ]);
         if (empty($entries)) {
+            $form = $this->formManager->getOne($formId);
             $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
                 self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
             $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP')
-                    .' \''.$formId.'\'</li>';
+                    .' \''.(!empty($form)?$form['bn_label_nature']:$formId).'\'</li>';
         }
         return $result;
     }
