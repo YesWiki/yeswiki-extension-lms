@@ -92,21 +92,21 @@ function activity_navigation_add_element(id,value,conditionObject = null){
       let new_id = id+'_'+value+'_'+activityNavigationConditionsEditUniqueId;
       clone.setAttribute("id",new_id);
       // enable input
-      let input = clone.querySelectorAll('input');
-      if (!input || input.length == 0){
-          console.log(new_id+' : not input tag');
+      let inputs = clone.querySelectorAll('input,select');
+      if (!inputs || inputs.length == 0){
+          console.log(new_id+' : not input or select tag');
       } else {
-          let end = input.length;
+          let end = inputs.length;
           for (let i=0;i<end;++i){
-              input[i].removeAttribute('disabled');
+              inputs[i].removeAttribute('disabled');
               // set default value
               for (var key in conditionObject) {
-                if (input[i].name == id+'['+value+']['+key+']'){
-                  input[i].value = conditionObject[key];
+                if (inputs[i].name == id+'['+value+']['+key+']'){
+                  inputs[i].value = conditionObject[key];
                 }
               }
               // change name to be sure to be unique
-              input[i].name += '['+activityNavigationConditionsEditUniqueId+']';
+              inputs[i].name += '['+activityNavigationConditionsEditUniqueId+']';
           }
 
           // Add remove button

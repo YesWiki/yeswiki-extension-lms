@@ -78,9 +78,14 @@
             ~ ' ' ~ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM') ~ ':' }}</span>
     </div>
     <input type="hidden" name="{{ field.propertyName }}[form_filled][head]" value="1" disabled>
-    <input type="text" name="{{ field.propertyName }}[form_filled][formId]"
-          value="" maxlength="256" placeholder="formId"
-          class="form-control input-xxlarge" disabled/>
+    <select
+      name="{{ field.propertyName }}[form_filled][formId]"
+      class="form-control" disabled>
+      <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
+      {% for key, option in formOptions %}
+          <option value={{ key }}>{{ option|raw }}</option>
+      {% endfor %}
+    </select>
   </div>
   <div id="{{ id }}_remove_button_template" class="input-group-append"  style="display:none !important;">
     <button onclick="activity_navigation_remove_condition(this)"

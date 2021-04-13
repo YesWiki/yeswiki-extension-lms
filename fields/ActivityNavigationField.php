@@ -5,6 +5,7 @@ namespace YesWiki\Lms\Field;
 use Psr\Container\ContainerInterface;
 use YesWiki\Wiki;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\DateManager;
@@ -160,7 +161,10 @@ class ActivityNavigationField extends LmsField
                 self::LABEL_QUIZ_PASSED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED'),
                 self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_WITH_MINIMUM_LEVEL'),
                 self::LABEL_FORM_FILLED => _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED')
-            ]
+            ],
+            'formOptions' => array_map(function ($form) {
+                return $form['bn_label_nature'];
+            }, $this->getService(FormManager::class)->getAll())
         ])
         : null;
     }
