@@ -286,7 +286,7 @@ class QuizManager
     ): array {
 
         /* Check if admin */
-        if (!$this->learnerManager->getLearner()->isAdmin()) {
+        if (!$this->learnerManager->getLearner() || !$this->learnerManager->getLearner()->isAdmin()) {
             return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'DELETE only authorized for admins!'];
         }
 

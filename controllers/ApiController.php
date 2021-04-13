@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\QuizManager;
+use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
 
 class ApiController extends YesWikiController
 {
@@ -323,6 +324,17 @@ class ApiController extends YesWikiController
     }
 
     /**
+     * @Route("/api/lms/activity-navigation-conditions/{courseId}/{moduleId}/{activityId}",options={"acl":{"public","+"}})
+     */
+    public function checkActivityNavigationConditions($courseId, $moduleId, $activityId)
+    {
+        return new ApiResponse(
+            $this->getService(ActivityNavigationConditionsManager::class)
+                ->checkActivityNavigationConditions($courseId, $moduleId, $activityId)
+        );
+    }
+
+    /**
      * Display lms api documentation
      *
      * @return string
@@ -382,7 +394,7 @@ class ApiController extends YesWikiController
         $output .= '"><code>';
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></a><br />';
-        $output .= 'Same as previous but for current connected leaner<br />';
+        $output .= 'Same as previous but for current connected learner<br />';
         
         $urlSaveQuizResult = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '<br />The following code :<br />';
@@ -397,7 +409,7 @@ class ApiController extends YesWikiController
         $output .= '<br />POST <b><code>';
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></b><br />';
-        $output .= 'Same as previous but for current connected leaner<br />';
+        $output .= 'Same as previous but for current connected learner<br />';
 
         
         $output .= '<br />The following codes delete quiz\'s results:<br />';
@@ -420,6 +432,17 @@ class ApiController extends YesWikiController
         $output .= $this->wiki->Href('lms/quizresults', 'api');
         $output .= '</code> for all quizzes of all user<br />';
         $output .= '<b>You must sent cookies to be connected as admin.</b><br />';
+
+        $urlCheckConditions = $this->wiki->Href('', 'api/lms/activity-navigation-conditions/{courseId}/{moduleId}/{activityId}');
+        $output .= '<br />The following code :<br />';
+        $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
+        $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
+        $output .= '<code>['.ActivityNavigationConditionsManager::STATUS_LABEL.':STATUS_CODE,<br />';
+        $output .= ActivityNavigationConditionsManager::URL_LABEL.':null|"https://...",<br />';
+        $output .= ActivityNavigationConditionsManager::MESSAGE_LABEL.':"html code"]</code><br />';
+        $output .= 'STATUS_CODE: '.ActivityNavigationConditionsManager::STATUS_CODE_OK.' = OK; ';
+        $output .= ActivityNavigationConditionsManager::STATUS_CODE_ERROR.' = ERROR; ';
+        $output .= ActivityNavigationConditionsManager::STATUS_CODE_NOT_OK.' = NOT OK; <br />';
         return $output;
     }
 }

@@ -131,5 +131,27 @@ $GLOBALS['translations'] = array_merge(
         'LMS_QUIZ_DELETE_WARNING' => 'Attention! Toutes les données enregistrées seront perdues.. Etes-vous sûrs de vouloir ',
         'LMS_QUIZ_FILTER_ON_THIS_USER' => 'Filtrer les résultats pour cet utilisateur',
         'LMS_QUIZ_FILTER_ON_THIS_QUIZID' => 'Filtrer les résultats pour ce quiz',
+
+        // activity navigation conditions
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ADD' => 'Ajouter une condition',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED' => 'Réaction demandée',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP' => 'Veuillez donner une réaction',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP_ALERT' => 'Veuillez sélectionner au moins une réaction',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED' => 'Quiz rempli',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP' => 'Veuillez répondre au quiz',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY' => 'Veuillez répondre à au moins un quiz',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_EMPTY' => '(vide = n\'importe quel test de l\'activité)',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_WITH_MINIMUM_LEVEL' => 'Quiz réussi avec un niveau minimum',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP' => ' avec une note minimum de :',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_LEVEL' => 'Niveau',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED' => 'Fiche complétée',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP' => 'Veuillez ajouter une fiche au formulaire',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM' => 'Formulaire',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR' => 'Une erreur est survenue lors de la vérification.<br>Veuillez contacter un administrateur du site !',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_CLOSED' => 'Veuillez patienter, le prochain module est encore fermé.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN' => 'Veuillez patienter, le prochain module n\'est pas encore ouvert.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE' => 'Veuillez patienter, le prochain module n\'est pas accessible.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
     )
 );
