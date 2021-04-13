@@ -743,6 +743,16 @@
       }
   }
 
+  .activity-navigation-border .input-group .scope-list{
+    min-width: 500px;
+  }
+
+@media(max-width:1000px){
+.activity-navigation-border .input-group .scope-list{
+    min-width: 50vw;
+    }
+}
+
 
   /** end for activity navigation edit **/
 
