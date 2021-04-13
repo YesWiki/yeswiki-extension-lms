@@ -177,6 +177,7 @@ class QuizManager
         $like .= $data['module'] ? '%"module":"' . $data['module']->getTag() . '"%' : '';
         $like .= $data['activity'] ? '%"activity":"' . $data['activity']->getTag() . '"%' : '';
         $like .= $data['quizId'] ? '%"quizId":"' . $data['quizId'] . '"%' : '';
+        $like .= isset($data['log_time']) ? '%"log_time":"' . $data['log_time'] . '"%' : '';
         $like = empty($like) ? '%' : $like ;
         $results = $this->tripleStore->getMatching(
             $data['learner'] ? $data['learner']->getUsername() : null,
@@ -279,6 +280,7 @@ class QuizManager
      * @param string|null $moduleId, id of the concerned module, null = all modules
      * @param string|null $activityId, id of the concerned activity, null = all activities
      * @param string|null $quizId, id of the concerned quiz, null = all quizzes
+     * @param string|null $log_time, log_time of the concerned quiz, null = all quizzes
      * @return array|null [self::STATUS_LABEL=>0(OK)/1(error)/2(not existing)
      *      (,'message'=>'error message')]
      */
@@ -287,7 +289,8 @@ class QuizManager
         ?string $courseId = null,
         ?string $moduleId = null,
         ?string $activityId = null,
-        ?string $quizId = null
+        ?string $quizId = null,
+        ?string $log_time = null
     ): array {
 
         /* Check if admin */
@@ -301,6 +304,9 @@ class QuizManager
             return $data;
         } else {
             unset($data[self::STATUS_LABEL]);
+        }
+        if (!empty($log_time)) {
+            $data['log_time'] = $log_time;
         }
         /* find results to delete */
         if (empty($results = $this->findResults($data, true))) {
@@ -340,5 +346,48 @@ class QuizManager
             }
         }
         return [self::STATUS_LABEL => self::STATUS_CODE_OK];
+    }
+
+    /** keepOnlyBestResult
+     * @param array $results
+     * @return array $results
+     */
+    public function keepOnlyBestResult($results):array
+    {
+        // create unique key
+        $results_with_unique_id = array_map(function ($result) {
+            $result['unique_id'] = $result['learner'] . '_' . $result['course'] . '_' . $result['module'] . '_' . $result['activity'] . '_' . $result['quizId'];
+            return $result;
+        }, $results);
+
+        $results_with_unique_id = array_filter($results_with_unique_id, function ($result) use ($results_with_unique_id) {
+            $currentUniqueId = $result['unique_id'];
+            $currentResult = $result['result'];
+            $higher_results_same_unique_ids = array_filter($results_with_unique_id, function ($previous_result) use ($currentUniqueId, $currentResult) {
+                return $previous_result['unique_id'] == $currentUniqueId && $previous_result['result'] > $currentResult;
+            });
+            return empty($higher_results_same_unique_ids);
+        });
+
+        return $results_with_unique_id;
+    }
+
+    /**
+     * check if a specific request as quizzes' results
+     * @param string|null $userId, id of the concerned learner, if all learners for admin or current learner
+     * @param string|null $courseId, id of the concerned course, null = all courses
+     * @param string|null $moduleId, id of the concerned module, null = all modules
+     * @param string|null $activityId, id of the concerned activity, null = all activities
+     * @param string|null $quizId, id of the concerned quiz, null = all quizzes
+     * @return bool
+     */
+    public function hasQuizResults(
+        ?string $userId = null,
+        ?string $courseId = null,
+        ?string $moduleId = null,
+        ?string $activityId = null,
+        ?string $quizId = null
+    ): bool {
+        return ($this->getQuizResults($userId, $courseId, $moduleId, $activityId, $quizId)[self::STATUS_LABEL] == self::STATUS_CODE_OK);
     }
 }

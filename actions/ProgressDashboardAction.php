@@ -8,6 +8,7 @@ use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Lms\Service\LearnerManager;
+use YesWiki\Lms\Service\QuizManager;
 
 class ProgressDashboardAction extends YesWikiAction
 {
@@ -16,6 +17,7 @@ class ProgressDashboardAction extends YesWikiAction
     protected $learnerManager;
     protected $entryManager;
     protected $extraActivityManager;
+    protected $quizManager;
 
     // the progresses related to the current course for all users
     protected $progresses;
@@ -48,6 +50,7 @@ class ProgressDashboardAction extends YesWikiAction
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
         $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
+        $this->quizManager = $this->getService(QuizManager::class);
 
         $currentLearner = $this->learnerManager->getLearner();
         if (!$currentLearner || !$currentLearner->isAdmin()) {
@@ -157,6 +160,9 @@ class ProgressDashboardAction extends YesWikiAction
             $this->activitiesStat[$activity->getTag()] = [];
             $this->activitiesStat[$activity->getTag()]['finished'] = $finishedUsernames;
             $this->activitiesStat[$activity->getTag()]['notFinished'] = $notFinishedUsernames;
+            if ($this->quizManager->hasQuizResults(null, $course->getTag(), $module->getTag(), $activity->getTag())) {
+                $this->activitiesStat[$activity->getTag()]['hasQuizResults'] = true;
+            }
         }
     }
 
@@ -189,6 +195,9 @@ class ProgressDashboardAction extends YesWikiAction
         ksort($notFinishedUsernames);
         $this->modulesStat[$module->getTag()]['finished'] = $finishedUsernames;
         $this->modulesStat[$module->getTag()]['notFinished'] = $notFinishedUsernames;
+        if ($this->quizManager->hasQuizResults(null, $course->getTag(), $module->getTag())) {
+            $this->modulesStat[$module->getTag()]['hasQuizResults'] = true;
+        }
     }
 
     private function processCourseStat(Course $course)

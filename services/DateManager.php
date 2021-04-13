@@ -35,8 +35,10 @@ class DateManager
     public function createIntervalFromString(string $durationString): ?CarbonInterval
     {
         try {
-            return CarbonInterval::createFromFormat(self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT,
-                $durationString)->cascade();
+            return CarbonInterval::createFromFormat(
+                self::TIME_FORMAT_WITH_COLONS_FOR_IMPORT,
+                $durationString
+            )->cascade();
         } catch (Exception $e) {
             //error_log("Error by parsing the interval. The format '00:00:00' is expected but '$durationString' is given");
             return null;
@@ -88,7 +90,9 @@ class DateManager
 
     public function diffDatesInReadableFormat(Carbon $fromDate, Carbon $toDate): string
     {
-        return $toDate->locale($GLOBALS['prefered_language'])->DiffForHumans($fromDate,
-            CarbonInterface::DIFF_ABSOLUTE);
+        return $toDate->locale($GLOBALS['prefered_language'])->DiffForHumans(
+            $fromDate,
+            CarbonInterface::DIFF_ABSOLUTE
+        );
     }
 }

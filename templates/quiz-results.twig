@@ -1,0 +1,104 @@
+{% from "@lms/datetime-macros.twig" import displayDate %}
+
+{{ include_javascript('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.js') }}
+{{ include_javascript('tools/templates/libs/vendor/datatables/jquery.dataTables.min.js') }}
+{{ include_css('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.css') }}
+
+<h3>{{ _t('LMS_QUIZ_RESULTS_TITLE') }}</h3>
+
+<div class="table-responsive">
+  <table id="existing-forms-table" class="bazar-table table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>{{ _t('LMS_COURSE') }}</th>
+        <th>{{ _t('LMS_MODULE') }}</th>
+        <th>{{ _t('LMS_ACTIVITY') }}</th>
+        <th>quizId</th>
+        <th>{{ _t('LMS_EXTRA_ACTIVITY_LEARNERS') }}</th>
+        <th>{{ _t('LMS_EXTRA_ACTIVITY_DATE') }}</th>
+        <th>{{ _t('LMS_QUIZ_RESULTS') }}</th>
+        <th>
+          <a href="{{ url({handler:handler,params:urlParams|merge({quiz_results_mode:'delete',urlParams:urlParams|keys|join(',')})}) }}"
+            class="btn btn-danger btn-xs"
+            title="{{  _t('LMS_QUIZ_DELETE_ALL') }}" 
+            onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE_ALL') }}');">
+            <i class="fa fa-trash"></i>
+          </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key, result in results %}
+        {% if rawdata %}
+          <tr>
+            <td>{{ result.course }}</td>
+            <td>{{ result.module }}</td>
+            <td>{{ result.activity }}</td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  quizId:result.quizId})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_QUIZID') }}">
+                {{ result.quizId }}
+              </a>
+            </td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  learner:result.learner})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_USER') }}">
+                {{ result.learner }}
+              </a>
+            </td>
+            <td>{{ result.log_time }}</td>
+            <td>{{ result.result ?? 0 }} %</td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  quiz_results_mode:'delete',
+                  course:result.course,
+                  module:result.module,
+                  activity:result.activity,
+                  quizId:result.quizId,
+                  learner:result.learner,
+                  log_time:result.log_time,
+                  urlParams:urlParams|keys|join(','),
+                  })}) }}"{% block deleteLine %}
+                class="btn btn-danger btn-xs"
+                title="{{  _t('LMS_QUIZ_DELETE') }}" 
+                onclick="javascript:return confirm('{{ _t('LMS_QUIZ_DELETE_WARNING') ~ _t('LMS_QUIZ_DELETE') }}');">
+                <i class="fa fa-trash"></i>
+              </a>
+            </td>{% endblock %}
+          </tr>
+        {% else %}
+          <tr>
+            <td>{{ result.course.title }}</td>
+            <td>{{ result.module.title }}</td>
+            <td>{{ result.activity.title }}</td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  quizId:result.quizId})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_QUIZID') }}">
+                {{ result.quizId }}
+              </a>
+            </td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  learner:result.learner.userName})}) }}" title="{{  _t('LMS_QUIZ_FILTER_ON_THIS_USER') }}">
+                {{ result.learner.fullName }}
+              </a>
+            </td>
+            <td>{{ displayDate(result.log_time) }}</td>
+            <td>{{ result.result ?? 0 }} %</td>
+            <td>
+              <a href="{{ url({handler:handler,params:urlParams|merge({
+                  quiz_results_mode:'delete',
+                  course:result.course.tag,
+                  module:result.module.tag,
+                  activity:result.activity.tag,
+                  quizId:result.quizId,
+                  learner:result.learner.userName,
+                  log_time:result.log_time|date(dateFormat),
+                  urlParams:urlParams|keys|join(','),
+                  })}) }}"{{ block('deleteLine') }}
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div> <!-- /.table-responsive -->
