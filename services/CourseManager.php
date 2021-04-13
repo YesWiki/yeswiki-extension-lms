@@ -326,4 +326,33 @@ class CourseManager
             'label' => $labelStart
         ];
     }
+
+    
+    /**
+     * getActivityParents
+     * @param array $entry
+     * @return array [['course'=>courseTag],['module'=>moduleTag],['course'=>courseTag,'module'=>moduleTag]]
+     */
+    public function getActivityParents(array $entry):array
+    {
+        if (!isset($entry['id_fiche'])) {
+            return [];
+        }
+
+        $parents = [];
+        foreach ($this->getAllCourses() as $course) {
+            $courseFound = false;
+            foreach ($course->getModules() as $module) {
+                if ($module->hasActivity($entry['id_fiche'])) {
+                    if (!$courseFound) {
+                        $parents[] = ['course'=>$course->getTag()];
+                    }
+                    $courseFound = true;
+                    $parents[] = ['course'=>$course->getTag(),'module'=>$module->getTag()];
+                    $parents[] = ['module'=>$module->getTag()];
+                }
+            }
+        }
+        return $parents;
+    }
 }

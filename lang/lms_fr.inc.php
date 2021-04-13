@@ -154,5 +154,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN' => 'Veuillez patienter, le prochain module n\'est pas encore ouvert.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE' => 'Veuillez patienter, le prochain module n\'est pas accessible.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE' => 'Périmètre',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE_EMPTY' => 'Vide = pas de contrainte',
     )
 );

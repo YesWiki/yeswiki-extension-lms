@@ -118,7 +118,7 @@ function activity_navigation_add_element(id,value,conditionObject = null){
               cloneButton.setAttribute("id",new_id+"_remove_button");
               cloneButton.removeAttribute("style");
               cloneButton.setAttribute("data-id",new_id);
-              clone.appendChild(cloneButton);
+              clone.querySelector(".input-group.mb-3").appendChild(cloneButton);
               let container = document.getElementById(id+'_container');
               if (!container){
                   console.log(id+'_container : not found');
@@ -137,6 +137,80 @@ function activity_navigation_remove_condition(elem){
       console.log(id+' : not found');
   } else {
       conditionContainer.remove();
+  }
+}
+
+function activity_navigation_scopeSelect(elem,id){
+  let value = elem.value ;
+  let name = elem.parentNode.name;
+  let base = elem.parentNode.parentNode.querySelector('.input-group-append.scope-list');
+  if (value && name && base) {
+    let longPrefix = id+'[scope_select]['
+    let uniqueId = name.substr(longPrefix.length,name.length-(longPrefix.length+1)); // to remove $id[scope][...]
+    // find other scope for this uniqueId
+    let othersScope = base.querySelectorAll("input[name^='"+id+'[scope]['+uniqueId+']'+"']");
+    let newIndex = othersScope.length ;
+    // reset selection
+    elem.parentNode.selectedIndex = "0";
+    // find associated template
+    let template_container = document.getElementById(id+'_scope_template_container') ;
+    if (!template_container) {
+        console.log(id+'_scope_template_container : not found');
+    } else {
+        let clone = template_container.cloneNode(true);
+        clone.setAttribute("value",value);
+        clone.removeAttribute("id");
+        clone.removeAttribute("style");
+        clone.removeAttribute('disabled');
+        clone.name += '['+uniqueId+']['+newIndex+']';
+        // clear current message
+        let empty_message = base.querySelector('span.input-group-text i.empty-message');
+        if (empty_message){
+          empty_message.setAttribute("style","display:none !important;");
+        }
+        let baseText = base.querySelector('span.input-group-text');
+        var baseList = baseText.querySelector('ul');
+        if (!baseList){
+          baseList = document.createElement('ul');
+          baseText.appendChild(baseList);
+        }
+        let newMessage = document.createElement('li');
+        newMessage.setAttribute("data-name",clone.name);
+        newMessage.innerText = value ;
+        // add remove button
+        let removeBtn = document.createElement('i');
+        removeBtn.classList.add('fas');
+        removeBtn.classList.add('fa-times');
+        removeBtn.setAttribute("onclick","activity_navigation_scope_remove(this)");
+        newMessage.innerText += ' ';
+        newMessage.appendChild(removeBtn);
+        baseList.appendChild(newMessage);
+        base.appendChild(clone);
+    }
+  }
+}
+
+function activity_navigation_scope_remove(elem){
+  let name = elem.parentNode.getAttribute("data-name");
+  // search associated input
+  let baseUl = elem.parentNode.parentNode;
+  let inputs = baseUl.parentNode.parentNode.querySelectorAll("input[name='"+name+"']");
+  let end = inputs.length;
+  for (let i=0;i<end;++i){
+    inputs[i].remove() ;
+  }
+  // search associated li
+  let lis = baseUl.querySelectorAll("li[data-name='"+name+"']");
+  end = lis.length;
+  for (let i=0;i<end;++i){
+    lis[i].remove() ;
+  }
+
+  if(baseUl.children.length == 0){
+    let empty_message = baseUl.parentNode.querySelector('i.empty-message');
+    if (empty_message){
+      empty_message.removeAttribute("style");
+    }
   }
 }
 

@@ -164,7 +164,8 @@ class ActivityNavigationField extends LmsField
             ],
             'formOptions' => array_map(function ($form) {
                 return $form['bn_label_nature'];
-            }, $this->getService(FormManager::class)->getAll())
+            }, $this->getService(FormManager::class)->getAll()),
+            'scopeOptions' => $this->courseManager->getActivityParents($entry)
         ])
         : null;
     }
