@@ -2,6 +2,7 @@
 
 namespace YesWiki\Lms\Service;
 
+use YesWiki\Bazar\Field\TextareaField;
 use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\PageManager;
@@ -227,7 +228,7 @@ class ImportManager
             $form = $formManager->getOne($wikiPage['id_typeannonce']);
             // find fields that are textareas
             foreach ($form['prepared'] as $field) {
-                if (get_class($field) === 'YesWiki\Bazar\Field\TextareaField') {
+                if ($field instanceof TextareaField) {
                     $fields[] = $field->getName();
                 }
             }
@@ -253,8 +254,7 @@ class ImportManager
             $inlineAttachments
         );
 
-        $bazarImages = array_filter($wikiPage
-        , function ($k) {
+        $bazarImages = array_filter($wikiPage, function ($k) {
             return str_starts_with($k, 'image');
         }, ARRAY_FILTER_USE_KEY);
 
@@ -265,9 +265,9 @@ class ImportManager
             $contentKeys = $this->getTextFieldsFromWikiPage($wikiPage);
             foreach ($contentKeys as $key) {
                 $wikiPage[$key] = preg_replace(
-                  $regex,
-                  '="'.$this->wiki->getBaseUrl().'files/${filename}"',
-                  $wikiPage[$key]
+                    $regex,
+                    '="'.$this->wiki->getBaseUrl().'files/${filename}"',
+                    $wikiPage[$key]
                 );
             }
         }
@@ -371,13 +371,13 @@ class ImportManager
         $allVideoWikiMatches = [];
         foreach ($contentKeys as $key) {
             preg_match_all(
-              $videoWikiRegex,
-              $wikiPage[$key],
-              $videoWikiMatches
+                $videoWikiRegex,
+                $wikiPage[$key],
+                $videoWikiMatches
             );
             $allVideoWikiMatches = array_merge_recursive(
-              $allVideoWikiMatches,
-              $videoWikiMatches
+                $allVideoWikiMatches,
+                $videoWikiMatches
             );
         }
 
@@ -429,13 +429,13 @@ class ImportManager
         $allVideoHtmlMatches = [];
         foreach ($contentKeys as $key) {
             preg_match_all(
-              $videoHtmlRegex,
-              $wikiPage[$key],
-              $videoHtmlMatches
+                $videoHtmlRegex,
+                $wikiPage[$key],
+                $videoHtmlMatches
             );
             $allVideoHtmlMatches = array_merge_recursive(
-              $allVideoWikiMatches,
-              $videoHtmlMatches
+                $allVideoWikiMatches,
+                $videoHtmlMatches
             );
         }
 
