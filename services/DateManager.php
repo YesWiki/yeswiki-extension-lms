@@ -11,11 +11,11 @@ use YesWiki\Wiki;
 
 class DateManager
 {
-    protected const TIME_FORMAT_WITH_COLONS = '%H:%I:%S';
-    protected const TIME_FORMAT_WITH_COLONS_FOR_IMPORT = 'H:i:s';
-    protected const DATETIME_FORMAT = 'Y-m-d H:i:s';
-    protected const LONG_DATE_ISOFORMAT = 'LL';
-    protected const LONG_DATETIME_ISOFORMAT = 'LLLL';
+    public const TIME_FORMAT_WITH_COLONS = '%H:%I:%S';
+    public const TIME_FORMAT_WITH_COLONS_FOR_IMPORT = 'H:i:s';
+    public const DATETIME_FORMAT = 'Y-m-d H:i:s';
+    public const LONG_DATE_ISOFORMAT = 'LL';
+    public const LONG_DATETIME_ISOFORMAT = 'LLLL';
     protected $config;
 
     /**
