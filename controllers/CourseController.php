@@ -176,17 +176,19 @@ class CourseController extends YesWikiController
         $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
+        
+        $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
+        $nextActivityTag = $tmpData['tag'];
+        $labelStart = $tmpData['label'];
+
         if (!$disabledLink) {
             $activityLink = $this->wiki->href(
                 '',
-                $module->getFirstActivityTag(),
+                $nextActivityTag,
                 ['course' => $course->getTag(), 'module' => $module->getTag()],
                 false
             );
         }
-        $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-            _t('LMS_BEGIN_ONLY_ADMIN')
-            : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
 
         // End of duplicate code

@@ -3,7 +3,7 @@
 <nav class="module-nav" aria-label="navigation" {{ field.name ? 'data-id="' ~ field.name ~ '"' }}>
   <div class="module-launch">
     <a class="btn btn-primary btn-block launch-module {{ disabledLink ? 'disabled' : '' }}"
-      {% if not disabledLink %} href="{{ url({tag:module.firstActivityTag,params:{course:course.tag,module:module.tag}}) }}"{% endif %}}>
+      {% if not disabledLink %} href="{{ url({tag:nextActivityTag,params:{course:course.tag,module:module.tag}}) }}"{% endif %}}>
       <i class="fas fa-play fa-fw"></i>{{ labelStart }}
     </a>
   </div>
