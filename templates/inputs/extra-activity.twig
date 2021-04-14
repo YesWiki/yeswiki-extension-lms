@@ -1,0 +1,62 @@
+{{ include_javascript('tools/bazar/libs/vendor/bootstrap-datepicker.js')}}
+{{ include('@bazar/inputs/date.twig', {'field': {
+        'name': field.propertyName ~ '_bf_date_debut_evenement',
+        'required':true,
+        'label':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE')
+        },        
+    'day': (extraActivityLog ? extraActivityLog.date:date())|date("Y-m-d"),
+    'hour': extraActivityLog ? extraActivityLog.date|date("H"):12,
+    'minute': extraActivityLog ? extraActivityLog.date|date("i"):0,
+    'hasTime':true
+    }) }}
+{{ include('@bazar/inputs/date.twig', {'field': {
+        'name': field.propertyName ~ '_bf_date_fin_evenement',
+        'required':true,
+        'label':  _t('LMS_EXTRA_ACTIVITY_END_DATE')
+        },        
+    'day': (extraActivityLog ? extraActivityLog.endDate:date())|date("Y-m-d"),
+    'hour': extraActivityLog ? extraActivityLog.endDate|date("H"):14,
+    'minute': extraActivityLog ? extraActivityLog.endDate|date("i"):0,
+    'hasTime':true
+    }) }}
+{% if not course %}
+    {{ include('@bazar/inputs/select.twig', {'field': {
+        'name': field.propertyName ~ '_course',
+        'propertyName': field.propertyName ~ '_course',
+        'required':true,
+        'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_COURSE')
+        },        
+    'value':null,
+    'options': courses
+    }) }}
+{% else %}
+    {{ include('@bazar/fields/text.twig',{'field': {
+        'name': field.propertyName ~ '_course',
+        'type':'text',
+        'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_COURSE')
+        },
+        'value': course.title}) }}
+    <input type="hidden" id="{{ field.propertyName ~ '_course' }}" name="{{field.propertyName ~ '_course'}}" value="{{ course.tag }}">
+    {{ include('@bazar/inputs/select.twig', {'field': {
+        'name': field.propertyName ~ '_module',
+        'propertyName': field.propertyName ~ '_module',
+        'required':false,
+        'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')
+        },        
+    'value': module,
+    'options': modules
+    }) }}
+{% endif %}
+{{ include('@bazar/inputs/checkbox_drag_and_drop.twig', {'field': {
+        'name':field.propertyName ~ '_registeredLearnerNames',
+        'propertyName':field.propertyName ~ '_registeredLearnerNames',
+        'required':false,
+        'label':  _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
+        },        
+    'value': module,
+    'options': learners,
+    'selectedOptionsId': extraActivityLog.registeredLearnerNames,
+    'formName': _t('LMS_EXTRA_ACTIVITY_LEARNERS'),
+    'name': _t('BAZ_DRAG_n_DROP_CHECKBOX_LIST') ~ _t('LMS_EXTRA_ACTIVITY_D') ~ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
+    }) }}
+<input type="hidden" id="{{field.propertyName ~ '_tag'}}" name="{{field.propertyName ~ '_tag'}}" value="{{ extraActivityLog.tag }}">
