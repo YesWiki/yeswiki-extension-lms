@@ -112,8 +112,7 @@ class ActivityNavigationField extends LmsField
             }
 
             // display the next button
-            $nextCourseStructure = $this->ActivityNavigationConditionsManager
-                    ->getNextActivityOrModule($course, $module, $activity);
+            $nextCourseStructure = $this->courseManager->getNextActivityOrModule($course, $module, $activity);
             if ($nextCourseStructure instanceof Module) {
                 $nextModule = $nextCourseStructure;
             } else {
