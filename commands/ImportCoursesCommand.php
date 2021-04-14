@@ -319,13 +319,13 @@ class ImportCoursesCommand extends Command
         }
         
         // Fetching all information needed
-        if (false === $this->courses = $this->fetch_api('fiche/1203/html', 'courses', $output)) {
+        if (false === $this->courses = $this->fetch_api('forms/1203/entries/html', 'courses', $output)) {
             return Command::FAILURE;
         }
-        if (false === $this->modules = $this->fetch_api('fiche/1202/html', 'modules', $output)) {
+        if (false === $this->modules = $this->fetch_api('forms/1202/entries/html', 'modules', $output)) {
             return Command::FAILURE;
         }
-        if (false === $this->activities = $this->fetch_api('fiche/1201/html', 'activities', $output)) {
+        if (false === $this->activities = $this->fetch_api('forms/1201/entries/html', 'activities', $output)) {
             return Command::FAILURE;
         }
 
