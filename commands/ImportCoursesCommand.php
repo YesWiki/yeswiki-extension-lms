@@ -24,7 +24,6 @@ class ImportCoursesCommand extends Command
     protected $force;
     protected $keep_original;
     protected $last_choice;
-    // protected $peertube_token;
 
     protected $courses;
     protected $modules;
@@ -34,7 +33,6 @@ class ImportCoursesCommand extends Command
     {
         parent::__construct();
         $this->wiki = $wiki;
-        // $this->peertube_token = null;
         $this->importManager = $this->wiki->services->get(ImportManager::class);
     }
 
