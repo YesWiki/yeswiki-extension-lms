@@ -328,10 +328,15 @@ class ApiController extends YesWikiController
      */
     public function checkActivityNavigationConditions($courseId, $moduleId, $activityId)
     {
-        return new ApiResponse(
-            $this->getService(ActivityNavigationConditionsManager::class)
-                ->checkActivityNavigationConditions($courseId, $moduleId, $activityId)
-        );
+        /* start buffer for api */
+        ob_start();
+        $data = $this->getService(ActivityNavigationConditionsManager::class)
+            ->checkActivityNavigationConditions($courseId, $moduleId, $activityId);
+
+        // error + fetch trigger_errors on message
+        $data[ActivityNavigationConditionsManager::MESSAGE_LABEL] .= ob_get_contents() ;
+        ob_get_clean();
+        return new ApiResponse($data);
     }
 
     /**
