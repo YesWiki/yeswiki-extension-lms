@@ -207,6 +207,16 @@ class ExtraActivityLog implements \JsonSerializable
         }
     }
 
+    public function getCourse(): Course
+    {
+        return $this->course;
+    }
+
+    public function getModule(): ?Module
+    {
+        return $this->module;
+    }
+
     public function jsonSerialize()
     {
         return array_merge(
