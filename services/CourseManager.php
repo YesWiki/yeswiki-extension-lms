@@ -7,6 +7,7 @@ use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiService;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
+use YesWiki\Lms\CourseStructure;
 use YesWiki\Lms\Learner;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Module;
@@ -354,5 +355,28 @@ class CourseManager
             }
         }
         return $parents;
+    }
+
+    
+    /** getNextActivityOrModule
+     * @param Course $course
+     * @param Module $module
+     * @param Activity $activity
+     * @return CourseStructure next activity or module
+     */
+    public function getNextActivityOrModule(Course $course, Module $module, Activity $activity): ?CourseStructure
+    {
+        if ($activity->getTag() == $module->getLastActivityTag()) {
+            if ($module->getTag() != $course->getLastModuleTag()) {
+                return $course->getNextModule($module->getTag());
+                // if the current page is the last activity of the module and the module is not the last one,
+                // the next link is to the next module entry
+                // (no next button is showed for the last activity of the last module)
+            }
+        } else {
+            // otherwise, the current activity is not the last of the module and the next link is set to the next activity
+            return $module->getNextActivity($activity->getTag());
+        }
+        return null;
     }
 }
