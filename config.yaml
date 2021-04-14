@@ -11,6 +11,7 @@ parameters:
     activity_form_id: 1201
     module_form_id: 1202
     course_form_id: 1203
+    attendance_sheet_form_id: 1204
     use_yeswiki_comments: false
     # maximum size for both width and height to render the module images in the course entry
     module_image_size_in_course: 400
