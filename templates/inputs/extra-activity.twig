@@ -60,3 +60,15 @@
     'name': _t('BAZ_DRAG_n_DROP_CHECKBOX_LIST') ~ _t('LMS_EXTRA_ACTIVITY_D') ~ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS')
     }) }}
 <input type="hidden" id="{{field.propertyName ~ '_tag'}}" name="{{field.propertyName ~ '_tag'}}" value="{{ extraActivityLog.tag }}">
+{% if extraActivityLog %}
+  {# init bf_titre from  extraActivityLog.title #}
+  <script>
+    function initExtraactivityTitle(){
+        let inputTitle = document.querySelector('#formulaire input#bf_titre');
+        if (inputTitle){
+            inputTitle.value = '{{ extraActivityLog.title }}';
+        }
+    }
+    initExtraactivityTitle();
+  </script>
+{% endif %}
