@@ -136,6 +136,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_YES' => 'Oui',
         'LMS_NO' => 'Non',
         'LMS_BACK_TO_PROGRESSES_DASHBOARD' => 'Retour au tableau de bord',
+        'LMS_EXTRA_ACTIVITY_SIGNATURE' => 'Signature',
 
         // QUIZ
         'LMS_QUIZ_RESULTS' => 'Résultats',
