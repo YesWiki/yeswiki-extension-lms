@@ -41,7 +41,28 @@ class ExtraActivityField extends BazarField
     // Render the show view of the field
     protected function renderStatic($entry)
     {
-        return null ;// $this->render("@lms/fields/extra-activity.twig", []);
+        $value = $this->getValue($entry);
+        if (!empty($value)) {
+            if ($extraActivityLog = $this->extraActivityManager->getExtraActivityLog($value)) {
+                $courseTag = $extraActivityLog->getCourse()->getTag();
+                $module = $extraActivityLog->getModule() ;
+                
+                $learner = $this->learnerManager->getLearner();
+                if ($learner && $learner->isAdmin()) {
+                    $learners = [] ;
+                    foreach ($extraActivityLog->getRegisteredLearnerNames() as $userName) {
+                        if ($extractedLearner = $this->learnerManager->getLearner($userName)) {
+                            $learners[$extractedLearner->getUserName()] = $extractedLearner;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return ($extraActivityLog) ? $this->render("@lms/fields/extra-activity.twig", [
+            'extraActivityLog' => $extraActivityLog ,
+            'learners' => $learners ?? null,
+        ]):null;
     }
 
     protected function renderInput($entry)

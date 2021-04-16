@@ -1,0 +1,59 @@
+{% from "@lms/datetime-macros.twig" import displayDate,displayTime %}
+{{ include('@bazar/fields/date.twig', {'field': {
+        'propertyName': field.propertyName ~ '_bf_date_debut_evenement',
+        'label':  _t('LMS_EXTRA_ACTIVITY_BEGIN_DATE'),
+        'type': 'date'
+        },        
+    'value': displayDate(extraActivityLog.date),
+    }) }}
+{{ include('@bazar/fields/text.twig', {'field': {
+        'propertyName': field.propertyName ~ '_duration',
+        'label':  _t('LMS_DASHBOARD_ELAPSEDTIME'),
+        'type': 'text'
+        },        
+    'value': displayTime(extraActivityLog.elapsedTime),
+    }) }}
+{% if extraActivityLog.course %}
+    {{ include('@bazar/fields/text.twig',{'field': {
+        'propertyName': field.propertyName ~ '_course',
+        'name': field.propertyName ~ '_course',
+        'type':'text',
+        'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_COURSE')
+        },
+        'value': extraActivityLog.course.title}) }}
+{% endif %}
+{% if extraActivityLog.module %}
+    {{ include('@bazar/fields/text.twig',{'field': {
+        'propertyName': field.propertyName ~ '_module',
+        'name': field.propertyName ~ '_module',
+        'type':'text',
+        'label':  _t('LMS_EXTRA_ACTIVITY_ASSOCIATED_MODULE')
+        },
+        'value': extraActivityLog.module.title}) }}
+{% endif %}
+{% if learners %}
+    {{ include_javascript('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.js') }}
+    {{ include_javascript('tools/templates/libs/vendor/datatables/jquery.dataTables.min.js') }}
+    {{ include_css('tools/templates/libs/vendor/datatables/dataTables.bootstrap.min.css') }}
+
+    <h3>{{ _t('LMS_EXTRA_ACTIVITY_REGISTERED_LEARNERS') }}</h3>
+
+    <div class="table-responsive">
+    <table id="existing-forms-table" class="bazar-table table table-condensed table-striped">
+        <thead>
+        <tr>
+            <th>{{ _t('LMS_EXTRA_ACTIVITY_LEARNERS') }}</th>
+            <th>{{ _t('LMS_EXTRA_ACTIVITY_SIGNATURE') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for username, fullname in learners %}
+            <tr>
+                <td>{{ include('@lms/progress-dashboard-user.twig',{course:extraActivityLog.course}) }}</a></td>
+                <td style="height:100px;"></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div> <!-- /.table-responsive -->
+{% endif %}
