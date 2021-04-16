@@ -24,7 +24,7 @@
                    href="{{ url({tag:'BazaR',params:{
                     vue:'saisir',action:'saisir_fiche',
                     id:'1204',bf_extraactivity:extraActivityLog.tag}}) }}"
-                    title=""><i class="fas fa-file-signature"></i></a>
+                    title="{{ _t('LMS_EXTRA_ACTIVITY_CREATE_ATTENDANCE_SHEET') }}"><i class="fas fa-file-signature"></i></a>
             {% endif %}
             {{ include('@lms/extra-activity-link.twig', {mode:'delete'}) }}
         </div>
