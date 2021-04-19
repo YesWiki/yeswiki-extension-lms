@@ -207,7 +207,7 @@ class ImportManager
 
         if ($err) {
             unlink($to);
-            throw new \Exception($output._t('LMS_ERROR_DOWNLOADING').' '.$filename.': '.$err."\n"._t('LMS_REMOVING_CORRUPTED_FILE').' '.$filename);
+            throw new \Exception($output._t('LMS_ERROR_DOWNLOADING').' '.$from.': '.$err."\n"._t('LMS_REMOVING_CORRUPTED_FILE').' '.$to);
         }
         return $output;
     }
