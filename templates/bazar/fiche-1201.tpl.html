@@ -48,7 +48,8 @@ $learner = $learnerManager->getLearner();
                 (
                     $module
                     && ($activity = $module->getActivity($fiche['id_fiche']))
-                    && $activity->isAccessibleBy($learner, $course, $module)
+                    && (($learner && $activity->isAccessibleBy($learner, $course, $module))
+                        || (!$learner && $courseController->activitiesCanBeDisplayedWithoutContext()))
                 )) {
                 $title = '';
                 if ($GLOBALS['wiki']->config['lms_config']['display_activity_title'] && !empty($html['bf_titre'])) {
