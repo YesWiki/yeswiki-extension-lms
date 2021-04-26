@@ -51,6 +51,7 @@ class CourseManager
         $this->moduleFormId = $this->config['lms_config']['module_form_id'];
         $this->courseFormId = $this->config['lms_config']['course_form_id'];
         $this->coursesCache = [];
+        $this->conditionsEnabled = $this->config['lms_config']['activity_navigation_conditions_enabled'] ?? false ;
     }
 
     /**
@@ -260,20 +261,11 @@ class CourseManager
     }
 
     /**
-     * check if conditions are enabled (need at least one course or module scripted)
+     * return if conditions are enabled
      * @return bool
      */
     public function isConditionsEnabled(): bool
     {
-        if (is_null($this->conditionsEnabled)) {
-            $this->conditionsEnabled = false ;
-            foreach ($this->getAllCourses() as $course) {
-                if ($course->isActivityScripted() || $course->isModuleScripted()) {
-                    $this->conditionsEnabled = true ;
-                    return true ;
-                }
-            }
-        }
         return $this->conditionsEnabled;
     }
     /**

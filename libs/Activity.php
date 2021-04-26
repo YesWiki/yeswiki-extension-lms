@@ -57,7 +57,7 @@ class Activity extends CourseStructure
      */
     public function isAccessibleBy(?Learner $learner, Course $course, Module $module): bool
     {
-        return ($learner && $learner->isAdmin()) || ($module->getStatus($course) == ModuleStatus::OPEN
-            && ($learner && $this->canBeOpenedBy($learner)));
+        return ($learner && ($learner->isAdmin() || $this->canBeOpenedBy($learner)))
+            || ($module->getStatus($course) == ModuleStatus::OPEN);
     }
 }
