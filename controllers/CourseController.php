@@ -44,6 +44,7 @@ class CourseController extends YesWikiController
         $this->learnerManager = $learnerManager;
         $this->dateManager = $dateManager;
         $this->config = $config->all();
+        $this->activitiesCanBeDisplayedWithoutContext = $this->config['lms_config']['show_activities_without_context_or_learner'] ?? true;
     }
 
     /**
@@ -248,19 +249,6 @@ class CourseController extends YesWikiController
      */
     public function activitiesCanBeDisplayedWithoutContext():bool
     {
-        if (is_null($this->activitiesCanBeDisplayedWithoutContext)) {
-            $this->activitiesCanBeDisplayedWithoutContext = true ;
-            if (!(isset($this->config['lms_config']['show_activities_without_context_when_scripted'])
-                && $this->config['lms_config']['show_activities_without_context_when_scripted'])) {
-            
-                // true by default except if one course is scripted (module or activity)
-                foreach ($this->courseManager->getAllCourses() as $course) {
-                    if ($course->isActivityScripted() || $course->isModuleScripted()) {
-                        $this->activitiesCanBeDisplayedWithoutContext = false ;
-                    }
-                }
-            }
-        }
         return $this->activitiesCanBeDisplayedWithoutContext;
     }
 }
