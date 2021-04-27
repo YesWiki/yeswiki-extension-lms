@@ -275,9 +275,9 @@ class CourseManager
      * @param Learner $learner
      * @param Course $course
      * @param Module $module
-     * @return string tag of the activity
+     * @return string|null tag of the activity
      */
-    public function getLastAccessibleActivityTagForLearner(Learner $learner, Course $course, Module $module):string
+    public function getLastAccessibleActivityTagForLearner(Learner $learner, Course $course, Module $module)
     {
         $openableActivities = [];
         foreach ($module->getActivities() as $activity) {
@@ -294,7 +294,7 @@ class CourseManager
                 break;
             }
         }
-        return isset($lastOpenedActivity) ? $openableActivity->getTag() : $module->getFirstActivityTag() ;
+        return isset($lastOpenedActivity) ? $lastOpenedActivity->getTag() : $module->getFirstActivityTag() ;
     }
 
     /**
