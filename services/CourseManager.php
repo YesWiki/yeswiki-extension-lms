@@ -157,6 +157,7 @@ class CourseManager
      */
     public function checkModuleCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, bool $checkConditions= true): ?bool
     {
+        $checkConditions = (!$this->isConditionsEnabled()) ? false : $checkConditions; // TODO really needed ?
         return !$course->isModuleScripted() //no constraint
             || !($previousModule = $course->getPreviousModule($module->getTag())) // or scripted but no previous module
             || (
@@ -218,6 +219,7 @@ class CourseManager
         if (is_null($this->activityNavigationConditionsManager)) {
             $this->activityNavigationConditionsManager = $this->wiki->services->get(ActivityNavigationConditionsManager::class);
         }
+        $checkConditions = (!$this->isConditionsEnabled()) ? false : $checkConditions;
         return (
                 !$course->isModuleScripted() //no constraint
                 || (
