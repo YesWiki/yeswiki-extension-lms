@@ -6,7 +6,7 @@
             <i class="fa fa-chevron-up"></i><i class="fa fa-chevron-down"></i>
             {{ activity.title }}
             <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_ACTIVITY_PREVIEW') }}"
-               href="{{ url({tag: activity.tag}) }}">
+               href="{{ url({tag: activity.tag,params: {course: course.tag,module:module.tag}}) }}">
                 <i class="fas fa-eye"></i>
             </a>
             {% if activitiesStat[activity.tag].hasQuizResults %}

@@ -9,7 +9,7 @@
                 {{ module.title }}
             </a>
             <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_MODULE_PREVIEW') }}"
-               href="{{ url({tag: module.tag}) }}">
+               href="{{ url({tag: module.tag,params: {course: course.tag}}) }}">
                 <i class="fas fa-eye"></i>
             </a>
             {% if modulesStat[module.tag].hasQuizResults %}
