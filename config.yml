@@ -22,7 +22,7 @@ parameters:
     # if true, the extra activities can be added to the courses
     extra_activity_enabled: false
     # show activities without context when one course is scripted (false = to be sure no activity is readable)
-    show_activities_without_context_when_scripted: true
+    show_activities_without_context: true
     # activate navigation conditions to check if user is allowed to view next activity
     activity_navigation_conditions_enabled: false
 
