@@ -37,6 +37,12 @@
 #YesWikiModal .lms-container .lms-menu {
     display: none;
 }
+/* to hide the navigations buttons in preview mode */
+#YesWikiModal .modal-body .id1201 .lms-container .lms-activity-content nav,
+#YesWikiModal .modal-body .id1202 nav.module-nav
+{
+    display: none;
+}
 
 /* remove the info bar below the entry, but keep for admins */
 .lms-container ~ .BAZ_fiche_info {
