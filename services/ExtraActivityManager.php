@@ -103,7 +103,7 @@ class ExtraActivityManager
         $date=$this->getDateFromData('bf_date_debut_evenement', $data);
         $endDate=$this->getDateFromData('bf_date_fin_evenement', $data);
         if (isset($data['bf_date_fin_evenement_allday']) && $data['bf_date_fin_evenement_allday'] == 1) {
-            $endDate->add(new \DateInterval('P1D')) ;
+            $endDate->add(1, 'days') ;
         }
         $elapsedTime = $date->diffAsCarbonInterval($endDate, false) ;
         $elapsedTime->invert = false; // to have only positive without warning
