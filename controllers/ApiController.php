@@ -6,7 +6,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\QuizManager;
-use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
+use YesWiki\Lms\Service\ConditionsChecker;
 
 class ApiController extends YesWikiController
 {
@@ -294,7 +294,7 @@ class ApiController extends YesWikiController
     {
         /* start buffer for api */
         ob_start();
-        $result = $this->getService(ActivityNavigationConditionsManager::class)
+        $result = $this->getService(ConditionsChecker::class)
             ->checkActivityNavigationConditions($courseId, $moduleId, $activityId);
 
         // error + fetch trigger_errors on message
@@ -413,12 +413,12 @@ class ApiController extends YesWikiController
         $output .= '<br />The following code :<br />';
         $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
         $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
-        $output .= '<code>['.ActivityNavigationConditionsManager::STATUS_LABEL.':STATUS_CODE,<br />';
-        $output .= ActivityNavigationConditionsManager::URL_LABEL.':null|"https://...",<br />';
-        $output .= ActivityNavigationConditionsManager::MESSAGE_LABEL.':"html code"]</code><br />';
-        $output .= 'STATUS_CODE: '.ActivityNavigationConditionsManager::STATUS_CODE_OK.' = OK; ';
-        $output .= ActivityNavigationConditionsManager::STATUS_CODE_ERROR.' = ERROR; ';
-        $output .= ActivityNavigationConditionsManager::STATUS_CODE_NOT_OK.' = NOT OK; <br />';
+        $output .= '<code>['.ConditionsChecker::STATUS_LABEL.':STATUS_CODE,<br />';
+        $output .= ConditionsChecker::URL_LABEL.':null|"https://...",<br />';
+        $output .= ConditionsChecker::MESSAGE_LABEL.':"html code"]</code><br />';
+        $output .= 'STATUS_CODE: '.ConditionsChecker::STATUS_CODE_OK.' = OK; ';
+        $output .= ConditionsChecker::STATUS_CODE_ERROR.' = ERROR; ';
+        $output .= ConditionsChecker::STATUS_CODE_NOT_OK.' = NOT OK; <br />';
         return $output;
     }
 }

@@ -10,7 +10,7 @@ use YesWiki\Lms\Activity;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
+use YesWiki\Lms\Service\ConditionsChecker;
 
 /**
  * @Field({"navigationactivite","activitynavigation"})
@@ -40,7 +40,7 @@ class ActivityNavigationField extends LmsField
     protected $config;
     protected $entryManager;
     protected $dateManager;
-    protected $ActivityNavigationConditionsManager;
+    protected $ConditionsChecker;
     protected $moduleModal;
     protected $courseManager;
 
@@ -57,7 +57,7 @@ class ActivityNavigationField extends LmsField
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         $this->courseManager = $services->get(CourseManager::class);
-        $this->ActivityNavigationConditionsManager = $services->get(ActivityNavigationConditionsManager::class);
+        $this->ConditionsChecker = $services->get(ConditionsChecker::class);
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
@@ -121,7 +121,7 @@ class ActivityNavigationField extends LmsField
             
             // check conditions
             if ($this->courseManager->isConditionsEnabled()) {
-                $conditionsResults = $this->ActivityNavigationConditionsManager
+                $conditionsResults = $this->ConditionsChecker
                     ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
                 if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsResults->getErrorStatus()) {
                     trigger_error($conditionsResults->getFormattedMessages());

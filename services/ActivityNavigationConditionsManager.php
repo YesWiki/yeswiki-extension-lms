@@ -10,14 +10,14 @@ use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
-use YesWiki\Lms\ActivityNavigationConditionsManagerResult;
+use YesWiki\Lms\ConditionsState;
 use YesWiki\Lms\Field\ActivityNavigationField;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Lms\Service\QuizManager;
 use YesWiki\Wiki;
 
-class ActivityNavigationConditionsManager
+class ConditionsChecker
 {
     protected $courseManager;
     protected $learnerManager;
@@ -64,7 +64,7 @@ class ActivityNavigationConditionsManager
      * @param mixed $conditions, when called from field to avoid infinite loop
      * @param bool $checkStatus
      * @param CourseStructure|null $nextCourseStructure
-     * @return ActivityNavigationConditionsManagerResult
+     * @return ConditionsState
      */
     public function checkActivityNavigationConditions(
         $course,
@@ -73,12 +73,12 @@ class ActivityNavigationConditionsManager
         $conditions = [],
         bool $checkStatus = true,
         ?CourseStructure $nextCourseStructure = null
-    ): ActivityNavigationConditionsManagerResult {
+    ): ConditionsState {
         /* check params */
         try {
             $data = $this->checkParams($course, $module, $activity, $conditions);
         } catch (\Throwable $th) {
-            $result = new ActivityNavigationConditionsManagerResult();
+            $result = new ConditionsState();
             $result->setError();
             $result->addMessage($th->getMessage());
             return $result;
@@ -89,7 +89,7 @@ class ActivityNavigationConditionsManager
             try {
                 $data = $this->getConditions($data);
             } catch (\Throwable $th) {
-                $result = new ActivityNavigationConditionsManagerResult();
+                $result = new ConditionsState();
                 $result->setError();
                 $result->addMessage($th->getMessage());
                 return $result;
@@ -267,11 +267,11 @@ class ActivityNavigationConditionsManager
     /**
      * check conditions
      * @param array $data
-     * @return ActivityNavigationConditionsManagerResult
+     * @return ConditionsState
      */
-    private function checkConditions(array $data): ActivityNavigationConditionsManagerResult
+    private function checkConditions(array $data): ConditionsState
     {
-        $result = new ActivityNavigationConditionsManagerResult();
+        $result = new ConditionsState();
         if (!empty($data['conditions'])) {
             foreach ($data['conditions'] as $condition) {
                 switch ($condition['condition']) {
@@ -306,10 +306,10 @@ class ActivityNavigationConditionsManager
 
     /** checkReactionNeeded
      * @param array $data
-     * @param ActivityNavigationConditionsManagerResult $result
-     * @return ActivityNavigationConditionsManagerResult
+     * @param ConditionsState $result
+     * @return ConditionsState
      */
-    private function checkReactionNeeded(array $data, ActivityNavigationConditionsManagerResult $result): ActivityNavigationConditionsManagerResult
+    private function checkReactionNeeded(array $data, ConditionsState $result): ConditionsState
     {
         // get Reactions
         $reactions = $data['learner'] ? getUserReactionOnPage($data['activity']->getTag(), $data['learner']->getUserName()) : null;
@@ -324,11 +324,11 @@ class ActivityNavigationConditionsManager
     
     /** checkQuizPassed
      * @param array $data
-     * @param ActivityNavigationConditionsManagerResult $result
+     * @param ConditionsState $result
      * @param string $quizId
-     * @return ActivityNavigationConditionsManagerResult
+     * @return ConditionsState
      */
-    private function checkQuizPassed(array $data, ActivityNavigationConditionsManagerResult $result, string $quizId): ActivityNavigationConditionsManagerResult
+    private function checkQuizPassed(array $data, ConditionsState $result, string $quizId): ConditionsState
     {
         // get quizResults
         $quizResults = $this->quizManager->getQuizResults(
@@ -360,12 +360,12 @@ class ActivityNavigationConditionsManager
 
     /** checkQuizPassedMinimumLevel
      * @param array $data
-     * @param ActivityNavigationConditionsManagerResult $result
+     * @param ConditionsState $result
      * @param string $quizId
      * @param string $QuizMinimumLevel
-     * @return ActivityNavigationConditionsManagerResult
+     * @return ConditionsState
      */
-    private function checkQuizPassedMinimumLevel(array $data, ActivityNavigationConditionsManagerResult $result, string $quizId, string $QuizMinimumLevel): ActivityNavigationConditionsManagerResult
+    private function checkQuizPassedMinimumLevel(array $data, ConditionsState $result, string $quizId, string $QuizMinimumLevel): ConditionsState
     {
         // get quizResults
         $quizResults = $this->quizManager->getQuizResults(
@@ -416,11 +416,11 @@ class ActivityNavigationConditionsManager
 
     /** checkFormFilled
      * @param array $data
-     * @param ActivityNavigationConditionsManagerResult $result
+     * @param ConditionsState $result
      * @param array $formId
-     * @return ActivityNavigationConditionsManagerResult
+     * @return ConditionsState
      */
-    private function checkFormFilled(array $data, ActivityNavigationConditionsManagerResult $result, string $formId): ActivityNavigationConditionsManagerResult
+    private function checkFormFilled(array $data, ConditionsState $result, string $formId): ConditionsState
     {
         // get entries
         $entries = $this->entryManager->search([
@@ -438,11 +438,11 @@ class ActivityNavigationConditionsManager
 
     /** checkStatus
      * @param array $data
-     * @param ActivityNavigationConditionsManagerResult $result
+     * @param ConditionsState $result
      * @param CourseStructure $nextCourseStructure
-     * @return ActivityNavigationConditionsManagerResult
+     * @return ConditionsState
      */
-    private function checkStatus(array $data, ActivityNavigationConditionsManagerResult $result, CourseStructure $nextCourseStructure): ActivityNavigationConditionsManagerResult
+    private function checkStatus(array $data, ConditionsState $result, CourseStructure $nextCourseStructure): ConditionsState
     {
         if (!empty($data['activity'])) {
             if ($nextCourseStructure instanceof Module) {

@@ -217,7 +217,7 @@ class CourseManager
     public function checkActivityCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, Activity $activity, bool $checkConditions= true): ?bool
     {
         // can not be loaded in construct because creating loop
-        $activityNavigationConditionsManager = $this->wiki->services->get(ActivityNavigationConditionsManager::class);
+        $conditionsChecker = $this->wiki->services->get(ConditionsChecker::class);
         
         $checkConditions = (!$this->isConditionsEnabled()) ? false : $checkConditions;
         return (
@@ -234,7 +234,7 @@ class CourseManager
                     $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner) // previous activity should be opened
                     && (
                         !$checkConditions ? true
-                        : $activityNavigationConditionsManager
+                        : $conditionsChecker
                             ->passActivityNavigationConditions($course, $module, $previousActivity, $activity)
                     )
                 )

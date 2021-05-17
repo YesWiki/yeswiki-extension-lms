@@ -2,7 +2,7 @@
 
 namespace YesWiki\Lms;
 
-class ActivityNavigationConditionsManagerResult implements \JsonSerializable
+class ConditionsState implements \JsonSerializable
 {
     protected $status;
     protected $errorStatus;
