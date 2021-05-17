@@ -97,53 +97,10 @@ class ActivityNavigationConditionsManager
         }
 
         /* clean $data['conditions'] */
-        $data['conditions'] = array_filter($data['conditions'], function ($item) use ($data) {
-            return isset($item['condition']) && (
-                !isset($item['scope']) || !is_array($item['scope']) || (
-                    !empty(array_filter(
-                        $item['scope'],
-                        function ($scope_item) use ($data) {
-                            return isset($scope_item['course']) && $scope_item['course'] == $data['course']->getTag() &&
-                                (!isset($scope_item['module'])||(
-                                    $scope_item['module'] == $data['module']->getTag()
-                                ));
-                        }
-                    ))
-                )
-            );
-        });
+        $data = $this->cleanConditions($data);
         
         /* check conditions */
-        $result = new ActivityNavigationConditionsManagerResult();
-        if (!empty($data['conditions'])) {
-            foreach ($data['conditions'] as $condition) {
-                switch ($condition['condition']) {
-                    case ActivityNavigationField::LABEL_REACTION_NEEDED:
-                        $result = $this->checkReactionNeeded($data, $result);
-                        break;
-                    case ActivityNavigationField::LABEL_QUIZ_PASSED:
-                        $result = $this->checkQuizPassed($data, $result, $condition[ActivityNavigationField::LABEL_QUIZ_ID]);
-                        break;
-                    case ActivityNavigationField::LABEL_QUIZ_PASSED_MINIMUM_LEVEL:
-                        $result = $this->checkQuizPassedMinimumLevel(
-                            $data,
-                            $result,
-                            $condition[ActivityNavigationField::LABEL_QUIZ_ID],
-                            $condition[ActivityNavigationField::LABEL_QUIZ_MINIMUM_LEVEL]
-                        );
-                        break;
-                    case ActivityNavigationField::LABEL_FORM_FILLED:
-                        $result = $this->checkFormFilled($data, $result, $condition[ActivityNavigationField::LABEL_FORM_ID]);
-                        break;
-                    default:
-                        // unknown condition
-                        $result->setError();
-                        $result->addMessage('condition:\''.$condition['condition'].'\' is unknown  in activity: \''.
-                            $data['activity']->getTag().'\'!');
-                        break;
-                }
-            }
-        }
+        $result = $this->checkConditions($data);
         
         if ($result->getStatus()) {
             if (is_null($nextCourseStructure)) {
@@ -280,6 +237,71 @@ class ActivityNavigationConditionsManager
         $data['conditions'] = (isset($propertyName)) ? ($data['activity']->getField($propertyName) ?? []):[];
         $data['conditions'] = !is_array($data['conditions']) ? [] : $data['conditions'];
         return $data;
+    }
+
+    /**
+     * clean conditions
+     * @param array $data
+     * @return array $data
+     */
+    private function cleanConditions(array $data): array
+    {
+        $data['conditions'] = array_filter($data['conditions'], function ($item) use ($data) {
+            return isset($item['condition']) && (
+                !isset($item['scope']) || !is_array($item['scope']) || (
+                    !empty(array_filter(
+                        $item['scope'],
+                        function ($scope_item) use ($data) {
+                            return isset($scope_item['course']) && $scope_item['course'] == $data['course']->getTag() &&
+                                (!isset($scope_item['module'])||(
+                                    $scope_item['module'] == $data['module']->getTag()
+                                ));
+                        }
+                    ))
+                )
+            );
+        });
+        return $data;
+    }
+
+    /**
+     * check conditions
+     * @param array $data
+     * @return ActivityNavigationConditionsManagerResult
+     */
+    private function checkConditions(array $data): ActivityNavigationConditionsManagerResult
+    {
+        $result = new ActivityNavigationConditionsManagerResult();
+        if (!empty($data['conditions'])) {
+            foreach ($data['conditions'] as $condition) {
+                switch ($condition['condition']) {
+                    case ActivityNavigationField::LABEL_REACTION_NEEDED:
+                        $result = $this->checkReactionNeeded($data, $result);
+                        break;
+                    case ActivityNavigationField::LABEL_QUIZ_PASSED:
+                        $result = $this->checkQuizPassed($data, $result, $condition[ActivityNavigationField::LABEL_QUIZ_ID]);
+                        break;
+                    case ActivityNavigationField::LABEL_QUIZ_PASSED_MINIMUM_LEVEL:
+                        $result = $this->checkQuizPassedMinimumLevel(
+                            $data,
+                            $result,
+                            $condition[ActivityNavigationField::LABEL_QUIZ_ID],
+                            $condition[ActivityNavigationField::LABEL_QUIZ_MINIMUM_LEVEL]
+                        );
+                        break;
+                    case ActivityNavigationField::LABEL_FORM_FILLED:
+                        $result = $this->checkFormFilled($data, $result, $condition[ActivityNavigationField::LABEL_FORM_ID]);
+                        break;
+                    default:
+                        // unknown condition
+                        $result->setError();
+                        $result->addMessage('condition:\''.$condition['condition'].'\' is unknown  in activity: \''.
+                            $data['activity']->getTag().'\'!');
+                        break;
+                }
+            }
+        }
+        return $result;
     }
 
     /** checkReactionNeeded
