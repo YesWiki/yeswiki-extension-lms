@@ -23,7 +23,6 @@ class CourseManager
     protected $moduleFormId;
     protected $courseFormId;
     protected $learnerManager;
-    protected $activityNavigationConditionsManager;
     protected $coursesCache ;
     protected $conditionsEnabled ;
 
@@ -217,9 +216,9 @@ class CourseManager
      */
     public function checkActivityCanBeOpenedByLearner(Learner $learner, Course $course, Module $module, Activity $activity, bool $checkConditions= true): ?bool
     {
-        if (is_null($this->activityNavigationConditionsManager)) {
-            $this->activityNavigationConditionsManager = $this->wiki->services->get(ActivityNavigationConditionsManager::class);
-        }
+        // can not be loaded in construct because creating loop
+        $activityNavigationConditionsManager = $this->wiki->services->get(ActivityNavigationConditionsManager::class);
+        
         $checkConditions = (!$this->isConditionsEnabled()) ? false : $checkConditions;
         return (
                 !$course->isModuleScripted() //no constraint
@@ -235,7 +234,7 @@ class CourseManager
                     $this->learnerManager->hasBeenOpenedBy($course, $module, $previousActivity, $learner) // previous activity should be opened
                     && (
                         !$checkConditions ? true
-                        : $this->activityNavigationConditionsManager
+                        : $activityNavigationConditionsManager
                             ->passActivityNavigationConditions($course, $module, $previousActivity, $activity)
                     )
                 )
