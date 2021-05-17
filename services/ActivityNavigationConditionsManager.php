@@ -10,6 +10,7 @@ use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
+use YesWiki\Lms\ActivityNavigationConditionsManagerResult;
 use YesWiki\Lms\Field\ActivityNavigationField;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
@@ -18,14 +19,6 @@ use YesWiki\Wiki;
 
 class ActivityNavigationConditionsManager
 {
-    public const STATUS_LABEL = 'status';
-    public const URL_LABEL = 'url';
-    public const MESSAGE_LABEL = 'message';
-    public const STATUS_CODE_OK =  0 ;
-    public const STATUS_CODE_ERROR =  1 ;
-    public const STATUS_CODE_NOT_OK =  2 ;
-    public const STATUS_CODE_OK_REACTIONS_NEEDED =  3 ;
-
     protected $courseManager;
     protected $learnerManager;
     protected $quizManager;
@@ -71,7 +64,7 @@ class ActivityNavigationConditionsManager
      * @param mixed $conditions, when called from field to avoid infinite loop
      * @param bool $checkStatus
      * @param CourseStructure|null $nextCourseStructure
-     * @return [self::STATUS_LABEL => true|false,self::URL_LABEL => "https://...",self::MESSAGE_LABEL => <html for meesage>]
+     * @return ActivityNavigationConditionsManagerResult
      */
     public function checkActivityNavigationConditions(
         $course,
@@ -80,21 +73,26 @@ class ActivityNavigationConditionsManager
         $conditions = [],
         bool $checkStatus = true,
         ?CourseStructure $nextCourseStructure = null
-    ): array {
+    ): ActivityNavigationConditionsManagerResult {
         /* check params */
-        $data = $this->checkParams($course, $module, $activity, $conditions);
-        if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
-            // error
-            return $data;
+        try {
+            $data = $this->checkParams($course, $module, $activity, $conditions);
+        } catch (\Throwable $th) {
+            $result = new ActivityNavigationConditionsManagerResult();
+            $result->setError();
+            $result->addMessage($th->getMessage());
+            return $result;
         }
-        unset($data[self::STATUS_LABEL]);
 
         /* get $conditions */
         if (empty($data['conditions'])) {
-            $data = $this->getConditions($data);
-            if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
-                // error
-                return $data;
+            try {
+                $data = $this->getConditions($data);
+            } catch (\Throwable $th) {
+                $result = new ActivityNavigationConditionsManagerResult();
+                $result->setError();
+                $result->addMessage($th->getMessage());
+                return $result;
             }
         }
 
@@ -116,11 +114,7 @@ class ActivityNavigationConditionsManager
         });
         
         /* check conditions */
-        $result = [
-            self::STATUS_LABEL => self::STATUS_CODE_OK,
-            self::URL_LABEL => '',
-            self::MESSAGE_LABEL => '<ul>'
-        ];
+        $result = new ActivityNavigationConditionsManagerResult();
         if (!empty($data['conditions'])) {
             foreach ($data['conditions'] as $condition) {
                 switch ($condition['condition']) {
@@ -143,42 +137,41 @@ class ActivityNavigationConditionsManager
                         break;
                     default:
                         // unknown condition
-                        $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
-                        $result[self::MESSAGE_LABEL] .= '<li>condition:\''.$condition['condition'].'\' is unknown  in activity: \''.
-                            $data['activity']->getTag().'\'!</li>';
+                        $result->setError();
+                        $result->addMessage('condition:\''.$condition['condition'].'\' is unknown  in activity: \''.
+                            $data['activity']->getTag().'\'!');
                         break;
                 }
             }
         }
         
-        if (in_array($result[self::STATUS_LABEL], [self::STATUS_CODE_OK,self::STATUS_CODE_OK_REACTIONS_NEEDED])) {
+        if ($result->getStatus()) {
             if (is_null($nextCourseStructure)) {
                 $nextCourseStructure = $this->courseManager->getNextActivityOrModule($data['course'], $data['module'], $data['activity']);
             }
             /* check status if all is OK*/
             if (!$nextCourseStructure) {
-                $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
-                $result[self::MESSAGE_LABEL] .= '<li>Next activity or module not found in getNextActivityOrModule() for activity: \''.
-                    $data['activity']->getTag().'\'!</li>';
+                $result->setError();
+                $result->addMessage('Next activity or module not found in getNextActivityOrModule() for activity: \''.
+                    $data['activity']->getTag().'\'!');
             } else {
                 if ($checkStatus && !$data['learner']->isAdmin()) {
                     $result = $this->checkStatus($data, $result, $nextCourseStructure);
                 }
-                if (in_array($result[self::STATUS_LABEL], [self::STATUS_CODE_OK,self::STATUS_CODE_OK_REACTIONS_NEEDED])) {
-                    $result[self::URL_LABEL] = $this->wiki->Href(
+                if ($result->getStatus()) {
+                    $result->setURL($this->wiki->Href(
                         '',
                         $nextCourseStructure->getTag(),
                         ['course' => $data['course']->getTag()]+
                             (($nextCourseStructure instanceof Activity)
                                 ?['module' => $data['module']->getTag()]:[]),
                         false
-                    );
+                    ));
                 }
             }
         }
-        $result[self::MESSAGE_LABEL] .= '</ul>';
 
-        return $result;
+        return $result ;
     }
 
     /**
@@ -196,14 +189,14 @@ class ActivityNavigationConditionsManager
         $activity,
         ?CourseStructure $nextCourseStructure = null
     ):bool {
-        return in_array($this->checkActivityNavigationConditions(
+        return $this->checkActivityNavigationConditions(
             $course,
             $module,
             $activity,
             [],
             false,
             $nextCourseStructure
-        )[self::STATUS_LABEL], [self::STATUS_CODE_OK,self::STATUS_CODE_OK_REACTIONS_NEEDED]);
+        )->getStatus();
     }
 
     /** checks params
@@ -211,57 +204,46 @@ class ActivityNavigationConditionsManager
      * @param mixed $module, $module object or moduletag or null
      * @param mixed $activity, $activity object or activitytag or null
      * @param mixed $conditions, when called from field to avoid infinite loop
-     * @return [] [self::STATUS_LABEL=>0(OK)/1(error)/2(NOT OK),'course'=>$course,'module=>$module,'activity'=>$activity]
+     * @return [] ['course'=>$course,'module=>$module,'activity'=>$activity]
      */
     private function checkParams($course, $module, $activity, $conditions):array
     {
         if (!$course) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{course} should be defined !'];
+            throw new \Error('{course} should be defined !');
         }
         if (!($course instanceof Course) && !$course = $this->courseManager->getCourse(strval($course))) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{course} should be a course or a course\'s tag !'];
+            throw new \Error('{course} should be a course or a course\'s tag !');
         }
 
         if (!$module) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{module} should be defined !'];
+            throw new \Error('{module} should be defined !');
         }
         if ($module instanceof Module) {
             if (!$course->hasModule($module->getTag())) {
-                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                    self::MESSAGE_LABEL => '{module} \''.$module->getTag().'\' is not a module of the {course} \''.$course->getTag().'\' !'];
+                throw new \Error('{module} \''.$module->getTag().'\' is not a module of the {course} \''.$course->getTag().'\' !');
             }
         } elseif (!$module = $this->courseManager->getModule(strval($module))) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{module} should be a module or a module\'s tag !'];
+            throw new \Error('{module} should be a module or a module\'s tag !');
         } elseif (!$course->hasModule($module->getTag())) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{module} \''.$module->getTag().'\' is not a module of the {course} \''.$course->getTag().'\' !'];
+            throw new \Error('{module} \''.$module->getTag().'\' is not a module of the {course} \''.$course->getTag().'\' !');
         }
 
         if (!$activity) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{activity} should be defined !'];
+            throw new \Error('{activity} should be defined !');
         }
 
         if ($activity instanceof Activity) {
             if (!$module->hasActivity($activity->getTag())) {
-                return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                    self::MESSAGE_LABEL => '{activity} \''.$activity->getTag().'\' is not an activity of the {module} \''.$module->getTag().'\' !'];
+                throw new \Error('{activity} \''.$activity->getTag().'\' is not an activity of the {module} \''.$module->getTag().'\' !');
             }
         } elseif (!$activity = $this->courseManager->getActivity(strval($activity))) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{activity} should be an activity or an activity\'s tag !'];
+            throw new \Error('{activity} should be an activity or an activity\'s tag !');
         } elseif (!$module->hasActivity($activity->getTag())) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => '{activity} \''.$activity->getTag().'\' is not an activity of the {module} \''.$module->getTag().'\' !'];
+            throw new \Error('{activity} \''.$activity->getTag().'\' is not an activity of the {module} \''.$module->getTag().'\' !');
         }
 
         if (!$currentLearner = $this->learnerManager->getLearner()) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => 'You should be connected to check conditions !'];
+            throw new \Error('You should be connected to check conditions !');
         }
 
         if (!is_array($conditions)) {
@@ -269,7 +251,6 @@ class ActivityNavigationConditionsManager
         }
 
         return [
-            self::STATUS_LABEL => self::STATUS_CODE_OK,
             'course' => $course,
             'module' => $module,
             'activity' => $activity,
@@ -286,8 +267,7 @@ class ActivityNavigationConditionsManager
     {
         $formId = $data['activity']->getField('id_typeannonce');
         if (!$form = $this->formManager->getOne($formId)) {
-            return [self::STATUS_LABEL => self::STATUS_CODE_ERROR,
-                self::MESSAGE_LABEL => 'Not possible to get form from $activity[\'id_typeannone\'] for \''.$activity->getTag().'\' !'];
+            throw new \Error('Not possible to get form from $activity[\'id_typeannone\'] for \''.$activity->getTag().'\' !');
         }
 
         /* search ActivityNavigationField's propertyNmame */
@@ -299,33 +279,34 @@ class ActivityNavigationConditionsManager
         }
         $data['conditions'] = (isset($propertyName)) ? ($data['activity']->getField($propertyName) ?? []):[];
         $data['conditions'] = !is_array($data['conditions']) ? [] : $data['conditions'];
-
-        $data[self::STATUS_LABEL] = self::STATUS_CODE_OK ;
         return $data;
     }
 
     /** checkReactionNeeded
      * @param array $data
-     * @param array $result
-     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     * @param ActivityNavigationConditionsManagerResult $result
+     * @return ActivityNavigationConditionsManagerResult
      */
-    private function checkReactionNeeded(array $data, array $result): array
+    private function checkReactionNeeded(array $data, ActivityNavigationConditionsManagerResult $result): ActivityNavigationConditionsManagerResult
     {
         // get Reactions
         $reactions = $data['learner'] ? getUserReactionOnPage($data['activity']->getTag(), $data['learner']->getUserName()) : null;
-        $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-            ((empty($reactions))? self::STATUS_CODE_NOT_OK : self::STATUS_CODE_OK_REACTIONS_NEEDED) : $result[self::STATUS_LABEL];
-        $result[self::MESSAGE_LABEL] .= (empty($reactions))? '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP').'</li>':'';
+        if (empty($reactions)) {
+            $result->setNotOk();
+            $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP'));
+        } else {
+            $result->setReactionsNeeded();
+        }
         return $result;
     }
     
     /** checkQuizPassed
      * @param array $data
-     * @param array $result
+     * @param ActivityNavigationConditionsManagerResult $result
      * @param string $quizId
-     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     * @return ActivityNavigationConditionsManagerResult
      */
-    private function checkQuizPassed(array $data, array $result, string $quizId): array
+    private function checkQuizPassed(array $data, ActivityNavigationConditionsManagerResult $result, string $quizId): ActivityNavigationConditionsManagerResult
     {
         // get quizResults
         $quizResults = $this->quizManager->getQuizResults(
@@ -339,16 +320,17 @@ class ActivityNavigationConditionsManager
             case QuizManager::STATUS_CODE_OK:
                 break;
             case QuizManager::STATUS_CODE_NO_RESULT:
-                $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                    self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                    $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
-                        ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
-                        : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).'</li>';
+                $result->setNotOk();
+                $result->addMessage(
+                    !empty($quizId)
+                    ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
+                    : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')
+                );
                 break;
             case QuizManager::STATUS_CODE_ERROR:
             default:
-                $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
-                $result[self::MESSAGE_LABEL] .= $quizResults[QuizManager::MESSAGE_LABEL];
+                $result->setError();
+                $result->addMessage($quizResults[QuizManager::MESSAGE_LABEL]);
                 break;
         }
         return $result;
@@ -356,12 +338,12 @@ class ActivityNavigationConditionsManager
 
     /** checkQuizPassedMinimumLevel
      * @param array $data
-     * @param array $result
+     * @param ActivityNavigationConditionsManagerResult $result
      * @param string $quizId
      * @param string $QuizMinimumLevel
-     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     * @return ActivityNavigationConditionsManagerResult
      */
-    private function checkQuizPassedMinimumLevel(array $data, array $result, string $quizId, string $QuizMinimumLevel): array
+    private function checkQuizPassedMinimumLevel(array $data, ActivityNavigationConditionsManagerResult $result, string $quizId, string $QuizMinimumLevel): ActivityNavigationConditionsManagerResult
     {
         // get quizResults
         $quizResults = $this->quizManager->getQuizResults(
@@ -381,26 +363,30 @@ class ActivityNavigationConditionsManager
                     }
                 }
                 if (!$levelPassed) {
-                    $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                        self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                    $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
-                        ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
-                        : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).
-                        _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP').' '.$QuizMinimumLevel.' %'.
-                        '</li>';
+                    $result->setNotOk();
+                    $result->addMessage(
+                        (
+                            !empty($quizId)
+                            ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
+                            : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')
+                        )._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP').' '.$QuizMinimumLevel.' %'
+                    );
                 }
                 break;
             case QuizManager::STATUS_CODE_NO_RESULT:
-                $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                    self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                $result[self::MESSAGE_LABEL] .= '<li>'. (!empty($quizId)
-                    ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
-                    : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')).'</li>';
+                $result->setNotOk();
+                $result->addMessage(
+                    (
+                        !empty($quizId)
+                        ? _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP').' \''.$quizId.'\''
+                        : _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY')
+                    )
+                );
                 break;
             case QuizManager::STATUS_CODE_ERROR:
             default:
-                $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR;
-                $result[self::MESSAGE_LABEL] .= $quizResults[QuizManager::MESSAGE_LABEL];
+                $result->setError();
+                $result->addMessage($quizResults[QuizManager::MESSAGE_LABEL]);
                 break;
         }
         return $result;
@@ -408,11 +394,11 @@ class ActivityNavigationConditionsManager
 
     /** checkFormFilled
      * @param array $data
-     * @param array $result
+     * @param ActivityNavigationConditionsManagerResult $result
      * @param array $formId
-     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     * @return ActivityNavigationConditionsManagerResult
      */
-    private function checkFormFilled(array $data, array $result, string $formId): array
+    private function checkFormFilled(array $data, ActivityNavigationConditionsManagerResult $result, string $formId): ActivityNavigationConditionsManagerResult
     {
         // get entries
         $entries = $this->entryManager->search([
@@ -421,53 +407,48 @@ class ActivityNavigationConditionsManager
         ]);
         if (empty($entries)) {
             $form = $this->formManager->getOne($formId);
-            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-            $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP')
-                    .' \''.(!empty($form)?$form['bn_label_nature']:$formId).'\'</li>';
+            $result->setNotOk();
+            $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP')
+                    .' \''.(!empty($form)?$form['bn_label_nature']:$formId).'\'');
         }
         return $result;
     }
 
     /** checkStatus
      * @param array $data
-     * @param array $result
+     * @param ActivityNavigationConditionsManagerResult $result
      * @param CourseStructure $nextCourseStructure
-     * @return array [self::STATUS_LABEL => status,self::MESSAGE_LABEL => '...']
+     * @return ActivityNavigationConditionsManagerResult
      */
-    private function checkStatus(array $data, array $result, CourseStructure $nextCourseStructure): array
+    private function checkStatus(array $data, ActivityNavigationConditionsManagerResult $result, CourseStructure $nextCourseStructure): ActivityNavigationConditionsManagerResult
     {
         if (!empty($data['activity'])) {
             if ($nextCourseStructure instanceof Module) {
                 if (!$this->courseManager->checkModuleCanBeOpenedByLearner($data['learner'], $data['course'], $nextCourseStructure, false)) {
                     switch ($nextCourseStructure->getStatus($data['course'])) {
                         case ModuleStatus::CLOSED:
-                            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                                 self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                            $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_CLOSED').'</li>';
+                            $result->setNotOk();
+                            $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_CLOSED'));
                             break;
                         case ModuleStatus::TO_BE_OPEN:
-                            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                                 self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                            $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN').'</li>';
+                            $result->setNotOk();
+                            $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN'));
                             break;
                         case ModuleStatus::NOT_ACCESSIBLE:
                         case ModuleStatus::OPEN:
-                            $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                                 self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                            $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE').'</li>';
+                            $result->setNotOk();
+                            $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE'));
                             break;
                         default:
-                            $result[self::STATUS_LABEL] = self::STATUS_CODE_ERROR ;
-                            $result[self::MESSAGE_LABEL] .= '<li>The module status \''.$nextCourseStructure->getStatus($data['course']).'\' is not defined !</li>';
+                            $result->setError();
+                            $result->addMessage('The module status \''.$nextCourseStructure->getStatus($data['course']).'\' is not defined !');
                             break;
                     }
                 }
             } elseif ($nextCourseStructure instanceof Activity) {
                 if (!$this->courseManager->checkActivityCanBeOpenedByLearner($data['learner'], $data['course'], $data['module'], $nextCourseStructure, false)) {
-                    $result[self::STATUS_LABEL] = ($result[self::STATUS_LABEL] != self::STATUS_CODE_ERROR) ?
-                            self::STATUS_CODE_NOT_OK : self::STATUS_CODE_ERROR ;
-                    $result[self::MESSAGE_LABEL] .= '<li>'._t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE').'</li>';
+                    $result->setNotOk();
+                    $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE'));
                 }
             }
         }

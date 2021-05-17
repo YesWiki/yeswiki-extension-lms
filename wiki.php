@@ -26,3 +26,4 @@ require_once LMS_PATH . 'libs/TimeLogs.php'; // to require before following line
 require_once LMS_PATH . 'libs/ExtraActivityLog.php';
 require_once LMS_PATH . 'libs/ExtraActivityLogs.php';
 require_once LMS_PATH . 'libs/Progresses.php';
+require_once LMS_PATH . 'libs/ActivityNavigationConditionsManagerResult.php';

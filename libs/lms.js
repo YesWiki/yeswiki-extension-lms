@@ -279,19 +279,23 @@ function checkActivityNavigationConditionsRun(elem,courseTag, moduleTag, activit
   let url = checkActivityNavigationConditionsURL + '' + courseTag + '/' + moduleTag + '/' + activityTag ;
   $.get(url,function (data,status){
       if (status != 'success'){
-          checkActivityNavigationConditionsError(elem,'Error when calling url: '+url);
+          let message = 'Error when calling url: '+url;
+          if (data.formattedMessages != undefined){
+            message += ';'+data.formattedMessages ;
+          }
+          checkActivityNavigationConditionsError(elem,message);
       } else if (data.status == undefined )  {
           checkActivityNavigationConditionsError(elem,'No status in result calling url: '+url+', data:'+JSON.stringify(data));
-      } else if (data.status == 0) {
+      } else if (data.status) {
+          if (data.reactionsNeeded){
+            // reaction needed block remove
+            blockReactionRemove = true;
+          }
           checkActivityNavigationConditionsRight(elem,data.url);
-      } else if (data.status == 2) {
-          checkActivityNavigationConditionsWrong(elem,data.message);
-      } else if (data.status == 3) {
-          // reaction needed block remove
-          blockReactionRemove = true;
-          checkActivityNavigationConditionsRight(elem,data.url);
+      } else if (!data.errorStatus) {
+          checkActivityNavigationConditionsWrong(elem,data.formattedMessages);
       } else {
-          checkActivityNavigationConditionsError(elem,'Error when calling url: '+url+';'+data.message);
+          checkActivityNavigationConditionsError(elem,'Error when calling url: '+url+';'+data.formattedMessages);
       }
   });
 }

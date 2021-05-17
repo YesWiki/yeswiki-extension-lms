@@ -121,16 +121,10 @@ class ActivityNavigationField extends LmsField
             
             // check conditions
             if ($this->courseManager->isConditionsEnabled()) {
-                $conditions = $this->ActivityNavigationConditionsManager
+                $conditionsResults = $this->ActivityNavigationConditionsManager
                     ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
-                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? ActivityNavigationConditionsManager:: STATUS_CODE_ERROR;
-                if ($conditionsStatus == ActivityNavigationConditionsManager::STATUS_CODE_OK_REACTIONS_NEEDED) {
-                    $conditionsStatus = ActivityNavigationConditionsManager::STATUS_CODE_OK;
-                    $reactionNeeded = true ;
-                }
-                $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
-                if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsStatus == ActivityNavigationConditionsManager:: STATUS_CODE_ERROR) {
-                    trigger_error($conditionsMessage);
+                if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsResults->getErrorStatus()) {
+                    trigger_error($conditionsResults->getFormattedMessages());
                 }
             }
 
@@ -142,9 +136,7 @@ class ActivityNavigationField extends LmsField
                 'nextModule' => $nextModule ?? null,
                 'nextActivity' => $nextActivity ?? null,
                 'conditionsEnabled' => $this->courseManager->isConditionsEnabled(),
-                'conditionsStatus' => $conditionsStatus ?? false,
-                'conditionsMessage' => $conditionsMessage ?? null,
-                'reactionNeeded' => $reactionNeeded ?? false,
+                'conditionsResults' => $conditionsResults ?? null,
             ]);
         }
         return $output;

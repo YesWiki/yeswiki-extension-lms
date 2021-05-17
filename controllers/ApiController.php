@@ -330,13 +330,20 @@ class ApiController extends YesWikiController
     {
         /* start buffer for api */
         ob_start();
-        $data = $this->getService(ActivityNavigationConditionsManager::class)
+        $result = $this->getService(ActivityNavigationConditionsManager::class)
             ->checkActivityNavigationConditions($courseId, $moduleId, $activityId);
 
         // error + fetch trigger_errors on message
-        $data[ActivityNavigationConditionsManager::MESSAGE_LABEL] .= ob_get_contents() ;
+        $triggerErrorsMessage .= ob_get_contents() ;
         ob_get_clean();
-        return new ApiResponse($data);
+        if (!empty($triggerErrorsMessage)) {
+            $result->addMessage($triggerErrorsMessage);
+        }
+
+        $code = ($result->getErrorStatus())
+            ? 400 // Not OK
+            : 200; //OK
+        return new ApiResponse(['code'=>$code]+$result->jsonSerialize(), $code);
     }
 
     /**
