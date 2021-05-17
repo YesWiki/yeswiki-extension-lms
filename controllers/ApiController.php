@@ -17,10 +17,16 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults($userId, $courseId, $moduleId, $activityId, $quizId)
+        $result = $this->getService(QuizManager::class)
+                ->getQuizResults($userId, $courseId, $moduleId, $activityId, $quizId);
+        $code = ($result[QuizManager::STATUS_LABEL] == QuizManager::STATUS_CODE_OK)
+        ? 200 // OK
+        : (
+            ($result[QuizManager::STATUS_LABEL] == QuizManager::STATUS_CODE_ERROR)
+            ? 500 // server error
+            : 400 // no result
         );
+        return new ApiResponse(['code' => $code]+$result, $code);
     }
 
     /**
@@ -29,10 +35,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAUserAndAnActivity($userId, $courseId, $moduleId, $activityId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults($userId, $courseId, $moduleId, $activityId, null)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, null);
     }
     
     /**
@@ -41,10 +44,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAUserAndAModule($userId, $courseId, $moduleId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults($userId, $courseId, $moduleId, null, null)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, null, null);
     }
     
     /**
@@ -53,10 +53,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAUserAndACourse($userId, $courseId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults($userId, $courseId, null, null, null)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz($userId, $courseId, null, null, null);
     }
     
     /**
@@ -65,9 +62,12 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAUser($userId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults($userId, $_GET['course'] ?? null, $_GET['module'] ??  null, $_GET['activity'] ?? null, null)
+        return $this->getQuizResultsForAUserAndAQuiz(
+            $userId,
+            $_GET['course'] ?? null,
+            $_GET['module'] ??  null,
+            $_GET['activity'] ?? null,
+            null
         );
     }
 
@@ -77,10 +77,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAQuiz($courseId, $moduleId, $activityId, $quizId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults(null, $courseId, $moduleId, $activityId, $quizId)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, $quizId);
     }
     
     /**
@@ -89,10 +86,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAnActivity($courseId, $moduleId, $activityId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults(null, $courseId, $moduleId, $activityId, null)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, null);
     }
     
     /**
@@ -101,10 +95,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForAModule($courseId, $moduleId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults(null, $courseId, $moduleId, null, null)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, null, null);
     }
 
     /**
@@ -113,10 +104,7 @@ class ApiController extends YesWikiController
      */
     public function getQuizResultsForACourse($courseId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults(null, $courseId, null, null, null)
-        );
+        return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, null, null, null);
     }
 
     /**
@@ -125,9 +113,12 @@ class ApiController extends YesWikiController
      */
     public function getQuizResults()
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->getQuizResults(null, $_GET['course'] ?? null, $_GET['module'] ??  null, $_GET['activity'] ?? null, null)
+        return $this->getQuizResultsForAUserAndAQuiz(
+            null,
+            $_GET['course'] ?? null,
+            $_GET['module'] ??  null,
+            $_GET['activity'] ?? null,
+            null
         );
     }
     
@@ -140,17 +131,20 @@ class ApiController extends YesWikiController
     public function saveQuizResultForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
     {
         /* check $_POST */
-        if (empty($_POST[QuizManager::RESULT_LABEL])) {
+        if (!isset($_POST[QuizManager::RESULT_LABEL])) {
             return new ApiResponse(
                 [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
                 QuizManager::MESSAGE_LABEL => 'you must define $_POST[\''.QuizManager::RESULT_LABEL.'\']']
             );
         }
 
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->saveQuizResultForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId, floatval($_POST['result']))
-        );
+        $result = $this->getService(QuizManager::class)
+                    ->saveQuizResultForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId, floatval($_POST['result']));
+        $code = ($result[QuizManager::STATUS_LABEL] == QuizManager::STATUS_CODE_OK)
+            ? 200 // OK
+            : 400 // bad request or error
+            ;
+        return new ApiResponse(['code' => $code]+$result, $code);
     }
 
     /**
@@ -162,36 +156,27 @@ class ApiController extends YesWikiController
     public function saveQuizResultForAUserAndAQuizByPost($userId, $quizId)
     {
         /* check $_POST */
-        if (empty($_POST[QuizManager::RESULT_LABEL])) {
-            return new ApiResponse(
-                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
-                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\''.QuizManager::RESULT_LABEL.'\']']
-            );
-        }
-        if (empty($_POST['course'])) {
-            return new ApiResponse(
-                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
-                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\'course\']']
-            );
-        }
-        
-        if (empty($_POST['module'])) {
-            return new ApiResponse(
-                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
-                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\'module\']']
-            );
-        }
-        
-        if (empty($_POST['activity'])) {
-            return new ApiResponse(
-                [QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
-                QuizManager::MESSAGE_LABEL => 'you must define $_POST[\'activity\']']
-            );
+        foreach ([QuizManager::RESULT_LABEL,'course','module','activity'] as $key) {
+            if (!isset($_POST[$key])) {
+                $code= 400;
+                return new ApiResponse(
+                    [
+                        'code' => $code,
+                        QuizManager::STATUS_LABEL => QuizManager::STATUS_CODE_ERROR,
+                        QuizManager::MESSAGE_LABEL => 'you must define $_POST[\''.$key.'\']'
+                    ],
+                    $code
+                );
+            }
         }
 
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->saveQuizResultForAUserAndAQuiz($userId, $_POST['course'], $_POST['module'], $_POST['activity'], $quizId, floatval($_POST[QuizManager::RESULT_LABEL]))
+        return $this->saveQuizResultForAUserAndAQuiz(
+            $userId,
+            $_POST['course'],
+            $_POST['module'],
+            $_POST['activity'],
+            $quizId,
+            floatval($_POST[QuizManager::RESULT_LABEL])
         );
     }
     
@@ -212,10 +197,16 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, $quizId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults($userId, $courseId, $moduleId, $activityId, $quizId)
-        );
+        $result = $this->getService(QuizManager::class)
+                ->deleteQuizResults($userId, $courseId, $moduleId, $activityId, $quizId);
+        $code = ($result[QuizManager::STATUS_LABEL] == QuizManager::STATUS_CODE_OK)
+            ? 200 // OK
+            : (
+                ($result[QuizManager::STATUS_LABEL] == QuizManager::STATUS_CODE_ERROR)
+                ? 500 // server error
+                : 400 // no result
+            );
+        return new ApiResponse(['code' => $code]+$result, $code);
     }
 
     /**
@@ -224,10 +215,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAUserAndAnActivity($userId, $courseId, $moduleId, $activityId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults($userId, $courseId, $moduleId, $activityId, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, null);
     }
     /**
      * delete quiz's result for a user and for course, module
@@ -235,10 +223,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAUserAndAModule($userId, $courseId, $moduleId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults($userId, $courseId, $moduleId, null, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, null, null);
     }
     /**
      * delete quiz's result for a user and for course
@@ -246,10 +231,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAUserAndACourse($userId, $courseId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults($userId, $courseId, null, null, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz($userId, $courseId, null, null, null);
     }
     /**
      * delete quiz's result for a user
@@ -257,10 +239,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAUser($userId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults($userId, null, null, null, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz($userId, null, null, null, null);
     }
 
     /**
@@ -269,10 +248,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAQuiz($courseId, $moduleId, $activityId, $quizId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults(null, $courseId, $moduleId, $activityId, $quizId)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, $quizId);
     }
 
     /**
@@ -281,10 +257,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAnActivity($courseId, $moduleId, $activityId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults(null, $courseId, $moduleId, $activityId, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, null);
     }
 
     /**
@@ -293,10 +266,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForAModule($courseId, $moduleId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults(null, $courseId, $moduleId, null, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, null, null);
     }
 
     /**
@@ -305,10 +275,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResultsForACourse($courseId)
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults(null, $courseId, null, null, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz(null, $courseId, null, null, null);
     }
 
     /**
@@ -317,10 +284,7 @@ class ApiController extends YesWikiController
      */
     public function deleteQuizResults()
     {
-        return new ApiResponse(
-            $this->getService(QuizManager::class)
-                ->deleteQuizResults(null, null, null, null, null)
-        );
+        return $this->deleteQuizResultsForAUserAndAQuiz(null, null, null, null, null);
     }
 
     /**
