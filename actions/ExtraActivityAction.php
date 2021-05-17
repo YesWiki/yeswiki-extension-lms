@@ -98,15 +98,22 @@ class ExtraActivityAction extends YesWikiAction
         foreach ($course->getModules() as $module) {
             $modules[$module->getTag()] = $module->getTitle();
         }
+
+        // the progresses we are going to process
+        $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
+        $learners = [];
+        foreach ($this->progresses->getAllUsernames() as $username) {
+            $currentLearner = $this->learnerManager->getLearner($username) ;
+            $learners[$username] = $currentLearner->getFullName();
+        }
+
         return $this->render(
             '@lms/extra-activity-form.twig',
             array_merge([
                 'course' => $course,
                 'module' => $this->arguments['module'],
                 'modules' => $modules,
-                'learners' => array_map(function ($learner) {
-                    return $learner->getFullName() ;
-                }, $this->arguments['learners']),
+                'learners' => $learners,
                 'debug' => isset($_GET['debug']),
             ], $params)
         );

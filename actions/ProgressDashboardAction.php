@@ -73,10 +73,8 @@ class ProgressDashboardAction extends YesWikiAction
         }
 
         /* * Switch to extra activity if needed */
-        /* before costly method getProgressesForAllLearners if not add or not save */
         if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
                 && isset($_REQUEST['extra_activity_mode'])
-                && !in_array($_REQUEST['extra_activity_mode'], ['add','edit'])
                 && $message = $this->callAction('extraactivity', $this->arguments)
             ) {
             return $message ;
@@ -87,20 +85,6 @@ class ProgressDashboardAction extends YesWikiAction
         $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
         // the learners for this course, we count all users which have already a progress
         $this->setLearnersFromUsernames($this->progresses->getAllUsernames());
-        
-        /* * Switch to extra activity if needed */
-        /* aftert costly method getProgressesForAllLearners for add or save */
-        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
-                && isset($_REQUEST['extra_activity_mode'])
-                && in_array($_REQUEST['extra_activity_mode'], ['add','edit'])
-                && $message = $this->callAction(
-                    'extraactivity',
-                    $this->arguments+['learners' => $this->learners]
-                )
-            ) {
-            return $message ;
-        }
-        /* *************************** */
 
         // check if a GET module parameter is defined
         $moduleParam = isset($_GET['module']) ? $_GET['module'] : null;
