@@ -48,19 +48,15 @@ class ModuleNavigationField extends LmsField
             $learner = $this->learnerManager->getLearner();
             // set canBeOpenedBy from course's module
             if ($learner
-                && ($referenceModule = $course->getModule($currentModuleTag)) // module in course
-                && !is_null($this->courseManager->setModuleCanBeOpenedByLearner(
-                    $learner,
-                    $course,
-                    $referenceModule
-                )) // set Module Can be opened
-                && !is_null($module->canBeOpenedBy($learner, $referenceModule->canBeOpenedBy($learner)))
                 && $module->isAccessibleBy($learner, $course)) {
                 // save the activity progress if not already exists for this user and activity
                 $this->learnerManager->saveModuleProgress($course, $module);
-            }
+
+            // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
 
             $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
+            
+            // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
             $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
             $nextActivityTag = $tmpData['tag'];
             $labelStart = $tmpData['label'];

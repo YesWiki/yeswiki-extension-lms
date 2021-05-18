@@ -86,20 +86,6 @@ class ActivityNavigationField extends LmsField
         if ($course && $module && !empty($module->getActivities())) {
             $learner = $this->learnerManager->getLearner();
             if ($learner
-                && $this->courseManager->setModuleCanBeOpenedByLearner(
-                    $learner,
-                    $course,
-                    $module
-                ) // module should be accessible
-                && ($referenceActivity = $module->getActivity($activity->getTag()))
-                 // activity should be in module
-                && !is_null($this->courseManager->setActivityCanBeOpenedByLearner(
-                    $learner,
-                    $course,
-                    $module,
-                    $referenceActivity
-                )) // set Activity Can be opened
-                && !is_null($activity->canBeOpenedBy($learner, $referenceActivity->canBeOpenedBy($learner)))
                 && $activity->isAccessibleBy($learner, $course, $module)
             ) {
                 // save the activity progress if not already exists for this user and activity

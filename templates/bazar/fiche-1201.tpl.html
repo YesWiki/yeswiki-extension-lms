@@ -39,18 +39,8 @@ $learner = $learnerManager->getLearner();
             $course = $courseController->getContextualCourse();
             // the consulted module entry to display the current activity
             $module = $courseController->getContextualModule($course);
-            if (($learner && $learner->isAdmin()
-                ) ||
-                (
-                    (!$course || !$module)
-                    && $courseController->activitiesCanBeDisplayedWithoutContext()
-                ) || 
-                (
-                    $module
-                    && ($activity = $module->getActivity($fiche['id_fiche']))
-                    && (($learner && $activity->isAccessibleBy($learner, $course, $module))
-                        || (!$learner && $courseController->activitiesCanBeDisplayedWithoutContext()))
-                )) {
+
+            if (!$course || !$module || $module->isAccessibleBy($learner, $course)) {
                 $title = '';
                 if ($GLOBALS['wiki']->config['lms_config']['display_activity_title'] && !empty($html['bf_titre'])) {
                     if (isset($fiche['bf_titre_affiche'])  && !empty(trim($fiche['bf_titre_affiche']))){

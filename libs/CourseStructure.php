@@ -20,11 +20,7 @@ abstract class CourseStructure
     protected $entryManager;
     // manager used to format dates
     protected $dateManager;
-    // list of learners who have opened
-    protected $learnersWhoHaveOpened ;
-    // list of learners who can open
-    protected $learnersWhoCanOpen ;
-    
+
     /**
      * CourseStructure constructor
      * @param array $config the configuration parameters of YesWiki
@@ -50,8 +46,6 @@ abstract class CourseStructure
         $this->entryManager = $entryManager;
         $this->dateManager = $dateManager;
         $this->extraActivityLogs = new ExtraActivityLogs() ;
-        $this->learnersWhoHaveOpened = [];
-        $this->learnersWhoCanOpen = [];
     }
 
     /**
@@ -117,36 +111,5 @@ abstract class CourseStructure
     public function setExtraActivityLogs(ExtraActivityLogs $extraActivityLogs)
     {
         $this->extraActivityLogs = $extraActivityLogs;
-    }
-    
-    /**
-     * check if a learner has opened this CourseStructure
-     * @param Learner $learner
-     * @param bool|null $newValue
-     * @return bool|null
-     */
-    public function hasBeenOpenedBy(Learner $learner, ?bool $newValue = null): ?bool
-    {
-        if (!is_null($newValue)) {
-            $this->learnersWhoHaveOpened[$learner->getUserName()] = $newValue;
-        }
-        return $this->learnersWhoHaveOpened[$learner->getUserName()] ?? null ;
-    }
-
-    /**
-     * check if a learner can open this CourseStructure
-     * @param Learner $learner
-     * @param bool|null $newValue
-     * @return bool|null
-     */
-    public function canBeOpenedBy(Learner $learner, ?bool $newValue = null): ?bool
-    {
-        if (!is_null($newValue)) {
-            $this->learnersWhoCanOpen[$learner->getUserName()] = $newValue;
-        }
-        // if (!isset($this->learnersWhoCanOpen[$learner->getUserName()])) {
-        //     throw new \Exception('learnersWhoCanOpen not defined for '.$learner->getUserName().'!');
-        // }
-        return $this->learnersWhoCanOpen[$learner->getUserName()] ?? null ;
     }
 }

@@ -213,8 +213,7 @@ class Module extends CourseStructure
      */
     public function isAccessibleBy(?Learner $learner, Course $course): bool
     {
-        return ($learner && $learner->isAdmin()) || ($this->getStatus($course) == ModuleStatus::OPEN
-            && (($learner && $this->canBeOpenedBy($learner))|| !$learner));
+        return ($learner && $learner->isAdmin()) || $this->getStatus($course) == ModuleStatus::OPEN;
     }
 
     /**

@@ -22,7 +22,6 @@ class CourseController extends YesWikiController
     protected $learnerManager;
     protected $dateManager;
     protected $config;
-    protected $activitiesCanBeDisplayedWithoutContext;
 
     /**
      * CourseController constructor
@@ -106,21 +105,24 @@ class CourseController extends YesWikiController
 
             if ($moduleTag) {
                 // if the module is specified in the GET parameter, return it if the tag corresponds
-                $module = $course->getModule($moduleTag);
+                $module = $this->courseManager->getModule($moduleTag);
 
-                return ($module && $module->hasActivity($activity->getTag())) ?
+                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($activity->getTag())) ?
                     $module
                     : null;
             } else {
                 // if the current page refers to a module of the course, return it
-                if ($module = $course->getModule($activity->getTag())) {
-                    return $module;
+                $currentModule = $this->courseManager->getModule($activity->getTag());
+                if ($currentModule && $course->hasModule($activity->getTag())) {
+                    return $currentModule;
                 }
 
                 // find in the course modules, the first module which contains the activity
-                foreach ($course->getModules() as $currentModule) {
-                    if ($currentModule->hasActivity($activity->getTag())) {
-                        return $currentModule;
+                if ($course) {
+                    foreach ($course->getModules() as $currentModule) {
+                        if ($currentModule->hasActivity($activity->getTag())) {
+                            return $currentModule;
+                        }
                     }
                 }
             }
@@ -173,6 +175,9 @@ class CourseController extends YesWikiController
                 $imageSize,
                 'fit'
             );
+
+        // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
+
         $learner = $this->learnerManager->getLearner();
         $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
 
