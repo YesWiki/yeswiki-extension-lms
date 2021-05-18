@@ -51,6 +51,7 @@ class ModuleNavigationField extends LmsField
                 && $module->isAccessibleBy($learner, $course)) {
                 // save the activity progress if not already exists for this user and activity
                 $this->learnerManager->saveModuleProgress($course, $module);
+            }
 
             // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
 
@@ -60,6 +61,11 @@ class ModuleNavigationField extends LmsField
             $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
             $nextActivityTag = $tmpData['tag'];
             $labelStart = $tmpData['label'];
+            if (empty($labelStart)) {
+                $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
+                    _t('LMS_BEGIN_ONLY_ADMIN')
+                    : _t('LMS_BEGIN');
+            }
             if ($module->isAccessibleBy($learner, $course)) {
                 $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
             } else {

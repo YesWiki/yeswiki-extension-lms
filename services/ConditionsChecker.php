@@ -112,7 +112,9 @@ class ConditionsChecker
                 $result->addMessage('Next activity or module not found in getNextActivityOrModule() for activity: \''.
                     $data['activity']->getTag().'\'!');
             } else {
-                if ($checkStatus && !$data['learner']->isAdmin()) {
+                if (false) {
+                    // TODO redo check status
+                    // if ($checkStatus && !$data['learner']->isAdmin()) {
                     $result = $this->checkStatus($data, $result, $nextCourseStructure);
                 }
                 if ($result->getStatus()) {
