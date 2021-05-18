@@ -123,7 +123,24 @@ class Learner
      */
     public function canAccessModule(Course $course, Module $module): bool
     {
-        return $this->isAdmin() || $module->getStatus($course) == ModuleStatus::OPEN;
+        return $this->isAdmin() ||
+            (
+                $module->getStatus($course) == ModuleStatus::OPEN
+                &&
+                (
+                    !$course->isModuleScripted() //no constraint
+                    || !($previousModule = $course->getPreviousModule($module->getTag())) // or scripted but no previous module
+                    ||
+                    (
+                        $this->hasOpened($course, $previousModule) // previous module should be opened
+                        && (
+                            !($previousActivity = $previousModule->getLastActivity()) // scripted with empty but opened previous module
+                            || $this->hasOpened($course, $previousModule, $previousActivity)
+                                // or scripted and has started the last Activity of the previous module
+                        )
+                    )
+                )
+            );
     }
 
     /**
