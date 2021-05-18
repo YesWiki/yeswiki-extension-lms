@@ -125,4 +125,16 @@ class Learner
     {
         return $this->isAdmin() || $module->getStatus($course) == ModuleStatus::OPEN;
     }
+
+    /**
+     * check canAccessActivity
+     * @param Course $course
+     * @param Module $module
+     * @param Activity $activity
+     * @return bool
+     */
+    public function canAccessActivity(Course $course, Module $module, Activity $activity): bool
+    {
+        return $this->isAdmin() || $module->getStatus($course) == ModuleStatus::OPEN;
+    }
 }
