@@ -22,7 +22,6 @@ class CourseManager
     protected $activityFormId;
     protected $moduleFormId;
     protected $courseFormId;
-    protected $conditionsEnabled ;
 
     /**
      * CourseManager constructor
@@ -45,7 +44,6 @@ class CourseManager
         $this->activityFormId = $this->config['lms_config']['activity_form_id'];
         $this->moduleFormId = $this->config['lms_config']['module_form_id'];
         $this->courseFormId = $this->config['lms_config']['course_form_id'];
-        $this->conditionsEnabled = $this->config['lms_config']['activity_navigation_conditions_enabled'] ?? false ;
     }
 
     /**
@@ -126,14 +124,6 @@ class CourseManager
         return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
     }
 
-    /**
-     * return if conditions are enabled
-     * @return bool
-     */
-    public function isConditionsEnabled(): bool
-    {
-        return $this->conditionsEnabled;
-    }
     /**
      * getLastAccessibleActivityTagForLearner for a module
      * @param Learner $learner

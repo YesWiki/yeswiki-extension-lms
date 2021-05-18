@@ -25,6 +25,7 @@ class ConditionsChecker
     protected $entryManager;
     protected $formManager;
     protected $wiki;
+    protected $conditionsEnabled ;
 
     /**
      * LearnerManager constructor
@@ -50,6 +51,7 @@ class ConditionsChecker
         $this->learnerManager = $learnerManager;
         $this->quizManager = $quizManager;
         $this->wiki = $wiki;
+        $this->conditionsEnabled = $this->wiki->config['lms_config']['activity_navigation_conditions_enabled'] ?? false ;
 
         // load the lms lib
         require_once LMS_PATH . 'libs/lms.lib.php';
@@ -478,5 +480,15 @@ class ConditionsChecker
         }
         
         return $result;
+    }
+
+    
+    /**
+     * return if conditions are enabled
+     * @return bool
+     */
+    public function isConditionsEnabled(): bool
+    {
+        return $this->conditionsEnabled;
     }
 }
