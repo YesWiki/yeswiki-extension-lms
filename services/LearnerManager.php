@@ -64,9 +64,9 @@ class LearnerManager
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->entryManager, $this->wiki);
+                : new Learner($user['name'], $this->entryManager, $this, $this->wiki);
         }
-        return new Learner($username, $this->entryManager, $this->wiki);
+        return new Learner($username, $this->entryManager, $this, $this->wiki);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool

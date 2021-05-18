@@ -3,6 +3,7 @@
 namespace YesWiki\lms;
 
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
 class Learner
@@ -13,9 +14,13 @@ class Learner
     protected $fullname;
     // the associated user entry if exists
     protected $userEntry;
+    // progresses (lazy loading)
+    protected $progresses;
 
     // the entryManager to get the user entry
     protected $entryManager;
+    // the learnerManager to get the learner's progresses
+    protected $learnerManager;
     // the Wiki service
     protected $wiki;
 
@@ -24,16 +29,20 @@ class Learner
      * A learner always corresponds to a user
      * @param string $username the name of the learner
      * @param EntryManager $entryManager the EntryManager service
+     * @param LearnerManager $learnerManager the LearnerManager service
      * @param Wiki $wiki the Wiki service
      */
     public function __construct(
         string $username,
         EntryManager $entryManager,
+        LearnerManager $learnerManager,
         Wiki $wiki
     ) {
         $this->username = $username;
         $this->entryManager = $entryManager;
+        $this->learnerManager = $learnerManager;
         $this->wiki = $wiki;
+        $this->progresses = null;
     }
 
     public function getUsername(): string
@@ -91,5 +100,18 @@ class Learner
     public function isAdmin(): bool
     {
         return $this->wiki->userIsAdmin($this->username);
+    }
+
+    /**
+     * get Progresses for current learner
+     * @return Progresses
+     */
+    public function getProgresses(): Progresses
+    {
+        // Lazy Loading
+        if (is_null($this->progresses)) {
+            $this->progresses = $this->learnerManager->getAllProgressesForLearner($this);
+        }
+        return $this->progresses;
     }
 }
