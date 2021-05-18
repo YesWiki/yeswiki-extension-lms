@@ -157,11 +157,12 @@ class Learner
      * @param Course $course
      * @param Module $module
      * @param Activity $activity
+     * @param bool $checkConditions parameters used to prevent loop with ConditionChecker
      * @return bool
      */
-    public function canAccessActivity(Course $course, Module $module, Activity $activity): bool
+    public function canAccessActivity(Course $course, Module $module, Activity $activity, bool $checkConditions = true): bool
     {
-        $checkConditions = $this->conditionsChecker->isConditionsEnabled() ;// TODO avoid loop? false : $checkConditions;
+        $checkConditions = (!$this->conditionsChecker->isConditionsEnabled()) ? false : $checkConditions;
         $previousActivity = $module->getPreviousActivity($activity->getTag());
         return $this->isAdmin() ||
             (

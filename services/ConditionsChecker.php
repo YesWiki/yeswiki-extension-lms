@@ -114,9 +114,7 @@ class ConditionsChecker
                 $result->addMessage('Next activity or module not found in getNextActivityOrModule() for activity: \''.
                     $data['activity']->getTag().'\'!');
             } else {
-                if (false) {
-                    // TODO redo check status
-                    // if ($checkStatus && !$data['learner']->isAdmin()) {
+                if ($checkStatus && !$data['learner']->isAdmin()) {
                     $result = $this->checkStatus($data, $result, $nextCourseStructure);
                 }
                 if ($result->getConditionsMet()) {
@@ -450,7 +448,7 @@ class ConditionsChecker
     {
         if (!empty($data['activity'])) {
             if ($nextCourseStructure instanceof Module) {
-                if (!$this->courseManager->checkModuleCanBeOpenedByLearner($data['learner'], $data['course'], $nextCourseStructure, false)) {
+                if (!$data['learner']->canAccessModule($data['course'], $nextCourseStructure)) {
                     switch ($nextCourseStructure->getStatus($data['course'])) {
                         case ModuleStatus::CLOSED:
                             $result->setNotOk();
@@ -472,7 +470,7 @@ class ConditionsChecker
                     }
                 }
             } elseif ($nextCourseStructure instanceof Activity) {
-                if (!$this->courseManager->checkActivityCanBeOpenedByLearner($data['learner'], $data['course'], $data['module'], $nextCourseStructure, false)) {
+                if (!$data['learner']->canAccessModule($data['course'], $data['module'], $nextCourseStructure, false)) {
                     $result->setNotOk();
                     $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE'));
                 }
