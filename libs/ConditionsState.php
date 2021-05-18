@@ -4,7 +4,7 @@ namespace YesWiki\Lms;
 
 class ConditionsState implements \JsonSerializable
 {
-    protected $status;
+    protected $conditionsMet;
     protected $errorStatus;
     protected $reactionsNeeded;
     protected $messages;
@@ -15,7 +15,7 @@ class ConditionsState implements \JsonSerializable
      */
     public function __construct()
     {
-        $this->status = true;
+        $this->conditionsMet = true;
         $this->errorStatus = false;
         $this->reactionsNeeded = false;
         $this->messages = [];
@@ -23,12 +23,12 @@ class ConditionsState implements \JsonSerializable
     }
 
     /**
-     * getStatus
+     * getConditionsMet
      * @return bool
      */
-    public function getStatus(): bool
+    public function getConditionsMet(): bool
     {
-        return $this->status;
+        return $this->conditionsMet;
     }
 
     /**
@@ -55,7 +55,7 @@ class ConditionsState implements \JsonSerializable
     public function setError()
     {
         $this->errorStatus = true;
-        $this->status= false;
+        $this->conditionsMet= false;
     }
 
     /**
@@ -71,7 +71,7 @@ class ConditionsState implements \JsonSerializable
      */
     public function setNotOk()
     {
-        $this->status = false;
+        $this->conditionsMet = false;
     }
     /**
      * set url
@@ -129,7 +129,7 @@ class ConditionsState implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'status' => $this->getStatus(),
+            'conditionsMet' => $this->getConditionsMet(),
             'errorStatus' => $this->getErrorStatus(),
             'reactionsNeeded' => $this->getReactionsNeeded()]
             + ($this->getURL() ? ['url' => $this->getURL()]:[])

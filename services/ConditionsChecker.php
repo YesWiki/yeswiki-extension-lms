@@ -104,7 +104,7 @@ class ConditionsChecker
         /* check conditions */
         $result = $this->checkConditions($data);
         
-        if ($result->getStatus()) {
+        if ($result->getConditionsMet()) {
             if (is_null($nextCourseStructure)) {
                 $nextCourseStructure = $this->courseManager->getNextActivityOrModule($data['course'], $data['module'], $data['activity']);
             }
@@ -119,7 +119,7 @@ class ConditionsChecker
                     // if ($checkStatus && !$data['learner']->isAdmin()) {
                     $result = $this->checkStatus($data, $result, $nextCourseStructure);
                 }
-                if ($result->getStatus()) {
+                if ($result->getConditionsMet()) {
                     $result->setURL($this->wiki->Href(
                         '',
                         $nextCourseStructure->getTag(),
@@ -157,7 +157,7 @@ class ConditionsChecker
             [],
             false,
             $nextCourseStructure
-        )->getStatus();
+        )->getConditionsMet();
     }
 
     /** checks params

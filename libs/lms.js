@@ -284,9 +284,9 @@ function checkActivityNavigationConditionsRun(elem,courseTag, moduleTag, activit
             message += ';'+data.formattedMessages ;
           }
           checkActivityNavigationConditionsError(elem,message);
-      } else if (data.status == undefined )  {
-          checkActivityNavigationConditionsError(elem,'No status in result calling url: '+url+', data:'+JSON.stringify(data));
-      } else if (data.status) {
+      } else if (data.conditionsMet == undefined )  {
+          checkActivityNavigationConditionsError(elem,'No conditionsMet in result calling url: '+url+', data:'+JSON.stringify(data));
+      } else if (data.conditionsMet) {
           if (data.reactionsNeeded){
             // reaction needed block remove
             blockReactionRemove = true;
