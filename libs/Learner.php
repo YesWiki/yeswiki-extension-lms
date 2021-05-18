@@ -137,4 +137,17 @@ class Learner
     {
         return $this->isAdmin() || $module->getStatus($course) == ModuleStatus::OPEN;
     }
+
+    /**
+     * check if an activity or a module has been opened by the learner
+     * @param Course $course
+     * @param Module $module
+     * @param null|Activity $activity
+     * @return bool
+     */
+    public function hasOpened(Course $course, Module $module, Activity $activity = null):bool
+    {
+        $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner($this, $course, $module, $activity);
+        return !empty($progress);
+    }
 }
