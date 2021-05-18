@@ -60,13 +60,15 @@ class LearnerManager
      */
     public function getLearner(string $username = null): ?Learner
     {
+        // load ConditionsChecker not in constructor to prevent loop
+        $conditionsChecker = $this->wiki->services->get(ConditionsChecker::class);
         if (empty($username) || empty($this->userManager->getOneByName($username))) {
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->entryManager, $this, $this->wiki);
+                : new Learner($user['name'], $conditionsChecker, $this->entryManager, $this, $this->wiki);
         }
-        return new Learner($username, $this->entryManager, $this, $this->wiki);
+        return new Learner($username, $conditionsChecker, $this->entryManager, $this, $this->wiki);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool

@@ -3,6 +3,7 @@
 namespace YesWiki\lms;
 
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Lms\Service\ConditionsChecker;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Wiki;
 
@@ -17,6 +18,8 @@ class Learner
     // progresses (lazy loading)
     protected $progresses;
 
+    // the conditionsChecker to check conditions
+    protected $conditionsChecker;
     // the entryManager to get the user entry
     protected $entryManager;
     // the learnerManager to get the learner's progresses
@@ -28,17 +31,20 @@ class Learner
      * Learner constructor
      * A learner always corresponds to a user
      * @param string $username the name of the learner
+     * @param ConditionsChecker $conditionsChecker the ConditionsChecker service
      * @param EntryManager $entryManager the EntryManager service
      * @param LearnerManager $learnerManager the LearnerManager service
      * @param Wiki $wiki the Wiki service
      */
     public function __construct(
         string $username,
+        ConditionsChecker $conditionsChecker,
         EntryManager $entryManager,
         LearnerManager $learnerManager,
         Wiki $wiki
     ) {
         $this->username = $username;
+        $this->conditionsChecker = $conditionsChecker;
         $this->entryManager = $entryManager;
         $this->learnerManager = $learnerManager;
         $this->wiki = $wiki;
@@ -123,18 +129,21 @@ class Learner
      */
     public function canAccessModule(Course $course, Module $module): bool
     {
+        $previousModule = $course->getPreviousModule($module->getTag());
+        $previousActivity = (isset($previousModule)) ? $previousModule->getLastActivity() : null;
+        
         return $this->isAdmin() ||
             (
                 $module->getStatus($course) == ModuleStatus::OPEN
                 &&
                 (
                     !$course->isModuleScripted() //no constraint
-                    || !($previousModule = $course->getPreviousModule($module->getTag())) // or scripted but no previous module
+                    || !$previousModule // or scripted but no previous module
                     ||
                     (
                         $this->hasOpened($course, $previousModule) // previous module should be opened
                         && (
-                            !($previousActivity = $previousModule->getLastActivity()) // scripted with empty but opened previous module
+                            !$previousActivity // scripted with empty but opened previous module
                             || $this->hasOpened($course, $previousModule, $previousActivity)
                                 // or scripted and has started the last Activity of the previous module
                         )
@@ -152,7 +161,34 @@ class Learner
      */
     public function canAccessActivity(Course $course, Module $module, Activity $activity): bool
     {
-        return $this->isAdmin() || $module->getStatus($course) == ModuleStatus::OPEN;
+        $checkConditions = $this->conditionsChecker->isConditionsEnabled() ;// TODO avoid loop? false : $checkConditions;
+        $previousActivity = $module->getPreviousActivity($activity->getTag());
+        return $this->isAdmin() ||
+            (
+                $module->getStatus($course) == ModuleStatus::OPEN
+                &&
+                (
+                    (
+                        !$course->isModuleScripted() //no constraint
+                        || $this->canAccessModule($course, $module) // module accessible if scripted
+                    )
+                    &&
+                    (
+                        !$course->isActivityScripted() //no constraint
+                        || !$previousActivity // or scripted but no previous activity
+                        ||
+                        (
+                            $this->hasOpened($course, $module, $previousActivity) // previous activity should be opened
+                            &&
+                            (
+                                !$checkConditions
+                                || $this->conditionsChecker
+                                    ->passActivityNavigationConditions($course, $module, $previousActivity, $activity)
+                            )
+                        )
+                    )
+                )
+            );
     }
 
     /**
