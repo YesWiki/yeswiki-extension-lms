@@ -114,4 +114,15 @@ class Learner
         }
         return $this->progresses;
     }
+
+    /**
+     * check canAccessModule
+     * @param Course $course
+     * @param Module $module
+     * @return bool
+     */
+    public function canAccessModule(Course $course, Module $module): bool
+    {
+        return $this->isAdmin() || $module->getStatus($course) == ModuleStatus::OPEN;
+    }
 }
