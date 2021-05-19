@@ -37,10 +37,9 @@
 #YesWikiModal .lms-container .lms-menu {
     display: none;
 }
-/* to hide the navigations buttons in preview mode */
+/* to hide the previous/next navigations buttons in preview mode */
 #YesWikiModal .modal-body .id1201 .lms-container .lms-activity-content nav,
-#YesWikiModal .modal-body .id1202 nav.module-nav
-{
+#YesWikiModal .modal-body .id1202 nav.module-nav .pager-lms{
     display: none;
 }
 
