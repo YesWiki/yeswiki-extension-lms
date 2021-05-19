@@ -113,18 +113,6 @@ class CourseManager
     }
 
     /**
-     * check disabled link for module
-     * @param Learner|null $learner
-     * @param Course $course
-     * @param Module $module
-     * @return bool
-     */
-    public function isModuleDisabledLink(?Learner $learner = null, Course $course, Module $module):bool
-    {
-        return !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
-    }
-
-    /**
      * getLastAccessibleActivityTagForLearner for a module
      * @param Learner $learner
      * @param Course $course

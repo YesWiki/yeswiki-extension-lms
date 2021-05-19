@@ -180,7 +180,7 @@ class CourseController extends YesWikiController
         // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
 
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
+        $disabledLink = !$module->isAccessibleBy($learner, $course);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         

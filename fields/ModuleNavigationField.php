@@ -55,7 +55,7 @@ class ModuleNavigationField extends LmsField
 
             // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
 
-            $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
+            $disabledLink = !$module->isAccessibleBy($learner, $course);
             
             // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
             $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
