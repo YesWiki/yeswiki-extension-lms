@@ -64,6 +64,7 @@ class ActivityNavigationField extends LmsField
     }
 
     // Render the show view of the field
+    // TODO check if the current form is an LMS activity form to prevent errors
     protected function renderStatic($entry)
     {
         $currentActivityTag = $this->getCurrentTag($entry);
