@@ -130,7 +130,6 @@ class Learner
     public function canAccessModule(Course $course, Module $module): bool
     {
         $previousModule = $course->getPreviousModule($module->getTag());
-        $previousActivity = (isset($previousModule)) ? $previousModule->getLastActivity() : null;
         
         return $this->isAdmin() ||
             (
@@ -139,15 +138,7 @@ class Learner
                 (
                     !$course->isModuleScripted() //no constraint
                     || !$previousModule // or scripted but no previous module
-                    ||
-                    (
-                        $this->hasOpened($course, $previousModule) // previous module should be opened
-                        && (
-                            !$previousActivity // scripted with empty but opened previous module
-                            || $this->hasOpened($course, $previousModule, $previousActivity)
-                                // or scripted and has started the last Activity of the previous module
-                        )
-                    )
+                    || $this->hasFinishedModule($course, $previousModule)  // previous module should be finished
                 )
             );
     }
@@ -203,5 +194,49 @@ class Learner
     {
         $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner($this, $course, $module, $activity);
         return !empty($progress);
+    }
+
+    /**
+     * check if an activity has been finished by the learner
+     * @param Course $course
+     * @param Module $module
+     * @param Activity $activity
+     * @return bool
+     */
+    public function hasFinishedActivity(Course $course, Module $module, Activity $activity):bool
+    {
+        $userNames = $this->getProgresses()->getUsernamesForFinishedActivity($course, $module, $activity);
+        return in_array($this->getUsername(), $userNames);
+    }
+
+    
+
+    /**
+     * check if a module has been finished by the learner
+     * @param Course $course
+     * @param Module $module
+     * @param bool $checkConditions parameters used to prevent loop with ConditionChecker
+     * @return bool
+     */
+    public function hasFinishedModule(Course $course, Module $module, bool $checkConditions = true):bool
+    {
+        $checkConditions = (!$this->conditionsChecker->isConditionsEnabled()) ? false : $checkConditions;
+        if (!$this->hasOpened($course, $module)) {
+            return false;
+        }
+        $lastActivityTag = $module->getLastActivityTag() ;
+        foreach ($module->getActivities() as $activity) {
+            if ($activity->getTag() != $lastActivityTag) {
+                if (!$this->hasFinishedActivity($course, $module, $activity)) {
+                    return false ;
+                }
+            } elseif ($checkConditions) {
+                // the last activity should not be finihed because the next module has not been opened
+                // so check conditions
+                return $this->conditionsChecker
+                    ->passActivityNavigationConditions($course, $module, $activity);
+            }
+        }
+        return true;
     }
 }
