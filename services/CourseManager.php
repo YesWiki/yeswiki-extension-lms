@@ -130,8 +130,7 @@ class CourseManager
             $openableActivities[] = $activity ;
         }
         foreach ($openableActivities as $openableActivity) {
-            //TODO check has been open
-            if (true) {
+            if ($learner->hasOpened($course, $module, $activity)) {
                 $lastOpenedActivity = $openableActivity;
             } else {
                 break;
@@ -153,8 +152,7 @@ class CourseManager
             $nextActivityTag = $this->getLastAccessibleActivityTagForLearner($learner, $course, $module) ;
             $isFinished = (
                 $module->getLastActivityTag() == $nextActivityTag
-                && ($nextModule = $course->getNextModule($module->getTag()))
-                // && $this->learnerManager->hasBeenOpenedBy($course, $nextModule, null, $learner) TODO
+                && $learner->hasFinishedModule($course, $module)
             );
         }
         $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
