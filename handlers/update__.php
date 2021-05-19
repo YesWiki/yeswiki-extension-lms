@@ -170,14 +170,16 @@ if ($learner && $learner->isAdmin()) {
         COURSE_FORM_DESCRIPTION,
         COURSE_FORM_TEMPLATE
     );
-    // test if the attendance sheet form exists, if not, install it
-    checkAndAddForm(
-        $output,
-        $GLOBALS['wiki']->config['lms_config']['attendance_sheet_form_id'],
-        ATTENDANCE_SHEET_FORM_NAME,
-        ATTENDANCE_SHEET_FORM_DESCRIPTION,
-        ATTENDANCE_SHEET_FORM_TEMPLATE
-    );
+    if ($GLOBALS['wiki']->config['lms_config']['extra_activity_enabled'] ?? false){
+        // test if the attendance sheet form exists, if not, install it
+        checkAndAddForm(
+            $output,
+            $GLOBALS['wiki']->config['lms_config']['attendance_sheet_form_id'],
+            ATTENDANCE_SHEET_FORM_NAME,
+            ATTENDANCE_SHEET_FORM_DESCRIPTION,
+            ATTENDANCE_SHEET_FORM_TEMPLATE
+        );
+    }
 
     // if the PageMenuLms page doesn't exist, create it with a default version
     if (!$this->LoadPage('PageMenuLms')) {
