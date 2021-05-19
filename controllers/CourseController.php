@@ -22,6 +22,7 @@ class CourseController extends YesWikiController
     protected $learnerManager;
     protected $dateManager;
     protected $config;
+    protected $activitiesCanBeDisplayedWithoutContext;
 
     /**
      * CourseController constructor
