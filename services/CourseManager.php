@@ -130,7 +130,7 @@ class CourseManager
             $openableActivities[] = $activity ;
         }
         foreach ($openableActivities as $openableActivity) {
-            if ($learner->hasOpened($course, $module, $activity)) {
+            if ($learner->hasOpened($course, $module, $openableActivity)) {
                 $lastOpenedActivity = $openableActivity;
             } else {
                 break;
