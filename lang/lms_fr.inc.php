@@ -58,7 +58,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
-
+        'LMS_MISSING_COURSE' => 'Il n\'existe encore aucun «&nbsp;Parcours LMS&nbsp;». Veuillez en créer un, puis lui rajouter des «&nbsp;LMS Modules&nbsp;» et «&nbsp;LMS Activités&nbsp;» depuis la page <a href="%s">Base de données</a>.',
         // For Learner Dashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
         'LMS_DASHBOARD_TYPE' => 'Type',

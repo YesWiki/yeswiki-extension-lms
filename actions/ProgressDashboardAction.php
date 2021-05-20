@@ -63,6 +63,13 @@ class ProgressDashboardAction extends YesWikiAction
 
         // the course for which we want to display the dashboard
         $course = $this->courseController->getContextualCourse();
+        if (!$course) {
+            // information msg if no course available
+            return $this->render("@templates/alert-message.twig", [
+                'type' => 'info',
+                'message' => sprintf(_t('LMS_MISSING_COURSE'), $this->wiki->href('', 'BazaR'))
+            ]);
+        }
 
         /* * Switch to extra activity if needed */
         /* before costly method getProgressesForAllLearners if not add or not save */
