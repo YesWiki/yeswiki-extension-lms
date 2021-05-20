@@ -67,7 +67,8 @@ class ProgressDashboardAction extends YesWikiAction
             // information msg if no course available
             return $this->render("@templates/alert-message.twig", [
                 'type' => 'info',
-                'message' => sprintf(_t('LMS_MISSING_COURSE'), $this->wiki->href('', 'BazaR'))
+                'message' => _t('LMS_MISSING_COURSE') . ' ' . '<a href="' . $this->wiki->href('', 'BazaR') .
+                    '">' . _t('LMS_MISSING_COURSE_PAGELINK') . '.'
             ]);
         }
 

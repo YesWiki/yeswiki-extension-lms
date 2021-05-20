@@ -58,7 +58,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
-        'LMS_MISSING_COURSE' => 'Il n\'existe encore aucun «&nbsp;Parcours LMS&nbsp;». Veuillez en créer un, puis lui rajouter des «&nbsp;LMS Modules&nbsp;» et «&nbsp;LMS Activités&nbsp;» depuis la page <a href="%s">Base de données</a>.',
+        'LMS_MISSING_COURSE' => 'Il n\'existe encore aucun « Parcours LMS ». Veuillez en créer un, et lui ajouter des « LMS Modules » et « LMS Activités » depuis la page',
+        'LMS_MISSING_COURSE_PAGELINK' => 'Base de données',
         // For Learner Dashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
         'LMS_DASHBOARD_TYPE' => 'Type',
@@ -148,7 +149,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED' => 'Fiche complétée',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP' => 'Veuillez ajouter une fiche au formulaire',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM' => 'Formulaire',
-        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR' => 'Une erreur est survenue lors de la vérification.<br>Veuillez contacter un administrateur du site !',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR' => 'Une erreur est survenue lors de la vérification. Veuillez contacter un administrateur du site',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_CLOSED' => 'Veuillez patienter, le prochain module est encore fermé.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN' => 'Veuillez patienter, le prochain module n\'est pas encore ouvert.',
