@@ -63,21 +63,18 @@ class Module extends CourseStructure
     }
 
     /**
-     * Get the activity of the activity with the given tag
+     * Get the activity with the given tag
      * @param $activityTag the tag which specified the activity
      * @return Activity|null return null if the activity specified is not found
      */
     public function getActivity($activityTag): ?Activity
     {
-        $foundIndex = false;
-        foreach ($this->getActivities() as $index => $activity) {
+        foreach ($this->getActivities() as $activity) {
             if ($activity->getTag() == $activityTag) {
-                $foundIndex = $index;
+                return $activity;
             }
         }
-        return ($foundIndex === false) ?
-            null
-            : $this->getActivities()[$foundIndex];
+        return null;
     }
 
     /**
