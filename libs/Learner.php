@@ -130,7 +130,7 @@ class Learner
     public function canAccessModule(Course $course, Module $module): bool
     {
         $previousModule = $course->getPreviousModule($module->getTag());
-        
+
         return $this->isAdmin() ||
             (
                 $module->getStatus($course) == ModuleStatus::OPEN
@@ -151,8 +151,12 @@ class Learner
      * @param bool $checkConditions parameters used to prevent loop with ConditionChecker
      * @return bool
      */
-    public function canAccessActivity(Course $course, Module $module, Activity $activity, bool $checkConditions = true): bool
-    {
+    public function canAccessActivity(
+        Course $course,
+        Module $module,
+        Activity $activity,
+        bool $checkConditions = true
+    ): bool {
         $checkConditions = (!$this->conditionsChecker->isConditionsEnabled()) ? false : $checkConditions;
         $previousActivity = $module->getPreviousActivity($activity->getTag());
         return $this->isAdmin() ||
@@ -166,7 +170,7 @@ class Learner
                     )
                     &&
                     (
-                        !$course->isActivityScripted() //no constraint
+                        !$course->isActivityScripted() // no constraint
                         || !$previousActivity // or scripted but no previous activity
                         ||
                         (
@@ -190,9 +194,10 @@ class Learner
      * @param null|Activity $activity
      * @return bool
      */
-    public function hasOpened(Course $course, Module $module, Activity $activity = null):bool
+    public function hasOpened(Course $course, Module $module, Activity $activity = null): bool
     {
-        $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner($this, $course, $module, $activity);
+        $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner($this, $course, $module,
+            $activity);
         return !empty($progress);
     }
 
@@ -203,13 +208,12 @@ class Learner
      * @param Activity $activity
      * @return bool
      */
-    public function hasFinishedActivity(Course $course, Module $module, Activity $activity):bool
+    public function hasFinishedActivity(Course $course, Module $module, Activity $activity): bool
     {
         $userNames = $this->getProgresses()->getUsernamesForFinishedActivity($course, $module, $activity);
         return in_array($this->getUsername(), $userNames);
     }
 
-    
 
     /**
      * check if a module has been finished by the learner
@@ -218,17 +222,17 @@ class Learner
      * @param bool $checkConditions parameters used to prevent loop with ConditionChecker
      * @return bool
      */
-    public function hasFinishedModule(Course $course, Module $module, bool $checkConditions = true):bool
+    public function hasFinishedModule(Course $course, Module $module, bool $checkConditions = true): bool
     {
         $checkConditions = (!$this->conditionsChecker->isConditionsEnabled()) ? false : $checkConditions;
         if (!$this->hasOpened($course, $module)) {
             return false;
         }
-        $lastActivityTag = $module->getLastActivityTag() ;
+        $lastActivityTag = $module->getLastActivityTag();
         foreach ($module->getActivities() as $activity) {
             if ($activity->getTag() != $lastActivityTag) {
                 if (!$this->hasFinishedActivity($course, $module, $activity)) {
-                    return false ;
+                    return false;
                 }
             } elseif ($checkConditions) {
                 // the last activity should not be finihed because the next module has not been opened

@@ -72,14 +72,13 @@ class ProgressDashboardAction extends YesWikiAction
             ]);
         }
 
-        /* * Switch to extra activity if needed */
-        if (($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false)
-                && isset($_REQUEST['extra_activity_mode'])
-                && $message = $this->callAction('extraactivity', $this->arguments)
-            ) {
-            return $message ;
+        // switch to extra activity if needed
+        if ($this->wiki->config['lms_config']['extra_activity_enabled']
+            && isset($_REQUEST['extra_activity_mode'])
+            && $message = $this->callAction('extraactivity', $this->arguments)
+        ) {
+            return $message;
         }
-        /* *************************** */
 
         // the progresses we are going to process
         $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
@@ -107,14 +106,14 @@ class ProgressDashboardAction extends YesWikiAction
         }
 
         $this->processActivitiesAndModuleStat($course, $module);
-        
+
         // render the dashboard for a module
         return $this->render('@lms/progress-dashboard-module.twig', [
             'course' => $course,
             'module' => $module,
             'activitiesStat' => $this->activitiesStat,
             'modulesStat' => $this->modulesStat,
-            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'],
             'learners' => $this->learners,
             'debug' => isset($_GET['debug']),
         ]);
@@ -133,7 +132,7 @@ class ProgressDashboardAction extends YesWikiAction
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
-            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
+            'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'],
             'learners' => $this->learners,
             'debug' => isset($_GET['debug']),
         ]);
@@ -176,9 +175,9 @@ class ProgressDashboardAction extends YesWikiAction
                 );
             }
         }
-        
-        
-        if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
+
+
+        if ($this->wiki->config['lms_config']['extra_activity_enabled']) {
             $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module));
         }
         // $finishedUsernames contains now the usernames which have finished the module
@@ -208,8 +207,8 @@ class ProgressDashboardAction extends YesWikiAction
                 );
             }
         }
-        
-        if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
+
+        if ($this->wiki->config['lms_config']['extra_activity_enabled']) {
             $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course));
         }
         // $finishedUsernames contains now the usernames which have finished the course

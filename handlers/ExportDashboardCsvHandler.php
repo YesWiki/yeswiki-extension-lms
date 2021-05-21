@@ -2,9 +2,9 @@
 
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiHandler;
-use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\DateManager;
+use YesWiki\Lms\Service\LearnerDashboardManager;
 use YesWiki\Lms\Service\LearnerManager;
 
 class ExportDashboardCsvHandler extends YesWikiHandler
@@ -114,8 +114,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                     $progressRatio = $moduleStat['progressRatio'] . ' %';
                 }
                 $elapsedTime = ($moduleStat['elapsedTime']
-                    && !($this->wiki->config['lms_config']['use_only_custom_elapsed_time']
-                        && !$moduleStat['finished'])
+                    && !($this->wiki->config['lms_config']['use_only_custom_elapsed_time'] && !$moduleStat['finished'])
                 ) ?
                     $this->dateManager->formatTimeWithColons($moduleStat['elapsedTime'])
                     : null;
@@ -139,7 +138,8 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                         $progressRatio = '----';
                     }
                     $elapsedTime = ($this->wiki->config['lms_config']['display_activity_elapsed_time']
-                        && $activityStat['elapsedTime'] && $activityStat['finished']) ?
+                        && $activityStat['elapsedTime'] && $activityStat['finished']
+                    ) ?
                         $this->dateManager->formatTimeWithColons($activityStat['elapsedTime'])
                         : null;
                     $row = [
