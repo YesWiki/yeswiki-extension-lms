@@ -70,6 +70,7 @@ acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 );
 !defined('COURSE_FORM_TEMPLATE') && define('COURSE_FORM_TEMPLATE', 'texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
+image***bf_image***Image***300***300***600***600***right***0*** *** *** * *** * *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module, un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si désactivé, les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
