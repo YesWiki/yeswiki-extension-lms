@@ -22,6 +22,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_BEGIN' => 'Commencer',
         'LMS_BEGIN_ONLY_ADMIN' => 'Accès admin',
         'LMS_RESUME' => 'Reprendre',
+        'LMS_RESTART' => 'Revoir',
         'LMS_RETURN_BUTTON' => 'Retour',
         'LMS_ADMIN_NO_MODULES' => 'Pas encore de modules associés à ce parcours, créez d\'abord des activités, puis des modules avec des activités dedans, puis associez les modules au parcours en l\'éditant à nouveau',
         'LMS_NO_MODULES' => 'Ce parcours ne contient pas encore de modules',
@@ -57,7 +58,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
         'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
-
+        'LMS_MISSING_COURSE' => 'Il n\'existe encore aucun « Parcours LMS ». Veuillez en créer un, et lui ajouter des « LMS Modules » et « LMS Activités » depuis la page',
+        'LMS_MISSING_COURSE_PAGELINK' => 'Base de données',
         // For Learner Dashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
         'LMS_DASHBOARD_TYPE' => 'Type',
@@ -134,5 +136,36 @@ $GLOBALS['translations'] = array_merge(
         'LMS_YES' => 'Oui',
         'LMS_NO' => 'Non',
         'LMS_BACK_TO_PROGRESSES_DASHBOARD' => 'Retour au tableau de bord',
+
+        // QUIZ
+        'LMS_QUIZ_RESULTS' => 'Résultats',
+        'LMS_QUIZ_RESULTS_TITLE' => 'Résultats de quiz',
+        'LMS_QUIZ_DELETE_ALL' => 'supprimer tous les résultats affichés ?',
+        'LMS_QUIZ_DELETE' => 'supprimer les résultats de cette ligne ?',
+        'LMS_QUIZ_DELETE_WARNING' => 'Attention! Toutes les données enregistrées seront perdues.. Etes-vous sûrs de vouloir ',
+        'LMS_QUIZ_FILTER_ON_THIS_USER' => 'Filtrer les résultats pour cet utilisateur',
+        'LMS_QUIZ_FILTER_ON_THIS_QUIZID' => 'Filtrer les résultats pour ce quiz',
+
+        // activity navigation conditions
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ADD' => 'Ajouter une condition',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED' => 'Réaction demandée',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP' => 'Veuillez donner une réaction',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP_ALERT' => 'Veuillez sélectionner au moins une réaction',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED' => 'Quiz rempli',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP' => 'Veuillez répondre au quiz',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_HELP_FOR_ANY' => 'Veuillez répondre à au moins un quiz',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_EMPTY' => '(vide = n\'importe quel test de l\'activité)',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_WITH_MINIMUM_LEVEL' => 'Quiz réussi avec un niveau minimum',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_MINIMUM_LEVEL_HELP' => ' avec une note minimum de :',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_LEVEL' => 'Niveau',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED' => 'Fiche complétée',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP' => 'Veuillez ajouter une fiche au formulaire',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM' => 'Formulaire',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_ERROR' => 'Une erreur est survenue lors de la vérification. Veuillez contacter un administrateur du site',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS' => 'Conditions de passage',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_CLOSED' => 'Veuillez patienter, le prochain module est encore fermé.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN' => 'Veuillez patienter, le prochain module n\'est pas encore ouvert.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE' => 'Veuillez patienter, le prochain module n\'est pas accessible.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
     )
 );

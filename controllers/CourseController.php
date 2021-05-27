@@ -22,6 +22,7 @@ class CourseController extends YesWikiController
     protected $learnerManager;
     protected $dateManager;
     protected $config;
+    protected $activitiesCanBeDisplayedWithoutContext;
 
     /**
      * CourseController constructor
@@ -43,6 +44,7 @@ class CourseController extends YesWikiController
         $this->learnerManager = $learnerManager;
         $this->dateManager = $dateManager;
         $this->config = $config->all();
+        $this->activitiesCanBeDisplayedWithoutContext = $this->config['lms_config']['show_activities_without_context_or_learner'] ?? true;
     }
 
     /**
@@ -104,24 +106,21 @@ class CourseController extends YesWikiController
 
             if ($moduleTag) {
                 // if the module is specified in the GET parameter, return it if the tag corresponds
-                $module = $this->courseManager->getModule($moduleTag);
+                $module = $course->getModule($moduleTag);
 
-                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($activity->getTag())) ?
+                return ($module && $module->hasActivity($activity->getTag())) ?
                     $module
                     : null;
             } else {
                 // if the current page refers to a module of the course, return it
-                $currentModule = $this->courseManager->getModule($activity->getTag());
-                if ($currentModule && $course->hasModule($activity->getTag())) {
-                    return $currentModule;
+                if ($module = $course->getModule($activity->getTag())) {
+                    return $module;
                 }
 
                 // find in the course modules, the first module which contains the activity
-                if ($course) {
-                    foreach ($course->getModules() as $currentModule) {
-                        if ($currentModule->hasActivity($activity->getTag())) {
-                            return $currentModule;
-                        }
+                foreach ($course->getModules() as $currentModule) {
+                    if ($currentModule->hasActivity($activity->getTag())) {
+                        return $currentModule;
                     }
                 }
             }
@@ -174,24 +173,23 @@ class CourseController extends YesWikiController
                 $imageSize,
                 'fit'
             );
-
-        // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
-
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
+        $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
+        
+        $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
+        $nextActivityTag = $tmpData['tag'];
+        $labelStart = $tmpData['label'];
+
         if (!$disabledLink) {
             $activityLink = $this->wiki->href(
                 '',
-                $module->getFirstActivityTag(),
+                $nextActivityTag,
                 ['course' => $course->getTag(), 'module' => $module->getTag()],
                 false
             );
         }
-        $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-            _t('LMS_BEGIN_ONLY_ADMIN')
-            : _t('LMS_BEGIN');
         $statusMsg = $this->calculateModuleStatusMessage($course, $module);
 
         // End of duplicate code
@@ -243,5 +241,14 @@ class CourseController extends YesWikiController
                 return _t('LMS_MODULE_NOT_ACCESSIBLE');
                 break;
         }
+    }
+
+    /**
+     * check if we can display activity without contextual course or module
+     * @return bool
+     */
+    public function activitiesCanBeDisplayedWithoutContext():bool
+    {
+        return $this->activitiesCanBeDisplayedWithoutContext;
     }
 }

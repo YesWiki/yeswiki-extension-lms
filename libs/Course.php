@@ -39,12 +39,22 @@ class Course extends CourseStructure
      */
     public function hasModule($moduleTag): bool
     {
+        return !is_null($this->getModule($moduleTag));
+    }
+
+    /**
+     * get a child module with the given tag
+     * @param $moduleTag the module tag to search
+     * @return Module|null
+     */
+    public function getModule($moduleTag): ?Module
+    {
         foreach ($this->getModules() as $module) {
             if ($module->getTag() == $moduleTag) {
-                return true;
+                return $module;
             }
         }
-        return false;
+        return null;
     }
 
     /**

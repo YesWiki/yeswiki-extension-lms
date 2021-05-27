@@ -37,6 +37,11 @@
 #YesWikiModal .lms-container .lms-menu {
     display: none;
 }
+/* to hide the previous/next navigations buttons in preview mode */
+#YesWikiModal .modal-body .id1201 .lms-container .lms-activity-content nav,
+#YesWikiModal .modal-body .id1202 nav.module-nav .pager-lms{
+    display: none;
+}
 
 /* remove the info bar below the entry, but keep for admins */
 .lms-container ~ .BAZ_fiche_info {
@@ -146,6 +151,18 @@
 }
 .user-reaction {
     border: 1px solid var(--primary-color);
+}
+
+/* fix bootstrap */
+.pager .disabled > a, .pager .disabled > a:focus, .pager .disabled > a:hover, .pager .disabled > span {
+    background-color: initial;
+}
+
+/* managing conditions */
+.pager .wait-cursor > a, .pager .wait-cursor > a:focus, .pager .wait-cursor > a:hover, .pager .wait-cursor > span,
+.wait-cursor,
+.wait-cursor:hover {
+    cursor: wait !important;
 }
 
 /**
@@ -689,3 +706,72 @@
     }
 }
 /** End - Index menu button in small screen size **/
+
+/** Start for activity navigation edit **/
+
+.activity-navigation-border {
+    border-color:var(--secondary-color-2);
+    border-style: solid;
+    border-radius: 0.5rem;
+    border-width: 0.2rem;
+    padding: 15px 5px 5px 5px;
+  }
+  .activity-navigation-condition-container{
+    margin:5px;
+    border-color:var(--primary-color);
+    border-style: solid;
+    border-radius: 0.3rem;
+    border-width: 0.15rem;
+    padding: 3px;
+  }
+  .activity-navigation-btn{
+    flex-grow: 0;
+  }
+
+  .activity-navigation-border .form-control{
+      margin-left: 3px;
+      margin-right: 3px;
+  }
+  
+  .activity-navigation-border .input-group .item-title{
+    flex-shrink: 0;
+  }
+
+  @media(max-width:800px){
+    .activity-navigation-border  .input-group .item-title{
+        flex-shrink: 1;
+      }
+  }
+
+
+  /** end for activity navigation edit **/
+
+  /** Start for activity navigation view **/
+
+  .activity-navigation-conditions-helper {
+    float: right;
+    border-color: var(--primary-color);
+    border-style: solid;
+    border-radius: 0.5rem;
+    border-width: 0.2rem;
+    padding: 5px;
+    margin-right: 5px;
+    text-align: initial;
+  }
+  
+  .activity-navigation-conditions-helper li {
+    display: list-item;
+    margin-left: 2px;
+  }
+  
+  .activity-navigation-conditions-helper.no-border {
+    border-style: none;
+  }
+  
+  .activity-navigation-view-icon {
+    flex-grow: 0;
+    cursor:initial;
+    float:left;
+  }
+
+/** end for activity navigation view **/

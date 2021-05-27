@@ -1,0 +1,111 @@
+{% extends "@bazar/layouts/input.twig" %}
+
+{%- block label -%}            
+    {% if field.required %}<span class="symbole_obligatoire"></span>{% endif %}
+    {% if field.hint %}
+        <img class="tooltip_aide" title="{{ field.hint|raw('html') }}" src="tools/bazar/presentation/images/aide.png" width="16" height="16" alt="image aide" />
+    {% endif %}
+    {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS') }}         
+{%- endblock -%}
+
+{% set id = field.propertyName %}
+
+{% block input %}
+  {# Add javascript definition #}
+  {{ include_javascript('tools/lms/libs/lms.js') }}
+  {# Add CSS definition #}
+  {{ include_css('tools/lms/presentation/styles/lms.css') }}
+  {# Border #}
+  <div class="activity-navigation-border">
+    {# Add select #}
+    <div class="input-group mb-3">
+      <div class="input-group-prepend item-title">
+        <span class="input-group-text">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_ADD') }}</span>
+      </div>
+      <select
+        id="{{ id }}_select"
+        name="{{ id }}[select]"
+        class="form-control"
+        {% if field.required %}required{% endif %}>
+        <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
+        {% for key, option in options %}
+            <option value={{ key }} onclick="activity_navigation_select(this,'{{ id }}')"
+              {% if value == key %}selected{% endif %}
+              >{{ option|raw }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div id="{{ id }}_container">
+    </div>
+  </div>
+  <input type="hidden" name="{{ field.propertyName }}[new_values]" value="1">
+  <input type="hidden" name="{{ field.propertyName }}[id]" value="{{ id }}">
+  {# Templates for javascript #}
+  <div id="{{ id }}_reaction_needed_template_container" style="display:none !important;" class="activity-navigation-condition-container input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED') }}</span>
+    </div>
+    <input type="hidden" name="{{ field.propertyName }}[reaction_needed]" value="1" disabled>
+    <span class="input-group-text" style="flex-grow:10;"></span>
+  </div>
+  <div id="{{ id }}_quiz_passed_template_container" style="display:none !important;" class="activity-navigation-condition-container input-group mb-3">
+    <div class="input-group-prepend item-title">
+      <span class="input-group-text">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED') }}</span>
+    </div>
+    <input type="hidden" name="{{ field.propertyName }}[quiz_passed][head]" value="1" disabled>
+    <input type="text" name="{{ field.propertyName }}[quiz_passed][quizId]"
+          value="" maxlength="256" placeholder="quizId {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_EMPTY') }}"
+          class="form-control input-xxlarge" disabled/>
+  </div>
+  <div id="{{ id }}_quiz_passed_minimum_level_template_container" style="display:none !important;" class="activity-navigation-condition-container input-group mb-3r">
+    <div class="input-group-prepend item-title">
+      <span class="input-group-text">{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_PASSED_WITH_MINIMUM_LEVEL') }}</span>
+    </div>
+    <input type="hidden" name="{{ field.propertyName }}[quiz_passed_minimum_level][head]" value="1" disabled>
+    <input type="text" name="{{ field.propertyName }}[quiz_passed_minimum_level][quizId]"
+          value="" maxlength="256" placeholder="quizId {{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_EMPTY') }}"
+          class="form-control input-xxlarge" disabled/>
+    <input type="number" name="{{ field.propertyName }}[quiz_passed_minimum_level][quiz_minimum_level]"
+          value="" maxlength="256" placeholder="{{ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_QUIZ_LEVEL') }}"
+          class="form-control input-xxlarge" disabled/>
+    <div class="input-group-append">
+      <span class="input-group-text"> (%)</span>
+    </div>
+  </div>
+  <div id="{{ id }}_form_filled_template_container" style="display:none !important;" class="activity-navigation-condition-container input-group mb-3">
+    <div class="input-group-prepend item-title">
+      <span class="input-group-text">{{  _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED') 
+            ~ ' ' ~ _t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM') ~ ':' }}</span>
+    </div>
+    <input type="hidden" name="{{ field.propertyName }}[form_filled][head]" value="1" disabled>
+    <select
+      name="{{ field.propertyName }}[form_filled][formId]"
+      class="form-control" disabled>
+      <option value='' selected="selected">{{ _t('BAZ_CHOISIR') }}</option>
+      {% for key, option in formOptions %}
+          <option value={{ key }}>{{ option|raw }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div id="{{ id }}_remove_button_template" class="input-group-append"  style="display:none !important;">
+    <button onclick="activity_navigation_remove_condition(this)"
+        type="button"
+        class="btn btn-danger btn-icon activity-navigation-btn">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  {# Variable definition for javascripts and start definition #}
+  <script>
+    if (typeof activityNavigationInit === 'undefined'){
+      var activityNavigationInit = [];
+    }
+    activityNavigationInit.push({
+      id:'{{ id }}',
+      value:{{ value|json_encode()|raw }}
+    });
+    // if function already define, run it
+    if (typeof activity_navigation_init === 'function') {
+      activity_navigation_init(activityNavigationInit);
+    }
+  </script>
+{% endblock %}

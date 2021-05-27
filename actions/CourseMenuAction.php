@@ -10,8 +10,7 @@ use YesWiki\Lms\Service\LearnerManager;
 
 class CourseMenuAction extends YesWikiAction
 {
-
-    function run()
+    public function run()
     {
         $courseController = $this->getService(CourseController::class);
         $courseManager = $this->getService(CourseManager::class);
@@ -41,6 +40,10 @@ class CourseMenuAction extends YesWikiAction
                 : $course->getLastModuleTag();
 
             $modulesDisplayed = $course->getModulesBetween($moduleDebutTag, $moduleFinTag);
+
+            if ($learner = $learnerManager->getLearner()) {
+                $courseManager->setModulesScriptedOpenedStatus($learner, $course, $modulesDisplayed);
+            }
 
             // if an handler is after the page tag in the wiki parameter variable, get only the tag
             $pageTag = isset($_GET['wiki']) ?
@@ -72,7 +75,7 @@ class CourseMenuAction extends YesWikiAction
                         'course' => $course,
                         'module' => $module,
                         'modulesDisplayed' => $modulesDisplayed,
-                        'learner' => $learnerManager->getLearner()
+                        'learner' => $learner
                     ]);
                 }
             }

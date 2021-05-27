@@ -40,23 +40,35 @@ class ModuleNavigationField extends LmsField
         // the consulted course entry
         $course = $this->courseController->getContextualCourse();
         // the consulted module entry to display the current activity
+        // TODO check if $module = $course->getModule($currentModuleTag); is better
         $module = $this->courseManager->getModule($currentModuleTag, $entry);
 
         $output = '';
         if ($course && $module) {
-            // save the activity progress if not already exists for this user and activity
-            $this->learnerManager->saveModuleProgress($course, $module);
-
-            // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
-
             $learner = $this->learnerManager->getLearner();
-            $disabledLink = !$module->isAccessibleBy($learner, $course) || $module->getStatus($course) == ModuleStatus::UNKNOWN;
+            // set canBeOpenedBy from course's module
+            if ($learner
+                && ($referenceModule = $course->getModule($currentModuleTag)) // module in course
+                && !is_null($this->courseManager->setModuleCanBeOpenedByLearner(
+                    $learner,
+                    $course,
+                    $referenceModule
+                )) // set Module Can be opened
+                && !is_null($module->canBeOpenedBy($learner, $referenceModule->canBeOpenedBy($learner)))
+                && $module->isAccessibleBy($learner, $course)) {
+                // save the activity progress if not already exists for this user and activity
+                $this->learnerManager->saveModuleProgress($course, $module);
+            }
 
-            // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-            $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-                _t('LMS_BEGIN_ONLY_ADMIN')
-                : _t('LMS_BEGIN');
-            $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
+            $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
+            $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
+            $nextActivityTag = $tmpData['tag'];
+            $labelStart = $tmpData['label'];
+            if ($module->isAccessibleBy($learner, $course)) {
+                $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
+            } else {
+                $statusMsg = _t('LMS_MODULE_NOT_ACCESSIBLE');
+            }
 
             // End of duplicate code
 
@@ -81,6 +93,7 @@ class ModuleNavigationField extends LmsField
                 'module' => $module,
                 'nextModule' => $nextModule ?? null,
                 'previousModule' => $previousModule ?? null,
+                'nextActivityTag' => $nextActivityTag ?? $module->getTag(),
             ]);
         }
         return $output;
