@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+// application.php
+
+namespace YesWiki\Lms\Commands;
+
+if (!file_exists('wakka.config.php')) {
+    exit("\e[31mThe command should be launched from your YesWiki root directory\e[0m");
+} else {
+    include_once('wakka.config.php');
+    // fake $_SERVER vars
+    $_SERVER['REQUEST_URI'] = $wakkaConfig['base_url'].$wakkaConfig['root_page'];
+    $_SERVER['HTTP_HOST'] = parse_url($wakkaConfig['base_url'], PHP_URL_HOST);
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    // fake wiki page
+    $_REQUEST['wiki'] = $wakkaConfig['root_page'];
+    // fake user
+    $_SERVER["REMOTE_ADDR"] = '@admins';
+}
+
+use Doctrine\Common\Annotations\AnnotationRegistry;
+
+require_once 'includes/autoload.inc.php';
+$loader = require_once 'vendor/autoload.php';
+AnnotationRegistry::registerLoader([$loader, 'loadClass']);
+require_once __DIR__.'/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+require_once 'includes/YesWiki.php';
+$wiki = new \YesWiki\Wiki();
+
+// ... register commands
+use YesWiki\Lms\Commands\ImportCoursesCommand;
+$application->add(new ImportCoursesCommand($wiki));
+
+$application->run();

@@ -98,6 +98,18 @@ $GLOBALS['translations'] = array_merge(
         'LMS_IMPORT_URL' => 'URL à importer',
         'LMS_IMPORT' => 'Importer',
 
+        // ImportService
+        'LMS_ERROR_NO_PEERTUBE_TOKEN' => 'Pas de jeton pour Peertube',
+        'LMS_ERROR_NO_CREDENTIALS' => 'Pas d\'identifiants reçus pour',
+        'LMS_FILE' => 'Fichier',
+        'LMS_FILE_OVERWRITE' => 'existe déja parmi les fichiers, on l\'écrase',
+        'LMS_FILE_NO_OVERWRITE' => 'existe déja parmi les fichiers, on ne le télécharge pas',
+        'LMS_ERROR_DOWNLOADING' => 'Erreur pendant le téléchargement',
+        'LMS_REMOVING_CORRUPTED_FILE' => 'on enlève le fichier corrompu',
+        'LMS_ERROR_NO_DATA' => 'pas de données à analyser',
+        'LMS_ERROR_PARSING_DATA' => 'erreur lors du décodage du format JSON',
+        'LMS_ERROR_PROVIDER' => 'Impossible de déterminer le provider de la vidéo',
+
         // extra activities
         'LMS_EXTRA_ACTIVITY_ADD' => 'Ajouter une activité supplémentaire (atelier, webinaire, séminaire, ...)',
         'LMS_EXTRA_ACTIVITY_REMOVE' => 'Retirer cet utilisateur',

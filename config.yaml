@@ -36,3 +36,4 @@ services:
 
   YesWiki\Lms\Controller\:
     resource: 'controllers/*'
+    resource: 'controllers/*'
