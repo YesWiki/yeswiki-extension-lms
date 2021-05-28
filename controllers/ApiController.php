@@ -298,7 +298,7 @@ class ApiController extends YesWikiController
             ->checkActivityNavigationConditions($courseId, $moduleId, $activityId);
 
         // error + fetch trigger_errors on message
-        $triggerErrorsMessage .= ob_get_contents() ;
+        $triggerErrorsMessage = ob_get_contents() ;
         ob_get_clean();
         if (!empty($triggerErrorsMessage)) {
             $result->addMessage($triggerErrorsMessage);
