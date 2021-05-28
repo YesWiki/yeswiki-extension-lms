@@ -78,6 +78,7 @@ class ImportCoursesCommand extends Command
             $data = $this->importManager->fetchEntriesFromApi($this->remote_url, $this->remote_token, $api_args);
         } catch (\Exception $e) {
             $output->writeln('<error>Error: '.$e->getMessage().'</>');
+            return false;
         }
 
         return $data;
