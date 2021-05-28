@@ -48,9 +48,9 @@ class ImportManager
         // Fetching all information needed
         $dataStr = file_get_contents($remoteUrl.'?api/'.$apiArgs, false, $context);
         if (empty($dataStr)) {
-            throw new \Exception(_('LMS_ERROR_NO_DATA'));
+            throw new \Exception(_t('LMS_ERROR_NO_DATA'));
         } elseif (!$dataJson=json_decode($dataStr, true)) {
-            throw new \Exception(_('LMS_ERROR_PARSING_DATA'), $dataStr);
+            throw new \Exception(_t('LMS_ERROR_PARSING_DATA'), $dataStr);
         } else {
             $data = array();
             foreach ($dataJson as $entry) {
@@ -105,10 +105,10 @@ class ImportManager
                     $this->peertubeToken = $token['access_token'];
                     return true;
                 } else {
-                    throw new \Exception(_('LMS_ERROR_NO_PEERTUBE_TOKEN'));
+                    throw new \Exception(_t('LMS_ERROR_NO_PEERTUBE_TOKEN'));
                 }
             } else {
-                throw new \Exception(_('LMS_ERROR_NO_CREDENTIALS').': '.$apiUrl);
+                throw new \Exception(_t('LMS_ERROR_NO_CREDENTIALS').': '.$apiUrl);
             }
         }
         return false;
