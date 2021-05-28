@@ -3,7 +3,7 @@ parameters:
   actionbuilder_textarea_name: 'bf_contenu'
   lms_config:
     # if true, tabs can be used in LMS activities (MyActivity2, MyActivity3... refer to the parent activity MyActivity)
-    tabs_enabled: true
+    tabs_enabled: false
     # if true, the activity title is automatically added at the begin of the entry page
     display_activity_title: true
     # if you change activitie_form_id, module_form_id or course_form_id, you have also to rename the corresponding
