@@ -136,7 +136,7 @@ class CourseManager
                 break;
             }
         }
-        return isset($lastOpenedActivity) ? $lastOpenedActivity->getTag() : $module->getFirstActivityTag() ;
+        return isset($lastOpenedActivity) ? $lastOpenedActivity->getTag() : null ;
     }
 
     /**
@@ -157,9 +157,9 @@ class CourseManager
         }
         $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
             _t('LMS_BEGIN_ONLY_ADMIN')
-            : (!$learner || ($module->getFirstActivityTag() == $nextActivityTag) ?  _t('LMS_BEGIN')
+            : (!$learner || (is_null($nextActivityTag)) ?  _t('LMS_BEGIN')
                 : ($isFinished ? _t('LMS_RESTART') : _t('LMS_RESUME')));
-        if (!$learner || $isFinished) {
+        if (!$learner || $isFinished || is_null($nextActivityTag)) {
             $nextActivityTag = $module->getFirstActivityTag();
         }
         return [
