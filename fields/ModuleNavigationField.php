@@ -4,6 +4,7 @@ namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
 use YesWiki\Lms\ModuleStatus;
+use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
 
 /**
@@ -18,12 +19,14 @@ class ModuleNavigationField extends LmsField
      * The second position value is the name of the entry field.
      */
 
+    protected $courseController;
     protected $courseManager;
 
     public function __construct(array $values, ContainerInterface $services)
     {
         parent::__construct($values, $services);
         $this->courseManager = $services->get(CourseManager::class);
+        $this->courseController = $services->get(CourseController::class);
         
         // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
         $this->moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
@@ -58,19 +61,8 @@ class ModuleNavigationField extends LmsField
             $disabledLink = !$module->isAccessibleBy($learner, $course);
             
             // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-            $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
-            $nextActivityTag = $tmpData['tag'];
-            $labelStart = $tmpData['label'];
-            if (empty($labelStart)) {
-                $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
-                    _t('LMS_BEGIN_ONLY_ADMIN')
-                    : _t('LMS_BEGIN');
-            }
-            if ($module->isAccessibleBy($learner, $course)) {
-                $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
-            } else {
-                $statusMsg = _t('LMS_MODULE_NOT_ACCESSIBLE');
-            }
+            list($nextActivityTag, $labelStart, $statusMsg) =
+                $this->courseController->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
 
             // End of duplicate code
 
