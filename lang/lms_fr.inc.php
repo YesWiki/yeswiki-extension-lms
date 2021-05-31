@@ -136,6 +136,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_YES' => 'Oui',
         'LMS_NO' => 'Non',
         'LMS_BACK_TO_PROGRESSES_DASHBOARD' => 'Retour au tableau de bord',
+        'LMS_EXTRA_ACTIVITY_SIGNATURE' => 'Signature',
+        'LMS_EXTRA_ACTIVITY_CREATE_ATTENDANCE_SHEET' => 'Créer une feuille d\'emargement',
 
         // QUIZ
         'LMS_QUIZ_RESULTS' => 'Résultats',
@@ -167,5 +169,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_TO_BE_OPEN' => 'Veuillez patienter, le prochain module n\'est pas encore ouvert.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_MODULE_NOT_ACCESSIBLE' => 'Veuillez patienter, le prochain module n\'est pas accessible.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE' => 'Périmètre',
+        'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE_EMPTY' => 'Vide = pas de contrainte',
     )
 );

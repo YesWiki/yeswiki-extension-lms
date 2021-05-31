@@ -18,6 +18,14 @@
                 {{ extraActivityLog.title }}
             {% endif %}
             {{ include('@lms/extra-activity-link.twig', {mode:'edit'}) }}
+            {# Link to create attendance sheet associated to the extra activity (only if no existing related link#}   
+            {% if not extraActivityLog.relatedLink %}         
+                <a class="btn btn-default btn-xs no-collapsable"
+                   href="{{ url({tag:'BazaR',params:{
+                    vue:'saisir',action:'saisir_fiche',
+                    id:'1204',bf_extraactivity:extraActivityLog.tag}}) }}"
+                    title="{{ _t('LMS_EXTRA_ACTIVITY_CREATE_ATTENDANCE_SHEET') }}"><i class="fas fa-file-signature"></i></a>
+            {% endif %}
             {{ include('@lms/extra-activity-link.twig', {mode:'delete'}) }}
         </div>
         <div class="finished-ratio">

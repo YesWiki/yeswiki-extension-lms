@@ -118,12 +118,34 @@ function activity_navigation_add_element(id,value,conditionObject = null){
               cloneButton.setAttribute("id",new_id+"_remove_button");
               cloneButton.removeAttribute("style");
               cloneButton.setAttribute("data-id",new_id);
-              clone.appendChild(cloneButton);
+              clone.querySelector(".input-group.mb-3").appendChild(cloneButton);
               let container = document.getElementById(id+'_container');
               if (!container){
                   console.log(id+'_container : not found');
               } else {
                   container.appendChild(clone);
+
+                  // add default params for scope
+                  if (conditionObject.scope)
+                  for (var key in conditionObject.scope) {
+                    let searchKey = '';
+                    if (conditionObject.scope[key].course){
+                      searchKey += conditionObject.scope[key].course ;
+                    } else {
+                      searchKey += '*';
+                    }
+                    searchKey += '/';
+                    if (conditionObject.scope[key].module){
+                      searchKey += conditionObject.scope[key].module ;
+                    } else {
+                      searchKey += '*';
+                    }
+                    let optionToActivate = clone.querySelector('.input-group.mb-3 select[name="'+id+'[scope_select]['
+                        +activityNavigationConditionsEditUniqueId+']"] option[value="'+searchKey+'"]');
+                    if(optionToActivate){
+                      activity_navigation_scopeSelect(optionToActivate,id);
+                    }
+                  }
               }
           }
       }
@@ -137,6 +159,80 @@ function activity_navigation_remove_condition(elem){
       console.log(id+' : not found');
   } else {
       conditionContainer.remove();
+  }
+}
+
+function activity_navigation_scopeSelect(elem,id){
+  let value = elem.value ;
+  let name = elem.parentNode.name;
+  let base = elem.parentNode.parentNode.querySelector('.input-group-append.scope-list');
+  if (value && name && base) {
+    let longPrefix = id+'[scope_select]['
+    let uniqueId = name.substr(longPrefix.length,name.length-(longPrefix.length+1)); // to remove $id[scope][...]
+    // find other scope for this uniqueId
+    let othersScope = base.querySelectorAll("input[name^='"+id+'[scope]['+uniqueId+']'+"']");
+    let newIndex = othersScope.length ;
+    // reset selection
+    elem.parentNode.selectedIndex = "0";
+    // find associated template
+    let template_container = document.getElementById(id+'_scope_template_container') ;
+    if (!template_container) {
+        console.log(id+'_scope_template_container : not found');
+    } else {
+        let clone = template_container.cloneNode(true);
+        clone.setAttribute("value",value);
+        clone.removeAttribute("id");
+        clone.removeAttribute("style");
+        clone.removeAttribute('disabled');
+        clone.name += '['+uniqueId+']['+newIndex+']';
+        // clear current message
+        let empty_message = base.querySelector('span.input-group-text i.empty-message');
+        if (empty_message){
+          empty_message.setAttribute("style","display:none !important;");
+        }
+        let baseText = base.querySelector('span.input-group-text');
+        var baseList = baseText.querySelector('ul');
+        if (!baseList){
+          baseList = document.createElement('ul');
+          baseText.appendChild(baseList);
+        }
+        let newMessage = document.createElement('li');
+        newMessage.setAttribute("data-name",clone.name);
+        newMessage.innerText = value ;
+        // add remove button
+        let removeBtn = document.createElement('i');
+        removeBtn.classList.add('fas');
+        removeBtn.classList.add('fa-times');
+        removeBtn.setAttribute("onclick","activity_navigation_scope_remove(this)");
+        newMessage.innerText += ' ';
+        newMessage.appendChild(removeBtn);
+        baseList.appendChild(newMessage);
+        base.appendChild(clone);
+    }
+  }
+}
+
+function activity_navigation_scope_remove(elem){
+  let name = elem.parentNode.getAttribute("data-name");
+  // search associated input
+  let baseUl = elem.parentNode.parentNode;
+  let inputs = baseUl.parentNode.parentNode.querySelectorAll("input[name='"+name+"']");
+  let end = inputs.length;
+  for (let i=0;i<end;++i){
+    inputs[i].remove() ;
+  }
+  // search associated li
+  let lis = baseUl.querySelectorAll("li[data-name='"+name+"']");
+  end = lis.length;
+  for (let i=0;i<end;++i){
+    lis[i].remove() ;
+  }
+
+  if(baseUl.children.length == 0){
+    let empty_message = baseUl.parentNode.querySelector('i.empty-message');
+    if (empty_message){
+      empty_message.removeAttribute("style");
+    }
   }
 }
 
@@ -183,19 +279,23 @@ function checkActivityNavigationConditionsRun(elem,courseTag, moduleTag, activit
   let url = checkActivityNavigationConditionsURL + '' + courseTag + '/' + moduleTag + '/' + activityTag ;
   $.get(url,function (data,status){
       if (status != 'success'){
-          checkActivityNavigationConditionsError(elem,'Error when calling url: '+url);
-      } else if (data.status == undefined )  {
-          checkActivityNavigationConditionsError(elem,'No status in result calling url: '+url+', data:'+JSON.stringify(data));
-      } else if (data.status == 0) {
+          let message = 'Error when calling url: '+url;
+          if (data.formattedMessages != undefined){
+            message += ';'+data.formattedMessages ;
+          }
+          checkActivityNavigationConditionsError(elem,message);
+      } else if (data.conditionsMet == undefined )  {
+          checkActivityNavigationConditionsError(elem,'No conditionsMet in result calling url: '+url+', data:'+JSON.stringify(data));
+      } else if (data.conditionsMet) {
+          if (data.reactionsNeeded){
+            // reaction needed block remove
+            blockReactionRemove = true;
+          }
           checkActivityNavigationConditionsRight(elem,data.url);
-      } else if (data.status == 2) {
-          checkActivityNavigationConditionsWrong(elem,data.message);
-      } else if (data.status == 3) {
-          // reaction needed block remove
-          blockReactionRemove = true;
-          checkActivityNavigationConditionsRight(elem,data.url);
+      } else if (!data.errorStatus) {
+          checkActivityNavigationConditionsWrong(elem,data.formattedMessages);
       } else {
-          checkActivityNavigationConditionsError(elem,'Error when calling url: '+url+';'+data.message);
+          checkActivityNavigationConditionsError(elem,'Error when calling url: '+url+';'+data.formattedMessages);
       }
   });
 }

@@ -76,6 +76,20 @@ liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenar
 liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si désactivé, les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
+!defined('ATTENDANCE_SHEET_FORM_NAME') && define('ATTENDANCE_SHEET_FORM_NAME', 'LMS Feuille d\'émargement');
+!defined('ATTENDANCE_SHEET_FORM_DESCRIPTION') && define(
+    'ATTENDANCE_SHEET_FORM_DESCRIPTION',
+    'Feuille d\'émargement pour une activité supplémentaire'
+);
+!defined('ATTENDANCE_SHEET_FORM_TEMPLATE') && define('ATTENDANCE_SHEET_FORM_TEMPLATE', 'texte***bf_titre***Titre de l\'activité supplémentaire***255***255*** *** ***text***1*** *** *** * ***@admins*** *** *** ***
+texte***bf_type***Type d\'activité*** *** *** *** ***text***0*** ***atelier, webinaire, sortie, ...*** * ***@admins*** *** *** ***
+tags***bf_formateurs***Formateur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les formateur·ice·s*** * ***@admins*** *** *** ***
+texte***bf_localization***Lieu*** *** *** *** ***text***0*** *** *** * *** * *** *** *** ***
+textelong***bf_contenu***Description***80***4*** *** ***wiki***0*** *** *** * ***@admins*** *** *** ***
+extraactivity***bf_extraactivity*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés*** * *** * *** *** *** ***
+acls*** + ***@admins***@admins***');
+
 /**
  * Check if a form exists and if not, add it to the nature table
  * @param $plugin_output_new the buffer in which to write
@@ -156,6 +170,16 @@ if ($learner && $learner->isAdmin()) {
         COURSE_FORM_DESCRIPTION,
         COURSE_FORM_TEMPLATE
     );
+    if ($GLOBALS['wiki']->config['lms_config']['extra_activity_enabled'] ?? false){
+        // test if the attendance sheet form exists, if not, install it
+        checkAndAddForm(
+            $output,
+            $GLOBALS['wiki']->config['lms_config']['attendance_sheet_form_id'],
+            ATTENDANCE_SHEET_FORM_NAME,
+            ATTENDANCE_SHEET_FORM_DESCRIPTION,
+            ATTENDANCE_SHEET_FORM_TEMPLATE
+        );
+    }
 
     // if the PageMenuLms page doesn't exist, create it with a default version
     if (!$this->LoadPage('PageMenuLms')) {

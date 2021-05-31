@@ -4,6 +4,7 @@ namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
 use YesWiki\Lms\ModuleStatus;
+use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
 
 /**
@@ -18,12 +19,14 @@ class ModuleNavigationField extends LmsField
      * The second position value is the name of the entry field.
      */
 
+    protected $courseController;
     protected $courseManager;
 
     public function __construct(array $values, ContainerInterface $services)
     {
         parent::__construct($values, $services);
         $this->courseManager = $services->get(CourseManager::class);
+        $this->courseController = $services->get(CourseController::class);
         
         // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
         $this->moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
@@ -48,27 +51,18 @@ class ModuleNavigationField extends LmsField
             $learner = $this->learnerManager->getLearner();
             // set canBeOpenedBy from course's module
             if ($learner
-                && ($referenceModule = $course->getModule($currentModuleTag)) // module in course
-                && !is_null($this->courseManager->setModuleCanBeOpenedByLearner(
-                    $learner,
-                    $course,
-                    $referenceModule
-                )) // set Module Can be opened
-                && !is_null($module->canBeOpenedBy($learner, $referenceModule->canBeOpenedBy($learner)))
                 && $module->isAccessibleBy($learner, $course)) {
                 // save the activity progress if not already exists for this user and activity
                 $this->learnerManager->saveModuleProgress($course, $module);
             }
 
-            $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
-            $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
-            $nextActivityTag = $tmpData['tag'];
-            $labelStart = $tmpData['label'];
-            if ($module->isAccessibleBy($learner, $course)) {
-                $statusMsg = $this->courseController->calculateModuleStatusMessage($course, $module);
-            } else {
-                $statusMsg = _t('LMS_MODULE_NOT_ACCESSIBLE');
-            }
+            // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
+
+            $disabledLink = !$module->isAccessibleBy($learner, $course);
+            
+            // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
+            list($nextActivityTag, $labelStart, $statusMsg) =
+                $this->courseController->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
 
             // End of duplicate code
 

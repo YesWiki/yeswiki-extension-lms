@@ -9,6 +9,7 @@ use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
+use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Service\CourseManager;
@@ -106,21 +107,24 @@ class CourseController extends YesWikiController
 
             if ($moduleTag) {
                 // if the module is specified in the GET parameter, return it if the tag corresponds
-                $module = $course->getModule($moduleTag);
+                $module = $this->courseManager->getModule($moduleTag);
 
-                return ($module && $module->hasActivity($activity->getTag())) ?
+                return ($module && $course->hasModule($module->getTag()) && $module->hasActivity($activity->getTag())) ?
                     $module
                     : null;
             } else {
                 // if the current page refers to a module of the course, return it
-                if ($module = $course->getModule($activity->getTag())) {
-                    return $module;
+                $currentModule = $this->courseManager->getModule($activity->getTag());
+                if ($currentModule && $course->hasModule($activity->getTag())) {
+                    return $currentModule;
                 }
 
                 // find in the course modules, the first module which contains the activity
-                foreach ($course->getModules() as $currentModule) {
-                    if ($currentModule->hasActivity($activity->getTag())) {
-                        return $currentModule;
+                if ($course) {
+                    foreach ($course->getModules() as $currentModule) {
+                        if ($currentModule->hasActivity($activity->getTag())) {
+                            return $currentModule;
+                        }
                     }
                 }
             }
@@ -173,14 +177,16 @@ class CourseController extends YesWikiController
                 $imageSize,
                 'fit'
             );
+
+        // TODO duplicate code (function navigationmodule in bazarlms.fonc.inc.php) : when passing to twig, mutualize it
+
         $learner = $this->learnerManager->getLearner();
-        $disabledLink = $this->courseManager->isModuleDisabledLink($learner, $course, $module);
+        $disabledLink = !$module->isAccessibleBy($learner, $course);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
         
-        $tmpData = $this->courseManager->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
-        $nextActivityTag = $tmpData['tag'];
-        $labelStart = $tmpData['label'];
+        list($nextActivityTag, $labelStart, $statusMsg) =
+            $this->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
 
         if (!$disabledLink) {
             $activityLink = $this->wiki->href(
@@ -190,7 +196,6 @@ class CourseController extends YesWikiController
                 false
             );
         }
-        $statusMsg = $this->calculateModuleStatusMessage($course, $module);
 
         // End of duplicate code
 
@@ -242,6 +247,46 @@ class CourseController extends YesWikiController
                 break;
         }
     }
+
+    /**
+     * getLastAccessibleActivityTagAndLabelForLearner
+     * @param Learner|null $learner
+     * @param Course $course
+     * @param Module $module
+     * @return array ["activity's tag",'label','statusMsg']
+     */
+    public function getLastAccessibleActivityTagAndLabelForLearner(?Learner $learner = null, Course $course, Module $module): array
+    {
+        if ($learner) {
+            $nextActivityTag = $this->courseManager->getLastAccessibleActivityTagForLearner($learner, $course, $module) ;
+            $isFinished = (
+                $module->getLastActivityTag() == $nextActivityTag
+                && $learner->hasFinishedModule($course, $module)
+            );
+        }
+        $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
+            _t('LMS_BEGIN_ONLY_ADMIN')
+            : (!$learner || (is_null($nextActivityTag)) ?  _t('LMS_BEGIN')
+                : ($isFinished ? _t('LMS_RESTART') : _t('LMS_RESUME')));
+
+        if (!$learner || $isFinished || is_null($nextActivityTag)) {
+            $nextActivityTag = $module->getFirstActivityTag();
+        }
+                        
+        if ($module->getStatus($course) == ModuleStatus::OPEN && !$module->isAccessibleBy($learner, $course)) {
+            // define status here because it depends of learner and can not be stored into $module->status
+            $statusMsg = _t('LMS_MODULE_NOT_ACCESSIBLE');
+        } else {
+            $statusMsg = $this->calculateModuleStatusMessage($course, $module);
+        }
+        
+        return [
+            $nextActivityTag,
+            $labelStart,
+            $statusMsg
+        ];
+    }
+
 
     /**
      * check if we can display activity without contextual course or module

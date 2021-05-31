@@ -41,10 +41,6 @@ class CourseMenuAction extends YesWikiAction
 
             $modulesDisplayed = $course->getModulesBetween($moduleDebutTag, $moduleFinTag);
 
-            if ($learner = $learnerManager->getLearner()) {
-                $courseManager->setModulesScriptedOpenedStatus($learner, $course, $modulesDisplayed);
-            }
-
             // if an handler is after the page tag in the wiki parameter variable, get only the tag
             $pageTag = isset($_GET['wiki']) ?
                 strpos($_GET['wiki'], '/') ?
@@ -75,7 +71,7 @@ class CourseMenuAction extends YesWikiAction
                         'course' => $course,
                         'module' => $module,
                         'modulesDisplayed' => $modulesDisplayed,
-                        'learner' => $learner
+                        'learner' => $learnerManager->getLearner()
                     ]);
                 }
             }

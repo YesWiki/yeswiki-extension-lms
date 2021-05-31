@@ -93,7 +93,7 @@
                   activity:result.activity.tag,
                   quizId:result.quizId,
                   learner:result.learner.userName,
-                  log_time:result.log_time|date(dateFormat),
+                  log_time:result.log_time|date(constant('YesWiki\\Lms\\Service\\DateManager::DATETIME_FORMAT')),
                   urlParams:urlParams|keys|join(','),
                   })}) }}"{{ block('deleteLine') }}
           </tr>

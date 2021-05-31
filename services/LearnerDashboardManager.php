@@ -5,15 +5,10 @@ namespace YesWiki\Lms\Service;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use YesWiki\Core\Service\UserManager;
-use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Course;
 use YesWiki\Lms\Learner;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Progresses;
-use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Lms\Service\DateManager;
-use YesWiki\Lms\Service\LearnerManager;
-use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Wiki;
 
 class LearnerDashboardManager
@@ -22,7 +17,6 @@ class LearnerDashboardManager
     protected $userManager;
     protected $courseManager;
     protected $dateManager;
-    protected $learnerManager;
     protected $extraActivityManager;
 
     /**
@@ -30,7 +24,6 @@ class LearnerDashboardManager
      * @param Wiki $wiki the injected Wiki instance
      * @param UserManager $userManager the injected UserManager instance
      * @param CourseManager $courseManager the injected CourseManager instance
-     * @param LearnerManager $learnerManager the injected LearnerManager instance
      * @param DateManager $dateManager the injected DateManager instance
      * @param ExtraActivityManager $extraActivityManager the injected ExtraActivityManager instance
      */
@@ -38,14 +31,12 @@ class LearnerDashboardManager
         Wiki $wiki,
         UserManager $userManager,
         CourseManager $courseManager,
-        LearnerManager $learnerManager,
         DateManager $dateManager,
         ExtraActivityManager $extraActivityManager
     ) {
         $this->wiki = $wiki;
         $this->userManager = $userManager;
         $this->courseManager = $courseManager;
-        $this->learnerManager = $learnerManager;
         $this->dateManager = $dateManager;
         $this->extraActivityManager = $extraActivityManager;
     }
@@ -66,8 +57,9 @@ class LearnerDashboardManager
         $coursesStat = [];
         foreach ($courses as $course) {
             // extra activity part
-            if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
-                $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, null, $learner));
+            if ($this->wiki->config['lms_config']['extra_activity_enabled']) {
+                $course->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, null,
+                    $learner));
             }
             $modulesStat = $this->processModulesStat($course, $learner);
 
@@ -122,12 +114,13 @@ class LearnerDashboardManager
     {
         $modulesStat = [];
         $modules = $course->getModules();
-        $progresses = $this->learnerManager->getAllProgressesForLearner($learner);
+        $progresses = $learner->getProgresses();
 
         foreach ($modules as $module) {
             // extra activity part
-            if ($this->wiki->config['lms_config']['extra_activity_enabled'] ?? false) {
-                $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module, $learner));
+            if ($this->wiki->config['lms_config']['extra_activity_enabled']) {
+                $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module,
+                    $learner));
             }
             $activitiesStat = $this->processActivitiesStat($course, $module, $learner, $progresses);
             // get progress
@@ -139,8 +132,8 @@ class LearnerDashboardManager
             );
 
             $started = $progress || !empty(array_filter($activitiesStat, function ($activityStat) {
-                return $activityStat['started'];
-            }));
+                    return $activityStat['started'];
+                }));
 
             $nbActivities = count($activitiesStat);
             if ($nbActivities > 0) {

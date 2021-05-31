@@ -43,9 +43,9 @@ class Course extends CourseStructure
     }
 
     /**
-     * get a child module with the given tag
-     * @param $moduleTag the module tag to search
-     * @return Module|null
+     * Get the module with the given tag
+     * @param $moduleTag the tag which specified the module
+     * @return Module|null return null if the module specified is not found
      */
     public function getModule($moduleTag): ?Module
     {

@@ -60,13 +60,15 @@ class LearnerManager
      */
     public function getLearner(string $username = null): ?Learner
     {
+        // load ConditionsChecker not in constructor to prevent loop
+        $conditionsChecker = $this->wiki->services->get(ConditionsChecker::class);
         if (empty($username) || empty($this->userManager->getOneByName($username))) {
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
-                : new Learner($user['name'], $this->entryManager, $this->wiki);
+                : new Learner($user['name'], $conditionsChecker, $this->entryManager, $this, $this->wiki);
         }
-        return new Learner($username, $this->entryManager, $this->wiki);
+        return new Learner($username, $conditionsChecker, $this->entryManager, $this, $this->wiki);
     }
 
     public function saveActivityProgress(Course $course, Module $module, Activity $activity): bool
@@ -257,51 +259,5 @@ class LearnerManager
         ?Activity $activity
     ): bool {
         return $this->saveElapsedTimeForLearner($learner, $course, $module, $activity, null);
-    }
-
-    
-    /**
-     * Check if module or activity has been started by a learner
-     * @param Course $course
-     * @param Module $module
-     * @param Activity|null $activity
-     * @param Learner|null $learner or current learner is null
-     * @param Progresses|null $progresses of current Learner if available
-     * @return bool
-     *
-     */
-    public function hasBeenOpenedBy(
-        Course $course,
-        Module $module,
-        ?Activity $activity = null,
-        ?Learner $learner = null,
-        ?Progresses $progresses = null
-    ):bool {
-        if (!$learner && !($learner = $this->getLearner())) {
-            return false ;
-        }
-        if ($activity) {
-            $courseStructure = $activity;
-        } else {
-            $courseStructure = $module;
-        }
-        $status = $courseStructure->hasBeenOpenedBy($learner) ;
-        if (!is_null($status)) {
-            return $status ;
-        }
-
-        if (!$progresses) {
-            $progresses = $this->getAllProgressesForLearner($learner);
-        }
-        // get progress
-        $progress = $progresses->getProgressForActivityOrModuleForLearner(
-            $learner,
-            $course,
-            $module,
-            $activity
-        );
-
-        $status = !empty($progress);
-        return $courseStructure->hasBeenOpenedBy($learner, $status);
     }
 }

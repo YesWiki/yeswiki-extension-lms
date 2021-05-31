@@ -1,9 +1,6 @@
 <?php
 
 use YesWiki\Core\YesWikiAction;
-use YesWiki\Lms\Course;
-use YesWiki\Lms\ExtraActivityLog;
-use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ExtraActivityManager;
 use YesWiki\Lms\Service\LearnerManager;
@@ -13,7 +10,7 @@ class ExtraActivityAction extends YesWikiAction
     protected $courseManager;
     protected $extraActivityManager;
     protected $learnerManager;
-    
+
     /**
      * format arguments property
      * @param array $arguments
@@ -22,17 +19,17 @@ class ExtraActivityAction extends YesWikiAction
     protected function formatArguments($arg)
     {
         return [
-            'mode' => $_REQUEST['extra_activity_mode'] ?? null ,
-            'extra_activity_enabled' => $this->wiki->config['lms_config']['extra_activity_enabled'] ?? false,
-            'course' => $_REQUEST['course'] ?? null ,
-            'module' => $_REQUEST['module'] ?? null ,
-            'tag' => $_REQUEST['tag'] ?? null ,
-            'learner' => $_REQUEST['learner'] ?? null ,
-            'confirm' => $_REQUEST['confirm'] ?? null ,
+            'mode' => $_REQUEST['extra_activity_mode'] ?? null,
+            'extra_activity_enabled' => $this->wiki->config['lms_config']['extra_activity_enabled'],
+            'course' => $_REQUEST['course'] ?? null,
+            'module' => $_REQUEST['module'] ?? null,
+            'tag' => $_REQUEST['tag'] ?? null,
+            'learner' => $_REQUEST['learner'] ?? null,
+            'confirm' => $_REQUEST['confirm'] ?? null,
             'learners' => $arg['learners'] ?? [],
         ];
     }
-    
+
     /**
      * run the controller
      * @return string|null null if nothing to do
@@ -63,7 +60,7 @@ class ExtraActivityAction extends YesWikiAction
         switch ($this->arguments['mode']) {
             case 'add':
                 return $this->edit();
-                break ;
+                break;
             case 'edit':
                 $extraActivityLog = $this->extraActivityManager->getExtraActivityLog(
                     $this->arguments['tag']
@@ -71,10 +68,10 @@ class ExtraActivityAction extends YesWikiAction
                 return $this->edit(
                     ($extraActivityLog) ? ['extraActivityLog' => $extraActivityLog] : []
                 );
-                break ;
+                break;
             case 'save':
                 return $this->save();
-                break ;
+                break;
             case 'remove':
                 return $this->remove();
                 break;
@@ -82,7 +79,7 @@ class ExtraActivityAction extends YesWikiAction
                 return $this->delete();
                 break;
             default:
-                return null ;
+                return null;
         }
     }
 
@@ -93,20 +90,27 @@ class ExtraActivityAction extends YesWikiAction
      */
     private function edit(array $params = []): string
     {
-        $course = $this->courseManager->getCourse($this->arguments['course']) ;
+        $course = $this->courseManager->getCourse($this->arguments['course']);
         $modules = [];
         foreach ($course->getModules() as $module) {
             $modules[$module->getTag()] = $module->getTitle();
         }
+
+        // the progresses we are going to process
+        $this->progresses = $this->learnerManager->getProgressesForAllLearners($course);
+        $learners = [];
+        foreach ($this->progresses->getAllUsernames() as $username) {
+            $currentLearner = $this->learnerManager->getLearner($username);
+            $learners[$username] = $currentLearner->getFullName();
+        }
+
         return $this->render(
             '@lms/extra-activity-form.twig',
             array_merge([
                 'course' => $course,
                 'module' => $this->arguments['module'],
                 'modules' => $modules,
-                'learners' => array_map(function ($learner) {
-                    return $learner->getFullName() ;
-                }, $this->arguments['learners']),
+                'learners' => $learners,
                 'debug' => isset($_GET['debug']),
             ], $params)
         );
@@ -129,22 +133,22 @@ class ExtraActivityAction extends YesWikiAction
             }
         } catch (Throwable $t) {
             return $this->render(
-                '@templates/alert-message.twig',
-                [
-                    'type' => 'danger',
-                    'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') .
-                       ($_POST['title'] ?? '!!!$_POST[\'title\'] not set!!!') . '<br>'
-                       . (($this->wiki->GetConfigValue('debug')=='yes')
-                         ? $t->getMessage().'<br>'
-                         .'in file:'.$t->getFile().'<br>'
-                         . 'at line:'.$t->getLine().'<br>'
-                         :'')
-                ]
-            )
-            . $this->render('@lms/extra-activity-backlink.twig', [
-                'course' => $this->arguments['course'],
-                'module' => $this->arguments['module']
-            ]);
+                    '@templates/alert-message.twig',
+                    [
+                        'type' => 'danger',
+                        'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') .
+                            ($_POST['title'] ?? '!!!$_POST[\'title\'] not set!!!') . '<br>'
+                            . (($this->wiki->GetConfigValue('debug') == 'yes')
+                                ? $t->getMessage() . '<br>'
+                                . 'in file:' . $t->getFile() . '<br>'
+                                . 'at line:' . $t->getLine() . '<br>'
+                                : '')
+                    ]
+                )
+                . $this->render('@lms/extra-activity-backlink.twig', [
+                    'course' => $this->arguments['course'],
+                    'module' => $this->arguments['module']
+                ]);
         }
     }
 
@@ -159,10 +163,10 @@ class ExtraActivityAction extends YesWikiAction
                 '@lms/extra-activity-confirm.twig',
                 [
                     'message' => _t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER')
-                            .'"'.$this->arguments['learner'].'"'
-                            ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
-                            .'"'.$this->arguments['tag'].'"'
-                            ,
+                        . '"' . $this->arguments['learner'] . '"'
+                        . _t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
+                        . '"' . $this->arguments['tag'] . '"'
+                    ,
                     'course' => $this->arguments['course'],
                     'module' => $this->arguments['module'],
                     'tag' => $this->arguments['tag'],
@@ -173,7 +177,8 @@ class ExtraActivityAction extends YesWikiAction
             );
         } else {
             try {
-                if ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'], $this->arguments['learner'])) {
+                if ($this->extraActivityManager->deleteExtraActivity($this->arguments['tag'],
+                    $this->arguments['learner'])) {
                     $this->wiki->Redirect($this->wiki->Href(null, null, [
                         'course' => $this->arguments['course'],
                         'module' => $this->arguments['module'],
@@ -184,24 +189,24 @@ class ExtraActivityAction extends YesWikiAction
                 }
             } catch (Throwable $t) {
                 return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'danger',
-                        'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE')
-                        .'"'.($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!!').'"'
-                        ._t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
-                        .'"'.($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!').'" <br>'
-                        . (($this->wiki->GetConfigValue('debug')=='yes')
-                         ? $t->getMessage().'<br>'
-                         .'in file:'.$t->getFile().'<br>'
-                         . 'at line:'.$t->getLine().'<br>'
-                         :'')
-                    ]
-                )
-                . $this->render('@lms/extra-activity-backlink.twig', [
-                    'course' => $this->arguments['course'],
-                    'module' => $this->arguments['module']
-                ]);
+                        '@templates/alert-message.twig',
+                        [
+                            'type' => 'danger',
+                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_REMOVE')
+                                . '"' . ($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!!') . '"'
+                                . _t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
+                                . '"' . ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '" <br>'
+                                . (($this->wiki->GetConfigValue('debug') == 'yes')
+                                    ? $t->getMessage() . '<br>'
+                                    . 'in file:' . $t->getFile() . '<br>'
+                                    . 'at line:' . $t->getLine() . '<br>'
+                                    : '')
+                        ]
+                    )
+                    . $this->render('@lms/extra-activity-backlink.twig', [
+                        'course' => $this->arguments['course'],
+                        'module' => $this->arguments['module']
+                    ]);
             }
         }
     }
@@ -212,7 +217,7 @@ class ExtraActivityAction extends YesWikiAction
             return $this->render(
                 '@lms/extra-activity-confirm.twig',
                 [
-                    'message' => _t('LMS_EXTRA_ACTIVITY_DELETE').'"'.$this->arguments['tag'].'"',
+                    'message' => _t('LMS_EXTRA_ACTIVITY_DELETE') . '"' . $this->arguments['tag'] . '"',
                     'course' => $this->arguments['course'],
                     'module' => $this->arguments['module'],
                     'tag' => $this->arguments['tag'],
@@ -232,22 +237,22 @@ class ExtraActivityAction extends YesWikiAction
                 }
             } catch (Throwable $t) {
                 return $this->render(
-                    '@templates/alert-message.twig',
-                    [
-                        'type' => 'danger',
-                        'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
-                            ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '<br>'
-                            . (($this->wiki->GetConfigValue('debug')=='yes')
-                            ? $t->getMessage().'<br>'
-                            .'in file:'.$t->getFile().'<br>'
-                            . 'at line:'.$t->getLine().'<br>'
-                            :'')
-                    ]
-                )
-                . $this->render('@lms/extra-activity-backlink.twig', [
-                    'course' => $this->arguments['course'],
-                    'module' => $this->arguments['module']
-                ]);
+                        '@templates/alert-message.twig',
+                        [
+                            'type' => 'danger',
+                            'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
+                                ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '<br>'
+                                . (($this->wiki->GetConfigValue('debug') == 'yes')
+                                    ? $t->getMessage() . '<br>'
+                                    . 'in file:' . $t->getFile() . '<br>'
+                                    . 'at line:' . $t->getLine() . '<br>'
+                                    : '')
+                        ]
+                    )
+                    . $this->render('@lms/extra-activity-backlink.twig', [
+                        'course' => $this->arguments['course'],
+                        'module' => $this->arguments['module']
+                    ]);
             }
         }
     }

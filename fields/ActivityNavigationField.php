@@ -10,7 +10,7 @@ use YesWiki\Lms\Activity;
 use YesWiki\Lms\Module;
 use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
-use YesWiki\Lms\Service\ActivityNavigationConditionsManager;
+use YesWiki\Lms\Service\ConditionsChecker;
 
 /**
  * @Field({"navigationactivite","activitynavigation"})
@@ -40,7 +40,7 @@ class ActivityNavigationField extends LmsField
     protected $config;
     protected $entryManager;
     protected $dateManager;
-    protected $ActivityNavigationConditionsManager;
+    protected $conditionsChecker;
     protected $moduleModal;
     protected $courseManager;
 
@@ -57,13 +57,14 @@ class ActivityNavigationField extends LmsField
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         $this->courseManager = $services->get(CourseManager::class);
-        $this->ActivityNavigationConditionsManager = $services->get(ActivityNavigationConditionsManager::class);
+        $this->conditionsChecker = $services->get(ConditionsChecker::class);
         
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
     }
 
     // Render the show view of the field
+    // TODO check if the current form is an LMS activity form to prevent errors
     protected function renderStatic($entry)
     {
         $currentActivityTag = $this->getCurrentTag($entry);
@@ -86,20 +87,6 @@ class ActivityNavigationField extends LmsField
         if ($course && $module && !empty($module->getActivities())) {
             $learner = $this->learnerManager->getLearner();
             if ($learner
-                && $this->courseManager->setModuleCanBeOpenedByLearner(
-                    $learner,
-                    $course,
-                    $module
-                ) // module should be accessible
-                && ($referenceActivity = $module->getActivity($activity->getTag()))
-                 // activity should be in module
-                && !is_null($this->courseManager->setActivityCanBeOpenedByLearner(
-                    $learner,
-                    $course,
-                    $module,
-                    $referenceActivity
-                )) // set Activity Can be opened
-                && !is_null($activity->canBeOpenedBy($learner, $referenceActivity->canBeOpenedBy($learner)))
                 && $activity->isAccessibleBy($learner, $course, $module)
             ) {
                 // save the activity progress if not already exists for this user and activity
@@ -112,8 +99,7 @@ class ActivityNavigationField extends LmsField
             }
 
             // display the next button
-            $nextCourseStructure = $this->ActivityNavigationConditionsManager
-                    ->getNextActivityOrModule($course, $module, $activity);
+            $nextCourseStructure = $this->courseManager->getNextActivityOrModule($course, $module, $activity);
             if ($nextCourseStructure instanceof Module) {
                 $nextModule = $nextCourseStructure;
             } else {
@@ -121,17 +107,11 @@ class ActivityNavigationField extends LmsField
             }
             
             // check conditions
-            if ($this->courseManager->isConditionsEnabled()) {
-                $conditions = $this->ActivityNavigationConditionsManager
+            if ($this->conditionsChecker->isConditionsEnabled()) {
+                $conditionsResults = $this->conditionsChecker
                     ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
-                $conditionsStatus = $conditions[ActivityNavigationConditionsManager::STATUS_LABEL] ?? ActivityNavigationConditionsManager:: STATUS_CODE_ERROR;
-                if ($conditionsStatus == ActivityNavigationConditionsManager::STATUS_CODE_OK_REACTIONS_NEEDED) {
-                    $conditionsStatus = ActivityNavigationConditionsManager::STATUS_CODE_OK;
-                    $reactionNeeded = true ;
-                }
-                $conditionsMessage = $conditions[ActivityNavigationConditionsManager::MESSAGE_LABEL] ?? null;
-                if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsStatus == ActivityNavigationConditionsManager:: STATUS_CODE_ERROR) {
-                    trigger_error($conditionsMessage);
+                if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsResults->getErrorStatus()) {
+                    trigger_error($conditionsResults->getFormattedMessages());
                 }
             }
 
@@ -142,10 +122,8 @@ class ActivityNavigationField extends LmsField
                 'previousActivity' => $previousActivity ?? null,
                 'nextModule' => $nextModule ?? null,
                 'nextActivity' => $nextActivity ?? null,
-                'conditionsEnabled' => $this->courseManager->isConditionsEnabled(),
-                'conditionsStatus' => $conditionsStatus ?? false,
-                'conditionsMessage' => $conditionsMessage ?? null,
-                'reactionNeeded' => $reactionNeeded ?? false,
+                'conditionsEnabled' => $this->conditionsChecker->isConditionsEnabled(),
+                'conditionsResults' => $conditionsResults ?? null,
             ]);
         }
         return $output;
@@ -153,7 +131,7 @@ class ActivityNavigationField extends LmsField
 
     protected function renderInput($entry)
     {
-        return ($this->courseManager->isConditionsEnabled()) ? $this->render("@lms/inputs/activity-navigation.twig", [
+        return ($this->conditionsChecker->isConditionsEnabled()) ? $this->render("@lms/inputs/activity-navigation.twig", [
             'value' => $this->getValue($entry),
             'entryId' => $entry['id_fiche'] ?? 'new',
             'options' => [
@@ -164,7 +142,8 @@ class ActivityNavigationField extends LmsField
             ],
             'formOptions' => array_map(function ($form) {
                 return $form['bn_label_nature'];
-            }, $this->getService(FormManager::class)->getAll())
+            }, $this->getService(FormManager::class)->getAll()),
+            'scopeOptions' => $this->courseManager->getActivityParents($entry)
         ])
         : null;
     }
@@ -176,13 +155,17 @@ class ActivityNavigationField extends LmsField
         if ($this->canEdit($entry) && is_array($value) && isset($value[self::LABEL_NEW_VALUES])) {
             $data = [];
             if (isset($value[self::LABEL_REACTION_NEEDED])) {
-                $data[] = ['condition' => self::LABEL_REACTION_NEEDED];
+                foreach ($value[self::LABEL_REACTION_NEEDED] as $id => $val) {
+                    $data[] = ['condition' => self::LABEL_REACTION_NEEDED]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
+                }
             }
             if (isset($value[self::LABEL_QUIZ_PASSED]) && isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID])) {
                 foreach ($value[self::LABEL_QUIZ_PASSED]['head'] as $id => $val) {
                     if (isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
-                        self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]];
+                        self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
                     }
                 }
             }
@@ -194,7 +177,8 @@ class ActivityNavigationField extends LmsField
                             && isset($value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id])) {
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL,
                         self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_ID][$id],
-                        self::LABEL_QUIZ_MINIMUM_LEVEL => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id]];
+                        self::LABEL_QUIZ_MINIMUM_LEVEL => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id]]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
                     }
                 }
             }
@@ -202,7 +186,8 @@ class ActivityNavigationField extends LmsField
                 foreach ($value[self::LABEL_FORM_FILLED]['head'] as $id => $val) {
                     if (isset($value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_FORM_FILLED,
-                        self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id]];
+                        self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id]]
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
                     }
                 }
             }
@@ -217,5 +202,29 @@ class ActivityNavigationField extends LmsField
     protected function getValue($entry)
     {
         return $entry[$this->propertyName] ?? $_REQUEST[$this->propertyName] ?? $this->default;
+    }
+
+    private function extractScope($scope):?array
+    {
+        if (is_array($scope)) {
+            $results = [];
+            foreach ($scope as $value) {
+                $tmpRes = $this->extractScope($value);
+                if (!empty($tmpRes)) {
+                    $results[] = $tmpRes;
+                }
+            }
+            
+            return $results ;
+        } elseif (is_string($scope)) {
+            $extracted = explode('/', $scope);
+            if (count($extracted) < 2) {
+                return null;
+            }
+            $course = $extracted[0];
+            $module = $extracted[1];
+            $result = (($course == '*')?[]:['course' => $course]) + (($module == '*')?[]:['module' => $module]);
+            return empty($result) ? null : $result ;
+        }
     }
 }
