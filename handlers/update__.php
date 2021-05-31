@@ -57,8 +57,8 @@ acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 !defined('MODULE_FORM_TEMPLATE') && define('MODULE_FORM_TEMPLATE', 'texte***bf_titre***Titre du module***255***255*** *** ***text***1*** *** *** *** *** *** ***
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 image***bf_image***Image***300***300***600***600***left***0*** ***
-jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** *** *** *** *** *** ***
-liste***ListeOuinonLms***Activé*** *** ***oui***bf_actif*** ***0*** *** *** *** *** *** ***
+jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** ***Les apprenants pourront accéder au module qu\'à partir de cette date*** * *** * *** *** *** ***
+liste***ListeOuinonLms***Activé*** *** ***oui***bf_actif*** ***0*** ***Vous pouvez fermer le module afin d\'interdire l\'accès aux apprenants. Ce paramétrage est prioritaire sur « Date d\'ouverture ».*** * *** * *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . '***Activités*** *** *** ***bf_activites***dragndrop***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
@@ -72,8 +72,8 @@ acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 image***bf_image***Image***300***300***600***600***right***0*** *** *** * *** * *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
-liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Pour valider un module, un apprenant doit avoir valider toutes les activités du module*** *** *** *** ***
-liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si désactivé, les apprenants n\'ont pas besoin de terminer le module précédent pour accéder au suivant*** *** *** *** ***
+liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Si « oui », les apprenants doivent avoir consulté l\'activité précédente pour accéder à la suivante*** *** *** *** ***
+liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si « oui », les apprenants doivent avoir consulté toutes les activités du module précédent pour accéder au module suivant*** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 
 !defined('ATTENDANCE_SHEET_FORM_NAME') && define('ATTENDANCE_SHEET_FORM_NAME', 'LMS Feuille d\'émargement');
