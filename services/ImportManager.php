@@ -42,22 +42,23 @@ class ImportManager
                 'header' => 'Authorization: Bearer ' . $remoteToken . "\r\n"
             )
         );
-
         $context = stream_context_create($opts);
 
         // Fetching all information needed
         $dataStr = file_get_contents($remoteUrl.'?api/'.$apiArgs, false, $context);
         if (empty($dataStr)) {
             throw new \Exception(_t('LMS_ERROR_NO_DATA'));
-        } elseif ($dataJson=json_decode($dataStr, true) === null) {
-            throw new \Exception(_t('LMS_ERROR_PARSING_DATA') . "\n" . $dataStr . "\n");
         } else {
-            $data = array();
-            foreach ($dataJson as $entry) {
-                $data[$entry['id_fiche']] = $entry;
+            $dataJson=json_decode($dataStr, true);
+            if (!$dataJson) {
+                throw new \Exception(_t('LMS_ERROR_PARSING_DATA') . "\n" . $dataStr . "\n");
+            } else {
+                $data = array();
+                foreach ($dataJson as $entry) {
+                    $data[$entry['id_fiche']] = $entry;
+                }
             }
         }
-
         return $data;
     }
 
