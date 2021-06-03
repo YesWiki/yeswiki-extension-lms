@@ -46,7 +46,7 @@ class ImportManager
 
         // Fetching all information needed
         $dataStr = file_get_contents($remoteUrl.'?api/'.$apiArgs, false, $context);
-        if (empty($dataStr)) {
+        if (empty($dataStr) || $dataStr == "{}") {
             throw new \Exception(_t('LMS_ERROR_NO_DATA'));
         } else {
             $dataJson=json_decode($dataStr, true);
