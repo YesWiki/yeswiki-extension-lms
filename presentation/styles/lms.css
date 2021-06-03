@@ -42,6 +42,10 @@
 #YesWikiModal .modal-body .id1202 nav.module-nav .pager-lms{
     display: none;
 }
+/* add space after title in lms activity */
+.id1201 .lms-container h1 {
+    margin-bottom: 1em;
+}
 
 /* remove the info bar below the entry, but keep for admins */
 .lms-container ~ .BAZ_fiche_info {
