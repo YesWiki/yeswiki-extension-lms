@@ -613,7 +613,7 @@
 
 /** Index menu button in small screen size **/
 /* Begin - Burger Style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
-.open-main-nav {
+#burger {
     position: absolute;
     top: 15px;
     right: 15px;
@@ -622,10 +622,10 @@
     border: 0;
     cursor: pointer;
 }
-.open-main-nav:focus {
+#burger:focus {
     outline: none;
 }
-.burger {
+#burger-icon {
     position: relative;
     display: block;
     width: 28px;
@@ -635,33 +635,32 @@
     transform: skew(5deg);
     transition: all .275s;
 }
-.burger:after,
-.burger:before {
+#burger-icon:after, #burger-icon:before {
     content: '';
     display: block;
     height: 100%;
     background: #5A3B5D;
     transition: all .275s;
 }
-.burger:after {
+#burger-icon:after {
     transform: translateY(-12px) translateX(-2px) skew(-20deg);
 }
-.burger:before {
+#burger-icon:before {
     transform: translateY(-16px) skew(-10deg);
 }
 /* Toggle State part */
-.is-open .burger {
+.burger-is-open #burger-icon {
     transform: skew(5deg) translateY(-8px) rotate(-45deg);
 }
-.is-open .burger:before {
+.burger-is-open #burger-icon:before {
     transform: translateY(0px) skew(-10deg) rotate(75deg);
 }
-.is-open .burger:after {
+.burger-is-open #burger-icon:after {
     transform: translateY(-12px) translateX(10px) skew(-20deg);
     opacity: 0;
 }
 /* MENU Text part */
-.burger-text {
+#burger-text {
     display: block;
     font-size: .675rem;
     letter-spacing: .05em;
@@ -676,24 +675,18 @@
     display: none;
 }
 @media (max-width:991px) {
-    #burger.is-open ~ .lms-menu {
+    #burger.burger-is-open ~ .lms-menu {
         display: block;
     }
-    #burger.is-open ~ .lms-content {
+    #burger.burger-is-open ~ .lms-content {
         display: none;
     }
-    /*#burger.is-open ~ .lms-container ~ * {*/
-    /*    display: none;*/
-    /*}*/
-    #burger:not(.is-open) ~ .lms-menu {
+    #burger:not(.burger-is-open) ~ .lms-menu {
         display: none;
     }
-    #burger:not(.is-open) ~ .lms-content {
+    #burger:not(.burger-is-open) ~ .lms-content {
         display: block;
     }
-    /*#burger:not(.is-open) ~ .lms-container ~ * {*/
-    /*    display: block;*/
-    /*}*/
     .lms-menu>:first-child, .lms-content>:first-child {
         margin-top: 40px;
     }

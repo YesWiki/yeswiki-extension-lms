@@ -65,9 +65,8 @@ $(document).ready(function () {
 })
 
 /** for menu index in small screen size **/
-let burger = document.getElementById('burger');
 $('#burger').on('click', function(){
-  $('#burger').toggleClass('is-open');
+  $('#burger').toggleClass('burger-is-open');
 })
 
 /** == ==  Part for activity navigation edit == == */
