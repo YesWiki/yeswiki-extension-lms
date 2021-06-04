@@ -46,17 +46,15 @@ class ImportManager
 
         // Fetching all information needed
         $dataStr = file_get_contents($remoteUrl.'?api/'.$apiArgs, false, $context);
-        if (empty($dataStr) || $dataStr == "{}") {
+        $dataJson = json_decode($dataStr, true);
+        if ($dataJson === null && json_last_error() !== JSON_ERROR_NONE) {
+            throw new \Exception(_t('LMS_ERROR_PARSING_DATA') . "\n" . $dataStr . "\n");
+        } else if (empty($dataJson)) {
             throw new \Exception(_t('LMS_ERROR_NO_DATA'));
         } else {
-            $dataJson=json_decode($dataStr, true);
-            if (!$dataJson) {
-                throw new \Exception(_t('LMS_ERROR_PARSING_DATA') . "\n" . $dataStr . "\n");
-            } else {
-                $data = array();
-                foreach ($dataJson as $entry) {
-                    $data[$entry['id_fiche']] = $entry;
-                }
+            $data = array();
+            foreach ($dataJson as $entry) {
+                $data[$entry['id_fiche']] = $entry;
             }
         }
         return $data;
