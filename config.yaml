@@ -26,6 +26,9 @@ parameters:
     show_activities_without_context_or_learner: true
     # activate navigation conditions to check if user is allowed to view next activity
     activity_navigation_conditions_enabled: false
+  # for edit config action
+  lms_editable_config_params:
+    - 'lms_config'
 
 services:
   _defaults:
