@@ -494,7 +494,7 @@
 .panel-lms-dashboard .panel-heading:not(.collapsed) .fa-chevron-down {
     display: none;
 }
-.panel-heading[data-toggle="collapse"] {
+.panel-lms-dashboard  .panel-heading[data-toggle="collapse"] {
     --chevron-color: transparent; /* hack to not display the bootstrap right chevron */
 }
 .panel-lms-dashboard .panel-heading .fa-chevron-up,
