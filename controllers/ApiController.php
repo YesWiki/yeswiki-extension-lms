@@ -413,12 +413,13 @@ class ApiController extends YesWikiController
         $output .= '<br />The following code :<br />';
         $output .= 'GET <code>'.$urlCheckConditions.'</code><br />';
         $output .= 'gives for {activity} of {module} of {course} for the current user :<br />';
-        $output .= '<code>['.ConditionsChecker::STATUS_LABEL.':STATUS_CODE,<br />';
-        $output .= ConditionsChecker::URL_LABEL.':null|"https://...",<br />';
-        $output .= ConditionsChecker::MESSAGE_LABEL.':"html code"]</code><br />';
-        $output .= 'STATUS_CODE: '.ConditionsChecker::STATUS_CODE_OK.' = OK; ';
-        $output .= ConditionsChecker::STATUS_CODE_ERROR.' = ERROR; ';
-        $output .= ConditionsChecker::STATUS_CODE_NOT_OK.' = NOT OK; <br />';
+        $output .= '<code>[code:HTML_CODE,<br />';
+        $output .= 'conditionsMet:true/false,<br />';
+        $output .= 'errorStatus:true/false",<br />';
+        $output .= 'reactionsNeeded:true/false,<br />';
+        $output .= '(optionnal) url:"https://...",<br />';
+        $output .= 'messages:[...],<br />';
+        $output .= 'formattedMessages:"<.....>"]</code><br />';
         return $output;
     }
 }
