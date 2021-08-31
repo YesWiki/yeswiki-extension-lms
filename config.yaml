@@ -28,7 +28,21 @@ parameters:
     activity_navigation_conditions_enabled: false
   # for edit config action
   lms_editable_config_params:
-    - 'lms_config'
+    - lms_config:
+      - activity_form_id
+      - module_form_id
+      - course_form_id
+      - extra_activity_enabled
+      - attendance_sheet_form_id
+      - save_progress_for_admins
+      - activity_navigation_conditions_enabled
+      - display_activity_title
+      - module_image_size_in_course
+      - use_yeswiki_comments
+      - tabs_enabled
+      - use_only_custom_elapsed_time
+      - display_activity_elapsed_time
+      - show_activities_without_context_or_learner
 
 services:
   _defaults:
