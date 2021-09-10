@@ -127,7 +127,7 @@ class UpdateElapsedTimeHandler extends YesWikiHandler
     {
         // get elapsedtime
         if (isset($_POST['elapsedtime'])) {
-            if (!ctype_digit($_POST['elapsedtime'])) {
+            if (!ctype_digit($_POST['elapsedtime']) && (intval($_POST['elapsedtime']) != 0)) {
                 return $this->twig->renderInSquelette('@templates/alert-message-with-back.twig', [
                     'type' => 'danger',
                     'message' => 'The GET parameter \'elapsedtime\' must be a positive integer'
