@@ -92,8 +92,9 @@ class Learner
      */
     public function getEmail(): ?string
     {
-        return !empty($this->getUserEntry()) && !empty($this->getUserEntry()['bf_mail']) ?
-            $this->getUserEntry()['bf_mail']
+        return !empty($this->getUserEntry())
+                && !empty($this->getUserEntry()[$this->wiki->config['lms_config']['learner_mail_field']]) ?
+            $this->getUserEntry()[$this->wiki->config['lms_config']['learner_mail_field']]
             : null;
     }
 

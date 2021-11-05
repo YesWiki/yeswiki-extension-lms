@@ -24,8 +24,8 @@ parameters:
     extra_activity_enabled: false
     # show activities without context when one course is scripted (false = to be sure no activity is readable)
     show_activities_without_context_or_learner: true
-    # activate navigation conditions to check if user is allowed to view next activity
-    activity_navigation_conditions_enabled: false
+    # field name for the learner mail in the user profil form (form id: 1000)
+    learner_mail_field : bf_email
   # for edit config action
   lms_editable_config_params:
     - lms_config:
@@ -43,6 +43,7 @@ parameters:
       - use_only_custom_elapsed_time
       - display_activity_elapsed_time
       - show_activities_without_context_or_learner
+      - learner_mail_field
 
 services:
   _defaults:

@@ -191,6 +191,6 @@ $GLOBALS['translations'] = array_merge(
         'EDIT_CONFIG_HINT_LMS_CONFIG[USE_ONLY_CUSTOM_ELAPSED_TIME]' => 'Utiliser uniquement les temps personnalisés dans le tableau de bord des apprenants (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[DISPLAY_ACTIVITY_ELAPSED_TIME]' => 'Afficher la durée des activités dans le tableau de bord des apprenants (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[SHOW_ACTIVITIES_WITHOUT_CONTEXT_OR_LEARNER]' => 'Autoriser l\'accès aux activités qui ne font pas partie d\'un cours (true/false)',
-    
+        'EDIT_CONFIG_HINT_LMS_CONFIG[LEARNER_MAIL_FIELD]' => 'Nom du champ pour le mail de l\'apprenant dans le formulaire du profil utilisateur (id du formulaire : 1000)',
     )
 );
