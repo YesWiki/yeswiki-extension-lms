@@ -87,6 +87,17 @@ class Learner
     }
 
     /**
+     * Get the email of the learner if it's defined in the user entry
+     * @return string|null the learner email if it's defined in the user entry, otherwise return null
+     */
+    public function getEmail(): ?string
+    {
+        return !empty($this->getUserEntry()) && !empty($this->getUserEntry()['bf_mail']) ?
+            $this->getUserEntry()['bf_mail']
+            : null;
+    }
+
+    /**
      * Get the tag of the learner user entry
      * @return string|null if the learner has a user entry return its tag, otherwise return null
      */

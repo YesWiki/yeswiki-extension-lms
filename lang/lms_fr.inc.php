@@ -43,6 +43,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_MODULES' => 'Modules',
         'LMS_COURSE' => 'Parcours',
         'LMS_ESTIMATED_TIME' => 'Temps estimé',
+
+        // ProgressDashboard
         'LMS_PROGRESS_DASHBOARD' => 'Tableau de bord des progressions',
         'LMS_ACTIVITY_PREVIEW' => 'Prévisualiser l\'activité',
         'LMS_MODULE_PREVIEW' => 'Prévisualiser le module',
@@ -56,11 +58,13 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_RATIO' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s / Nombre d\'apprenant⋅e⋅s',
         'LMS_ESTIMATED_TIME_DETAILLED' => 'Temps estimé par les formateurs',
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
-        'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
+        'LMS_UNFINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
         'LMS_MISSING_COURSE' => 'Il n\'existe encore aucun « Parcours LMS ». Veuillez en créer un, et lui ajouter des « LMS Modules » et « LMS Activités » depuis la page',
         'LMS_MISSING_COURSE_PAGELINK' => 'Base de données',
-        // For Learner Dashboard
+        'LMS_DASHBOARD_FINISHED_USER_FILE_SUFFIX' => 'finished-users',
+        'LMS_DASHBOARD_UNFINISHED_USER_FILE_SUFFIX' => 'unfinished-users',
+        // LearnerDashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
         'LMS_DASHBOARD_TYPE' => 'Type',
         'LMS_DASHBOARD_NAME' => 'Nom',
@@ -74,7 +78,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_DASHBOARD_SELECT_USER_TITLE' => 'Choix de l\'utilisateur',
         'LMS_DASHBOARD_EXPORT_TO_CSV' => 'Export CSV',
         'LMS_DASHBOARD_LEGEND' => 'Légende',
-        'LMS_DASHBOARD_FILENAME' => 'tableau_de_bord',
+        'LMS_DASHBOARD_USER_FILE_SUFFIX' => 'tableau-de-bord',
         'LMS_DASHBOARD_RETURN' => 'Retourner à ',
         'LMS_NO_ACTIVITY' => 'Pas d\'activités',
         'LMS_MODULE_PREVIEW_NOT_POSSIBLE' => 'Non accessible ici tant que vous n\'avez pas commencé le module ',

@@ -1,4 +1,3 @@
-console.log('coucou import');
 $('.btn-import-form').click(function(e) {
   e.preventDefault()
 
