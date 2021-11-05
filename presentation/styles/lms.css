@@ -566,17 +566,23 @@
     border: 1px solid var(--primary-color, #444);
 }
 .learners-groups .fieldset-group label {
-    position: absolute;
+    position: relative;
     font-size: 1.1rem;
-    z-index: 5;
-    left: 1.7rem;
-    background-color: var(--neutral-light-color);
-    bottom: calc(100% - 1.2rem);
     padding: 0 10px;
     margin: 0;
+    line-height: 25px;
 }
 .learners-groups .fieldset-group label button {
     margin-left: 20px;
+}
+@media (min-width:768px) {
+    .learners-groups .fieldset-group label {
+        position : absolute;
+        bottom: calc(100% - 1.2rem);
+        left: 1.7rem;
+        z-index: 5;
+        background-color: var(--neutral-light-color);
+    }
 }
 .learners-groups .fieldset-group label i.fa-user-check{
     color: #8dc63f;
@@ -587,7 +593,6 @@
     color: var(--danger-color);
     font-size: 1.6em;
     margin-right: 6px;
-
 }
 .learners-groups .learner-details-table {
     margin: 10px auto 0px auto;
@@ -707,69 +712,61 @@
     border-radius: 0.5rem;
     border-width: 0.2rem;
     padding: 15px 5px 5px 5px;
-  }
-  .activity-navigation-condition-container{
+}
+.activity-navigation-condition-container{
     margin:5px;
     border-color:var(--primary-color);
     border-style: solid;
     border-radius: 0.3rem;
     border-width: 0.15rem;
     padding: 3px;
-  }
-  .activity-navigation-btn{
+}
+.activity-navigation-btn{
     flex-grow: 0;
-  }
-
-  .activity-navigation-border .form-control{
-      margin-left: 3px;
-      margin-right: 3px;
-  }
-  
-  .activity-navigation-border .input-group .item-title{
+}
+.activity-navigation-border .form-control{
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.activity-navigation-border .input-group .item-title{
     flex-shrink: 0;
-  }
-
-  @media(max-width:800px){
-    .activity-navigation-border  .input-group .item-title{
+}
+@media(max-width:800px) {
+    .activity-navigation-border .input-group .item-title {
         flex-shrink: 1;
-      }
-  }
-
-  .activity-navigation-border .input-group .scope-list{
+    }
+}
+.activity-navigation-border .input-group .scope-list {
     min-width: 500px;
-  }
+}
 
-@media(max-width:1000px){
-.activity-navigation-border .input-group .scope-list{
-    min-width: 50vw;
+@media (max-width: 1000px) {
+    .activity-navigation-border .input-group .scope-list {
+        min-width: 50vw;
     }
 }
 /** end for activity navigation edit **/
-
 /** start for activity navigation view **/
 .activity-navigation-conditions-helper {
-float: right;
-border-color: var(--primary-color);
-border-style: solid;
-border-radius: 0.5rem;
-border-width: 0.2rem;
-padding: 5px;
-margin-right: 5px;
-text-align: initial;
+    float: right;
+    border-color: var(--primary-color);
+    border-style: solid;
+    border-radius: 0.5rem;
+    border-width: 0.2rem;
+    padding: 5px;
+    margin-right: 5px;
+    text-align: initial;
 }
-
 .activity-navigation-conditions-helper li {
-display: list-item;
-margin-left: 2px;
+    display: list-item;
+    margin-left: 2px;
 }
-
 .activity-navigation-conditions-helper.no-border {
-border-style: none;
+    border-style: none;
 }
-
 .activity-navigation-view-icon {
-flex-grow: 0;
-cursor:initial;
-float:left;
-}
+    flex-grow: 0;
+    cursor: initial;
+    float: left;
+}q
 /** end for activity navigation view **/
