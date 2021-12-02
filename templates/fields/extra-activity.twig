@@ -49,7 +49,7 @@
         <tbody>
         {% for username, fullname in learners %}
             <tr>
-                <td>{{ include('@lms/progress-dashboard-user.twig',{course:extraActivityLog.course}) }}</a></td>
+                <td>{{ include('@lms/progress-dashboard-cols-user.twig',{course:extraActivityLog.course}) }}</a></td>
                 <td style="height:100px;"></td>
             </tr>
         {% endfor %}
