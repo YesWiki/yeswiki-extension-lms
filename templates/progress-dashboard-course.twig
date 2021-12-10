@@ -18,7 +18,7 @@
     <div class="finished-ratio">
         <span title="{{ _t('LMS_FINISHED_RATIO') }}">
             <span class="label-icon"><i class="fas fa-user-check"></i></span>
-            {{ coursesStat[module.tag].finished | length}} / {{ learners | length }}
+            {{ courseStat[course.tag].finished | length}} / {{ learners | length }}
         </span>
     </div>
     <div class="estimated-time">
