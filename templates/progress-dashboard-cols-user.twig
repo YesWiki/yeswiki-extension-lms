@@ -1,14 +1,14 @@
 <td>
-    <a href="{{ url({tag: 'LearnerDashboard', params: {'learner': username,'course': course.tag}}) }}"
-       title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
-        {{ learners[username].fullName }}
-    </a>
     {% if not learners[username].userEntryTag is null %}
         <a class="btn btn-default btn-xs modalbox" data-size="modal-lg" title="{{ _t('LMS_LEARNER_PREVIEW') }}"
            href="{{ url({tag: learners[username].userEntryTag}) }}">
             <i class="fas fa-eye"></i>
         </a>
     {% endif %}
+    <a href="{{ url({tag: 'LearnerDashboard', params: {'learner': username,'course': course.tag}}) }}"
+       title="{{ _t('LMS_VIEW_LEARNER_DASHBOARD') }}">
+        {{ learners[username].fullName }}
+    </a>
 </td>
 <td>
     {{ learners[username].email }}
