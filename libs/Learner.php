@@ -65,7 +65,8 @@ class Learner
         // lazy loading
         if (is_null($this->userEntry)) {
             $this->userEntry = $this->entryManager->getOne($this->username);
-            if (!$this->userEntry) {
+            if (!$this->userEntry
+                || $this->userEntry['id_typeannonce'] != $this->wiki->config['lms_config']['learner_form_id']) {
                 // if no associated user entry, we assign an empty array to avoid other loadings
                 $this->userEntry = [];
             }
