@@ -557,13 +557,6 @@
 .course-back {
     margin-bottom: 30px;
 }
-.learners-groups {
-    display: flex;
-    flex-wrap: wrap;
-}
-.learners-groups .learners-group {
-    flex: 1 1 300px;
-}
 .learners-groups .fieldset-group {
     position: relative;
     box-shadow: 0 7px 20px -10px rgba(150, 170, 180, 0.75);
@@ -571,48 +564,56 @@
     margin: 1em 10px 2em 10px;
     border-radius: 0.5em;
     border: 1px solid var(--primary-color, #444);
-    display: flex;
 }
 .learners-groups .fieldset-group label {
-    position: absolute;
-    z-index: 5;
-    height: 1.3em;
-    left: 1.7rem;
-    background-color: var(--neutral-light-color);
-    bottom: calc(100% - 15px);
+    position: relative;
+    font-size: 1.1rem;
     padding: 0 10px;
-    font-size: 1.8em;
     margin: 0;
+    line-height: 25px;
+}
+.learners-groups .fieldset-group label button {
+    margin-left: 20px;
+}
+@media (min-width:768px) {
+    .learners-groups .fieldset-group label {
+        position : absolute;
+        bottom: calc(100% - 1.2rem);
+        left: 1.7rem;
+        z-index: 5;
+        background-color: var(--neutral-light-color);
+    }
 }
 .learners-groups .fieldset-group label i.fa-user-check{
     color: #8dc63f;
+    font-size: 1.6em;
+    margin-right: 6px;
 }
-.learners-groups .fieldset-group label i.fa-user-times{
+.learners-groups .fieldset-group label i.fa-user-times {
     color: var(--danger-color);
+    font-size: 1.6em;
+    margin-right: 6px;
 }
-.learners-groups .learner-details {
-    /*margin: 10px 5px 0px 5px;*/
+.learners-groups .learner-details-table {
     margin: 10px auto 0px auto;
     padding: 0;
-    list-style: none;
-    /* doesn't manage to make work grid, the nowrap on li make it exceed the learner-details */
-    /*display: grid;*/
-    /*grid-auto-flow: column;*/
-    /*grid-template-columns: max-content max-content;*/
-    /*repeat(auto-fill, minmax(200px, 1fr));*/
-    /*grid-row-gap: 2rem;*/
-    /*grid-column-gap: 1rem;*/
+    font-size: 0.9em;
+    width: 90%;
 }
-.learners-groups .learner-details li{
-    display: block;
-    margin-bottom: 2px;
-    /*white-space: nowrap;*/
-    /*margin: 5px 10px;*/
-    /*min-width: 200px;*/
+.learners-groups .learner-details-table tr {
+    display: flex;
+    flex-flow: row wrap;
+}
+.learners-groups .learner-details-table  tr:nth-child(odd) {
+    background-color: #f5f5f5; /* light grey because primary color with opacity change the text color */
+}
+.learners-groups .learner-details-table tr td {
+    flex: 1;
+    white-space: nowrap;
 }
 
-/** Index menu button in small screen size **/
-/* Begin - Burger Style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
+/** index menu button in small screen size **/
+/* begin - burger style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
 #burger {
     position: absolute;
     top: 15px;
@@ -648,7 +649,7 @@
 #burger-icon:before {
     transform: translateY(-16px) skew(-10deg);
 }
-/* Toggle State part */
+/* toggle state part */
 .burger-is-open #burger-icon {
     transform: skew(5deg) translateY(-8px) rotate(-45deg);
 }
@@ -659,7 +660,7 @@
     transform: translateY(-12px) translateX(10px) skew(-20deg);
     opacity: 0;
 }
-/* MENU Text part */
+/* menu text part */
 #burger-text {
     display: block;
     font-size: .675rem;
@@ -670,7 +671,7 @@
     text-align: center;
     color: #5A3B5D;
 }
-/* End - Burger Style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
+/* end - burger style: @see: https://codepen.io/CreativeJuiz/full/oMZNXy */
 .lms-menu {
     display: none;
 }
@@ -702,60 +703,51 @@
         display: block;
     }
 }
-/** End - Index menu button in small screen size **/
+/** end - Index menu button in small screen size **/
 
-/** Start for activity navigation edit **/
-
+/** start for activity navigation edit **/
 .activity-navigation-border {
     border-color:var(--secondary-color-2);
     border-style: solid;
     border-radius: 0.5rem;
     border-width: 0.2rem;
     padding: 15px 5px 5px 5px;
-  }
-  .activity-navigation-condition-container{
+}
+.activity-navigation-condition-container{
     margin:5px;
     border-color:var(--primary-color);
     border-style: solid;
     border-radius: 0.3rem;
     border-width: 0.15rem;
     padding: 3px;
-  }
-  .activity-navigation-btn{
+}
+.activity-navigation-btn{
     flex-grow: 0;
-  }
-
-  .activity-navigation-border .form-control{
-      margin-left: 3px;
-      margin-right: 3px;
-  }
-  
-  .activity-navigation-border .input-group .item-title{
+}
+.activity-navigation-border .form-control{
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.activity-navigation-border .input-group .item-title{
     flex-shrink: 0;
-  }
-
-  @media(max-width:800px){
-    .activity-navigation-border  .input-group .item-title{
+}
+@media(max-width:800px) {
+    .activity-navigation-border .input-group .item-title {
         flex-shrink: 1;
-      }
-  }
-
-  .activity-navigation-border .input-group .scope-list{
-    min-width: 500px;
-  }
-
-@media(max-width:1000px){
-.activity-navigation-border .input-group .scope-list{
-    min-width: 50vw;
     }
 }
+.activity-navigation-border .input-group .scope-list {
+    min-width: 500px;
+}
 
-
-  /** end for activity navigation edit **/
-
-  /** Start for activity navigation view **/
-
-  .activity-navigation-conditions-helper {
+@media (max-width: 1000px) {
+    .activity-navigation-border .input-group .scope-list {
+        min-width: 50vw;
+    }
+}
+/** end for activity navigation edit **/
+/** start for activity navigation view **/
+.activity-navigation-conditions-helper {
     float: right;
     border-color: var(--primary-color);
     border-style: solid;
@@ -764,21 +756,17 @@
     padding: 5px;
     margin-right: 5px;
     text-align: initial;
-  }
-  
-  .activity-navigation-conditions-helper li {
+}
+.activity-navigation-conditions-helper li {
     display: list-item;
     margin-left: 2px;
-  }
-  
-  .activity-navigation-conditions-helper.no-border {
+}
+.activity-navigation-conditions-helper.no-border {
     border-style: none;
-  }
-  
-  .activity-navigation-view-icon {
+}
+.activity-navigation-view-icon {
     flex-grow: 0;
-    cursor:initial;
-    float:left;
-  }
-
+    cursor: initial;
+    float: left;
+}q
 /** end for activity navigation view **/

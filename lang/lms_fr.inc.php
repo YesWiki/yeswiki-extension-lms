@@ -43,6 +43,8 @@ $GLOBALS['translations'] = array_merge(
         'LMS_MODULES' => 'Modules',
         'LMS_COURSE' => 'Parcours',
         'LMS_ESTIMATED_TIME' => 'Temps estimé',
+
+        // ProgressDashboard
         'LMS_PROGRESS_DASHBOARD' => 'Tableau de bord des progressions',
         'LMS_ACTIVITY_PREVIEW' => 'Prévisualiser l\'activité',
         'LMS_MODULE_PREVIEW' => 'Prévisualiser le module',
@@ -56,11 +58,13 @@ $GLOBALS['translations'] = array_merge(
         'LMS_FINISHED_RATIO' => 'Apprenant⋅e⋅s qui ont terminé⋅e⋅s / Nombre d\'apprenant⋅e⋅s',
         'LMS_ESTIMATED_TIME_DETAILLED' => 'Temps estimé par les formateurs',
         'LMS_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui ont terminé',
-        'LMS_NOT_FINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
+        'LMS_UNFINISHED_LEARNERS' => 'Apprenant⋅e⋅s qui n\'ont pas terminé',
         'LMS_ERROR_NOT_A_VALID_MODULE' => 'Le module donné en paramètre n\'existe pas ou n\'appartient pas au parcours',
         'LMS_MISSING_COURSE' => 'Il n\'existe encore aucun « Parcours LMS ». Veuillez en créer un, et lui ajouter des « LMS Modules » et « LMS Activités » depuis la page',
         'LMS_MISSING_COURSE_PAGELINK' => 'Base de données',
-        // For Learner Dashboard
+        'LMS_DASHBOARD_FINISHED_USER_FILE_SUFFIX' => 'finished-users',
+        'LMS_DASHBOARD_UNFINISHED_USER_FILE_SUFFIX' => 'unfinished-users',
+        // LearnerDashboard
         'LMS_DASHBOARD' => 'Tableau de bord de ',
         'LMS_DASHBOARD_TYPE' => 'Type',
         'LMS_DASHBOARD_NAME' => 'Nom',
@@ -74,7 +78,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_DASHBOARD_SELECT_USER_TITLE' => 'Choix de l\'utilisateur',
         'LMS_DASHBOARD_EXPORT_TO_CSV' => 'Export CSV',
         'LMS_DASHBOARD_LEGEND' => 'Légende',
-        'LMS_DASHBOARD_FILENAME' => 'tableau_de_bord',
+        'LMS_DASHBOARD_USER_FILE_SUFFIX' => 'tableau-de-bord',
         'LMS_DASHBOARD_RETURN' => 'Retourner à ',
         'LMS_NO_ACTIVITY' => 'Pas d\'activités',
         'LMS_MODULE_PREVIEW_NOT_POSSIBLE' => 'Non accessible ici tant que vous n\'avez pas commencé le module ',
@@ -178,7 +182,7 @@ $GLOBALS['translations'] = array_merge(
         'EDIT_CONFIG_HINT_LMS_CONFIG[COURSE_FORM_ID]' => 'Identifiant du formulaire LMS Parcours',
         'EDIT_CONFIG_HINT_LMS_CONFIG[ATTENDANCE_SHEET_FORM_ID]' => 'Identifiant du formulaire LMS Feuille d\'émargement',
         'EDIT_CONFIG_HINT_LMS_CONFIG[EXTRA_ACTIVITY_ENABLED]' => 'Activer les activités supplémentaires (webinaires, ateliers, ...) (true/false)',
-        'EDIT_CONFIG_HINT_LMS_CONFIG[SAVE_PROGRESS_FOR_ADMINS]' => 'Sauvegarder la progession des adminstrateurs, administratrices (true/false)',
+        'EDIT_CONFIG_HINT_LMS_CONFIG[SAVE_PROGRESS_FOR_ADMINS]' => 'Sauvegarder la progression des adminstrateurs, administratrices (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[ACTIVITY_NAVIGATION_CONDITIONS_ENABLED]' => 'Activer les conditions de passage pour la scénarisation (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[DISPLAY_ACTIVITY_TITLE]' => 'Afficher le titre des activités (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[MODULE_IMAGE_SIZE_IN_COURSE]' => 'Taille de l\'image de chaque module sur la page de présentation d\'un cours (en pixels)',
@@ -187,6 +191,7 @@ $GLOBALS['translations'] = array_merge(
         'EDIT_CONFIG_HINT_LMS_CONFIG[USE_ONLY_CUSTOM_ELAPSED_TIME]' => 'Utiliser uniquement les temps personnalisés dans le tableau de bord des apprenants (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[DISPLAY_ACTIVITY_ELAPSED_TIME]' => 'Afficher la durée des activités dans le tableau de bord des apprenants (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[SHOW_ACTIVITIES_WITHOUT_CONTEXT_OR_LEARNER]' => 'Autoriser l\'accès aux activités qui ne font pas partie d\'un cours (true/false)',
-    
+        'EDIT_CONFIG_HINT_LMS_CONFIG[LEARNER_FORM_ID]' => 'Identifiant du profil utilisateur utilisé pour l\'apprenant',
+        'EDIT_CONFIG_HINT_LMS_CONFIG[LEARNER_MAIL_FIELD]' => 'Nom du champ pour le mail de l\'apprenant dans le formulaire du profil utilisateur',
     )
 );

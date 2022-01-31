@@ -2,30 +2,36 @@ parameters:
   # display composant feature for LMS Activities's bf_contenu
   actionbuilder_textarea_name: 'bf_contenu'
   lms_config:
-    # if true, tabs can be used in LMS activities (MyActivity2, MyActivity3... refer to the parent activity MyActivity)
-    tabs_enabled: false
-    # if true, the activity title is automatically added at the begin of the entry page
-    display_activity_title: true
     # if you change activitie_form_id, module_form_id or course_form_id, you have also to rename the corresponding
     # bazar template : tools/lms/templates/bazar/fiche-XXXX.tpl.html
     activity_form_id: 1201
     module_form_id: 1202
     course_form_id: 1203
     attendance_sheet_form_id: 1204
+    # if true, the extra activities can be added to the courses
+    extra_activity_enabled: false
+    # activate navigation conditions to check if user is allowed to view next activity
+    activity_navigation_conditions_enabled: false
+    # only for developers : displays the lms pages as a user sees them
+    save_progress_for_admins: false
+    # use the comments from yeswiki
     use_yeswiki_comments: false
     # maximum size for both width and height to render the module images in the course entry
     module_image_size_in_course: 400
-    # only for developers : displays the lms pages as a user sees them
-    save_progress_for_admins: false
-    # for learner dashboard
+    # if true, the activity title is automatically added at the begin of the entry page
+    display_activity_title: true
+    # if true, tabs can be used in LMS activities (MyActivity2, MyActivity3... refer to the parent activity MyActivity)
+    tabs_enabled: false
+    # use only custom elapsed time in learner dashboard
     use_only_custom_elapsed_time: true
+    # display activity elapsed time in the learner dashboard
     display_activity_elapsed_time: false
-    # if true, the extra activities can be added to the courses
-    extra_activity_enabled: false
     # show activities without context when one course is scripted (false = to be sure no activity is readable)
     show_activities_without_context_or_learner: true
-    # activate navigation conditions to check if user is allowed to view next activity
-    activity_navigation_conditions_enabled: false
+    # user profil form used for the learner
+    learner_form_id: 1000
+    # field name for the learner mail in the user profil form (form id: 1000)
+    learner_mail_field : bf_mail
   # for edit config action
   lms_editable_config_params:
     - lms_config:
@@ -43,6 +49,8 @@ parameters:
       - use_only_custom_elapsed_time
       - display_activity_elapsed_time
       - show_activities_without_context_or_learner
+      - learner_form_id
+      - learner_mail_field
 
 services:
   _defaults:

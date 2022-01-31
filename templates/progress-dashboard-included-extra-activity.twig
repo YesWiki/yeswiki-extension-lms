@@ -55,7 +55,7 @@
                     <ul class="learner-details">
                         {% for username in extraActivityLog.registeredLearnerNames %}
                             <li>
-                                {{ include('@lms/progress-dashboard-user.twig') }}
+                                {{ include('@lms/progress-dashboard-cols-user.twig') }}
                                 {{ include('@lms/extra-activity-link.twig', {mode:'remove',
                                     learner:username}) }}
                             </li>

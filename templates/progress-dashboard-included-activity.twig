@@ -1,4 +1,6 @@
 {% from "@lms/datetime-macros.twig" import displayTime %}
+{{ include_javascript('tools/lms/libs/csv-export.js') }}
+
 <div class="panel panel-lms-dashboard dashboard-activity-frame collapsed">
     <div id="heading_{{ activity.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
          href="#collapse_{{ activity.tag }}" aria-expanded="false" aria-controls="collapse_{{ activity.tag }}">
@@ -32,26 +34,42 @@
     </div>
     <div id="collapse_{{ activity.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ activity.tag }}" aria-expanded="false">
-        <div class="learners-groups emulated-flex-gap">
+        <div class="learners-groups">
             <div class="learners-group fieldset-group dashboard-activity-frame">
-                <label><i class="fas fa-user-check"></i></label>
-                    <ul class="learner-details">
-                        {% for username in activitiesStat[activity.tag].finished %}
-                            <li>
-                                {{ include('@lms/progress-dashboard-user.twig') }}
-                            </li>
-                        {%  endfor %}
-                    </ul>
+                <label>
+                    <i class="fas fa-user-check"></i>
+                    {{ _t('LMS_FINISHED_LEARNERS') }}
+                    <button class="btn btn-secondary-1 btn-xs" onclick="exportTableToCSV(
+                        '{{ activity.tag ~ '_' ~ _t('LMS_DASHBOARD_FINISHED_USER_FILE_SUFFIX') }}.csv',
+                        '#table_finished_{{ activity.tag }}')">
+                        {{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}
+                    </button>
+                </label>
+                <table id="table_finished_{{ activity.tag }}" class="learner-details-table">
+                    {% for username in activitiesStat[activity.tag].finished %}
+                        <tr>
+                            {{ include('@lms/progress-dashboard-cols-user.twig') }}
+                        </tr>
+                    {% endfor %}
+                </table>
             </div>
             <div class="learners-group fieldset-group dashboard-activity-frame">
-                <label><i class="fas fa-user-times"></i></label>
-                    <ul class="learner-details">
-                        {% for username in activitiesStat[activity.tag].notFinished %}
-                            <li>
-                                {{ include('@lms/progress-dashboard-user.twig') }}
-                            </li>
-                        {%  endfor %}
-                    </ul>
+                <label>
+                    <i class="fas fa-user-times"></i>
+                    {{ _t('LMS_UNFINISHED_LEARNERS') }}
+                    <button class="btn btn-secondary-1 btn-xs" onclick="exportTableToCSV(
+                        '{{ activity.tag ~ '_' ~ _t('LMS_DASHBOARD_UNFINISHED_USER_FILE_SUFFIX') }}.csv',
+                        '#table_unfinished_{{ activity.tag }}')">
+                        {{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}
+                    </button>
+                </label>
+                <table id="table_unfinished_{{ activity.tag }}" class="learner-details-table">
+                    {% for username in activitiesStat[activity.tag].notFinished %}
+                        <tr>
+                            {{ include('@lms/progress-dashboard-cols-user.twig') }}
+                        </tr>
+                    {% endfor %}
+                </table>
             </div>
         </div>
     </div>

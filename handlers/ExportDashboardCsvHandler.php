@@ -68,7 +68,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
 
         // output headers so that the file is downloaded rather than displayed
         header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename=' . $this->learner->getUsername() . '_' . _t('LMS_DASHBOARD_FILENAME') . '.csv');
+        header('Content-Disposition: attachment; filename=' . $this->learner->getUsername() . '_' . _t('LMS_DASHBOARD_USER_FILE_SUFFIX') . '.csv');
 
         // create a file pointer connected to the output stream
         $output = fopen('php://output', 'w');
