@@ -52,8 +52,7 @@ class LearnerManager
 
     /**
      * Load a Learner from 'username' or connected user.
-     * if empty('username') gives the current logged user
-     * if not existing username or not logged, return null
+     * if username is null, gives the current logged user or null if not logged
      *
      * @param string $username the username for a specific learner
      * @return Learner|null the Learner or null if not connected or not existing
@@ -62,7 +61,7 @@ class LearnerManager
     {
         // load ConditionsChecker not in constructor to prevent loop
         $conditionsChecker = $this->wiki->services->get(ConditionsChecker::class);
-        if (empty($username) || empty($this->userManager->getOneByName($username))) {
+        if (empty($username)){
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null
