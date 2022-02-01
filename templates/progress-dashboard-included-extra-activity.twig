@@ -1,4 +1,5 @@
 {% from "@lms/datetime-macros.twig" import displayTime, displayDate %}
+
 {% set level = (level ?? 'activity') %}
 <div class="panel panel-lms-dashboard dashboard-{{ level }}-frame collapsed">
     <div id="heading_{{ extraActivityLog.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"

@@ -1,4 +1,7 @@
 {% from "@lms/datetime-macros.twig" import displayTime %}
+{{ include_javascript('tools/lms/libs/learners-count.js') }}
+{{ include_javascript('tools/lms/presentation/javascript/collapsible-panel.js') }}
+
 <h1 class="dashboard-title">{{ _t('LMS_PROGRESS_DASHBOARD') }}</h1>
 
 <h3 class="dashboard-course course-back">
