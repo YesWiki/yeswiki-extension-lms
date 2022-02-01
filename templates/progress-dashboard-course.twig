@@ -21,7 +21,8 @@
     <div class="finished-ratio">
         <span title="{{ _t('LMS_FINISHED_RATIO') }}">
             <span class="label-icon"><i class="fas fa-user-check"></i></span>
-            {{ courseStat[course.tag].finished | length}} / {{ learners | length }}
+            <span class="learners-finished">{{ courseStat[course.tag].finished | length}}</span> / <span
+                class="learners-total">{{ learners | length }}</span>
         </span>
     </div>
     <div class="estimated-time">
@@ -31,10 +32,15 @@
     </div>
 </div>
 
-<h3 class="dashboard-module">{{ _t('LMS_MODULES')}}</h3>
-{% for module in course.modules %}
-    {{ include('@lms/progress-dashboard-included-module.twig') }}
-{% endfor %}
+<div class="dashboard-facette facette-container">
+    {{ include("@bazar/entries/index/_filters.twig") }}
+    <div>
+        <h3 class="dashboard-module">{{ _t('LMS_MODULES')}}</h3>
+        {% for module in course.modules %}
+            {{ include('@lms/progress-dashboard-included-module.twig') }}
+        {% endfor %}
+    </div>
+</div>
 
 {% if course.extraActivityLogs|length > 0 %}
     <h3 class="dashboard-module">{{ _t('LMS_EXTRA_ACTIVITIES')}}{{ include('@lms/extra-activity-link.twig', {mode:'add-light'}) }}</h3>
