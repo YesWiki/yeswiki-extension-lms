@@ -35,7 +35,7 @@ class ExtraActivityLog implements \JsonSerializable
         DateManager $dateManager,
         string $tag,
         string $title,
-        string $relatedLink = '',
+        string $relatedLink,
         Carbon $date,
         CarbonInterval $elapsedTime,
         Course $course,
