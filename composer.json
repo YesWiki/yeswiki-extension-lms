@@ -2,6 +2,13 @@
     "require": {
         "nesbot/carbon": "^2.41",
         "symfony/console": "^5.2",
-        "php": "^7.2.1"
+        "php": "^7.2.1 || ^8.0"
+    },
+    "conflict": {
+        "psr/container": ">=1.1.2",
+        "symfony/deprecation-contracts": ">=3.0",
+        "symfony/service-contracts": ">=3.0",
+        "symfony/string": ">=6.0",
+        "symfony/translation": ">=6.0"
     }
 }
