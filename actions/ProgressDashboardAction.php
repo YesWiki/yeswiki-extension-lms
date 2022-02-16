@@ -143,7 +143,6 @@ class ProgressDashboardAction extends YesWikiAction
         $filters = $bazarListService->formatFilters($filtersArg, $learnersEntries, $forms);
 
         // render the dashboard for a course
-        $this->wiki->AddJavascriptFile('tools/bazar/libs/bazar.js');
         return $this->render('@lms/progress-dashboard-course.twig', [
             'course' => $course,
             'modulesStat' => $this->modulesStat,
