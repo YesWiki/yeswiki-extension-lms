@@ -1,5 +1,4 @@
 {% from "@lms/datetime-macros.twig" import displayTime %}
-{{ include_javascript('tools/lms/libs/csv-export.js') }}
 
 <div class="panel panel-lms-dashboard dashboard-module-frame collapsed">
     <div id="heading_{{ module.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
@@ -16,8 +15,8 @@
             </a>
             {% if modulesStat[module.tag].hasQuizResults %}
                 <a class="btn btn-default btn-xs modalbox" data-iframe="1" data-size="modal-lg" title="{{ _t('LMS_QUIZ_RESULTS_TITLE') }}"
-                href="{{ url({handler:'render',params:{content:"{{quizresults}}",
-                        course:course.tag,module:module.tag,onlybest:true,noadmins:true}}) }}">
+                href="{{ url({handler:'render', params:{content:"{{ quizresults }}",
+                        course:course.tag, module:module.tag, onlybest:true, noadmins:true}}) }}">
                     <i class="fas fa-poll"></i>
                 </a>
             {% endif %}
@@ -25,7 +24,8 @@
         <div class="finished-ratio">
             <span title="{{ _t('LMS_FINISHED_RATIO') }}">
                 <span class="label-icon"><i class="fas fa-user-check"></i></span>
-                {{ modulesStat[module.tag].finished | length }} / {{ learners | length }}
+                <span class="learners-finished">{{ modulesStat[module.tag].finished | length }}</span> / <span
+                    class="learners-total">{{ learners | length }}</span>
             </span>
         </div>
         <div class="estimated-time">
@@ -38,37 +38,37 @@
     <div id="collapse_{{ module.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ module.tag }}" aria-expanded="false">
         <div class="learners-groups">
-            <div class="learners-group fieldset-group dashboard-module-frame">
+            <div class="learners-group finished-learners-group fieldset-group dashboard-module-frame">
                 <label>
                     <i class="fas fa-user-check"></i>
                     {{ _t('LMS_FINISHED_LEARNERS') }}
                     <button class="btn btn-secondary-2 btn-xs" onclick="exportTableToCSV(
                         '{{ module.tag ~ '_' ~ _t('LMS_DASHBOARD_FINISHED_USER_FILE_SUFFIX') }}.csv',
-                        '#table_finished_{{ module.tag }}')">
+                        '#table_finished_{{ module.tag }} tr:not([style*=&quot;display: none;&quot;])')">
                         {{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}
                     </button>
                 </label>
                 <table id="table_finished_{{ module.tag }}" class="learner-details-table">
                     {% for username in modulesStat[module.tag].finished %}
-                        <tr>
+                        <tr class="bazar-entry" {{ learners[username].userEntry.html_data | raw }}>
                             {{ include('@lms/progress-dashboard-cols-user.twig') }}
                         </tr>
                     {% endfor %}
                 </table>
             </div>
-            <div class="learners-group fieldset-group dashboard-module-frame">
+            <div class="learners-group unfinished-learners-group fieldset-group dashboard-module-frame">
                 <label>
                     <i class="fas fa-user-times"></i>
                     {{ _t('LMS_UNFINISHED_LEARNERS') }}
                     <button class="btn btn-secondary-2 btn-xs" onclick="exportTableToCSV(
                         '{{ module.tag ~ '_' ~ _t('LMS_DASHBOARD_UNFINISHED_USER_FILE_SUFFIX') }}.csv',
-                        '#table_unfinished_{{ module.tag }}')">
+                        '#table_unfinished_{{ module.tag }} tr:not([style*=&quot;display: none;&quot;])')">
                         {{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}
                     </button>
                 </label>
                 <table id="table_unfinished_{{ module.tag }}" class="learner-details-table">
                     {% for username in modulesStat[module.tag].notFinished %}
-                        <tr>
+                        <tr class="bazar-entry" {{ learners[username].userEntry.html_data | raw }}>
                             {{ include('@lms/progress-dashboard-cols-user.twig') }}
                         </tr>
                     {% endfor %}

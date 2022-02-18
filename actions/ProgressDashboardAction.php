@@ -1,6 +1,8 @@
 <?php
 
+use YesWiki\Bazar\Service\BazarListService;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Core\YesWikiAction;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Course;
@@ -16,6 +18,7 @@ class ProgressDashboardAction extends YesWikiAction
     protected $courseManager;
     protected $learnerManager;
     protected $entryManager;
+    protected $formManager;
     protected $extraActivityManager;
     protected $quizManager;
 
@@ -49,6 +52,7 @@ class ProgressDashboardAction extends YesWikiAction
         $this->courseManager = $this->getService(CourseManager::class);
         $this->learnerManager = $this->getService(LearnerManager::class);
         $this->entryManager = $this->getService(EntryManager::class);
+        $this->formManager = $this->getService(FormManager::class);
         $this->extraActivityManager = $this->getService(ExtraActivityManager::class);
         $this->quizManager = $this->getService(QuizManager::class);
 
@@ -126,14 +130,27 @@ class ProgressDashboardAction extends YesWikiAction
         }
         $this->processCourseStat($course);
 
+        // load filters
+        $bazarListService = $this->getService(BazarListService::class);
+        $learnersEntries = array_map(function($learner){
+            return $learner->getUserEntry();
+        }, $this->learners);
+        $forms = [$this->formManager->getOne($this->wiki->config['lms_config']['learner_form_id'])];
+        $filtersFieldnames = array_map('trim',
+            explode(",", $this->wiki->config['lms_config']['progress_dashboard_filters']));
+
+        $filtersArg = ["groups" => $filtersFieldnames, "groupsexpanded" => true];
+        $filters = $bazarListService->formatFilters($filtersArg, $learnersEntries, $forms);
+
         // render the dashboard for a course
-        $this->wiki->AddJavascriptFile('tools/lms/presentation/javascript/collapsible-panel.js');
         return $this->render('@lms/progress-dashboard-course.twig', [
             'course' => $course,
             'modulesStat' => $this->modulesStat,
             'courseStat' => $this->coursesStat,
             'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'],
             'learners' => $this->learners,
+            'filters' => $filters,
+            'facette' => $_GET['facette'] ?? null,
             'debug' => isset($_GET['debug']),
         ]);
     }
@@ -175,7 +192,6 @@ class ProgressDashboardAction extends YesWikiAction
                 );
             }
         }
-
 
         if ($this->wiki->config['lms_config']['extra_activity_enabled']) {
             $module->setExtraActivityLogs($this->extraActivityManager->getExtraActivityLogs($course, $module));

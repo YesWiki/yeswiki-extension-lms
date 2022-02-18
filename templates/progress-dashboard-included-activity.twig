@@ -1,5 +1,4 @@
 {% from "@lms/datetime-macros.twig" import displayTime %}
-{{ include_javascript('tools/lms/libs/csv-export.js') }}
 
 <div class="panel panel-lms-dashboard dashboard-activity-frame collapsed">
     <div id="heading_{{ activity.tag }}" class="panel-heading collapsed" role="tab button" data-toggle="collapse"
@@ -22,7 +21,8 @@
         <div class="finished-ratio">
             <span title="{{ _t('LMS_FINISHED_RATIO') }}">
                 <span class="label-icon"><i class="fas fa-user-check"></i></span>
-                {{ activitiesStat[activity.tag].finished | length }} / {{ learners | length }}
+                <span class="learners-finished">{{ activitiesStat[activity.tag].finished | length }}</span> / <span
+                    class="learners-total">{{ learners | length }}</span>
             </span>
         </div>
         <div class="estimated-time">
@@ -35,13 +35,13 @@
     <div id="collapse_{{ activity.tag }}" class="panel-collapse collapse" role="tabpanel"
          aria-labelledby="heading_{{ activity.tag }}" aria-expanded="false">
         <div class="learners-groups">
-            <div class="learners-group fieldset-group dashboard-activity-frame">
+            <div class="learners-group finished-learners-group fieldset-group dashboard-activity-frame">
                 <label>
                     <i class="fas fa-user-check"></i>
                     {{ _t('LMS_FINISHED_LEARNERS') }}
                     <button class="btn btn-secondary-1 btn-xs" onclick="exportTableToCSV(
                         '{{ activity.tag ~ '_' ~ _t('LMS_DASHBOARD_FINISHED_USER_FILE_SUFFIX') }}.csv',
-                        '#table_finished_{{ activity.tag }}')">
+                        '#table_finished_{{ activity.tag }} tr:not([style*=&quot;display: none;&quot;])')">
                         {{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}
                     </button>
                 </label>
@@ -53,13 +53,13 @@
                     {% endfor %}
                 </table>
             </div>
-            <div class="learners-group fieldset-group dashboard-activity-frame">
+            <div class="learners-group unfinished-learners-group fieldset-group dashboard-activity-frame">
                 <label>
                     <i class="fas fa-user-times"></i>
                     {{ _t('LMS_UNFINISHED_LEARNERS') }}
                     <button class="btn btn-secondary-1 btn-xs" onclick="exportTableToCSV(
                         '{{ activity.tag ~ '_' ~ _t('LMS_DASHBOARD_UNFINISHED_USER_FILE_SUFFIX') }}.csv',
-                        '#table_unfinished_{{ activity.tag }}')">
+                        '#table_unfinished_{{ activity.tag }} tr:not([style*=&quot;display: none;&quot;])')">
                         {{ _t('LMS_DASHBOARD_EXPORT_TO_CSV') }}
                     </button>
                 </label>

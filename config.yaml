@@ -30,8 +30,10 @@ parameters:
     show_activities_without_context_or_learner: true
     # user profil form used for the learner
     learner_form_id: 1000
-    # field name for the learner mail in the user profil form (form id: 1000)
+    # field name for the learner mail in the user profil form
     learner_mail_field : bf_mail
+    # list of learner field names on which we can filter in the progress dashboard. The differents values are separated by ','
+    progress_dashboard_filters :
   # for edit config action
   lms_editable_config_params:
     - lms_config:
@@ -51,6 +53,7 @@ parameters:
       - show_activities_without_context_or_learner
       - learner_form_id
       - learner_mail_field
+      - progress_dashboard_filters
 
 services:
   _defaults:

@@ -487,6 +487,9 @@
     justify-content: space-between;
     align-items: center;
 }
+.dashboard-facette.facette-container {
+    display: block;
+}
 /* display the right chevron according to the panel state */
 .panel-lms-dashboard .panel-heading.collapsed .fa-chevron-up {
     display: none;

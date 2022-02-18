@@ -51,8 +51,8 @@ class LearnerManager
     }
 
     /**
-     * Load a Learner from 'username' or connected user.
-     * if username is null, gives the current logged user or null if not logged
+     * Load a Learner from 'username' or connected user. If username is null, gives the current logged user or null if
+     * not logged. If no user with the corresponding username, return the learner anyway.
      *
      * @param string $username the username for a specific learner
      * @return Learner|null the Learner or null if not connected or not existing
