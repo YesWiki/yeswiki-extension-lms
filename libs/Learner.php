@@ -60,15 +60,15 @@ class Learner
      * Get the associated user entry of the learner
      * @return array the user entry or an empty array if the user doesn't have
      */
-    public function getUserEntry(): array
+    public function getUserEntry(): ?array
     {
         // lazy loading
         if (is_null($this->userEntry)) {
-            $this->userEntry = $this->entryManager->getOne($this->username);
-            if (!$this->userEntry
-                || $this->userEntry['id_typeannonce'] != $this->wiki->config['lms_config']['learner_form_id']) {
-                // if no associated user entry, we assign an empty array to avoid other loadings
-                $this->userEntry = [];
+            $userEntries = $this->entryManager->search(['formsIds' =>
+                [$this->wiki->config['lms_config']['learner_form_id']], 'user' => $this->username]);
+            if (!empty($userEntries)) {
+                // get first element of userEntries (a user can have several associated entries)
+                $this->userEntry = reset($userEntries);
             }
         }
         return $this->userEntry;

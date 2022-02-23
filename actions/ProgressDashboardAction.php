@@ -130,17 +130,23 @@ class ProgressDashboardAction extends YesWikiAction
         }
         $this->processCourseStat($course);
 
-        // load filters
-        $bazarListService = $this->getService(BazarListService::class);
-        $learnersEntries = array_map(function($learner){
-            return $learner->getUserEntry();
-        }, $this->learners);
-        $forms = [$this->formManager->getOne($this->wiki->config['lms_config']['learner_form_id'])];
-        $filtersFieldnames = array_map('trim',
-            explode(",", $this->wiki->config['lms_config']['progress_dashboard_filters']));
+        // load filters if the learner_form_id corresponds to an existing form
+        $learnerForm = $this->formManager->getOne($this->wiki->config['lms_config']['learner_form_id']);
+        if ($learnerForm) {
+            $bazarListService = $this->getService(BazarListService::class);
+            $learnersEntries = array_map(function ($learner) {
+                $userEntry = $learner->getUserEntry();
+                return $userEntry ? $userEntry :
+                    // id_typeannonce must be defined for facette filters
+                    ['id_typeannonce' => $this->wiki->config['lms_config']['learner_form_id']];
+            }, $this->learners);
+            $forms = [$learnerForm];
+            $filtersFieldnames = array_map('trim',
+                explode(",", $this->wiki->config['lms_config']['progress_dashboard_filters']));
 
-        $filtersArg = ["groups" => $filtersFieldnames, "groupsexpanded" => true];
-        $filters = $bazarListService->formatFilters($filtersArg, $learnersEntries, $forms);
+            $filtersArg = ["groups" => $filtersFieldnames, "groupsexpanded" => true];
+            $filters = $bazarListService->formatFilters($filtersArg, $learnersEntries, $forms);
+        }
 
         // render the dashboard for a course
         return $this->render('@lms/progress-dashboard-course.twig', [
