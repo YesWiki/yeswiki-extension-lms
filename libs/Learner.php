@@ -105,9 +105,9 @@ class Learner
      */
     public function getUserEntryTag(): ?string
     {
-        return !empty($this->getUserEntry()) ?
+        return !empty($this->getUserEntry()) && !empty($this->getUserEntry()['id_fiche']) ?
             // the user entry tag is always the username
-            $this->getUsername()
+            $this->getUserEntry()['id_fiche']
             : null;
     }
 
