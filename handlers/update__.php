@@ -72,7 +72,7 @@ acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 textelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***
 image***bf_image***Image***300***300***600***600***right***0*** *** *** * *** * *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
-liste***ListeOuinonLms***Scénarisation des activités*** *** ***oui***bf_scenarisation_activites*** ***1*** ***Si « oui », les apprenants doivent avoir consulté l\'activité précédente pour accéder à la suivante*** *** *** *** ***
+liste***ListeOuinonLms***Scénarisation des activités*** *** ***non***bf_scenarisation_activites*** ***1*** ***Si « oui », les apprenants doivent avoir consulté l\'activité précédente pour accéder à la suivante*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si « oui », les apprenants doivent avoir consulté toutes les activités du module précédent pour accéder au module suivant*** *** *** *** ***
 acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
 

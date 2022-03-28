@@ -22,10 +22,10 @@ parameters:
     display_activity_title: true
     # if true, tabs can be used in LMS activities (MyActivity2, MyActivity3... refer to the parent activity MyActivity)
     tabs_enabled: false
-    # use only custom elapsed time in learner dashboard
-    use_only_custom_elapsed_time: true
+    # show estimated time when no elapsed time defined in learner dashboard
+    use_only_custom_elapsed_time: false
     # display activity elapsed time in the learner dashboard
-    display_activity_elapsed_time: false
+    display_activity_elapsed_time: true
     # show activities without context when one course is scripted (false = to be sure no activity is readable)
     show_activities_without_context_or_learner: true
     # user profil form used for the learner
