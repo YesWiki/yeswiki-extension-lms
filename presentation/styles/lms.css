@@ -21,11 +21,6 @@
     margin-right: -50vw;
     padding: 0 1em;
 }
-/* specific rendering when in iframe */
-.yeswiki-iframe-body .lms-container {
-    left: 0;
-    right: 0;
-}
 /* specific rendering when a user preview a lms in a modal */
 /* for width */
 #YesWikiModal .lms-container {

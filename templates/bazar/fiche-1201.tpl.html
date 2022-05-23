@@ -19,7 +19,7 @@ $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 $learner = $learnerManager->getLearner();
 ?>
 
-<div class="container lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
+<div class="lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
     <div class="row">
         <div id="burger" aria-label="<?php echo _t('LMS_INDEX_MENU'); ?>">
             <span id="burger-icon"></span>
