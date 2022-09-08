@@ -254,7 +254,7 @@ class CourseController extends YesWikiController
      * @param Module $module
      * @return array ["activity's tag",'label','statusMsg']
      */
-    public function getLastAccessibleActivityTagAndLabelForLearner(?Learner $learner = null, Course $course, Module $module): array
+    public function getLastAccessibleActivityTagAndLabelForLearner(?Learner $learner, Course $course, Module $module): array
     {
         if ($learner) {
             $nextActivityTag = $this->courseManager->getLastAccessibleActivityTagForLearner($learner, $course, $module) ;

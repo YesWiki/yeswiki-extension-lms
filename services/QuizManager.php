@@ -206,7 +206,7 @@ class QuizManager
      *      ('message'=>'error message')]
      */
     public function saveQuizResultForAUserAndAQuiz(
-        ?string $userId = null,
+        ?string $userId,
         string $courseId,
         string $moduleId,
         string $activityId,

@@ -42,22 +42,26 @@ class ExtraActivityLogs extends TimeLogs implements \Countable, \Iterator
     }
 
     /* Iterator functions */
-    public function current(): ?ExtraActivityLog
+    // change return of this method to keep compatible with php 7.3 (mixed is not managed)
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         return $this->values[array_keys($this->values)[$this->position]];
     }
 
+    // change return of this method to keep compatible with php 7.3 (mixed is not managed)
+    #[\ReturnTypeWillChange]
     public function key(): string
     {
         return array_keys($this->values)[$this->position];
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -68,7 +72,9 @@ class ExtraActivityLogs extends TimeLogs implements \Countable, \Iterator
     }
 
     /* Countable */
-    public function count():int
+    // change return of this method to keep compatible with php 7.3 (mixed is not managed)
+    #[\ReturnTypeWillChange]
+    public function count(): int
     {
         return count($this->values);
     }
