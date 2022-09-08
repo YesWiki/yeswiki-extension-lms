@@ -1,6 +1,5 @@
 <?php
 
-
 namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
@@ -74,7 +73,6 @@ class QuizManager
         ?string $activityId = null,
         ?string $quizId = null
     ): array {
-
         /* check params */
         $data = $this->checkParams($userId, $courseId, $moduleId, $activityId, $quizId);
         if ($data[self::STATUS_LABEL] == self::STATUS_CODE_ERROR) {
@@ -142,7 +140,7 @@ class QuizManager
         } elseif (!$currentUser->isAdmin()) {
             $learner = $this->learnerManager->getLearner(); // current user
         }
-        
+
         return [
             self::STATUS_LABEL=>self::STATUS_CODE_OK,
             'learner'=>$learner ?? null,
@@ -192,7 +190,7 @@ class QuizManager
                 'quizId' => $values['quizId'],
                 'log_time' => $values['log_time'],
                 self::RESULT_LABEL => $values[self::RESULT_LABEL]
-            ] + ($withRaw ? ['raw' => $result['value']]:[]);
+            ] + ($withRaw ? ['raw' => $result['value']] : []);
         }, $results);
     }
 
@@ -215,7 +213,6 @@ class QuizManager
         string $quizId,
         float $result
     ): array {
-        
         /* check params */
         foreach (['courseId','moduleId','activityId','quizId'] as $varName) {
             if (empty($$varName)) {
@@ -264,7 +261,7 @@ class QuizManager
         }
     }
 
-    
+
     /**
      * method that delete results for the selected quiz
      * @param string|null $userId, id of the concerned learner, if all learners for admin
@@ -284,7 +281,6 @@ class QuizManager
         ?string $quizId = null,
         ?string $log_time = null
     ): array {
-
         /* Check if admin */
         if (!$this->learnerManager->getLearner() || !$this->learnerManager->getLearner()->isAdmin()) {
             return [self::STATUS_LABEL => self::STATUS_CODE_ERROR, self::MESSAGE_LABEL => 'DELETE only authorized for admins!'];
@@ -344,7 +340,7 @@ class QuizManager
      * @param array $results
      * @return array $results
      */
-    public function keepOnlyBestResult($results):array
+    public function keepOnlyBestResult($results): array
     {
         // create unique key
         $results_with_unique_id = array_map(function ($result) {

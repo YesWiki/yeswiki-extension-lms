@@ -96,7 +96,6 @@ class CourseController extends YesWikiController
             : null;
 
         if (!empty($currentPageTag) && $course) {
-
             // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
             $activity = new Activity($this->config, $this->entryManager, $this->dateManager, $currentPageTag);
 
@@ -184,7 +183,7 @@ class CourseController extends YesWikiController
         $disabledLink = !$module->isAccessibleBy($learner, $course);
 
         // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
-        
+
         list($nextActivityTag, $labelStart, $statusMsg) =
             $this->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;
 
@@ -266,20 +265,20 @@ class CourseController extends YesWikiController
         }
         $labelStart = $learner && $learner->isAdmin() && $module->getStatus($course) != ModuleStatus::OPEN ?
             _t('LMS_BEGIN_ONLY_ADMIN')
-            : (!$learner || (is_null($nextActivityTag)) ?  _t('LMS_BEGIN')
+            : (!$learner || (is_null($nextActivityTag)) ? _t('LMS_BEGIN')
                 : ($isFinished ? _t('LMS_RESTART') : _t('LMS_RESUME')));
 
         if (!$learner || $isFinished || is_null($nextActivityTag)) {
             $nextActivityTag = $module->getFirstActivityTag();
         }
-                        
+
         if ($module->getStatus($course) == ModuleStatus::OPEN && !$module->isAccessibleBy($learner, $course)) {
             // define status here because it depends of learner and can not be stored into $module->status
             $statusMsg = _t('LMS_MODULE_NOT_ACCESSIBLE');
         } else {
             $statusMsg = $this->calculateModuleStatusMessage($course, $module);
         }
-        
+
         return [
             $nextActivityTag,
             $labelStart,
@@ -292,7 +291,7 @@ class CourseController extends YesWikiController
      * check if we can display activity without contextual course or module
      * @return bool
      */
-    public function activitiesCanBeDisplayedWithoutContext():bool
+    public function activitiesCanBeDisplayedWithoutContext(): bool
     {
         return $this->activitiesCanBeDisplayedWithoutContext;
     }

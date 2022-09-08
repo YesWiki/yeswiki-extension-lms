@@ -62,7 +62,7 @@ class ExtraActivityLogs extends TimeLogs implements \Countable, \Iterator
         $this->position = 0;
     }
 
-    public function valid():bool
+    public function valid(): bool
     {
         return isset(array_keys($this->values)[$this->position]);
     }
