@@ -35,7 +35,7 @@ abstract class LmsField extends BazarField
     protected function renderInput($entry)
     {
         // No input need to be displayed for this example field
-        return null;
+        return "";
     }
 
     // Format input values before save
@@ -44,7 +44,7 @@ abstract class LmsField extends BazarField
         return [] ;
     }
 
-    
+
     protected function getValue($entry)
     {
         return null;

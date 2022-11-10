@@ -27,7 +27,7 @@ class ModuleNavigationField extends LmsField
         parent::__construct($values, $services);
         $this->courseManager = $services->get(CourseManager::class);
         $this->courseController = $services->get(CourseController::class);
-        
+
         // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
         $this->moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
@@ -37,9 +37,9 @@ class ModuleNavigationField extends LmsField
     {
         $currentModuleTag = $this->getCurrentTag($entry);
         if (is_null($currentModuleTag)) {
-            return null;
+            return "";
         }
-        
+
         // the consulted course entry
         $course = $this->courseController->getContextualCourse();
         // the consulted module entry to display the current activity
@@ -59,7 +59,7 @@ class ModuleNavigationField extends LmsField
             // TODO duplicate code ($courseController->renderModuleCard) : when passing to twig, mutualize it
 
             $disabledLink = !$module->isAccessibleBy($learner, $course);
-            
+
             // TODO implement getNextActivity for a learner, for the moment choose the first activity of the module
             list($nextActivityTag, $labelStart, $statusMsg) =
                 $this->courseController->getLastAccessibleActivityTagAndLabelForLearner($learner, $course, $module) ;

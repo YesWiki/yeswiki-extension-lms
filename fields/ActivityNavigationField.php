@@ -48,17 +48,17 @@ class ActivityNavigationField extends LmsField
     {
         parent::__construct($values, $services);
 
-        
+
         $this->label = null;
         $this->default = [];
-        
+
         $this->wiki = $services->get(Wiki::class) ;
         $this->config = $this->wiki->config ;
         $this->entryManager = $services->get(EntryManager::class);
         $this->dateManager = $services->get(DateManager::class);
         $this->courseManager = $services->get(CourseManager::class);
         $this->conditionsChecker = $services->get(ConditionsChecker::class);
-        
+
         // true if the module links are opened in a modal box
         $this->moduleModal = ($values[self::FIELD_MODAL] == 'module_modal');
     }
@@ -69,7 +69,7 @@ class ActivityNavigationField extends LmsField
     {
         $currentActivityTag = $this->getCurrentTag($entry);
         if (is_null($currentActivityTag)) {
-            return null;
+            return "";
         }
 
         // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
@@ -105,13 +105,16 @@ class ActivityNavigationField extends LmsField
             } else {
                 $nextActivity = $nextCourseStructure;
             }
-            
+
             // check conditions
             if ($this->conditionsChecker->isConditionsEnabled()) {
-                $conditionsResults = $this->conditionsChecker
-                    ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry)) ;
-                if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsResults->getErrorStatus()) {
-                    trigger_error($conditionsResults->getFormattedMessages());
+                $nextCourseStructure = $this->courseManager->getNextActivityOrModule($course, $module, $activity);
+                if ($nextCourseStructure){
+                    $conditionsResults = $this->conditionsChecker
+                        ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry),true,$nextCourseStructure) ;
+                    if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsResults->getErrorStatus()) {
+                        trigger_error($conditionsResults->getFormattedMessages());
+                    }
                 }
             }
 
@@ -157,7 +160,7 @@ class ActivityNavigationField extends LmsField
             if (isset($value[self::LABEL_REACTION_NEEDED])) {
                 foreach ($value[self::LABEL_REACTION_NEEDED] as $id => $val) {
                     $data[] = ['condition' => self::LABEL_REACTION_NEEDED]
-                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])] : []);
                 }
             }
             if (isset($value[self::LABEL_QUIZ_PASSED]) && isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID])) {
@@ -165,7 +168,7 @@ class ActivityNavigationField extends LmsField
                     if (isset($value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED,
                         self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED][self::LABEL_QUIZ_ID][$id]]
-                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])] : []);
                     }
                 }
             }
@@ -178,7 +181,7 @@ class ActivityNavigationField extends LmsField
                         $data[] = ['condition' => self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL,
                         self::LABEL_QUIZ_ID => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_ID][$id],
                         self::LABEL_QUIZ_MINIMUM_LEVEL => $value[self::LABEL_QUIZ_PASSED_MINIMUM_LEVEL][self::LABEL_QUIZ_MINIMUM_LEVEL][$id]]
-                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])] : []);
                     }
                 }
             }
@@ -187,7 +190,7 @@ class ActivityNavigationField extends LmsField
                     if (isset($value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id])) {
                         $data[] = ['condition' => self::LABEL_FORM_FILLED,
                         self::LABEL_FORM_ID => $value[self::LABEL_FORM_FILLED][self::LABEL_FORM_ID][$id]]
-                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])]:[]);
+                        + (isset($value['scope'][$id]) ? ['scope' => $this->extractScope($value['scope'][$id])] : []);
                     }
                 }
             }
@@ -204,7 +207,7 @@ class ActivityNavigationField extends LmsField
         return $entry[$this->propertyName] ?? $_REQUEST[$this->propertyName] ?? $this->default;
     }
 
-    private function extractScope($scope):?array
+    private function extractScope($scope): ?array
     {
         if (is_array($scope)) {
             $results = [];
@@ -214,7 +217,7 @@ class ActivityNavigationField extends LmsField
                     $results[] = $tmpRes;
                 }
             }
-            
+
             return $results ;
         } elseif (is_string($scope)) {
             $extracted = explode('/', $scope);
@@ -223,7 +226,7 @@ class ActivityNavigationField extends LmsField
             }
             $course = $extracted[0];
             $module = $extracted[1];
-            $result = (($course == '*')?[]:['course' => $course]) + (($module == '*')?[]:['module' => $module]);
+            $result = (($course == '*') ? [] : ['course' => $course]) + (($module == '*') ? [] : ['module' => $module]);
             return empty($result) ? null : $result ;
         }
     }
