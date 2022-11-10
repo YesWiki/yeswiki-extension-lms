@@ -22,7 +22,7 @@ class ReturnButtonField extends LmsField
     {
         parent::__construct($values, $services);
         $this->courseManager = $services->get(CourseManager::class);
-        
+
         // does the entry is viewed inside a modal box ? $moduleModal is true when the page was called in ajax
         $this->moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
@@ -32,7 +32,7 @@ class ReturnButtonField extends LmsField
     {
         $currentModuleTag = $this->getCurrentTag($entry);
         if (is_null($currentModuleTag)) {
-            return null;
+            return "";
         }
         // display the button if it's not inside a modal box
         return ($this->moduleModal) ? null : $this->render("@lms/fields/returnbutton.twig", [

@@ -42,7 +42,7 @@ class ReactionsField extends BazarField
         $this->label = null;
         $this->size = null;
         $this->maxChars = null;
-        
+
         $this->ids = $values[self::FIELD_IDS];
         $this->ids = explode(',', $this->ids);
         $this->ids = array_map('trim', $this->ids);
@@ -99,7 +99,7 @@ class ReactionsField extends BazarField
         $currentEntryTag = $this->getCurrentTag($entry);
 
         if (is_null($currentEntryTag) || empty($entry[$this->linkedFieldName]) || $entry[$this->linkedFieldName] != "oui") {
-            return null ;
+            return "" ;
         }
 
         // get reactions numbers for templating later
@@ -159,7 +159,7 @@ class ReactionsField extends BazarField
     protected function renderInput($entry)
     {
         // No input need to be displayed for this example field
-        return null;
+        return "";
     }
 
     // Format input values before save

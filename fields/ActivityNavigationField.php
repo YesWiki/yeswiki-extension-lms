@@ -69,7 +69,7 @@ class ActivityNavigationField extends LmsField
     {
         $currentActivityTag = $this->getCurrentTag($entry);
         if (is_null($currentActivityTag)) {
-            return null;
+            return "";
         }
 
         // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
