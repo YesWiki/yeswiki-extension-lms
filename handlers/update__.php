@@ -12,6 +12,9 @@
 
 namespace YesWiki;
 
+use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Bazar\Service\FormManager;
+use YesWiki\Core\Service\AclService;
 use YesWiki\Core\Service\Performer;
 use YesWiki\Lms\Service\LearnerManager;
 
@@ -47,7 +50,7 @@ liste***ListeOuinonLms***Activer les commentaires ?*** *** ***oui***bf_commentai
 liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** ***
 reactions***reactions*** *** *** *** *** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
-acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
+acls*** + ***@admins***comments-closed*** *** *** *** *** *** ***');
 
 !defined('MODULE_FORM_NAME') && define('MODULE_FORM_NAME', 'LMS Module');
 !defined('MODULE_FORM_DESCRIPTION') && define(
@@ -61,7 +64,7 @@ jour***bf_date_ouverture***Date d\'ouverture*** *** *** *** *** ***0*** ***Les a
 liste***ListeOuinonLms***Activé*** *** ***oui***bf_actif*** ***0*** ***Vous pouvez fermer le module afin d\'interdire l\'accès aux apprenants. Ce paramétrage est prioritaire sur « Date d\'ouverture ».*** * *** * *** *** *** ***
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . '***Activités*** *** *** ***bf_activites***dragndrop***0*** ***L\'ordre des activités définit la séquence d\'apprentissage du module*** *** *** *** ***
 navigationmodule***bf_navigation*** *** *** *** *** *** *** *** ***
-acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
+acls*** + ***@admins***comments-closed*** *** *** *** *** *** ***');
 
 !defined('COURSE_FORM_NAME') && define('COURSE_FORM_NAME', 'LMS Parcours');
 !defined('COURSE_FORM_DESCRIPTION') && define(
@@ -74,7 +77,7 @@ image***bf_image***Image***300***300***600***600***right***0*** *** *** * *** * 
 checkboxfiche***' . $GLOBALS['wiki']->config['lms_config']['module_form_id'] . '***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L\'ordre des modules définit le parcours de l\'apprenant*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des activités*** *** ***non***bf_scenarisation_activites*** ***1*** ***Si « oui », les apprenants doivent avoir consulté l\'activité précédente pour accéder à la suivante*** *** *** *** ***
 liste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si « oui », les apprenants doivent avoir consulté toutes les activités du module précédent pour accéder au module suivant*** *** *** *** ***
-acls*** + ***@admins***@admins*** *** *** *** *** *** ***');
+acls*** + ***@admins***comments-closed*** *** *** *** *** *** ***');
 
 !defined('ATTENDANCE_SHEET_FORM_NAME') && define('ATTENDANCE_SHEET_FORM_NAME', 'LMS Feuille d\'émargement');
 !defined('ATTENDANCE_SHEET_FORM_DESCRIPTION') && define(
@@ -88,7 +91,7 @@ texte***bf_localization***Lieu*** *** *** *** ***text***0*** *** *** * *** * ***
 textelong***bf_contenu***Description***80***4*** *** ***wiki***0*** *** *** * ***@admins*** *** *** ***
 extraactivity***bf_extraactivity*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés*** * *** * *** *** *** ***
-acls*** + ***@admins***@admins***');
+acls*** + ***@admins***comments-closed***');
 
 /**
  * Check if a form exists and if not, add it to the nature table
@@ -124,6 +127,44 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
     }
 }
 
+/**
+ * update comments acl
+ * @param $formId
+ */
+function updatCommentAcl($formId, $wiki)
+{
+    if (!is_scalar($formId) || intval($formId) < 1){
+        return null;
+    }
+    $formId = strval(intval($formId));
+    $aclService = $wiki->services->get(AclService::class);
+    $entryManager = $wiki->services->get(EntryManager::class);
+    $formManager = $wiki->services->get(FormManager::class);
+    $form = $formManager->getOne($formId);
+    if (!empty($form['bn_template'])){
+        $formattedCatch = preg_quote('acls*** + ***@admins***@admins***','/');
+        if(preg_match("/\n$formattedCatch/",$form['bn_template'])){
+            $form['bn_template'] = str_replace(
+                'acls*** + ***@admins***@admins***',
+                'acls*** + ***@admins***comments-closed***',
+                $form['bn_template']
+            );
+            $formManager->update($form);
+            $entries = $entryManager->search([
+                'formsIds' => [$formId]
+            ]);
+            if (is_array($entries)){
+                foreach ($entries as $entry) {
+                    $commentAcl = $aclService->load($entry['id_fiche'],'comment',false);
+                    if (!empty($commentAcl['list']) && $commentAcl['list'] == "@admins"){
+                        $aclService->save($entry['id_fiche'],'comment','comments-closed');
+                    }
+                }
+            }
+        }
+    }
+}
+
 $learnerManager = $GLOBALS['wiki']->services->get(LearnerManager::class);
 // the current learner
 $learner = $learnerManager->getLearner();
@@ -154,6 +195,10 @@ if ($learner && $learner->isAdmin()) {
         ACTIVITY_FORM_DESCRIPTION,
         ACTIVITY_FORM_TEMPLATE
     );
+    updatCommentAcl(
+        $GLOBALS['wiki']->config['lms_config']['activity_form_id'],
+        $this
+    );
     // test if the module form exists, if not, install it
     checkAndAddForm(
         $output,
@@ -161,6 +206,10 @@ if ($learner && $learner->isAdmin()) {
         MODULE_FORM_NAME,
         MODULE_FORM_DESCRIPTION,
         MODULE_FORM_TEMPLATE
+    );
+    updatCommentAcl(
+        $GLOBALS['wiki']->config['lms_config']['module_form_id'],
+        $this
     );
     // test if the course form exists, if not, install it
     checkAndAddForm(
@@ -170,6 +219,10 @@ if ($learner && $learner->isAdmin()) {
         COURSE_FORM_DESCRIPTION,
         COURSE_FORM_TEMPLATE
     );
+    updatCommentAcl(
+        $GLOBALS['wiki']->config['lms_config']['course_form_id'],
+        $this
+    );
     if ($GLOBALS['wiki']->config['lms_config']['extra_activity_enabled'] ?? false){
         // test if the attendance sheet form exists, if not, install it
         checkAndAddForm(
@@ -178,6 +231,10 @@ if ($learner && $learner->isAdmin()) {
             ATTENDANCE_SHEET_FORM_NAME,
             ATTENDANCE_SHEET_FORM_DESCRIPTION,
             ATTENDANCE_SHEET_FORM_TEMPLATE
+        );
+        updatCommentAcl(
+            $GLOBALS['wiki']->config['lms_config']['attendance_sheet_form_id'],
+            $this
         );
     }
 
