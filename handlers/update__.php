@@ -131,7 +131,7 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
  * update comments acl
  * @param $formId
  */
-function updatCommentAcl($formId, $wiki)
+function updateCommentAcl($formId, $wiki)
 {
     if (!is_scalar($formId) || intval($formId) < 1){
         return null;
@@ -153,12 +153,10 @@ function updatCommentAcl($formId, $wiki)
             $entries = $entryManager->search([
                 'formsIds' => [$formId]
             ]);
-            if (is_array($entries)){
-                foreach ($entries as $entry) {
-                    $commentAcl = $aclService->load($entry['id_fiche'],'comment',false);
-                    if (!empty($commentAcl['list']) && $commentAcl['list'] == "@admins"){
-                        $aclService->save($entry['id_fiche'],'comment','comments-closed');
-                    }
+            foreach ($entries as $entry) {
+                $commentAcl = $aclService->load($entry['id_fiche'],'comment',false);
+                if (!empty($commentAcl['list']) && $commentAcl['list'] == "@admins"){
+                    $aclService->save($entry['id_fiche'],'comment','comments-closed');
                 }
             }
         }
@@ -195,7 +193,7 @@ if ($learner && $learner->isAdmin()) {
         ACTIVITY_FORM_DESCRIPTION,
         ACTIVITY_FORM_TEMPLATE
     );
-    updatCommentAcl(
+    updateCommentAcl(
         $GLOBALS['wiki']->config['lms_config']['activity_form_id'],
         $this
     );
@@ -207,7 +205,7 @@ if ($learner && $learner->isAdmin()) {
         MODULE_FORM_DESCRIPTION,
         MODULE_FORM_TEMPLATE
     );
-    updatCommentAcl(
+    updateCommentAcl(
         $GLOBALS['wiki']->config['lms_config']['module_form_id'],
         $this
     );
@@ -219,7 +217,7 @@ if ($learner && $learner->isAdmin()) {
         COURSE_FORM_DESCRIPTION,
         COURSE_FORM_TEMPLATE
     );
-    updatCommentAcl(
+    updateCommentAcl(
         $GLOBALS['wiki']->config['lms_config']['course_form_id'],
         $this
     );
@@ -232,7 +230,7 @@ if ($learner && $learner->isAdmin()) {
             ATTENDANCE_SHEET_FORM_DESCRIPTION,
             ATTENDANCE_SHEET_FORM_TEMPLATE
         );
-        updatCommentAcl(
+        updateCommentAcl(
             $GLOBALS['wiki']->config['lms_config']['attendance_sheet_form_id'],
             $this
         );
