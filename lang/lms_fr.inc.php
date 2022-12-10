@@ -96,6 +96,13 @@ $GLOBALS['translations'] = array_merge(
         'LMS_TO_ALLOW_REACTION' => 'Pour vous permettre de réagir',
         'LMS_PLEASE_LOGIN' => 'veuillez vous identifier',
         'LMS_SHARE_YOUR_COMMENT' => 'Et n\'hésitez pas à faire un commentaire pour approfondir la réflexion !',
+        'LMS_ACTIVATE_REACTIONS' => 'Activer les réactions ?',
+        'LMS_REACTIONS_DEFAULT_GRATITUDE' => 'Gratitude',
+        'LMS_REACTIONS_DEFAULT_I_LOVE' => 'J\'aime',
+        'LMS_REACTIONS_DEFAULT_I_UNDERSTOOD' => 'J\'ai appris quelque chose',
+        'LMS_REACTIONS_DEFAULT_NOT_UNDERSTOOD' => 'J\'ai pas compris',
+        'LMS_REACTIONS_DEFAULT_NOT_AGREE' => 'Je ne suis pas d\'accord',
+        'LMS_REACTIONS_DEFAULT_BLACK_IDEA' => 'Ca me perturbe',
 
         // action importcourses
         'LMS_IMPORT_TOKEN' => 'Token du site distant',
