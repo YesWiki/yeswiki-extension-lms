@@ -14,13 +14,44 @@ class ReactionsField extends BazarField
     protected const FIELD_IDS = 2;
     protected const FIELD_TITLES = 3;
     protected const FIELD_IMAGES = 4;
-    protected const DEFAULT_REACTIONS = ['top-gratitude', 'j-aime', 'j-ai-appris', 'pas-compris', 'pas-d-accord', 'idee-noire'];
+    protected const FIELD_LABEL_REACTION = 6;
+    protected const DEFAULT_REACTIONS = [
+        'top-gratitude' => [
+            'title_t' => 'LMS_REACTIONS_DEFAULT_GRATITUDE',
+            'image' => 'tools/lms/presentation/images/mikone-top-gratitude.svg',
+        ],
+        'j-aime' => [
+            'title_t' => 'LMS_REACTIONS_DEFAULT_I_LOVE',
+            'image' => 'tools/lms/presentation/images/mikone-j-aime.svg',
+        ],
+        'j-ai-appris' => [
+            'title_t' => 'LMS_REACTIONS_DEFAULT_I_UNDERSTOOD',
+            'image' => 'tools/lms/presentation/images/mikone-j-ai-appris.svg',
+        ],
+        'pas-compris' => [
+            'title_t' => 'LMS_REACTIONS_DEFAULT_NOT_UNDERSTOOD',
+            'image' => 'tools/lms/presentation/images/mikone-pas-compris.svg',
+        ],
+        'pas-d-accord' => [
+            'title_t' => 'LMS_REACTIONS_DEFAULT_NOT_AGREE',
+            'image' => 'tools/lms/presentation/images/mikone-pas-d-accord.svg',
+        ],
+        'idee-noire' => [
+            'title_t' => 'LMS_REACTIONS_DEFAULT_BLACK_IDEA',
+            'image' => 'tools/lms/presentation/images/mikone-idee-noire.svg',
+        ]
+    ];
+    public const DEFAULT_OPTIONS = [
+        'oui' => 'YES',
+        'non' => 'NO'
+    ];
+    public const DEFAULT_OK_KEY = 'oui';
 
     protected $ids;
     protected $titles;
     protected $images;
-
-    protected $linkedFieldName ;
+    protected $imagesPath;
+    protected $options;
     protected $wiki;
 
     /*
@@ -35,11 +66,14 @@ class ReactionsField extends BazarField
         parent::__construct($values, $services);
 
         $this->wiki = $services->get(Wiki::class);
+        $this->imagesPath = null;
+        $this->options = array_map('_t',self::DEFAULT_OPTIONS);
 
-        $this->linkedFieldName = 'listeListeOuinonLmsbf_reactions';
-
+        $this->label = $values[self::FIELD_LABEL_REACTION] ?? '';
+        if (empty(trim($this->label))){
+            $this->label = _t('LMS_ACTIVATE_REACTIONS');
+        }
         // reset not used values
-        $this->label = null;
         $this->size = null;
         $this->maxChars = null;
 
@@ -48,45 +82,24 @@ class ReactionsField extends BazarField
         $this->ids = array_map('trim', $this->ids);
         // if empty, we use default values
         if (count($this->ids) == 1 && empty($this->ids[0])) {
-            $this->ids = self::DEFAULT_REACTIONS;
+            $this->ids = array_keys(self::DEFAULT_REACTIONS);
         }
 
         $this->titles = $values[self::FIELD_TITLES];
         $this->titles = explode(',', $this->titles);
         $this->titles = array_map('trim', $this->titles);
         foreach ($this->ids as $k => $id) {
-            if (empty($this->titles[$k])) { // if ids are default ones, we have some titles
-                switch ($id) {
-                    case 'j-ai-appris':
-                        $this->titles[$k] = "J'ai appris quelque chose";
-                        break;
-                    case 'j-aime':
-                        $this->titles[$k] = "J'aime";
-                        break;
-                    case 'idee-noire':
-                        $this->titles[$k] = "Ca me perturbe";
-                        break;
-                    case 'pas-compris':
-                        $this->titles[$k] = "J'ai pas compris";
-                        break;
-                    case 'pas-d-accord':
-                        $this->titles[$k] = "Je ne suis pas d'accord";
-                        break;
-                    case 'top-gratitude':
-                        $this->titles[$k] = "Gratitude";
-                        break;
-                    default:
-                        $this->titles[$k] = $id;  // we show just the id, as it's our only information available
-                        break;
-                }
+            if (empty($this->titles[$k])) {
+                // if ids are default ones, we have some titles
+                $this->titles[$k] = (array_key_exists($id,self::DEFAULT_REACTIONS))
+                    ? _t(self::DEFAULT_REACTIONS[$id]['title_t'])
+                    : $id ; // we show just the id, as it's our only information available
             }
         }
 
         $this->images = $values[self::FIELD_IMAGES];
         $this->images = explode(',', $this->images);
         $this->images = array_map('trim', $this->images);
-        // TODO : check realpath for security
-        // $images = array_map('realpath', $images);
 
         // load the lms lib
         require_once LMS_PATH . 'libs/lms.lib.php';
@@ -98,7 +111,7 @@ class ReactionsField extends BazarField
         // the tag of the current entry
         $currentEntryTag = $this->getCurrentTag($entry);
 
-        if (is_null($currentEntryTag) || empty($entry[$this->linkedFieldName]) || $entry[$this->linkedFieldName] != "oui") {
+        if (is_null($currentEntryTag) || $this->getValue($entry) !== self::DEFAULT_OK_KEY) {
             return "" ;
         }
 
@@ -107,37 +120,16 @@ class ReactionsField extends BazarField
 
         $reactions = [];
 
+        $imagesPath = $this->getImagesPath();
+
         foreach ($this->ids as $k => $id) {
-            if (empty($this->images[$k])) { // if ids are default ones, we have some images
-                switch ($id) {
-                    case 'j-ai-appris':
-                    case 'j-aime':
-                    case 'idee-noire':
-                    case 'pas-compris':
-                    case 'pas-d-accord':
-                    case 'top-gratitude':
-                        $image = LMS_PATH . 'presentation/images/mikone-' . $id . '.svg';
-                        break;
-                    default:
-                        $image = false;
-                        break;
-                }
-            } else {
-                if (file_exists('files/' . $this->images[$k])) { // custom image in files folder
-                    $image = 'files/' . $this->images[$k];
-                } elseif (file_exists(LMS_PATH . 'presentation/images/mikone-' . $this->images[$k] . '.svg')) {
-                    $image = LMS_PATH . 'presentation/images/mikone-' . $id . '.svg';
-                } else {
-                    $image = false;
-                }
-            }
-            if ($image) {
+            if (!empty($imagesPath[$k])) {
                 $nbReactions = $r['reactions'][$id];
             }
             $reactions[$id] = [
                 'id' => $id,
                 'nbReactions' => $nbReactions ?? null,
-                'image' => $image ?? null,
+                'image' => $imagesPath[$k] ?? null,
                 'title' => $this->titles[$k] ?? null,
             ];
         }
@@ -150,6 +142,32 @@ class ReactionsField extends BazarField
             ]);
     }
 
+    // lazy loading
+    protected function getImagesPath(): array
+    {
+        if (is_null($this->imagesPath)){
+            $imagesPath = [];
+            foreach ($this->ids as $k => $id) {
+                if (empty($this->images[$k]) || empty(trim($this->images[$k]))) { // if ids are default ones, we have some images
+                    $imagesPath[$k] = (array_key_exists($id,self::DEFAULT_REACTIONS))
+                        ? self::DEFAULT_REACTIONS[$id]['image']
+                        : '' ;
+                } else {
+                    $sanitizedImageFilename = basename(trim($this->images[$k]));
+                    if (file_exists("files/$sanitizedImageFilename")) { // custom image in files folder
+                        $imagesPath[$k] = "files/$sanitizedImageFilename";
+                    } elseif (file_exists("tools/lms/presentation/images/mikone-$sanitizedImageFilename.svg")) {
+                        $imagesPath[$k] = "tools/lms/presentation/images/mikone-$sanitizedImageFilename.svg";
+                    } else {
+                        $imagesPath[$k] = '';
+                    }
+                }
+            }
+            $this->imagesPath = $imagesPath;
+        }
+        return $this->imagesPath;
+    }
+
     protected function getCurrentTag($entry): ?string
     {
         // the tag of the current activity page
@@ -158,19 +176,10 @@ class ReactionsField extends BazarField
 
     protected function renderInput($entry)
     {
-        // No input need to be displayed for this example field
-        return "";
-    }
-
-    // Format input values before save
-    public function formatValuesBeforeSave($entry)
-    {
-        return [] ;
-    }
-
-    protected function getValue($entry)
-    {
-        return null;
+        return $this->render('@bazar/inputs/select.twig', [
+            'value' => $this->getValue($entry),
+            'options' => $this->options
+        ]);
     }
 
     // change return of this method to keep compatible with php 7.3 (mixed is not managed)
@@ -182,7 +191,7 @@ class ReactionsField extends BazarField
             [
                 'ids' => $this->ids,
                 'titles' => $this->titles,
-                // 'images' => $this->images, because containing file system path
+                'images' => array_map('basename',$this->getImagesPath()),
             ]
         );
     }

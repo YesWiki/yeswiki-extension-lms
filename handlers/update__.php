@@ -47,8 +47,7 @@ texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** *
 textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
 liste***ListeOuinonLms***Activer les commentaires ?*** *** ***oui***bf_commentaires*** ***0*** *** *** * *** * *** *** ***
-liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** ***
-reactions***reactions*** *** *** *** *** *** *** *** ***
+reactions***reactions*** *** *** ***oui*** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***comments-closed*** *** *** *** *** *** ***');
 
@@ -274,6 +273,52 @@ if ($learner && $learner->isAdmin()) {
     } else {
         $output .= '✅ The <em>LearnerDashboard</em> page already exists.<br />';
     }
+    // update Activity form
+    $result = $GLOBALS['wiki']->Query(<<<SQL
+    SELECT 1 FROM {$GLOBALS['wiki']->config['table_prefix']}nature WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+    SQL);
+    if (mysqli_num_rows($result) != 0) {
+        $output .= 'ℹ️ Removing list for reactions activation in activities from 1201<br/>';
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** ***\n", '') 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** ***\r\n", '') 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** *** ***\n", '') 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "liste***ListeOuinonLms***Activer les réactions ?*** *** ***oui***bf_reactions*** ***0*** *** *** * *** * *** *** *** ***\r\n", '') 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , 'reactions***reactions*** *** *** *** *** *** *** *** ***', 'reactions***reactions*** *** *** ***oui*** *** *** *** ***') 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}pages` 
+            SET `body`=REPLACE( `body` , '"listeListeOuinonLmsbf_reactions":"non"', '"reactions":"non"') 
+            WHERE `body` LIKE '%"id_typeannonce":"{$GLOBALS['wiki']->config['lms_config']['activity_form_id']}"%'
+               AND `body` LIKE '%"listeListeOuinonLmsbf_reactions":"non"%'
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}pages` 
+            SET `body`=REPLACE( `body` , '"listeListeOuinonLmsbf_reactions":"oui"', '"reactions":"oui"') 
+            WHERE `body` LIKE '%"id_typeannonce":"{$GLOBALS['wiki']->config['lms_config']['activity_form_id']}"%'
+               AND `body` LIKE '%"listeListeOuinonLmsbf_reactions":"oui"%'
+        SQL);
+        $output .= '✅ Done !<br />';
+
+    }
 }
 
 
@@ -314,6 +359,7 @@ if (!empty($oldaction)) {
     $this->Query('UPDATE `'.$this->config['table_prefix'].'pages` SET BODY=REPLACE( `body`, \'{{menuparcours\', \'{{coursemenu\') WHERE latest = \'Y\' AND comment_on=\'\' AND body not LIKE \'{"%\' AND body LIKE \'%{{menuparcours%\'');
     $output .= '✅ Done !<br />';
 }
+
 $output .= '<hr />';
 
 // add the content before footer
