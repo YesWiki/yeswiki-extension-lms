@@ -5,6 +5,7 @@ namespace YesWiki\Lms\Service;
 
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Bazar\Service\FormManager;
+use YesWiki\Core\Service\ReactionManager;
 use YesWiki\Lms\CourseStructure;
 use YesWiki\Lms\Activity;
 use YesWiki\Lms\Course;
@@ -50,9 +51,6 @@ class ConditionsChecker
         $this->learnerManager = $learnerManager;
         $this->quizManager = $quizManager;
         $this->wiki = $wiki;
-
-        // load the lms lib
-        require_once LMS_PATH . 'libs/lms.lib.php';
     }
 
     /**
@@ -312,7 +310,9 @@ class ConditionsChecker
     private function checkReactionNeeded(array $data, ConditionsState $result): ConditionsState
     {
         // get Reactions
-        $reactions = $data['learner'] ? getUserReactionOnPage($data['activity']->getTag(), $data['learner']->getUserName()) : null;
+        $reactions = $data['learner'] && $this->wiki->services->has(ReactionManager::class)
+            ? $this->wiki->services->get(ReactionManager::class)->getReactions($data['activity']->getTag(), [],$data['learner']->getUserName())
+            : null;
         if (empty($reactions)) {
             $result->setNotOk();
             $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP'));
