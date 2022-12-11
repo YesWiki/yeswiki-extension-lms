@@ -79,7 +79,7 @@ function activity_navigation_select(elem,id){
   }
 }
 
-function activity_navigation_add_element(id,value,conditionObject = null){
+function activity_navigation_add_element(id,value,conditionObject = {}){
   // find associated template
   let template_container = document.getElementById(id+'_'+value+'_template_container') ;
   if (!template_container) {
@@ -99,9 +99,11 @@ function activity_navigation_add_element(id,value,conditionObject = null){
           for (let i=0;i<end;++i){
               inputs[i].removeAttribute('disabled');
               // set default value
-              for (var key in conditionObject) {
-                if (inputs[i].name == id+'['+value+']['+key+']'){
-                  inputs[i].value = conditionObject[key];
+              if (typeof conditionObject === 'object'){
+                for (var key in conditionObject) {
+                  if (inputs[i].name == id+'['+value+']['+key+']'){
+                    inputs[i].value = conditionObject[key];
+                  }
                 }
               }
               // change name to be sure to be unique
@@ -125,24 +127,25 @@ function activity_navigation_add_element(id,value,conditionObject = null){
                   container.appendChild(clone);
 
                   // add default params for scope
-                  if (conditionObject.scope)
-                  for (var key in conditionObject.scope) {
-                    let searchKey = '';
-                    if (conditionObject.scope[key].course){
-                      searchKey += conditionObject.scope[key].course ;
-                    } else {
-                      searchKey += '*';
-                    }
-                    searchKey += '/';
-                    if (conditionObject.scope[key].module){
-                      searchKey += conditionObject.scope[key].module ;
-                    } else {
-                      searchKey += '*';
-                    }
-                    let optionToActivate = clone.querySelector('.input-group.mb-3 select[name="'+id+'[scope_select]['
-                        +activityNavigationConditionsEditUniqueId+']"] option[value="'+searchKey+'"]');
-                    if(optionToActivate){
-                      activity_navigation_scopeSelect(optionToActivate,id);
+                  if (typeof conditionObject === 'object' && 'scope' in conditionObject){
+                    for (var key in conditionObject.scope) {
+                      let searchKey = '';
+                      if (conditionObject.scope[key].course){
+                        searchKey += conditionObject.scope[key].course ;
+                      } else {
+                        searchKey += '*';
+                      }
+                      searchKey += '/';
+                      if (conditionObject.scope[key].module){
+                        searchKey += conditionObject.scope[key].module ;
+                      } else {
+                        searchKey += '*';
+                      }
+                      let optionToActivate = clone.querySelector('.input-group.mb-3 select[name="'+id+'[scope_select]['
+                          +activityNavigationConditionsEditUniqueId+']"] option[value="'+searchKey+'"]');
+                      if(optionToActivate){
+                        activity_navigation_scopeSelect(optionToActivate,id);
+                      }
                     }
                   }
               }
