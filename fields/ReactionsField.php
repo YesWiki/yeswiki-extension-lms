@@ -121,8 +121,8 @@ class ReactionsField extends BazarField
         ];
         if ($this->wiki->services->has(ReactionManager::class)) {
             $tmp = $this->wiki->services->get(ReactionManager::class)->getReactions($entry['id_fiche']);
-            if (!empty($tmp) && is_array($tmp)) {
-                $tmp = $tmp[array_key_first($tmp)];
+            if (!empty($tmp) && is_array($tmp) && isset($tmp["reactionField|{$entry['id_fiche']}"])) {
+                $tmp = $tmp["reactionField|{$entry['id_fiche']}"];
                 $user = $this->wiki->getUsername();
                 foreach ($tmp['reactions'] as $reaction) {
                     if ($reaction['user'] == $user) {

@@ -14,10 +14,10 @@ if ($ajaxRequest) {
 if ($user = $this->GetUser()) {
     if (!empty($_GET['id'])) {
         //get reactions from user for this page
-        if ($this->services->has(ReactionManager::class)){
-            $r = $this->services->get(ReactionManager::class)->getReactions($pageTag, [],$user['name']);
-            if (!empty($r)){
-                $r = $r[array_key_first($r)];
+        if ($this->services->has(ReactionManager::class)) {
+            $r = $this->services->get(ReactionManager::class)->getReactions($pageTag, [], $user['name']);
+            if (!empty($r) && is_array($r) && isset($r["reactionField|$pageTag"])) {
+                $r = $r["reactionField|$pageTag"];
                 $r = empty($r['reactions']) ? [] : $r['reactions'][array_key_first($r['reactions'])];
             }
         } else {
@@ -38,7 +38,7 @@ if ($user = $this->GetUser()) {
             $this->redirect($this->href(testRefererUrlInIframe(), '', $getParams, false));
         }
     } else {
-        if ($ajaxRequest) {           
+        if ($ajaxRequest) {
             echo json_encode(['state' => 'error', 'errorMessage' => 'Un type de réaction doit être présent dans l\'url.']);
         } else {
             $this->setMessage('Un type de réaction doit être présent dans l\'url.');
@@ -46,7 +46,7 @@ if ($user = $this->GetUser()) {
         }
     }
 } else {
-    if ($ajaxRequest) {           
+    if ($ajaxRequest) {
         echo json_encode(['state' => 'error', 'errorMessage' => 'Vous devez être connecté pour réagir.']);
     } else {
         $this->setMessage('Vous devez être connecté pour réagir.');
