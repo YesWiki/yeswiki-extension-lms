@@ -1,6 +1,5 @@
 <?php
 
-
 namespace YesWiki\Lms\Service;
 
 use YesWiki\Bazar\Service\EntryManager;
@@ -96,10 +95,10 @@ class ConditionsChecker
 
         /* clean $data['conditions'] */
         $data = $this->cleanConditions($data);
-        
+
         /* check conditions */
         $result = $this->checkConditions($data);
-        
+
         if ($result->getConditionsMet()) {
             if (is_null($nextCourseStructure)) {
                 $nextCourseStructure = $this->courseManager->getNextActivityOrModule($data['course'], $data['module'], $data['activity']);
@@ -119,7 +118,7 @@ class ConditionsChecker
                         $nextCourseStructure->getTag(),
                         ['course' => $data['course']->getTag()]+
                             (($nextCourseStructure instanceof Activity)
-                                ?['module' => $data['module']->getTag()]:[]),
+                                ? ['module' => $data['module']->getTag()] : []),
                         false
                     ));
                 }
@@ -143,7 +142,7 @@ class ConditionsChecker
         $module,
         $activity,
         ?CourseStructure $nextCourseStructure = null
-    ):bool {
+    ): bool {
         return $this->checkActivityNavigationConditions(
             $course,
             $module,
@@ -161,7 +160,7 @@ class ConditionsChecker
      * @param mixed $conditions, when called from field to avoid infinite loop
      * @return [] ['course'=>$course,'module=>$module,'activity'=>$activity]
      */
-    private function checkParams($course, $module, $activity, $conditions):array
+    private function checkParams($course, $module, $activity, $conditions): array
     {
         if (!$course) {
             throw new \Error('{course} should be defined !');
@@ -232,7 +231,7 @@ class ConditionsChecker
                 break;
             }
         }
-        $data['conditions'] = (isset($propertyName)) ? ($data['activity']->getField($propertyName) ?? []):[];
+        $data['conditions'] = (isset($propertyName)) ? ($data['activity']->getField($propertyName) ?? []) : [];
         $data['conditions'] = !is_array($data['conditions']) ? [] : $data['conditions'];
         return $data;
     }
@@ -310,9 +309,19 @@ class ConditionsChecker
     private function checkReactionNeeded(array $data, ConditionsState $result): ConditionsState
     {
         // get Reactions
+        $pageTag = $data['activity']->getTag();
         $reactions = $data['learner'] && $this->wiki->services->has(ReactionManager::class)
-            ? $this->wiki->services->get(ReactionManager::class)->getReactions($data['activity']->getTag(), [],$data['learner']->getUserName())
+            ? $this->wiki->services->get(ReactionManager::class)->getReactions($pageTag, [], $data['learner']->getUserName())
             : null;
+        if (empty($reactions)) {
+            $reactions = isset($reactions["reactionField|$pageTag"]['reactions'])
+                ? $reactions["reactionField|$pageTag"]['reactions']
+                : (
+                    isset($reactions[array_key_first($reactions)]['reactions'])
+                    ? $reactions[array_key_first($reactions)]['reactions']
+                    : []
+                );
+        }
         if (empty($reactions)) {
             $result->setNotOk();
             $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_REACTION_NEEDED_HELP'));
@@ -321,7 +330,7 @@ class ConditionsChecker
         }
         return $result;
     }
-    
+
     /** checkQuizPassed
      * @param array $data
      * @param ConditionsState $result
@@ -431,7 +440,7 @@ class ConditionsChecker
             $form = $this->formManager->getOne($formId);
             $result->setNotOk();
             $result->addMessage(_t('LMS_ACTIVITY_NAVIGATION_CONDITIONS_FORM_FILLED_HELP')
-                    .' \''.(!empty($form)?$form['bn_label_nature']:$formId).'\'');
+                    .' \''.(!empty($form) ? $form['bn_label_nature'] : $formId).'\'');
         }
         return $result;
     }
@@ -474,11 +483,11 @@ class ConditionsChecker
                 }
             }
         }
-        
+
         return $result;
     }
 
-    
+
     /**
      * return if conditions are enabled
      * @return bool
