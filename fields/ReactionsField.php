@@ -4,6 +4,7 @@ namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
 use YesWiki\Bazar\Field\BazarField;
+use YesWiki\Core\Service\ReactionManager;
 use YesWiki\Wiki;
 
 /**
@@ -15,7 +16,8 @@ class ReactionsField extends BazarField
     protected const FIELD_TITLES = 3;
     protected const FIELD_IMAGES = 4;
     protected const FIELD_LABEL_REACTION = 6;
-    protected const DEFAULT_REACTIONS = [
+
+    public const DEFAULT_REACTIONS = [
         'top-gratitude' => [
             'title_t' => 'LMS_REACTIONS_DEFAULT_GRATITUDE',
             'image' => 'tools/lms/presentation/images/mikone-top-gratitude.svg',
@@ -67,10 +69,10 @@ class ReactionsField extends BazarField
 
         $this->wiki = $services->get(Wiki::class);
         $this->imagesPath = null;
-        $this->options = array_map('_t',self::DEFAULT_OPTIONS);
+        $this->options = array_map('_t', self::DEFAULT_OPTIONS);
 
         $this->label = $values[self::FIELD_LABEL_REACTION] ?? '';
-        if (empty(trim($this->label))){
+        if (empty(trim($this->label))) {
             $this->label = _t('LMS_ACTIVATE_REACTIONS');
         }
         // reset not used values
@@ -91,7 +93,7 @@ class ReactionsField extends BazarField
         foreach ($this->ids as $k => $id) {
             if (empty($this->titles[$k])) {
                 // if ids are default ones, we have some titles
-                $this->titles[$k] = (array_key_exists($id,self::DEFAULT_REACTIONS))
+                $this->titles[$k] = (array_key_exists($id, self::DEFAULT_REACTIONS))
                     ? _t(self::DEFAULT_REACTIONS[$id]['title_t'])
                     : $id ; // we show just the id, as it's our only information available
             }
@@ -100,9 +102,6 @@ class ReactionsField extends BazarField
         $this->images = $values[self::FIELD_IMAGES];
         $this->images = explode(',', $this->images);
         $this->images = array_map('trim', $this->images);
-
-        // load the lms lib
-        require_once LMS_PATH . 'libs/lms.lib.php';
     }
 
     // Render the show view of the field
@@ -116,7 +115,27 @@ class ReactionsField extends BazarField
         }
 
         // get reactions numbers for templating later
-        $r = getAllReactions($entry['id_fiche'], $this->ids, $this->wiki->getUsername());
+        $r = [
+            'reactions' => empty($this->ids) ? [] : array_combine($this->ids, array_fill(0, count($this->ids), 0)),
+            'userReaction' => ''
+        ];
+        if ($this->wiki->services->has(ReactionManager::class)) {
+            $tmp = $this->wiki->services->get(ReactionManager::class)->getReactions($entry['id_fiche']);
+            if (!empty($tmp) && is_array($tmp)) {
+                $tmp = $tmp[array_key_first($tmp)];
+                $user = $this->wiki->getUsername();
+                foreach ($tmp['reactions'] as $reaction) {
+                    if ($reaction['user'] == $user) {
+                        $r['userReaction'] = $reaction['id'];
+                    }
+                    // check for existance of reaction
+                    if (isset($r['reactions'][$reaction['id']])) {
+                        $r['reactions'][$reaction['id']]++;
+                    }
+                }
+            }
+            unset($tmp);
+        }
 
         $reactions = [];
 
@@ -145,11 +164,11 @@ class ReactionsField extends BazarField
     // lazy loading
     protected function getImagesPath(): array
     {
-        if (is_null($this->imagesPath)){
+        if (is_null($this->imagesPath)) {
             $imagesPath = [];
             foreach ($this->ids as $k => $id) {
                 if (empty($this->images[$k]) || empty(trim($this->images[$k]))) { // if ids are default ones, we have some images
-                    $imagesPath[$k] = (array_key_exists($id,self::DEFAULT_REACTIONS))
+                    $imagesPath[$k] = (array_key_exists($id, self::DEFAULT_REACTIONS))
                         ? self::DEFAULT_REACTIONS[$id]['image']
                         : '' ;
                 } else {
@@ -191,7 +210,7 @@ class ReactionsField extends BazarField
             [
                 'ids' => $this->ids,
                 'titles' => $this->titles,
-                'images' => array_map('basename',$this->getImagesPath()),
+                'images' => array_map('basename', $this->getImagesPath()),
             ]
         );
     }

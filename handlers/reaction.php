@@ -1,5 +1,7 @@
 <?php
-include_once 'tools/lms/libs/lms.lib.php';
+
+use YesWiki\Core\Service\ReactionManager;
+
 $pageTag = $this->getPageTag();
 $ajaxRequest = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 $getParams = [];
@@ -12,7 +14,15 @@ if ($ajaxRequest) {
 if ($user = $this->GetUser()) {
     if (!empty($_GET['id'])) {
         //get reactions from user for this page
-        $r = getUserReactionOnPage($pageTag, $user['name']);
+        if ($this->services->has(ReactionManager::class)){
+            $r = $this->services->get(ReactionManager::class)->getReactions($pageTag, [],$user['name']);
+            if (!empty($r)){
+                $r = $r[array_key_first($r)];
+                $r = empty($r['reactions']) ? [] : $r['reactions'][array_key_first($r['reactions'])];
+            }
+        } else {
+            $r = [];
+        }
         if (!empty($r)) {
             // erase past reaction
             $sql = 'DELETE FROM ' . $this->GetConfigValue('table_prefix') . 'triples ' . 'WHERE resource = "' . $pageTag . '" ' . 'AND property = "https://yeswiki.net/vocabulary/reaction" AND value LIKE \'%"user":"'.$user['name'].'"%\';';
