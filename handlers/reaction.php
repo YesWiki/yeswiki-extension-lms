@@ -14,14 +14,10 @@ if ($ajaxRequest) {
 if ($user = $this->GetUser()) {
     if (!empty($_GET['id'])) {
         //get reactions from user for this page
-        if ($this->services->has(ReactionManager::class)) {
-            $r = $this->services->get(ReactionManager::class)->getReactions($pageTag, [], $user['name']);
-            if (!empty($r) && is_array($r) && isset($r["reactionField|$pageTag"])) {
-                $r = $r["reactionField|$pageTag"];
-                $r = empty($r['reactions']) ? [] : $r['reactions'][array_key_first($r['reactions'])];
-            }
-        } else {
-            $r = [];
+        $r = $this->services->get(ReactionManager::class)->getReactions($pageTag, [], $user['name']);
+        if (!empty($r) && is_array($r) && isset($r["reactionField|$pageTag"])) {
+            $r = $r["reactionField|$pageTag"];
+            $r = empty($r['reactions']) ? [] : $r['reactions'][array_key_first($r['reactions'])];
         }
         if (!empty($r)) {
             // erase past reaction

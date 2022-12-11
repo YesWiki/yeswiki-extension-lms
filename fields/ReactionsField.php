@@ -5,6 +5,7 @@ namespace YesWiki\Lms\Field;
 use Psr\Container\ContainerInterface;
 use YesWiki\Bazar\Field\BazarField;
 use YesWiki\Core\Service\ReactionManager;
+use YesWiki\Lms\Controller\ReactionsController;
 use YesWiki\Wiki;
 
 /**
@@ -54,6 +55,7 @@ class ReactionsField extends BazarField
     protected $images;
     protected $imagesPath;
     protected $options;
+    protected $reactionsController;
     protected $wiki;
 
     /*
@@ -67,6 +69,7 @@ class ReactionsField extends BazarField
     {
         parent::__construct($values, $services);
 
+        $this->reactionsController = $services->get(ReactionsController::class);
         $this->wiki = $services->get(Wiki::class);
         $this->imagesPath = null;
         $this->options = array_map('_t', self::DEFAULT_OPTIONS);
@@ -87,21 +90,17 @@ class ReactionsField extends BazarField
             $this->ids = array_keys(self::DEFAULT_REACTIONS);
         }
 
-        $this->titles = $values[self::FIELD_TITLES];
-        $this->titles = explode(',', $this->titles);
-        $this->titles = array_map('trim', $this->titles);
-        foreach ($this->ids as $k => $id) {
-            if (empty($this->titles[$k])) {
-                // if ids are default ones, we have some titles
-                $this->titles[$k] = (array_key_exists($id, self::DEFAULT_REACTIONS))
-                    ? _t(self::DEFAULT_REACTIONS[$id]['title_t'])
-                    : $id ; // we show just the id, as it's our only information available
-            }
-        }
+        list('labels'=>$this->titles) = $this->reactionsController->formatReactionsLabels(
+            isset($values[self::FIELD_TITLES]) && is_string($values[self::FIELD_TITLES])
+                ? $values[self::FIELD_TITLES]
+                : '',
+            $this->ids,
+            array_map(function ($reactionData) {
+                return _t($reactionData['title_t']);
+            }, self::DEFAULT_REACTIONS)
+        );
 
-        $this->images = $values[self::FIELD_IMAGES];
-        $this->images = explode(',', $this->images);
-        $this->images = array_map('trim', $this->images);
+        $this->images = isset($values[self::FIELD_IMAGES]) && is_string($values[self::FIELD_IMAGES]) ? $values[self::FIELD_IMAGES] : '';
     }
 
     // Render the show view of the field
@@ -119,23 +118,21 @@ class ReactionsField extends BazarField
             'reactions' => empty($this->ids) ? [] : array_combine($this->ids, array_fill(0, count($this->ids), 0)),
             'userReaction' => ''
         ];
-        if ($this->wiki->services->has(ReactionManager::class)) {
-            $tmp = $this->wiki->services->get(ReactionManager::class)->getReactions($entry['id_fiche']);
-            if (!empty($tmp) && is_array($tmp) && isset($tmp["reactionField|{$entry['id_fiche']}"])) {
-                $tmp = $tmp["reactionField|{$entry['id_fiche']}"];
-                $user = $this->wiki->getUsername();
-                foreach ($tmp['reactions'] as $reaction) {
-                    if ($reaction['user'] == $user) {
-                        $r['userReaction'] = $reaction['id'];
-                    }
-                    // check for existance of reaction
-                    if (isset($r['reactions'][$reaction['id']])) {
-                        $r['reactions'][$reaction['id']]++;
-                    }
+        $tmp = $this->wiki->services->get(ReactionManager::class)->getReactions($entry['id_fiche']);
+        if (!empty($tmp) && is_array($tmp) && isset($tmp["reactionField|{$entry['id_fiche']}"])) {
+            $tmp = $tmp["reactionField|{$entry['id_fiche']}"];
+            $user = $this->wiki->getUsername();
+            foreach ($tmp['reactions'] as $reaction) {
+                if ($reaction['user'] == $user) {
+                    $r['userReaction'] = $reaction['id'];
+                }
+                // check for existance of reaction
+                if (isset($r['reactions'][$reaction['id']])) {
+                    $r['reactions'][$reaction['id']]++;
                 }
             }
-            unset($tmp);
         }
+        unset($tmp);
 
         $reactions = [];
 
@@ -165,24 +162,13 @@ class ReactionsField extends BazarField
     protected function getImagesPath(): array
     {
         if (is_null($this->imagesPath)) {
-            $imagesPath = [];
-            foreach ($this->ids as $k => $id) {
-                if (empty($this->images[$k]) || empty(trim($this->images[$k]))) { // if ids are default ones, we have some images
-                    $imagesPath[$k] = (array_key_exists($id, self::DEFAULT_REACTIONS))
-                        ? self::DEFAULT_REACTIONS[$id]['image']
-                        : '' ;
-                } else {
-                    $sanitizedImageFilename = basename(trim($this->images[$k]));
-                    if (file_exists("files/$sanitizedImageFilename")) { // custom image in files folder
-                        $imagesPath[$k] = "files/$sanitizedImageFilename";
-                    } elseif (file_exists("tools/lms/presentation/images/mikone-$sanitizedImageFilename.svg")) {
-                        $imagesPath[$k] = "tools/lms/presentation/images/mikone-$sanitizedImageFilename.svg";
-                    } else {
-                        $imagesPath[$k] = '';
-                    }
-                }
-            }
-            $this->imagesPath = $imagesPath;
+            $this->imagesPath = $this->reactionsController->formatImages(
+                $this->ids,
+                $this->images,
+                array_map(function ($reactionsData) {
+                    return $reactionsData['image'];
+                }, self::DEFAULT_REACTIONS)
+            );
         }
         return $this->imagesPath;
     }
