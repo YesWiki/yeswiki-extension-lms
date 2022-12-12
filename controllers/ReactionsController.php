@@ -60,9 +60,13 @@ class ReactionsController extends YesWikiController
             $sanitizedImageFilename = empty($rawImages[$k]) ? '' : basename($rawImages[$k]);
             $images[$k] = empty($rawImages[$k]) // if ids are default ones, we have some images
                 ? (
-                    (array_key_exists($k, $defaultImages))
-                    ? $defaultImages[$k]
-                    : ''
+                    (array_key_exists($id, $defaultImages))
+                    ? $defaultImages[$id]
+                    : (
+                        (array_key_exists($k, $defaultImages))
+                        ? $defaultImages[$k]
+                        : ''
+                    )
                 )
                 : (
                     basename($rawImages[$k]) !== $rawImages[$k]
@@ -112,15 +116,17 @@ class ReactionsController extends YesWikiController
      *      ]
      *  ],
      *  'userReactions' = >string[] $ids
+     *  'oldIdsUserReactions' = >string[] $ids
      * ]
      */
     public function getReactionItems(string $pageTag, string $userName, string $reactionId, array $ids, array $labels, array $images, bool $isDefaultReactionFied = false): array
     {
         $reactions = [];
         $userReactions = [];
+        $oldIdsUserReactions = [];
         $uniqueIds = ["$reactionId|$pageTag"];
         if ($isDefaultReactionFied) {
-            $uniqueIds[] = "reactionField|$pageTag";
+            $uniqueIds['oldId'] = "reactionField|$pageTag";
         }
         foreach ($ids as $k => $id) {
             $reactions[$id] = [
@@ -131,18 +137,21 @@ class ReactionsController extends YesWikiController
             ];
         }
         $allReactions = $this->reactionManager->getReactions($pageTag, [$reactionId]);
-        foreach ($uniqueIds as $uniqueId) {
+        foreach ($uniqueIds as $k => $uniqueId) {
             if (!empty($allReactions[$uniqueId]['reactions'])) {
                 foreach ($allReactions[$uniqueId]['reactions'] as $reaction) {
                     if (isset($reactions[$reaction['id']])) {
                         $reactions[$reaction['id']]['nbReactions'] = $reactions[$reaction['id']]['nbReactions'] + 1;
                         if (!empty($userName) && $reaction['user'] === $userName && !in_array($reaction['id'], $userReactions)) {
                             $userReactions[] = $reaction['id'];
+                            if ($k === 'oldId') {
+                                $oldIdsUserReactions[] = $reaction['id'];
+                            }
                         }
                     }
                 }
             }
         }
-        return compact(['reactions','userReactions']);
+        return compact(['reactions','userReactions','oldIdsUserReactions']);
     }
 }
