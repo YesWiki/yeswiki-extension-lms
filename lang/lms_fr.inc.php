@@ -103,6 +103,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_REACTIONS_DEFAULT_NOT_UNDERSTOOD' => 'J\'ai pas compris',
         'LMS_REACTIONS_DEFAULT_NOT_AGREE' => 'Je ne suis pas d\'accord',
         'LMS_REACTIONS_DEFAULT_BLACK_IDEA' => 'Ca me perturbe',
+        'LMS_NO_IMAGE' => 'Image manquante',
 
         // action importcourses
         'LMS_IMPORT_TOKEN' => 'Token du site distant',
@@ -182,7 +183,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE' => 'Périmètre',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE_EMPTY' => 'Vide = pas de contrainte',
-        
+
         // actions/EditConfigAction.php
         'EDIT_CONFIG_HINT_LMS_CONFIG[ACTIVITY_FORM_ID]' => 'Identifiant du formulaire LMS Activité',
         'EDIT_CONFIG_HINT_LMS_CONFIG[MODULE_FORM_ID]' => 'Identifiant du formulaire LMS Module',

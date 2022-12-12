@@ -60,8 +60,8 @@ class ReactionsController extends YesWikiController
             $sanitizedImageFilename = empty($rawImages[$k]) ? '' : basename($rawImages[$k]);
             $images[$k] = empty($rawImages[$k]) // if ids are default ones, we have some images
                 ? (
-                    (array_key_exists($id, $defaultImages))
-                    ? $defaultImages[$id]
+                    (array_key_exists($k, $defaultImages))
+                    ? $defaultImages[$k]
                     : ''
                 )
                 : (
@@ -136,7 +136,7 @@ class ReactionsController extends YesWikiController
                 foreach ($allReactions[$uniqueId]['reactions'] as $reaction) {
                     if (isset($reactions[$reaction['id']])) {
                         $reactions[$reaction['id']]['nbReactions'] = $reactions[$reaction['id']]['nbReactions'] + 1;
-                        if ($reactions['user'] === $userName && !in_array($reaction['id'], $userReactions)) {
+                        if (!empty($userName) && $reaction['user'] === $userName && !in_array($reaction['id'], $userReactions)) {
                             $userReactions[] = $reaction['id'];
                         }
                     }
