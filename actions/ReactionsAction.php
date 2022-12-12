@@ -73,7 +73,7 @@ class ReactionsAction extends YesWikiAction
             'title' => empty($this->arguments['title']) ? _t('REACTION_SHARE_YOUR_REACTION') : $this->arguments['title'],
             'connected' => !empty($username),
             'reactionItems' => $reactionItems,
-            'userName' => $user['name'] ?? '',
+            'userName' => $username,
             'userReaction' => $userReactions,
             'maxReaction' => $this->arguments['maxreaction'],
             'pageTag' => $pageTag

@@ -4,6 +4,7 @@ namespace YesWiki\Lms\Field;
 
 use Psr\Container\ContainerInterface;
 use YesWiki\Bazar\Field\BazarField;
+use YesWiki\Core\Controller\AuthController;
 use YesWiki\Core\Service\ReactionManager;
 use YesWiki\Lms\Controller\ReactionsController;
 use YesWiki\Wiki;
@@ -113,49 +114,30 @@ class ReactionsField extends BazarField
             return "" ;
         }
 
-        // get reactions numbers for templating later
-        $r = [
-            'reactions' => empty($this->ids) ? [] : array_combine($this->ids, array_fill(0, count($this->ids), 0)),
-            'userReaction' => ''
-        ];
-        $tmp = $this->wiki->services->get(ReactionManager::class)->getReactions($entry['id_fiche']);
-        if (!empty($tmp) && is_array($tmp) && isset($tmp["reactionField|{$entry['id_fiche']}"])) {
-            $tmp = $tmp["reactionField|{$entry['id_fiche']}"];
-            $user = $this->wiki->getUsername();
-            foreach ($tmp['reactions'] as $reaction) {
-                if ($reaction['user'] == $user) {
-                    $r['userReaction'] = $reaction['id'];
-                }
-                // check for existance of reaction
-                if (isset($r['reactions'][$reaction['id']])) {
-                    $r['reactions'][$reaction['id']]++;
-                }
-            }
-        }
-        unset($tmp);
-
-        $reactions = [];
+        $user = $this->getService(AuthController::class)->getLoggedUser();
+        $username = empty($user['name']) ? '' : $user['name'];
 
         $imagesPath = $this->getImagesPath();
+        list('reactions'=>$reactionItems, 'userReactions'=>$userReactions, 'oldIdsUserReactions'=>$oldIdsUserReactions) =
+            $this->reactionsController->getReactionItems(
+                $currentEntryTag,
+                $username,
+                $this->name,
+                $this->ids,
+                $this->titles,
+                $this->getImagesPath(),
+                true
+            );
 
-        foreach ($this->ids as $k => $id) {
-            if (!empty($imagesPath[$k])) {
-                $nbReactions = $r['reactions'][$id];
-            }
-            $reactions[$id] = [
-                'id' => $id,
-                'nbReactions' => $nbReactions ?? null,
-                'image' => $imagesPath[$k] ?? null,
-                'title' => $this->titles[$k] ?? null,
-            ];
-        }
         return $this->render("@lms/fields/reactions.twig", [
-                'connected' => ($this->wiki->getUser()),
-                'course' => $_GET['course'] ?? null,
-                'module' => $_GET['module'] ?? null,
-                'reactions' => $reactions,
-                'userReaction' => $r['userReaction'] ?? null,
-            ]);
+            'reactionId' => $this->name,
+            'reactionItems' => $reactionItems,
+            'userName' => $username,
+            'userReaction' => $userReactions,
+            'oldIdsUserReactions' => $oldIdsUserReactions,
+            'maxReaction' => 1,
+            'pageTag' => $currentEntryTag
+        ]);
     }
 
     // lazy loading
