@@ -1,3 +1,5 @@
+{{ include_javascript('tools/lms/presentation/javascript/reactions.js') }}
+{{ include_css('tools/lms/presentation/styles/reactions.css') }}
 <div id="{{reactionId}}" class="reactions-container">
   {% if titleTag != 'h5' %}
     <h6>
@@ -22,15 +24,12 @@
           <a href="{{ url({tag:'api/reactions'}) }}"
             title="{{reaction.label}}"
             data-id="{{reaction.id}}" data-reactionId="{{reactionId}}" data-pageTag="{{pageTag}}" data-maxReaction="{{maxReaction}}" data-userName="{{userName}}"
-            class="link-reaction{{ (userReaction and reaction.id in userReaction) ? ' user-reaction' : '' }}">
+            class="link-reaction-refactor{{ (userReaction and reaction.id in userReaction) ? ' user-reaction' : '' }}"
+            {% if reaction.id in oldIdsUserReactions %}data-old-id="true"{% endif %}>
             {% block reactionBlock %}
               <div class="reaction-image">
                 {% if reaction.image is empty %}
-                  {% block noimage %}
-                    <span class="reaction-emoji">❌</span>
-                    <br/>
-                    <i>{{ _t('LMS_NO_IMAGE') }}</i>
-                  {% endblock noimage %}
+                  <div class="alert alert-danger">{{ _t('LMS_REACTIONS_NO_IMAGE') }}</div>
                 {% elseif reaction.image matches "/\.(gif|jpeg|png|jpg|svg|webp)$/i" %}
                   <img class="img-responsive" src="{{reaction.image}}" alt="reaction image {{ reaction.id }}" />
                 {% elseif reaction.image matches "/\\p{S}/u" %}
@@ -38,7 +37,7 @@
                 {% elseif reaction.image matches "/^(fa[srb]? fa-*)/i" %}
                   <i class="reaction-fa-icons {{reaction.image}}"></i>
                 {% else %}
-                  {{ block('noimage') }}
+                  <div class="alert alert-danger">{{ _t('LMS_REACTIONS_BAD_IMAGE_FORMAT') }}</div>
                 {% endif %}
               </div>
               <h6 class="reaction-title">{{ reaction.label }}</h6>

@@ -313,7 +313,7 @@ class ConditionsChecker
         $reactions = $data['learner'] && $this->wiki->services->has(ReactionManager::class)
             ? $this->wiki->services->get(ReactionManager::class)->getReactions($pageTag, [], $data['learner']->getUserName())
             : null;
-        if (empty($reactions)) {
+        if (!empty($reactions)) {
             $reactions = isset($reactions["reactionField|$pageTag"]['reactions'])
                 ? $reactions["reactionField|$pageTag"]['reactions']
                 : (
