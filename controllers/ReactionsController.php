@@ -2,6 +2,7 @@
 
 namespace YesWiki\Lms\Controller;
 
+use Throwable;
 use URLify;
 use YesWiki\Core\Service\ReactionManager;
 use YesWiki\Core\YesWikiController;
@@ -25,11 +26,13 @@ class ReactionsController extends YesWikiController
      */
     public function formatReactionsLabels(string $labelsComaSeparated, ?array $ids = null, array $defaultLabels = []): array
     {
-        $rawLabels = array_map('trim', explode(',', $labelsComaSeparated));
+        $rawLabels = empty($labelsComaSeparated) ? [] : array_map('trim', explode(',', $labelsComaSeparated));
         if (is_null($ids)) {
             $labels = $rawLabels;
-            $ids = array_map(class_exists(URLify::class, false) ? 'URLify::slug' : [$this,'backupURLify'], $labels);
+            $ids = array_map([$this,'securedSanitizeIds'], $labels);
         } else {
+            // security to prevent badly formatted ids
+            $ids = array_map([$this,'securedSanitizeIds'], $ids);
             $labels = [];
             foreach ($ids as $k => $id) {
                 $labels[$k] = (!empty($rawLabels[$k]))
@@ -54,7 +57,7 @@ class ReactionsController extends YesWikiController
      */
     public function formatImages(array $ids, string $imagesComaSeparated, array $defaultImages = []): array
     {
-        $rawImages = array_map('trim', explode(',', $imagesComaSeparated));
+        $rawImages = empty($imagesComaSeparated) ? [] : array_map('trim', explode(',', $imagesComaSeparated));
         $images = [];
         foreach ($ids as $k => $id) {
             $sanitizedImageFilename = empty($rawImages[$k]) ? '' : basename($rawImages[$k]);
@@ -93,9 +96,20 @@ class ReactionsController extends YesWikiController
         return $images;
     }
 
+    private function securedSanitizeIds(string $text): string
+    {
+        try {
+            if (class_exists(URLify::class)) {
+                return URLify::slug($text);
+            }
+        } catch (Throwable $th) {
+        }
+        return $this->backupURLify($text);
+    }
+
     private function backupURLify(string $text): string
     {
-        return strreplace(["\n","\r","\t","'"," ",'.'], '-', strtolower($text));
+        return str_replace(["\n","\r","\t","'"," ",'.'], '-', strtolower($text));
     }
 
     /**
