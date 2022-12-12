@@ -83,25 +83,29 @@ class ReactionsField extends BazarField
         $this->size = null;
         $this->maxChars = null;
 
-        $this->ids = $values[self::FIELD_IDS];
-        $this->ids = explode(',', $this->ids);
+        $this->ids = trim($values[self::FIELD_IDS]);
+        $this->ids = empty($this->ids) ? [] : explode(',', $this->ids);
         $this->ids = array_map('trim', $this->ids);
-        // if empty, we use default values
-        if (count($this->ids) == 1 && empty($this->ids[0])) {
-            $this->ids = array_keys(self::DEFAULT_REACTIONS);
-        }
 
-        list('labels'=>$this->titles) = $this->reactionsController->formatReactionsLabels(
-            isset($values[self::FIELD_TITLES]) && is_string($values[self::FIELD_TITLES])
-                ? $values[self::FIELD_TITLES]
-                : '',
-            $this->ids,
+        $titles = isset($values[self::FIELD_TITLES]) && is_string($values[self::FIELD_TITLES])
+            ? trim($values[self::FIELD_TITLES])
+            : '';
+
+        list('labels'=>$this->titles, 'ids'=>$this->ids) = $this->reactionsController->formatReactionsLabels(
+            $titles,
+            empty($this->ids)
+                ? (
+                    empty($titles)
+                    ? array_keys(self::DEFAULT_REACTIONS)
+                    : null
+                )
+                : $this->ids,
             array_map(function ($reactionData) {
                 return _t($reactionData['title_t']);
             }, self::DEFAULT_REACTIONS)
         );
 
-        $this->images = isset($values[self::FIELD_IMAGES]) && is_string($values[self::FIELD_IMAGES]) ? $values[self::FIELD_IMAGES] : '';
+        $this->images = isset($values[self::FIELD_IMAGES]) && is_string($values[self::FIELD_IMAGES]) ? trim($values[self::FIELD_IMAGES]) : '';
     }
 
     // Render the show view of the field
