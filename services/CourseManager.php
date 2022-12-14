@@ -22,6 +22,7 @@ class CourseManager
     protected $activityFormId;
     protected $moduleFormId;
     protected $courseFormId;
+    protected $wiki;
 
     /**
      * CourseManager constructor
