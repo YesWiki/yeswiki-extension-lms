@@ -46,7 +46,7 @@ texte***bf_duree***Durée estimée de l\'activité en minutes*** *** *** *** ***
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
 textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
-liste***ListeOuinonLms***Activer les commentaires ?*** *** ***oui***bf_commentaires*** ***0*** *** *** * *** * *** *** ***
+comments***bf_commentaires***Activer les commentaires ?*** *** ***oui*** *** + ***0*** *** *** * *** * *** *** ***
 reactions***reactions*** *** *** ***oui*** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins***comments-closed*** *** *** *** *** *** ***');
@@ -132,7 +132,7 @@ function checkAndAddForm(&$plugin_output_new, $formId, $formName, $formeDescript
  */
 function updateCommentAcl($formId, $wiki)
 {
-    if (!is_scalar($formId) || intval($formId) < 1){
+    if (!is_scalar($formId) || intval($formId) < 1) {
         return null;
     }
     $formId = strval(intval($formId));
@@ -140,9 +140,9 @@ function updateCommentAcl($formId, $wiki)
     $entryManager = $wiki->services->get(EntryManager::class);
     $formManager = $wiki->services->get(FormManager::class);
     $form = $formManager->getOne($formId);
-    if (!empty($form['bn_template'])){
-        $formattedCatch = preg_quote('acls*** + ***@admins***@admins***','/');
-        if(preg_match("/\n$formattedCatch/",$form['bn_template'])){
+    if (!empty($form['bn_template'])) {
+        $formattedCatch = preg_quote('acls*** + ***@admins***@admins***', '/');
+        if (preg_match("/\n$formattedCatch/", $form['bn_template'])) {
             $form['bn_template'] = str_replace(
                 'acls*** + ***@admins***@admins***',
                 'acls*** + ***@admins***comments-closed***',
@@ -153,9 +153,9 @@ function updateCommentAcl($formId, $wiki)
                 'formsIds' => [$formId]
             ]);
             foreach ($entries as $entry) {
-                $commentAcl = $aclService->load($entry['id_fiche'],'comment',false);
-                if (!empty($commentAcl['list']) && $commentAcl['list'] == "@admins"){
-                    $aclService->save($entry['id_fiche'],'comment','comments-closed');
+                $commentAcl = $aclService->load($entry['id_fiche'], 'comment', false);
+                if (!empty($commentAcl['list']) && $commentAcl['list'] == "@admins") {
+                    $aclService->save($entry['id_fiche'], 'comment', 'comments-closed');
                 }
             }
         }
@@ -220,7 +220,7 @@ if ($learner && $learner->isAdmin()) {
         $GLOBALS['wiki']->config['lms_config']['course_form_id'],
         $this
     );
-    if ($GLOBALS['wiki']->config['lms_config']['extra_activity_enabled'] ?? false){
+    if ($GLOBALS['wiki']->config['lms_config']['extra_activity_enabled'] ?? false) {
         // test if the attendance sheet form exists, if not, install it
         checkAndAddForm(
             $output,
@@ -318,6 +318,42 @@ if ($learner && $learner->isAdmin()) {
         SQL);
         $output .= '✅ Done !<br />';
 
+        $output .= 'ℹ️ Removing list for comments activation in activities from 1201<br/>';
+        $strToCatch = 'liste***ListeOuinonLms***Activer les commentaires ?*** *** ***oui***bf_commentaires*** ***0*** *** *** * *** * *** *** ***';
+        $newStr = 'comments***bf_commentaires***Activer les commentaires ?*** *** ***oui*** *** + ***0*** *** *** * *** * *** *** ***';
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch\n", "$newStr\n") 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch\r\n", "$newStr\r\n") 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch ***\n", "$newStr ***\n") 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}nature` 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch ***\r\n", "$newStr ***\r\n") 
+            WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}pages` 
+            SET `body`=REPLACE( `body` , '"listeListeOuinonLmsbf_commentaires":"non"', '"bf_commentaires":"non"') 
+            WHERE `body` LIKE '%"id_typeannonce":"{$GLOBALS['wiki']->config['lms_config']['activity_form_id']}"%'
+               AND `body` LIKE '%"listeListeOuinonLmsbf_commentaires":"non"%'
+        SQL);
+        $this->Query(<<<SQL
+        UPDATE `{$this->config['table_prefix']}pages` 
+            SET `body`=REPLACE( `body` , '"listeListeOuinonLmsbf_commentaires":"oui"', '"bf_commentaires":"oui"') 
+            WHERE `body` LIKE '%"id_typeannonce":"{$GLOBALS['wiki']->config['lms_config']['activity_form_id']}"%'
+               AND `body` LIKE '%"listeListeOuinonLmsbf_commentaires":"oui"%'
+        SQL);
+        $output .= '✅ Done !<br />';
     }
 }
 
