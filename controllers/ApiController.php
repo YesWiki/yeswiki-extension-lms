@@ -2,15 +2,18 @@
 
 namespace YesWiki\Lms\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Core\ApiResponse;
+use YesWiki\Core\Service\ReactionManager;
 use YesWiki\Core\YesWikiController;
 use YesWiki\Lms\Service\QuizManager;
 use YesWiki\Lms\Service\ConditionsChecker;
 
 class ApiController extends YesWikiController
 {
-    
     /**
      * Get quiz's results for a user, course, module, activity and quizId
      * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"GET"},options={"acl":{"public","+"}})
@@ -37,7 +40,7 @@ class ApiController extends YesWikiController
     {
         return $this->getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, $activityId, null);
     }
-    
+
     /**
      * Get quizzes' results for a user, course, module
      * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}",methods={"GET"},options={"acl":{"public","+"}})
@@ -46,7 +49,7 @@ class ApiController extends YesWikiController
     {
         return $this->getQuizResultsForAUserAndAQuiz($userId, $courseId, $moduleId, null, null);
     }
-    
+
     /**
      * Get quizzes' results for a user, course
      * @Route("/api/lms/users/{userId}/quizresults/{courseId}",methods={"GET"},options={"acl":{"public","+"}})
@@ -55,7 +58,7 @@ class ApiController extends YesWikiController
     {
         return $this->getQuizResultsForAUserAndAQuiz($userId, $courseId, null, null, null);
     }
-    
+
     /**
      * Get quizzes' results for a user, course
      * @Route("/api/lms/users/{userId}/quizresults",methods={"GET"},options={"acl":{"public","+"}})
@@ -79,7 +82,7 @@ class ApiController extends YesWikiController
     {
         return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, $quizId);
     }
-    
+
     /**
      * Get quiz's results for a course, module, activity (all users for admins otherwise only for current user)
      * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}",methods={"GET"},options={"acl":{"public","+"}})
@@ -88,7 +91,7 @@ class ApiController extends YesWikiController
     {
         return $this->getQuizResultsForAUserAndAQuiz(null, $courseId, $moduleId, $activityId, null);
     }
-    
+
     /**
      * Get quiz's results for a course, module (all users for admins otherwise only for current user)
      * @Route("/api/lms/quizresults/{courseId}/{moduleId}",methods={"GET"},options={"acl":{"public","+"}})
@@ -121,7 +124,7 @@ class ApiController extends YesWikiController
             null
         );
     }
-    
+
     /**
      * save quiz's result for a user, course, module, activity and quizId
      * @Route("/api/lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"POST"},options={"acl":{"public","+"}})
@@ -143,7 +146,7 @@ class ApiController extends YesWikiController
         $code = ($result[QuizManager::STATUS_LABEL] == QuizManager::STATUS_CODE_OK)
             ? 200 // OK
             : 400 // bad request or error
-            ;
+        ;
         return new ApiResponse(['code' => $code]+$result, $code);
     }
 
@@ -179,7 +182,7 @@ class ApiController extends YesWikiController
             floatval($_POST[QuizManager::RESULT_LABEL])
         );
     }
-    
+
     /**
      * save quiz's result for the connected user and for course, module, activity and quizId
      * @Route("/api/lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}",methods={"POST"},options={"acl":{"public","+"}})
@@ -371,7 +374,7 @@ class ApiController extends YesWikiController
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></a><br />';
         $output .= 'Same as previous but for current connected learner<br />';
-        
+
         $urlSaveQuizResult = $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '<br />The following code :<br />';
         $output .= 'POST <b><code>'.$urlSaveQuizResult.'</code></b><br />';
@@ -381,13 +384,13 @@ class ApiController extends YesWikiController
         $output .= QuizManager::STATUS_CODE_ERROR.' = error,<br />';
         $output .= '"message":"error message"]</code><br />';
         $output .= '<b>You must sent cookies to be connected as learner or admin.</b><br />';
-        
+
         $output .= '<br />POST <b><code>';
         $output .= $this->wiki->Href('lms/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
         $output .= '</code></b><br />';
         $output .= 'Same as previous but for current connected learner<br />';
 
-        
+
         $output .= '<br />The following codes delete quiz\'s results:<br />';
         $output .= 'DELETE <code>';
         $output .= $this->wiki->Href('lms/users/{userId}/quizresults/{courseId}/{moduleId}/{activityId}/{quizId}', 'api');
@@ -421,5 +424,143 @@ class ApiController extends YesWikiController
         $output .= 'messages:[...],<br />';
         $output .= 'formattedMessages:"<.....>"]</code><br />';
         return $output;
+    }
+
+    /**
+     * @Route("/api/reactions/{idreaction}/{id}/{page}/{username}/delete",methods={"GET"},options={"acl":{"public","+"}},priority=4)
+     */
+    public function deleteReactionByGetMethod($idreaction, $id, $page, $username)
+    {
+        if ($user = $this->wiki->getUser()) {
+            if ($username == $user['name'] || $this->wiki->UserIsAdmin()) {
+                $reactionManager = $this->getService(ReactionManager::class);
+                $reactionManager->deleteUserReaction($page, $idreaction, $id, $username);
+                // check if deleted
+                $reactions = $reactionManager->getReactions($page, [$idreaction], $username);
+                if (!empty($reactions)) {
+                    $uniqueId = "$idreaction|$page";
+                    if (!empty($reactions[$uniqueId]['reactions'])) {
+                        $notDeletedReactions = array_filter(
+                            $reactions[$uniqueId]['reactions'],
+                            function ($reaction) use ($id) {
+                                return isset($reaction[$id]) && $reaction[$id] == $id;
+                            }
+                        );
+                        if (!empty($notDeletedReactions)) {
+                            return new ApiResponse(
+                                ['error' => 'reaction not deleted'],
+                                Response::HTTP_INTERNAL_SERVER_ERROR
+                            );
+                        }
+                    }
+                }
+                return new ApiResponse(
+                    [
+                        'idReaction'=>$idreaction,
+                        'id'=>$id,
+                        'page' => $page,
+                        'user'=> $username,
+                    ],
+                    Response::HTTP_OK
+                );
+            } else {
+                return new ApiResponse(
+                    ['error' => 'Seul les admins ou l\'utilisateur concerné peuvent supprimer les réactions.'],
+                    Response::HTTP_UNAUTHORIZED
+                );
+            }
+        } else {
+            return new ApiResponse(
+                ['error' => 'Vous devez être connecté pour supprimer les réactions.'],
+                Response::HTTP_UNAUTHORIZED
+            );
+        }
+    }
+
+    /**
+     * @Route("/api/reactions", methods={"POST"}, options={"acl":{"public", "+"}},priority=4)
+     */
+    public function addReactionFromUser()
+    {
+        if ($user = $this->wiki->getUser()) {
+            if ($_POST['username'] == $user['name'] || $this->wiki->UserIsAdmin()) {
+                if ($_POST['reactionid']) {
+                    if ($_POST['pagetag']) { // save the reaction
+                        //get reactions from user for this page
+                        $userReactions = $this->getService(ReactionManager::class)->getReactions($_POST['pagetag'], [$_POST['reactionid']], $user['name']);
+                        $params = $this->getService(ReactionManager::class)->getActionParameters($_POST['pagetag']);
+                        $canRegister = !empty($params[$_POST['reactionid']]);
+                        if (!$canRegister &&
+                            !empty($params['reactionField']['labels']) &&
+                            in_array(strval($_POST['id']), array_keys($params['reactionField']['labels']))) {
+                            $entry = $this->getService(EntryManager::class)->getOne($_POST['pagetag']);
+                            $form = $this->getService(FormManager::class)->getOne($entry['id_typeannonce']);
+                            $fieldTemplate = array_filter($form['template'], function ($fTemplate) {
+                                return $fTemplate[0] == 'reactions';
+                            });
+                            $fieldTemplate = $fieldTemplate[array_key_first($fieldTemplate)];
+                            $canRegister = (trim($fieldTemplate[1]) == strval($_POST['reactionid']));
+                        }
+                        if ($canRegister) {
+                            // un choix de vote est fait
+                            if ($_POST['id']) {
+                                // test if limits wherer put
+                                if (!empty($params['maxreaction']) && count($userReactions)>= $params['maxreaction']) {
+                                    return new ApiResponse(
+                                        ['error' => 'Seulement '.$params['maxreaction'].' réaction(s) possible(s). Vous pouvez désélectionner une de vos réactions pour changer.'],
+                                        Response::HTTP_UNAUTHORIZED
+                                    );
+                                } else {
+                                    $reactionValues = [
+                                        'userName' => $user['name'],
+                                        'reactionId' => $_POST['reactionid'],
+                                        'id' => $_POST['id'],
+                                        'date' => date('Y-m-d H:i:s'),
+                                    ];
+                                    $this->getService(ReactionManager::class)->addUserReaction(
+                                        $_POST['pagetag'],
+                                        $reactionValues
+                                    );
+                                    // hurra, the reaction is saved!
+                                    return new ApiResponse(
+                                        $reactionValues,
+                                        Response::HTTP_OK
+                                    );
+                                }
+                            } else {
+                                return new ApiResponse(
+                                    ['error' => 'Il faut renseigner une valeur de reaction (id).'],
+                                    Response::HTTP_BAD_REQUEST
+                                );
+                            }
+                        }
+                        return new ApiResponse(
+                            ['error' => "'".strval($_POST['reactionid']) . "' n'est pas une réaction déclarée sur la page '".strval($_POST['pagetag'])."'"],
+                            Response::HTTP_INTERNAL_SERVER_ERROR
+                        );
+                    } else {
+                        return new ApiResponse(
+                            ['error' => 'Il faut renseigner une page wiki contenant la réaction.'],
+                            Response::HTTP_BAD_REQUEST
+                        );
+                    }
+                } else {
+                    return new ApiResponse(
+                        ['error' => 'Il faut renseigner un id de la réaction.'],
+                        Response::HTTP_BAD_REQUEST
+                    );
+                }
+            } else {
+                return new ApiResponse(
+                    ['error' => 'Seul les admins ou l\'utilisateur concerné peuvent réagir.'],
+                    Response::HTTP_UNAUTHORIZED
+                );
+            }
+        } else {
+            return new ApiResponse(
+                json_encode(['error' => 'Vous devez être connecté pour réagir.']),
+                Response::HTTP_UNAUTHORIZED
+            );
+        }
     }
 }

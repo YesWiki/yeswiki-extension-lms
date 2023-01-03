@@ -91,11 +91,17 @@ $GLOBALS['translations'] = array_merge(
         'LMS_UPDATE_ELAPSED_TIME_MINUTES' => 'minutes',
 
         // LMS Reactions
-        'LMS_LOGIN_TO_REACT' => 'Pour réagir, identifiez-vous!',
         'LMS_SHARE_YOUR_REACTION' => 'Partagez votre réaction à propos de ce contenu',
-        'LMS_TO_ALLOW_REACTION' => 'Pour vous permettre de réagir',
-        'LMS_PLEASE_LOGIN' => 'veuillez vous identifier',
         'LMS_SHARE_YOUR_COMMENT' => 'Et n\'hésitez pas à faire un commentaire pour approfondir la réflexion !',
+        'LMS_ACTIVATE_REACTIONS' => 'Activer les réactions ?',
+        'LMS_REACTIONS_DEFAULT_GRATITUDE' => 'Gratitude',
+        'LMS_REACTIONS_DEFAULT_I_LOVE' => 'J\'aime',
+        'LMS_REACTIONS_DEFAULT_I_UNDERSTOOD' => 'J\'ai appris quelque chose',
+        'LMS_REACTIONS_DEFAULT_NOT_UNDERSTOOD' => 'J\'ai pas compris',
+        'LMS_REACTIONS_DEFAULT_NOT_AGREE' => 'Je ne suis pas d\'accord',
+        'LMS_REACTIONS_DEFAULT_BLACK_IDEA' => 'Ca me perturbe',
+        'LMS_REACTIONS_NO_IMAGE' => 'Image manquante',
+        'LMS_REACTIONS_BAD_IMAGE_FORMAT' => 'Mauvais format d\'image : doit être un fichier, un icône utf8 ou une classe Fontawesome',
 
         // action importcourses
         'LMS_IMPORT_TOKEN' => 'Token du site distant',
@@ -175,7 +181,7 @@ $GLOBALS['translations'] = array_merge(
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_NEXT_ACTIVITY_NOT_ACCESSIBLE' => 'Veuillez patienter, la prochaine activité n\'est pas accessible.',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE' => 'Périmètre',
         'LMS_ACTIVITY_NAVIGATION_CONDITIONS_SCOPE_EMPTY' => 'Vide = pas de contrainte',
-        
+
         // actions/EditConfigAction.php
         'EDIT_CONFIG_HINT_LMS_CONFIG[ACTIVITY_FORM_ID]' => 'Identifiant du formulaire LMS Activité',
         'EDIT_CONFIG_HINT_LMS_CONFIG[MODULE_FORM_ID]' => 'Identifiant du formulaire LMS Module',
