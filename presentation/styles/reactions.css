@@ -1,0 +1,24 @@
+/* temporary for reaction */
+.link-reaction-refactor {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-between;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.5em;
+    padding: 1em 0.5em;
+    transition: all 200ms ease-in;
+    box-shadow: none;
+  }
+  .link-reaction-refactor:hover {
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    text-decoration: none;
+  }
+  .link-reaction-refactor:focus,
+  .link-reaction-refactor:active,
+  .link-reaction-refactor:visited {
+    text-decoration: none;
+  }
