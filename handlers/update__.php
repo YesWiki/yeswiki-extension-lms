@@ -49,7 +49,7 @@ tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur l
 comments***bf_commentaires***Activer les commentaires ?*** *** ***oui*** *** + ***0*** *** *** * *** * *** *** ***
 reactions***reactions*** *** *** ***oui*** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
-acls*** + ***@admins***comments-closed*** *** *** *** *** *** ***');
+acls*** + ***@admins*** + *** *** ***bf_commentaires***1*** *** *** ***');
 
 !defined('MODULE_FORM_NAME') && define('MODULE_FORM_NAME', 'LMS Module');
 !defined('MODULE_FORM_DESCRIPTION') && define(
@@ -320,27 +320,53 @@ if ($learner && $learner->isAdmin()) {
 
         $output .= 'ℹ️ Removing list for comments activation in activities from 1201<br/>';
         $strToCatch = 'liste***ListeOuinonLms***Activer les commentaires ?*** *** ***oui***bf_commentaires*** ***0*** *** *** * *** * *** *** ***';
-        $newStr = 'comments***bf_commentaires***Activer les commentaires ?*** *** ***oui*** *** + ***0*** *** *** * *** * *** *** ***';
         $this->Query(<<<SQL
         UPDATE `{$this->config['table_prefix']}nature` 
-            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch\n", "$newStr\n") 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch\n", "") 
             WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
         SQL);
         $this->Query(<<<SQL
         UPDATE `{$this->config['table_prefix']}nature` 
-            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch\r\n", "$newStr\r\n") 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch\r\n", "") 
             WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
         SQL);
         $this->Query(<<<SQL
         UPDATE `{$this->config['table_prefix']}nature` 
-            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch ***\n", "$newStr ***\n") 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch ***\n", "") 
             WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
         SQL);
         $this->Query(<<<SQL
         UPDATE `{$this->config['table_prefix']}nature` 
-            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch ***\r\n", "$newStr ***\r\n") 
+            SET `bn_template`=REPLACE( `bn_template` , "$strToCatch ***\r\n", "") 
             WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
         SQL);
+
+        $strToCatchAcls = 'acls*** + ***@admins***comments-closed***';
+        $strForReplacementAcls = 'acls*** + ***@admins*** + *** *** ***bf_commentaires***1*** *** *** ***';
+        for ($i=0; $i < 7; $i++) {
+            $extra = str_repeat(' ***', $i);
+            $this->Query(<<<SQL
+            UPDATE `{$this->config['table_prefix']}nature` 
+                SET `bn_template`=REPLACE( `bn_template` , "$strToCatchAcls$extra\n", "$strForReplacementAcls\n") 
+                WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+            SQL);
+            $this->Query(<<<SQL
+            UPDATE `{$this->config['table_prefix']}nature` 
+                SET `bn_template`=REPLACE( `bn_template` , "$strToCatchAcls$extra\r\n", "$strForReplacementAcls\r\n") 
+                WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+            SQL);
+            $this->Query(<<<SQL
+            UPDATE `{$this->config['table_prefix']}nature` 
+                SET `bn_template`=REPLACE( `bn_template` , "$strToCatchAcls$extra \n", "$strForReplacementAcls\n") 
+                WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+            SQL);
+            $this->Query(<<<SQL
+            UPDATE `{$this->config['table_prefix']}nature` 
+                SET `bn_template`=REPLACE( `bn_template` , "$strToCatchAcls$extra \r\n", "$strForReplacementAcls\r\n") 
+                WHERE bn_id_nature = {$GLOBALS['wiki']->config['lms_config']['activity_form_id']} LIMIT 1
+            SQL);
+        }
+
         $this->Query(<<<SQL
         UPDATE `{$this->config['table_prefix']}pages` 
             SET `body`=REPLACE( `body` , '"listeListeOuinonLmsbf_commentaires":"non"', '"bf_commentaires":"non"') 
