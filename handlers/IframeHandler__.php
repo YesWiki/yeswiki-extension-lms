@@ -12,7 +12,7 @@ class IframeHandler__ extends YesWikiHandler
 
         $commentsHandler = (
             empty($commentsType) ||
-            !is_string($lmcommentsType)
+            !is_string($commentsType)
         )
         ? ''
         : $commentsType;
