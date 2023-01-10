@@ -10,6 +10,7 @@ use YesWiki\Wiki;
 
 class ImportManager
 {
+    protected $uploadPath;
     protected $wiki;
     protected $peertubeToken;
 

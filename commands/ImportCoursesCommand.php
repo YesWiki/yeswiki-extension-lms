@@ -17,6 +17,7 @@ class ImportCoursesCommand extends Command
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'lms:import-courses';
 
+    protected $importManager;
     protected $wiki;
     protected $remote_url;
     protected $remote_token;
