@@ -79,7 +79,8 @@ abstract class CourseStructure
      */
     public function getField(string $key)
     {
-        return key_exists($key, $this->getFields()) ? $this->getFields()[$key] : null;
+        $fields = $this->getFields();
+        return (!empty($fields) && key_exists($key, $fields)) ? $fields[$key] : null;
     }
 
     /**
