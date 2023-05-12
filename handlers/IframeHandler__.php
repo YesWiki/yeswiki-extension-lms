@@ -6,24 +6,52 @@ use YesWiki\Wiki;
 
 class IframeHandler__ extends YesWikiHandler
 {
-    function run()
+    public function run()
     {
-        $config = $this->wiki->config;
+        $commentsType = $this->params->get('comments_handler');
 
-        // if the use_yeswiki_comments is false in the config and the current page is an activity, see if
-        // the activity have its comments enabled. If yes, add the 'data-external-comments' attribute to body to alert
-        // a potential social platform the content need comments
-        // TODO see if use_yeswiki_comments is still used and if not, think about another parameter name
-        if (isset($config['lms_config']['use_yeswiki_comments']) && !$config['lms_config']['use_yeswiki_comments']) {
+        $commentsHandler = (
+            empty($commentsType) ||
+            !is_string($commentsType)
+        )
+        ? ''
+        : $commentsType;
 
-            $courseManager = $this->wiki->services->get(CourseManager::class);
-            $activity = $courseManager->getActivity($this->wiki->GetPageTag());
-
-            if ($activity && !$activity->isCommentsEnabled()) {
-                $this->output = str_replace('<head>',
-                    '<head data-external-comments="0">',
-                    $this->output);
-            }
+        switch ($commentsHandler) {
+            case 'external_humhub':
+                if ($this->hasActivity(true)) {
+                    $this->output = str_replace(
+                        '<head>',
+                        '<head data-external-comments="1">',
+                        $this->output
+                    );
+                // todo add javascript link
+                } elseif ($this->hasActivity(false)) {
+                    $this->output = str_replace(
+                        '<head>',
+                        '<head data-external-comments="0">',
+                        $this->output
+                    );
+                }
+                //else do nothing
+                break;
+            case 'embedded_humhub':
+                // if ($this->hasActivity(true)){
+                // adjust fiche-x.tpl.html to load humhub comments
+                // }
+            case 'yeswiki':
+            case 'discourse':
+            default:
+                # code...
+                break;
         }
+    }
+
+    protected function hasActivity(bool $withActivatedComments): bool
+    {
+        $courseManager = $this->getService(CourseManager::class);
+        $activity = $courseManager->getActivity($this->wiki->GetPageTag());
+
+        return ($activity && ($activity->isCommentsEnabled() === $withActivatedComments));
     }
 }

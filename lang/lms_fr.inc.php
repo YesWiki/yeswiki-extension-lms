@@ -90,19 +90,6 @@ $GLOBALS['translations'] = array_merge(
         'LMS_UPDATE_ELAPSED_TIME_ACTIVITY' => 'l\'activté',
         'LMS_UPDATE_ELAPSED_TIME_MINUTES' => 'minutes',
 
-        // LMS Reactions
-        'LMS_SHARE_YOUR_REACTION' => 'Partagez votre réaction à propos de ce contenu',
-        'LMS_SHARE_YOUR_COMMENT' => 'Et n\'hésitez pas à faire un commentaire pour approfondir la réflexion !',
-        'LMS_ACTIVATE_REACTIONS' => 'Activer les réactions ?',
-        'LMS_REACTIONS_DEFAULT_GRATITUDE' => 'Gratitude',
-        'LMS_REACTIONS_DEFAULT_I_LOVE' => 'J\'aime',
-        'LMS_REACTIONS_DEFAULT_I_UNDERSTOOD' => 'J\'ai appris quelque chose',
-        'LMS_REACTIONS_DEFAULT_NOT_UNDERSTOOD' => 'J\'ai pas compris',
-        'LMS_REACTIONS_DEFAULT_NOT_AGREE' => 'Je ne suis pas d\'accord',
-        'LMS_REACTIONS_DEFAULT_BLACK_IDEA' => 'Ca me perturbe',
-        'LMS_REACTIONS_NO_IMAGE' => 'Image manquante',
-        'LMS_REACTIONS_BAD_IMAGE_FORMAT' => 'Mauvais format d\'image : doit être un fichier, un icône utf8 ou une classe Fontawesome',
-
         // action importcourses
         'LMS_IMPORT_TOKEN' => 'Token du site distant',
         'LMS_IMPORT_URL' => 'URL à importer',
@@ -192,7 +179,6 @@ $GLOBALS['translations'] = array_merge(
         'EDIT_CONFIG_HINT_LMS_CONFIG[ACTIVITY_NAVIGATION_CONDITIONS_ENABLED]' => 'Activer les conditions de passage pour la scénarisation (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[DISPLAY_ACTIVITY_TITLE]' => 'Afficher le titre des activités (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[MODULE_IMAGE_SIZE_IN_COURSE]' => 'Taille de l\'image de chaque module sur la page de présentation d\'un cours (en pixels)',
-        'EDIT_CONFIG_HINT_LMS_CONFIG[USE_YESWIKI_COMMENTS]' => 'Utiliser les commentaires de YesWiki (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[TABS_ENABLED]' => 'Activer le mode de regroupement des activités par onglets (TAB) (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[USE_ONLY_CUSTOM_ELAPSED_TIME]' => 'Utiliser uniquement les temps personnalisés dans le tableau de bord des apprenants (true/false)',
         'EDIT_CONFIG_HINT_LMS_CONFIG[DISPLAY_ACTIVITY_ELAPSED_TIME]' => 'Afficher la durée des activités dans le tableau de bord des apprenants (true/false)',

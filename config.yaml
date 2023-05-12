@@ -14,8 +14,6 @@ parameters:
     activity_navigation_conditions_enabled: false
     # only for developers : displays the lms pages as a user sees them
     save_progress_for_admins: false
-    # use the comments from yeswiki
-    use_yeswiki_comments: false
     # maximum size for both width and height to render the module images in the course entry
     module_image_size_in_course: 400
     # if true, the activity title is automatically added at the begin of the entry page
@@ -46,7 +44,6 @@ parameters:
       - activity_navigation_conditions_enabled
       - display_activity_title
       - module_image_size_in_course
-      - use_yeswiki_comments
       - tabs_enabled
       - use_only_custom_elapsed_time
       - display_activity_elapsed_time
