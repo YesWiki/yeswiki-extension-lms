@@ -36,9 +36,9 @@ if ($fiche && intval($fiche['id_typeannonce']) == $GLOBALS['wiki']->config['lms_
     }
     if (empty($course->getModules())) {
         if ($learner && $learner->isAdmin()) {
-            echo '<div class="alert alert-info">' . _t('LMS_ADMIN_NO_MODULES') . '.</div>';
+            echo '<div class="alert alert-info">' . _t('LMS_ADMIN_NO_MODULES') . '</div>';
         } else {
-            echo '<div class="alert alert-info">' . _t('LMS_NO_MODULES') . '.</div>';
+            echo '<div class="alert alert-info">' . _t('LMS_NO_MODULES') . '</div>';
         }
     } else { // Show modules list
         echo '<div class="module-list">' . "\n";
@@ -51,9 +51,9 @@ if ($fiche && intval($fiche['id_typeannonce']) == $GLOBALS['wiki']->config['lms_
     if ($learner && $learner->isAdmin()) {
         echo '<div class="admin-infos well">
             <h3>' . _t('LMS_RESERVED_FOR_ADMINS') . '</h3>
-            <p><strong>' . _t('LMS_ACTIVITY_SCENARISATION') . '</strong>
+            <p><strong>' . _t('LMS_ACTIVITY_SCRIPTING') . '</strong>
                 : ' . $course->getField('listeListeOuinonLmsbf_scenarisation_activites') . '</p>
-            <p><strong>' . _t('LMS_MODULE_SCENARISATION') . '</strong>
+            <p><strong>' . _t('LMS_MODULE_SCRIPTING') . '</strong>
                 : ' . $course->getField('listeListeOuinonLmsbf_scenarisation_modules') . '</p>
             <div class="dashboard-launch">
                 <a href="' . $GLOBALS['wiki']->href(null, 'ProgressDashboard',

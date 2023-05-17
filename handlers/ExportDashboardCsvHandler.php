@@ -95,7 +95,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
             $elapsedTime = ($courseStat['elapsedTime']) ?
                 $this->dateManager->formatTimeWithColons($courseStat['elapsedTime']) : null;
             $row = [
-                _t('LMS_DASHBOARD_COURSE') . ' ' . $courseIndex,
+                _t('LMS_COURSE') . ' ' . $courseIndex,
                 $course->getTitle(),
                 $progressRatio,
                 $elapsedTime /* TODO elapsedTime */,
@@ -119,7 +119,7 @@ class ExportDashboardCsvHandler extends YesWikiHandler
                     $this->dateManager->formatTimeWithColons($moduleStat['elapsedTime'])
                     : null;
                 $row = [
-                    _t('LMS_DASHBOARD_MODULE') . ' ' . $courseIndex . '.' . $moduleIndex,
+                    _t('LMS_MODULE') . ' ' . $courseIndex . '.' . $moduleIndex,
                     $module->getTitle(),
                     $progressRatio,
                     $elapsedTime,
