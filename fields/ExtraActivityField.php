@@ -17,10 +17,11 @@ use YesWiki\Lms\Service\ExtraActivityManager;
  */
 class ExtraActivityField extends BazarField
 {
-    protected $courseManager ;
-    protected $extraActivityManager ;
-    protected $userManager ;
-    protected $courseController ;
+    protected $courseManager;
+    protected $learnerManager;
+    protected $extraActivityManager;
+    protected $userManager;
+    protected $courseController;
 
     public function __construct(array $values, ContainerInterface $services)
     {

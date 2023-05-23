@@ -16,6 +16,7 @@ class ReturnButtonField extends LmsField
      * Must be declare in the bazar form definition as followed :
      *    'boutonretour*** *** *** *** *** *** *** *** *** ***'
      */
+    protected $courseManager;
 
 
     public function __construct(array $values, ContainerInterface $services)
