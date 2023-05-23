@@ -15,7 +15,7 @@
         <div class="activities-infos">
             <div class="activities-numbers">
                 {%  set nbActivities = module.activities|length %}
-                <strong><i class="fas fa-chalkboard-teacher fa-fw"></i> {{ _t('LMS_ACTIVITY') ~ (nbActivities > 1 ? 's' : '') }}</strong>
+                <strong><i class="fas fa-chalkboard-teacher fa-fw"></i> {{ (nbActivities > 1 ? _t('LMS_ACTIVITIES') : _t('LMS_ACTIVITY')) }}</strong>
                 : {{ nbActivities }}
             </div>
             <div class="activities-duration"><strong><i class="fas fa-hourglass-half fa-fw"></i> {{ _t('LMS_ESTIMATED_TIME') }}</strong>
