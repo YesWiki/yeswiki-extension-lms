@@ -31,10 +31,10 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
 <?php if (!$moduleModal) : ?>
 <div class="container lms-container <?php echo ($learner && $learner->isAdmin() ? 'admin-user' : '') ?>">
     <div class="row">
-        <button id="burger" class="open-main-nav" aria-label="<?php echo _t('LMS_INDEX_MENU'); ?>">
-            <span class="burger"></span>
-            <span class="burger-text"><?php echo _t('LMS_INDEX_MENU'); ?></span>
-        </button>
+        <div id="burger" aria-label="<?php echo _t('LMS_INDEX_MENU'); ?>">
+            <span id="burger-icon"></span>
+            <span id="burger-text"><?php echo _t('LMS_INDEX_MENU'); ?></span>
+        </div>
         <div class="col-md-3 lms-menu">
             <?php
             // display the PageMenuLms page if it exists
