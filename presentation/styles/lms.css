@@ -58,10 +58,25 @@
     padding: 0;
 }
 
-/* display menu link which are not actived in the main text color */
+/* custom course menu */
 .panel-menu-lms .list-group-item a,
 .panel-menu-lms .list-group-item a:visited {
+    /* display menu link which are not actived in the main text color */
     color: inherit;
+    font-size: 0.85em;
+}
+.panel-menu-lms .list-group-item {
+    padding: 5px 10px;
+}
+.panel-group-menu-lms {
+    margin-bottom: 4px;
+}
+.panel-group .panel-menu-lms .panel-heading+.panel-collapse>.list-group {
+    border-top: 0;
+}
+.panel-group-menu-lms .panel-heading {
+    margin: 0px;
+    padding: 0.4em 0.4em;
 }
 
 .bazar-list .lms-container {
@@ -95,61 +110,9 @@
 }
 
 /* reactions */
-.reactions-flex {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-}
-.reaction-img {
-    width: 80%;
-}
-.reaction-content {
-    width: 7em;
-    text-align: center;
-    margin-bottom: 1em;
-    font-size: 0.9em;
-}
 .reaction-title {
-    color: #333;
-    text-transform: uppercase;
-    font-size: 12px;
-    margin-top: 1em;
-    align-items: center;
-}
-.reaction-numbers {
-    color: #333;
-    font-size: 1.1em;
-    font-weight: bold;
-}
-.add-reaction {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    align-content: center;
-    justify-content: space-between;
-    height: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 0.5em;
-    padding: 1em 0.5em;
-    transition: all 200ms ease-in;
-    box-shadow: none;
-}
-.add-reaction:hover {
-    border: 1px solid rgba(0, 0, 0, 0.5);
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-    text-decoration: none;
-}
-.add-reaction:focus,
-.add-reaction:active,
-.add-reaction:visited {
-    text-decoration: none;
-}
-.disabled,
-.disabled:hover {
-    cursor: not-allowed !important;
-}
-.user-reaction {
-    border: 1px solid var(--primary-color);
+    font-family: 'Open Sans';
+    font-weight: 700;
 }
 
 /* fix bootstrap */
