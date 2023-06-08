@@ -1,6 +1,6 @@
 <?php
 /**
- * French translation
+ * English translation
  *
  * @category YesWiki
  * @package  lms
