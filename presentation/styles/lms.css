@@ -636,7 +636,7 @@
 .lms-menu {
     display: none;
 }
-@media (max-width:991px) {
+@media (max-width:680px) {
     #burger.burger-is-open ~ .lms-menu {
         display: block;
     }
@@ -653,7 +653,7 @@
         margin-top: 40px;
     }
 }
-@media (min-width:992px) {
+@media (min-width:680px) {
     #burger {
         display: none;
     }
@@ -665,6 +665,26 @@
     }
 }
 /** end - Index menu button in small screen size **/
+
+/* define min-width for the lms-menu */
+@media (min-width: 680px) {
+    .lms-container > .row {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    }
+    .lms-menu.col-md-3 {
+        -ms-flex: 0 0 25%;
+        flex: 0 0 25%;
+    }
+    .lms-activity-content.col-md-9, .lms-module-content.col-md-9 {
+        -ms-flex-preferred-size: 0;
+        flex-basis: 0;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+    }
+}
 
 /** start for activity navigation edit **/
 .activity-navigation-border {
