@@ -85,7 +85,8 @@
 .panel-menu-lms .list-group-item.active:hover {
     color: var(--primary-color);
     border-color: #ddd;
-    font-weight: bold;
+    background-color: white;
+    font-size:  var(--panel-heading-text-fontsize);
 }
 
 .bazar-list .lms-container {
