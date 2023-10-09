@@ -112,7 +112,7 @@ class ActivityNavigationField extends LmsField
                 if ($nextCourseStructure){
                     $conditionsResults = $this->conditionsChecker
                         ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry),true,$nextCourseStructure) ;
-                    if (($this->wiki->GetConfigValue('debug') == 'yes') && $conditionsResults->getErrorStatus()) {
+                    if ($this->config['debug'] == 'yes' && $conditionsResults->getErrorStatus()) {
                         trigger_error($conditionsResults->getFormattedMessages());
                     }
                 }

@@ -159,7 +159,7 @@ class ImportManager
             return $this->uploadPath;
         }
 
-        $attachConfig = $this->wiki->GetConfigValue("attach_config");
+        $attachConfig = $this->config['attach_config'];
 
         if (!is_array($attachConfig)) {
             $attachConfig = array();

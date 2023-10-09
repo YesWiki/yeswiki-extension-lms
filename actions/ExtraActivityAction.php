@@ -138,7 +138,7 @@ class ExtraActivityAction extends YesWikiAction
                         'type' => 'danger',
                         'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_SAVE') .
                             ($_POST['title'] ?? '!!!$_POST[\'title\'] not set!!!') . '<br>'
-                            . (($this->wiki->GetConfigValue('debug') == 'yes')
+                            . (($this->config['debug'] == 'yes')
                                 ? $t->getMessage() . '<br>'
                                 . 'in file:' . $t->getFile() . '<br>'
                                 . 'at line:' . $t->getLine() . '<br>'
@@ -196,7 +196,7 @@ class ExtraActivityAction extends YesWikiAction
                                 . '"' . ($this->arguments['learner'] ?? '!!!$_GET[\'learner\'] not set!!!') . '"'
                                 . _t('LMS_EXTRA_ACTIVITY_REMOVE_LEARNER_END')
                                 . '"' . ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '" <br>'
-                                . (($this->wiki->GetConfigValue('debug') == 'yes')
+                                . (($this->config['debug'] == 'yes')
                                     ? $t->getMessage() . '<br>'
                                     . 'in file:' . $t->getFile() . '<br>'
                                     . 'at line:' . $t->getLine() . '<br>'
@@ -242,7 +242,7 @@ class ExtraActivityAction extends YesWikiAction
                             'type' => 'danger',
                             'message' => _t('LMS_EXTRA_ACTIVITY_ERROR_AT_DELETE') .
                                 ($this->arguments['tag'] ?? '!!!$_GET[\'tag\'] not set!!!') . '<br>'
-                                . (($this->wiki->GetConfigValue('debug') == 'yes')
+                                . (($this->config['debug'] == 'yes')
                                     ? $t->getMessage() . '<br>'
                                     . 'in file:' . $t->getFile() . '<br>'
                                     . 'at line:' . $t->getLine() . '<br>'
