@@ -155,7 +155,7 @@ class ProgressDashboardAction extends YesWikiAction
             'courseStat' => $this->coursesStat,
             'extraActivityEnabled' => $this->wiki->config['lms_config']['extra_activity_enabled'],
             'learners' => $this->learners,
-            'filters' => $filters,
+            'filters' => $filters ?? null,
             'facette' => $_GET['facette'] ?? null,
             'debug' => isset($_GET['debug']),
         ]);
