@@ -72,35 +72,14 @@ class Progresses extends TimeLogs
                     })
                 );
             } else {
-                if ($module->getTag() != $course->getLastModuleTag()) {
-                    // if it's the last activity and not the last module, select the progresses for the next module or
-                    // the first activity of the next module
-                    $nextModule = $course->getNextModule($module->getTag());
-                    $progresses = new Progresses(
-                        array_filter($this->values, function ($value) use ($course, $nextModule) {
-                            return (
-                                    $value['course'] == $course->getTag()
-                                    && $value['module'] == $nextModule->getTag()
-                                    && !isset($value['activity'])
-                                ) ||  (
-                                    !empty($nextModule->getActivities())
-                                    && $value['course'] == $course->getTag()
-                                    && $value['module'] == $nextModule->getTag()
-                                    && isset($value['activity'])
-                                    && $value['activity'] == $nextModule->getFirstActivityTag()
-                                );
-                        })
-                    );
-                } else {
-                    // if it's the last activity and the last module, select the progresses for this activity
-                    $progresses = $progresses = new Progresses(
-                        array_filter($this->values, function ($value) use ($course, $module, $activity) {
-                            return $value['course'] == $course->getTag()
-                                && $value['module'] == $module->getTag()
-                                && isset($value['activity']) && $value['activity'] == $activity->getTag();
-                        })
-                    );
-                }
+                // if it's the last activity of any module, select the progresses for this activity
+                $progresses = $progresses = new Progresses(
+                    array_filter($this->values, function ($value) use ($course, $module, $activity) {
+                        return $value['course'] == $course->getTag()
+                            && $value['module'] == $module->getTag()
+                            && isset($value['activity']) && $value['activity'] == $activity->getTag();
+                    })
+                );
             }
         }
         return $progresses ? $progresses->getAllUsernames() : [];
