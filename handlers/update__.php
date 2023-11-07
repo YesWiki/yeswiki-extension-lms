@@ -240,10 +240,10 @@ if ($learner && $learner->isAdmin()) {
         $output .= 'ℹ️ Adding the <em>PageMenuLms</em> page<br />';
         $this->SavePage(
             'PageMenuLms',
-            '""<div><span>""{{button link="config/root_page" nobtn="1" icon="fas fa-home"}}""'
-            . '</span><span style="float: right;">""'
-            . '{{button link="UserEntries" nobtn="1" text="Accès à mes fiches" icon="far fa-clone"></i>"}}""</span></div>""'
-            . "\n\n" . '{{coursemenu}}'
+            '""<div style="margin-bottom: 5px; margin-left: 3px; font-size: 0.85em;">""'
+            . '{{button link="config/root_page" nobtn="1" icon="fas fa-door-open"}}""</span>'
+            . '<span style="float: right;">""{{button link="UserEntries" nobtn="1" text="Accès à mes fiches" '
+            . 'icon="far fa-clone"></i>"}}""</span></div>""{{coursemenu}}'
         );
         $output .= '✅ Done !<br />';
     } else {
