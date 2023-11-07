@@ -46,7 +46,6 @@ texte***bf_duree***Durée estimée de l\'activité en minutes*** *** *** *** ***
 texte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***
 textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
-comments***bf_commentaires***Activer les commentaires ?*** *** ***oui*** *** + ***0*** *** *** * *** * *** *** ***
 reactions***reactions*** *** *** ***oui*** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
 acls*** + ***@admins*** + *** *** ***bf_commentaires***1*** *** *** ***');
