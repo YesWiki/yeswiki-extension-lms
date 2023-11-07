@@ -17,7 +17,7 @@ class Activity extends CourseStructure
      */
     public function isCommentsEnabled(): bool
     {
-        return ($this->getField('listeListeOuinonLmsbf_commentaires') != 'non');
+        return ($this->getField('bf_commentaires') != 'non');
     }
 
     /**
@@ -26,7 +26,7 @@ class Activity extends CourseStructure
      */
     public function isReactionsEnabled(): bool
     {
-        return ($this->getField('listeListeOuinonLmsbf_reactions') == 'oui');
+        return ($this->getField('reactions') == 'oui');
     }
 
     /**
