@@ -48,7 +48,7 @@ textelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** ***
 tags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés
 reactions***reactions*** *** *** ***oui*** *** *** *** ***
 navigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***
-acls*** + ***@admins*** + *** *** ***bf_commentaires***1*** *** *** ***');
+acls*** + ***@admins*** + *** ***oui***bf_commentaires***1*** *** *** ***');
 
 !defined('MODULE_FORM_NAME') && define('MODULE_FORM_NAME', 'LMS Module');
 !defined('MODULE_FORM_DESCRIPTION') && define(
@@ -341,7 +341,7 @@ if ($learner && $learner->isAdmin()) {
         SQL);
 
         $strToCatchAcls = 'acls*** + ***@admins***comments-closed***';
-        $strForReplacementAcls = 'acls*** + ***@admins*** + *** *** ***bf_commentaires***1*** *** *** ***';
+        $strForReplacementAcls = 'acls*** + ***@admins*** + *** ***oui***bf_commentaires***1*** *** *** ***';
         for ($i=0; $i < 7; $i++) {
             $extra = str_repeat(' ***', $i);
             $this->Query(<<<SQL
