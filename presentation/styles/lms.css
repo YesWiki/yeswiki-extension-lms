@@ -83,7 +83,7 @@
 }
 .panel-menu-lms .list-group-item.active, .panel-menu-lms .list-group-item.active:focus,
 .panel-menu-lms .list-group-item.active:hover {
-    color: var(--primary-color);
+    color: black;
     border-color: #ddd;
     background-color: white;
     font-size:  var(--panel-heading-text-fontsize);
