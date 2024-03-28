@@ -72,7 +72,7 @@ class ActivityNavigationField extends LmsField
             return "";
         }
 
-        // the activity is not loaded from the manager because we don't want to requests the fields (it's an exception)
+        // the activity is not loaded from the manager because we don't want to requests all the fields (for performance)
         $activity = new Activity($this->config, $this->entryManager, $this->dateManager, $currentActivityTag);
 
         // if nav tabs are configurated and if the current activity is a tab activity, we refer now to the parent tab activity

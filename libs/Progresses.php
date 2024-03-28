@@ -49,9 +49,8 @@ class Progresses extends TimeLogs
 
     /**
      * Get the usernames of the learner who have finished an activity
-     * To considered finished, the next activity must have a progress. If it's the last activity of a module, it's the
-     * next module or the first activity of the next module which mush have a progress. The last activity of the last
-     * module is considered finished if it has a progress (the learner do it just by access it).
+     * To considered finished, the next activity must have a progress. The last activity of a module is considered
+     * finished if it has a progress (the learner do it just by access it).
      * @param Course $course the course which contains the module
      * @param Module $module the module which contains the activity
      * @param Activity $activity the activity that learners must have finished
