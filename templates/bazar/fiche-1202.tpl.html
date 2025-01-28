@@ -21,7 +21,9 @@ $learner = $learnerManager->getLearner();
 if (!defined('FIELDS_TO_HIDE')) {
     define('FIELDS_TO_HIDE', [
         'checkboxfiche' . $GLOBALS['wiki']->config['lms_config']['activity_form_id'] . 'bf_activites',
-        'listeListeOuinonLmsbf_actif'
+        'listeListeOuinonLmsbf_actif',
+        'bf_actif',
+        'bf_activites'
     ]);
 }
 
@@ -61,7 +63,7 @@ $moduleModal = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER[
                             && !in_array($form['template'][$i][1], FIELDS_TO_HIDE))
                         || (in_array($form['template'][$i][0], $INDEX_CHELOUS)
                             && !in_array($form['template'][$i][0] . $form['template'][$i][1] . $form['template'][$i][6],
-                                FIELDS_TO_HIDE))
+                                FIELDS_TO_HIDE) && !in_array($form['template'][$i][6], FIELDS_TO_HIDE))
                     )
                 ) {
                     if ($form['prepared'][$i] instanceof BazarField) {
