@@ -1,0 +1,15 @@
+{
+  "title": "OuiNon Lms",
+  "nodes": [
+    {
+      "id": "oui",
+      "label": "Oui",
+      "children": []
+    },
+    {
+      "id": "non",
+      "label": "Non",
+      "children": []
+    }
+  ]
+}

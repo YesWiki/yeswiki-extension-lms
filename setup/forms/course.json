@@ -1,0 +1,13 @@
+{
+  "bn_id_nature": "{{formCourseId}}",
+  "bn_label_nature": "LMS Parcours",
+  "bn_description": "Parcours (enchaînement de modules) utilisé pour le module d'apprentissage en ligne",
+  "bn_condition": "",
+  "bn_sem_context": "",
+  "bn_sem_type": "",
+  "bn_sem_use_template": "1",
+  "bn_template": "texte***bf_titre***Titre du parcours***255***255*** *** ***text***1*** *** *** *** *** *** ***\r\ntextelong***bf_description***Description***80***4*** *** ***wiki***0*** *** *** *** *** *** ***\r\nimage***bf_image***Image***300***300***600***600***right***0*** *** *** * *** * *** *** *** ***\r\ncheckboxfiche***{{formModuleId}}***Modules*** *** *** ***bf_modules***dragndrop***0*** ***L'ordre des modules définit le parcours de l'apprenant*** *** *** *** ***\r\nliste***ListeOuinonLms***Scénarisation des activités*** *** ***non***bf_scenarisation_activites*** ***1*** ***Si « oui », les apprenants doivent avoir consulté l'activité précédente pour accéder à la suivante*** *** *** *** ***\r\nliste***ListeOuinonLms***Scénarisation des modules*** *** ***non***bf_scenarisation_modules*** ***1*** ***Si « oui », les apprenants doivent avoir consulté toutes les activités du module précédent pour accéder au module suivant*** *** *** *** ***\r\nacls*** + ***@admins***comments-closed*** *** *** *** *** *** ***",
+  "bn_ce_i18n": "fr-FR",
+  "bn_only_one_entry": "N",
+  "bn_only_one_entry_message": ""
+}

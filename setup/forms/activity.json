@@ -1,0 +1,13 @@
+{
+  "bn_id_nature": "{{formActivityId}}",
+  "bn_label_nature": "LMS Activité",
+  "bn_description": "Activité (fiche de cours, exercice, vidéo, fiche pdf...) utilisée pour le module d'apprentissage en ligne",
+  "bn_condition": "",
+  "bn_sem_context": "",
+  "bn_sem_type": "",
+  "bn_sem_use_template": "1",
+  "bn_template": "texte***bf_titre***Titre de l'activité***255***255*** *** ***text***1*** *** *** *** *** *** ***\r\ntexte***bf_titre_affiche***Titre affiché (optionnel)*** *** *** *** ***text***0*** ***Si un titre de remplacement est renseigné, c'est ce titre qui sera affiché en début d'activité ou dans le menu*** * *** * *** *** ***\r\ntags***bf_autrices***Auteur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les auteur·ice·s\r\ntexte***bf_duree***Durée estimée de l'activité en minutes*** *** *** *** ***number***0*** *** *** *** *** *** ***\r\ntexte***bf_licence***Licence*** *** *** *** ***text***0*** *** *** *** *** *** ***\r\ntextelong***bf_contenu***Contenu***80***40*** *** ***wiki***1*** *** *** *** *** *** ***\r\ntags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés\r\nreactions***reactions*** *** *** ***oui*** *** *** *** ***\r\nnavigationactivite***bf_navigation*** *** *** *** *** *** *** *** ***\r\nacls*** + ***@admins*** + *** ***oui***bf_commentaires***1*** *** *** ***",
+  "bn_ce_i18n": "fr-FR",
+  "bn_only_one_entry": "N",
+  "bn_only_one_entry_message": ""
+}

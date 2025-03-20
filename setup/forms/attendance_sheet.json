@@ -1,0 +1,13 @@
+{
+  "bn_id_nature": "{{formSheetId}}",
+  "bn_label_nature": "LMS Feuille d'émargement",
+  "bn_description": "Feuille d'émargement pour une activité supplémentaire",
+  "bn_condition": "",
+  "bn_sem_context": "",
+  "bn_sem_type": "",
+  "bn_sem_use_template": "1",
+  "bn_template": "texte***bf_titre***Titre de l'activité supplémentaire***255***255*** *** ***text***1*** *** *** * ***@admins*** *** *** ***\r\ntexte***bf_type***Type d'activité*** *** *** *** ***text***0*** ***atelier, webinaire, sortie, ...*** * ***@admins*** *** *** ***\r\ntags***bf_formateurs***Formateur·ice·s*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les formateur·ice·s*** * ***@admins*** *** *** ***\r\ntexte***bf_localization***Lieu*** *** *** *** ***text***0*** *** *** * *** * *** *** *** ***\r\ntextelong***bf_contenu***Description***80***4*** *** ***wiki***0*** *** *** * ***@admins*** *** *** ***\r\nextraactivity***bf_extraactivity*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\ntags***bf_tags***Tags de description*** *** *** *** *** ***0*** ***Appuyer sur la touche « Entrée » pour séparer les mots-clés*** * *** * *** *** *** ***\r\nacls*** + ***@admins***comments-closed***",
+  "bn_ce_i18n": "fr-FR",
+  "bn_only_one_entry": "N",
+  "bn_only_one_entry_message": ""
+}
