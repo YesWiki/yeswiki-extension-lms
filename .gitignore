@@ -18,6 +18,6 @@
 
 # Other
 .phpintel/
-
+.php-cs-fixer.cache
 TODO
 /vendor

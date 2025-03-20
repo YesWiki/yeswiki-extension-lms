@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Handler called after the 'update' handler. Check if the different parts of the LMS module exists, and install the
  * needed ones.
@@ -15,7 +16,6 @@ namespace YesWiki;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Bazar\Service\FormManager;
 use YesWiki\Core\Service\AclService;
-use YesWiki\Core\Service\Performer;
 use YesWiki\Lms\Service\LearnerManager;
 
 // Verification de securite
@@ -342,7 +342,7 @@ if ($learner && $learner->isAdmin()) {
 
         $strToCatchAcls = 'acls*** + ***@admins***comments-closed***';
         $strForReplacementAcls = 'acls*** + ***@admins*** + *** ***oui***bf_commentaires***1*** *** *** ***';
-        for ($i=0; $i < 7; $i++) {
+        for ($i = 0; $i < 7; $i++) {
             $extra = str_repeat(' ***', $i);
             $this->Query(<<<SQL
             UPDATE `{$this->config['table_prefix']}nature` 
