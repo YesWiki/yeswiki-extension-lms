@@ -92,7 +92,7 @@ abstract class CourseStructure
         return $this->getField('bf_titre');
     }
 
-    
+
     /**
      * Get the Extra-activities of the courseStructure
      *
@@ -103,7 +103,7 @@ abstract class CourseStructure
         return $this->extraActivityLogs;
     }
 
-    
+
     /**
      * Set the Extra-activities of the courseStructure
      *

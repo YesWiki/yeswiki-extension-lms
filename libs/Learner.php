@@ -209,8 +209,12 @@ class Learner
      */
     public function hasOpened(Course $course, Module $module, Activity $activity = null): bool
     {
-        $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner($this, $course, $module,
-            $activity);
+        $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner(
+            $this,
+            $course,
+            $module,
+            $activity
+        );
         return !empty($progress);
     }
 

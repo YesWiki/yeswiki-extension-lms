@@ -1,6 +1,5 @@
 <?php
 
-
 namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
@@ -57,7 +56,7 @@ class ExtraActivityManager
                 || empty($data['bf_date_fin_evenement'])
                 || empty($data['course'])
                 || empty($data['registeredLearnerNames'])) {
-            $output = 'Errors in '. get_class($this) . ' :<br>' ;
+            $output = 'Errors in ' . get_class($this) . ' :<br>' ;
             $output .= (empty($data['title'])) ? 'empty($data[\'title\'])<br>' : '' ;
             $output .= (empty($data['bf_date_debut_evenement'])) ? 'empty($data[\'bf_date_debut_evenement\'])<br>' : '' ;
             $output .= (empty($data['bf_date_fin_evenement'])) ? 'empty($data[\'bf_date_fin_evenement\'])<br>' : '' ;
@@ -72,12 +71,12 @@ class ExtraActivityManager
         if (!empty($data['tag'])) {
             $extraActivityLogs = $this->getExtraActivityLogsFromLike('%"tag":"' . $data['tag'] . '"%');
             if (!$extraActivityLogs->has($data['tag'])) {
-                throw new \Exception('Errors in '. get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' .'<br>');
+                throw new \Exception('Errors in ' . get_class($this) . ' : $data[\'tag\'] defined but not existing in triples' . '<br>');
             }
         } else {
             // define new Tag
             $tmptag = genere_nom_wiki($data['title'], 1);
-        
+
             // check if tag is a pageName or already exists for this course
             // get all extra-activities
             $extraActivityLogs = $this->getExtraActivityLogsFromLike('');
@@ -88,7 +87,7 @@ class ExtraActivityManager
                 ++$i;
             } while ($i < 1000 && $extraActivityLogs->has($tag)) ;
             if ($extraActivityLogs->has($tag)) {
-                throw new \Exception('Errors in '. get_class($this) . ' : genere_nom_wiki does not work' .'<br>');
+                throw new \Exception('Errors in ' . get_class($this) . ' : genere_nom_wiki does not work' . '<br>');
             } else {
                 $data['tag'] = $tag ;
             }
@@ -100,8 +99,8 @@ class ExtraActivityManager
         $module = !empty($data['module']) ? $this->courseManager->getModule($data['module']) : null;
 
         // Date
-        $date=$this->getDateFromData('bf_date_debut_evenement', $data);
-        $endDate=$this->getDateFromData('bf_date_fin_evenement', $data);
+        $date = $this->getDateFromData('bf_date_debut_evenement', $data);
+        $endDate = $this->getDateFromData('bf_date_fin_evenement', $data);
         if (isset($data['bf_date_fin_evenement_allday']) && $data['bf_date_fin_evenement_allday'] == 1) {
             $endDate->add(1, 'days') ;
         }
@@ -121,10 +120,10 @@ class ExtraActivityManager
 
         // === START remove previous data if existing ====
         if ($this->getExtraActivityLog($data['tag']) && !$this->deleteExtraActivity($data['tag'])) {
-            throw new \Exception('Errors in '. get_class($this) . ' when deleting '.$data['tag'].'<br>');
+            throw new \Exception('Errors in ' . get_class($this) . ' when deleting ' . $data['tag'] . '<br>');
         }
         // === END remove previous data ====
-    
+
         // === START save new data ====
         $errorMessage = '' ;
         foreach ($data['registeredLearnerNames'] as $learnerName => $value) {
@@ -135,13 +134,13 @@ class ExtraActivityManager
                 '',
                 ''
             ) > 0))) {// create
-                $errorMessage .= 'Errors in '. get_class($this) . ' when creating '.$data['tag'].' for '.$learnerName .'<br>';
+                $errorMessage .= 'Errors in ' . get_class($this) . ' when creating ' . $data['tag'] . ' for ' . $learnerName . '<br>';
             }
         }
         if (!empty($errorMessage)) {
             throw new \Exception($errorMessage);
         }
-        
+
         // === END save new data ====
         return true;
     }
@@ -149,9 +148,9 @@ class ExtraActivityManager
     private function getDateFromData(string $prefix, array $data): ?Carbon
     {
         $date = $data[$prefix];
-        if (isset($data[$prefix.'_allday']) && $data[$prefix.'_allday'] == 0) {
-            $date .= ' ' . ($data[$prefix.'_hour'] ?? '00'). ':' ;
-            $date .=  ($data[$prefix.'_minutes'] ?? '00'). ':00' ;
+        if (isset($data[$prefix . '_allday']) && $data[$prefix . '_allday'] == 0) {
+            $date .= ' ' . ($data[$prefix . '_hour'] ?? '00') . ':' ;
+            $date .=  ($data[$prefix . '_minutes'] ?? '00') . ':00' ;
         }
         return new Carbon($date) ;
     }
@@ -171,7 +170,7 @@ class ExtraActivityManager
         } else {
             $like .= '}%';
         }
-        return $this->getExtraActivityLogsFromLike($like, ($learner)?$learner->getUsername():'') ;
+        return $this->getExtraActivityLogsFromLike($like, ($learner) ? $learner->getUsername() : '') ;
     }
 
     /**
@@ -195,7 +194,7 @@ class ExtraActivityManager
      * @param string $learnerName
      * @return ExtraActivityLogs the courseStructure's extraActivityLogs
      */
-    private function getExtraActivityLogsFromLike(string $like, string $learnerName = ''):ExtraActivityLogs
+    private function getExtraActivityLogsFromLike(string $like, string $learnerName = ''): ExtraActivityLogs
     {
         $results = $this->tripleStore->getMatching(
             (empty($learnerName) ? null : $learnerName),
@@ -226,7 +225,7 @@ class ExtraActivityManager
         return $extraActivityLogs ;
     }
 
-    
+
     /**
      * delete the Extra-activities of a courseStructure
      * @param string $tag tag of the ExtraActivityLog
@@ -246,7 +245,7 @@ class ExtraActivityManager
         );
 
         if (!$results) {
-            throw new \Exception('Errors in '. get_class($this) . ' : not possible to delete tag : "'.$tag.'" because not existing <br>');
+            throw new \Exception('Errors in ' . get_class($this) . ' : not possible to delete tag : "' . $tag . '" because not existing <br>');
         }
 
         $errorMessage = '';
@@ -259,7 +258,7 @@ class ExtraActivityManager
                 ''
             ) != 0) {
                 // error but continue deleting others before throwing error
-                $errorMessage .= 'Errors in '. get_class($this) . ' : error when deleting tag : "'.$tag.'" in TripleStore<br>'  ;
+                $errorMessage .= 'Errors in ' . get_class($this) . ' : error when deleting tag : "' . $tag . '" in TripleStore<br>'  ;
             };
         }
         if (!empty($errorMessage)) {
