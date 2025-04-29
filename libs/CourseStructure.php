@@ -34,7 +34,7 @@ abstract class CourseStructure
         EntryManager $entryManager,
         DateManager $dateManager,
         string $objectTag,
-        array $objectFields = null
+        ?array $objectFields = null
     ) {
         $this->tag = $objectTag;
 

@@ -149,7 +149,7 @@ class ExtraActivityField extends BazarField
      * @param string $tag of the related entry, saved in the relatedLink
      * @return string|null tag of the extra-activity
      */
-    private function getExtraActivityTagFromrelatedLink(string $courseTag, string $moduleTag = null, string $tag): ?string
+    private function getExtraActivityTagFromrelatedLink(string $courseTag, ?string $moduleTag = null, string $tag): ?string
     {
         if ($course = $this->courseManager->getCourse($courseTag)) {
             $module = ($moduleTag) ? $course->getModule($moduleTag) : null;

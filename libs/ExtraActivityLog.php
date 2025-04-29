@@ -39,7 +39,7 @@ class ExtraActivityLog implements \JsonSerializable
         Carbon $date,
         CarbonInterval $elapsedTime,
         Course $course,
-        Module $module = null
+        ?Module $module = null
     ) {
         $this->dateManager = $dateManager;
         $this->tag = $tag;

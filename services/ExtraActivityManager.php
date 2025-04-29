@@ -162,7 +162,7 @@ class ExtraActivityManager
      * @param Learner @learner (optional)
      * @return ExtraActivityLogs the courseStructure's extraActivityLogs
      */
-    public function getExtraActivityLogs(Course $course, Module $module = null, Learner $learner = null): ExtraActivityLogs
+    public function getExtraActivityLogs(Course $course, ?Module $module = null, ?Learner $learner = null): ExtraActivityLogs
     {
         $like = '%"course":"' . $course->getTag() . '"';
         if (!is_null($module)) {

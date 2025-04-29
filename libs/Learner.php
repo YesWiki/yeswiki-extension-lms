@@ -207,7 +207,7 @@ class Learner
      * @param null|Activity $activity
      * @return bool
      */
-    public function hasOpened(Course $course, Module $module, Activity $activity = null): bool
+    public function hasOpened(Course $course, Module $module, ?Activity $activity = null): bool
     {
         $progress = $this->getProgresses()->getProgressForActivityOrModuleForLearner(
             $this,

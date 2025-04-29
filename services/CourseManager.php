@@ -53,7 +53,7 @@ class CourseManager
      * @param array|null $activityFields the activity fields if needed to populate directly the object
      * @return Activity|null the activity or null if the entry is not an activity
      */
-    public function getActivity(string $entryTag, array $activityFields = null): ?Activity
+    public function getActivity(string $entryTag, ?array $activityFields = null): ?Activity
     {
         $activityEntry = $this->entryManager->getOne($entryTag);
         if ($activityEntry && intval($activityEntry['id_typeannonce']) == $this->activityFormId) {
@@ -69,7 +69,7 @@ class CourseManager
      * @param array|null $moduleFields the module fields if needed to populate directly the object
      * @return Module|null the module or null if the entry is not a module
      */
-    public function getModule(string $entryTag, array $moduleFields = null): ?Module
+    public function getModule(string $entryTag, ?array $moduleFields = null): ?Module
     {
         $moduleEntry = $this->entryManager->getOne($entryTag);
         if ($moduleEntry && intval($moduleEntry['id_typeannonce']) == $this->moduleFormId) {
@@ -85,7 +85,7 @@ class CourseManager
      * @param array|null $courseFields the course fields if needed to populate directly the object
      * @return Module|null the course or null if the entry is not a course
      */
-    public function getCourse(string $entryTag, array $courseFields = null): ?Course
+    public function getCourse(string $entryTag, ?array $courseFields = null): ?Course
     {
         $courseEntry = $this->entryManager->getOne($entryTag);
         if ($courseEntry && intval($courseEntry['id_typeannonce']) == $this->courseFormId) {
