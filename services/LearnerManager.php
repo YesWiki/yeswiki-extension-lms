@@ -1,6 +1,5 @@
 <?php
 
-
 namespace YesWiki\Lms\Service;
 
 use Carbon\Carbon;
@@ -61,7 +60,7 @@ class LearnerManager
     {
         // load ConditionsChecker not in constructor to prevent loop
         $conditionsChecker = $this->wiki->services->get(ConditionsChecker::class);
-        if (empty($username)){
+        if (empty($username)) {
             $user = $this->userManager->getLoggedUser();
             return empty($user) ?
                 null

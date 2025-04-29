@@ -70,7 +70,7 @@ class ExtraActivityLog implements \JsonSerializable
             && !empty($data['date'])
             && !empty($data['elapsedTime'])
             && !empty($data['course'])
-            ) {
+        ) {
             return new ExtraActivityLog(
                 $dateManager,
                 $data['tag'],
@@ -79,7 +79,7 @@ class ExtraActivityLog implements \JsonSerializable
                 $dateManager->createDatetimeFromString($data['date']),
                 $dateManager->createIntervalFromString($data['elapsedTime']),
                 $courseManager->getCourse($data['course']),
-                !empty($data['module']) ? $courseManager->getModule($data['module']):null,
+                !empty($data['module']) ? $courseManager->getModule($data['module']) : null,
             )  ;
         } else {
             return null;

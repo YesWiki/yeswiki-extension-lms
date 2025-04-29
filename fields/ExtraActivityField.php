@@ -27,7 +27,7 @@ class ExtraActivityField extends BazarField
     {
         parent::__construct($values, $services);
 
-        
+
         $this->label = null;
         $this->default = [];
 
@@ -47,7 +47,7 @@ class ExtraActivityField extends BazarField
             if ($extraActivityLog = $this->extraActivityManager->getExtraActivityLog($value)) {
                 $courseTag = $extraActivityLog->getCourse()->getTag();
                 $module = $extraActivityLog->getModule() ;
-                
+
                 $learner = $this->learnerManager->getLearner();
                 if ($learner && $learner->isAdmin()) {
                     $learners = [] ;
@@ -59,11 +59,11 @@ class ExtraActivityField extends BazarField
                 }
             }
         }
-        
+
         return ($extraActivityLog) ? $this->render("@lms/fields/extra-activity.twig", [
             'extraActivityLog' => $extraActivityLog ,
             'learners' => $learners ?? null,
-        ]):null;
+        ]) : null;
     }
 
     protected function renderInput($entry)
@@ -129,16 +129,16 @@ class ExtraActivityField extends BazarField
             foreach (['bf_date_debut_evenement','bf_date_debut_evenement_allday','bf_date_debut_evenement_hour','bf_date_debut_evenement_minutes',
                 'bf_date_fin_evenement','bf_date_fin_evenement_allday','bf_date_fin_evenement_hour','bf_date_fin_evenement_minutes',
                 'course','module','registeredLearnerNames','tag'] as $key) {
-                $data[$key] =  $entry[$id.'_'.$key]  ?? null;
+                $data[$key] =  $entry[$id . '_' . $key]  ?? null;
             }
-            
+
             if ($this->extraActivityManager->saveExtraActivity($data)) {
                 $value = $this->getExtraActivityTagFromrelatedLink($data['course'], $data['module'], $data['relatedLink']);
             }
         } else {
             $value = $this->getValue($entry);
         }
-        return ((isset($value)) ? [$this->getPropertyName() => $value]:[])
+        return ((isset($value)) ? [$this->getPropertyName() => $value] : [])
             + ['fields-to-remove' => [$this->getPropertyName()]];
     }
 
@@ -159,7 +159,7 @@ class ExtraActivityField extends BazarField
                 }
             }
         }
-        
+
         return $extraActivityTag ?? null;
     }
 }
