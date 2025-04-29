@@ -56,7 +56,7 @@ class LearnerManager
      * @param string $username the username for a specific learner
      * @return Learner|null the Learner or null if not connected or not existing
      */
-    public function getLearner(string $username = null): ?Learner
+    public function getLearner(?string $username = null): ?Learner
     {
         // load ConditionsChecker not in constructor to prevent loop
         $conditionsChecker = $this->wiki->services->get(ConditionsChecker::class);
