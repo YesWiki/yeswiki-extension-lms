@@ -40,7 +40,7 @@ class ExtraActivityField extends BazarField
     }
 
     // Render the show view of the field
-    protected function renderStatic($entry)
+    protected function renderStatic($entry, $pOptions = null)
     {
         $value = $this->getValue($entry);
         if (!empty($value)) {
@@ -66,7 +66,7 @@ class ExtraActivityField extends BazarField
         ]) : null;
     }
 
-    protected function renderInput($entry)
+    protected function renderInput($entry, $pOptions = null)
     {
         $courseTag = $_GET['course'] ?? null;
 
