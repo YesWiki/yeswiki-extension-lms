@@ -65,7 +65,7 @@ class ActivityNavigationField extends LmsField
 
     // Render the show view of the field
     // TODO check if the current form is an LMS activity form to prevent errors
-    protected function renderStatic($entry)
+    protected function renderStatic($entry, $pOptions = null)
     {
         $currentActivityTag = $this->getCurrentTag($entry);
         if (is_null($currentActivityTag)) {
@@ -132,7 +132,7 @@ class ActivityNavigationField extends LmsField
         return $output;
     }
 
-    protected function renderInput($entry)
+    protected function renderInput($entry, $pOptions = null)
     {
         return ($this->conditionsChecker->isConditionsEnabled()) ? $this->render("@lms/inputs/activity-navigation.twig", [
             'value' => $this->getValue($entry),
