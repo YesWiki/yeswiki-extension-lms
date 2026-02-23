@@ -32,7 +32,7 @@ abstract class LmsField extends BazarField
         return !empty($entry['id_fiche']) ? $entry['id_fiche'] : null;
     }
 
-    protected function renderInput($entry)
+    protected function renderInput($entry, $pOptions = null)
     {
         // No input need to be displayed for this example field
         return "";
