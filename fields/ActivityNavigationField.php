@@ -2,6 +2,7 @@
 
 namespace YesWiki\Lms\Field;
 
+use Field;
 use Psr\Container\ContainerInterface;
 use YesWiki\Wiki;
 use YesWiki\Bazar\Service\EntryManager;
@@ -12,9 +13,7 @@ use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ConditionsChecker;
 
-/**
- * @Field({"navigationactivite","activitynavigation"})
- */
+#[Field(['navigationactivite','activitynavigation'])]
 class ActivityNavigationField extends LmsField
 {
     public const LABEL_REACTION_NEEDED = 'reaction_needed';
@@ -109,9 +108,9 @@ class ActivityNavigationField extends LmsField
             // check conditions
             if ($this->conditionsChecker->isConditionsEnabled()) {
                 $nextCourseStructure = $this->courseManager->getNextActivityOrModule($course, $module, $activity);
-                if ($nextCourseStructure){
+                if ($nextCourseStructure) {
                     $conditionsResults = $this->conditionsChecker
-                        ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry),true,$nextCourseStructure) ;
+                        ->checkActivityNavigationConditions($course, $module, $activity, $this->getValue($entry), true, $nextCourseStructure) ;
                     if ($this->config['debug'] == 'yes' && $conditionsResults->getErrorStatus()) {
                         trigger_error($conditionsResults->getFormattedMessages());
                     }

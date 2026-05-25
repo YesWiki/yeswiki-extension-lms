@@ -2,6 +2,8 @@
 
 namespace YesWiki\Lms\Field;
 
+use Field;
+
 use Psr\Container\ContainerInterface;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Bazar\Field\BazarField;
@@ -12,9 +14,7 @@ use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Lms\Service\ExtraActivityManager;
 
-/**
- * @Field({"extraactivity"})
- */
+#[Field(['extraactivity'])]
 class ExtraActivityField extends BazarField
 {
     protected $courseManager;

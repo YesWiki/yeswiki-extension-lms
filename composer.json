@@ -1,13 +1,13 @@
 {
-    "require": {
-        "php": "^7.2.5 || ^8.0"
+  "require": {
+    "php": "^8.2"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2.0"
     },
-    "config": {
-        "optimize-autoloader": true,
-        "platform": {
-            "php": "7.2.5"
-        },
-        "platform-check": true,
-        "sort-packages": true
-    }
+    "platform-check": true,
+    "sort-packages": true
+  }
 }
