@@ -1,13 +1,15 @@
 {
-  "require": {
-    "php": "^8.2"
-  },
-  "config": {
-    "optimize-autoloader": true,
-    "platform": {
-      "php": "8.2.0"
+    "name": "yeswiki/extension-lms",
+    "type": "yeswiki-extension",
+    "require": {
+        "php": "^8.2"
     },
-    "platform-check": true,
-    "sort-packages": true
-  }
+    "config": {
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "8.2.0"
+        },
+        "platform-check": true,
+        "sort-packages": true
+    }
 }
