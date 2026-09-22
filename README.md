@@ -1,65 +1,48 @@
 # yeswiki-extension-lms
-Permet d'utiliser YesWiki comme une plateforme d'apprentissage (LMS : Learning Management System)
 
-> Attention — Ceci est une extension de YesWiki. Elle ne fait pas partie du cœur officiellement maintenu de YesWiki.
+ - [English](#english)
+ - [Français](#français)
 
-## Installation
+## English
 
-  1) Copiez l'extension dans votre dossier tools ou installez-la depuis la page `GererMisesAJour` sur votre YesWiki.
-  2) Une fois l'installation automatique terminée sans erreur, taper `/update` à la fin de l'url d'une page. Ceci terminera la mise à jour du module LMS.
+[YesWiki](https://yeswiki.net/) extension. Turns YesWiki into a learning management system.
 
-_Exemple : `https://www.example.com/?GererMisesAJour/update`_
+### Authors
 
-## Utilisation
+ - all contributors indicated on this page : <https://github.com/YesWiki/yeswiki-extension-lms/graphs/contributors>
 
-  1) Rendez-vous sur la page `Bazar` de votre YesWiki
-  2) Ajoutez des activités LMS en ajoutant des fiches au formulaire ID = 1201.
-  3) Ajoutez ensuite des modules LMS en ajoutant des fiches au formulaire ID = 1202.
-  4) Ajoutez ensuite un parcours LMS en ajoutant un fiche au formulaire ID = 1203.
-  5) Notez l'url de ce parcours. Vous pouvez l'indiquer sur votre liste de parcours.
-  
-_Documentation sur le site [https://yeswiki.net](https://yeswiki.net/?DocumentationExtensionLMS)_
+### Install
 
-## Fonctionnalité d'import
+In page `GererMisesAJour` on your YesWiki website, search extension `lms` and install it.
 
-L'extension permet l'import de parcours depuis d'autres wikis.
+### Usage
 
-Elle s'utilise en ligne de commande uniquement, il vous faut donc un accès en SSH à votre serveur.
+Usage help is described in `http://example.com/?doc/#tools/lms/en/README.md` (replacing `http://example.com/?` by the `baseUrl` of your wiki). The same file can be found also here : https://github.com/YesWiki/yeswiki-extension-lms/blob/doryphore/docs/en/README.md
 
-Pour l'utiliser, il vous faut:
+### Warranty
 
-  1) L'URL vers le wiki depuis lequel importer
-  2) Un token d'API de ce wiki
+Like written in the licence file, there is no warranty on usage of this software. Refer to licence file for details.
+Developpers of this extension can not be responsible of consequences of the usage of this extension.
 
-Il est possible de créer un token d'API pour un wiki simplement en ajoutant les lignes suivantes au `wakka.config.php`
+----
 
-```php
-  'api_allowed_keys' =>
-  [
-    'nom-du-token' => 'token-a-garder-secret',
-  ],
-```
+## Français
 
-Depuis la racine du wiki, utiliser la commande suivante :
-*(en étant identifié avec le bon utilisateur ou en prefixant les commandes avec par exemple pour le user www-data `sudo -u www-data `)*
+Extension [YesWiki](https://yeswiki.net/). Permet d'utiliser YesWiki comme plateforme d'apprentissage.
 
-```sh
-php tools/lms/commands/console lms:import-courses URL-DISTANTE TOKEN
-```
+### Auteurs
 
-Vous serez ensuite guidé interactivement
+ - tous les contributeurs et toutes les contributrices indiqués sur cette page : <https://github.com/YesWiki/yeswiki-extension-lms/graphs/contributors>
 
-Il existe d'autres options plus avancées, il est possible d'obtenir leur documentation
+### Installation
 
-```sh
-php tools/lms/commands/console lms:import-courses -h
-```
+Dans la page `GererMisesAJour` de votre YesWiki, recherchez l'extension `lms` et installez-la.
 
-Il est possible d'importer les vidéos vers une instance peertube, pour cela, il faut que les paramètres suivants soient renseignés dans le `wakka.config.php`
+### Utilisation
 
-```php
-'peertube_url' => 'URL de l\'instance',
-'peertube_user' => 'Utilisateur',
-'peertube_password' => 'Mot de passe en clair de l\'utilisateur',
-'peertube_channel' => 'Chaine qui republie',
-```
+L'aide sur l'utilisation peut être trouvée sur `http://example.com/?doc/#tools/lms/fr/README.md` (en remplaçant `http://example.com/?` par `baseUrl` de votre wiki). Le même fichier peut aussi être trouvé ici : https://github.com/YesWiki/yeswiki-extension-lms/blob/doryphore/docs/fr/README.md
+
+### Garantie
+
+Comme énoncé dans le fichier de licence, il n'y a pas de garantie sur l'usage de ce logiciel. Se référer au fichier de licence pour les détails.
+Les développeurs de cette extension ne peuvent être responsables des conséquences qui découlent de l'usage de cette extension.

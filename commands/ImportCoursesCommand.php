@@ -14,9 +14,6 @@ use YesWiki\Wiki;
 
 class ImportCoursesCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'lms:import-courses';
-
     protected $importManager;
     protected $wiki;
     protected $remote_url;
@@ -34,12 +31,12 @@ class ImportCoursesCommand extends Command
     {
         parent::__construct();
         $this->wiki = $wiki;
-        $this->importManager = $this->wiki->services->get(ImportManager::class);
     }
 
     protected function configure()
     {
         $this
+            ->setName('lms:import-courses')
             // the short description shown while running "php bin/console list"
             ->setDescription('Import courses from another YesWiki url.')
 
@@ -302,8 +299,10 @@ class ImportCoursesCommand extends Command
         }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->importManager = $this->wiki->services->get(ImportManager::class);
+
         $this->remote_url = $input->getArgument('url');
         $this->remote_token = $input->getArgument('token');
         $this->force = $input->getOption('force');

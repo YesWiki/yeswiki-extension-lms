@@ -1,3 +1,6 @@
-# Extension LMS (Learning Management System)
+# Extension lms
 
-!> Currently the only available documentation is in [French](./fr/README.md).
+Turns YesWiki into a learning management system.
+
+ - [Aide en Français](./fr/README.md)
+ - [English help](./en/README.md)

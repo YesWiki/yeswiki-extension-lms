@@ -9,21 +9,17 @@
  * @link     https://yeswiki.net
  */
 
-if (!defined("WIKINI_VERSION")) {
-    die("acc&egrave;s direct interdit");
-}
-
 // Constants
 !defined('LMS_PATH') && define('LMS_PATH', 'tools/lms/');
 
 // Includes
-require_once LMS_PATH . 'libs/CourseStructure.php';
-require_once LMS_PATH . 'libs/Activity.php';
-require_once LMS_PATH . 'libs/Module.php';
-require_once LMS_PATH . 'libs/Course.php';
-require_once LMS_PATH . 'libs/Learner.php';
-require_once LMS_PATH . 'libs/TimeLogs.php'; // to require before following lines
-require_once LMS_PATH . 'libs/ExtraActivityLog.php';
-require_once LMS_PATH . 'libs/ExtraActivityLogs.php';
-require_once LMS_PATH . 'libs/Progresses.php';
-require_once LMS_PATH . 'libs/ConditionsState.php';
+require_once __DIR__ . '/libs/CourseStructure.php';
+require_once __DIR__ . '/libs/Activity.php';
+require_once __DIR__ . '/libs/Module.php';
+require_once __DIR__ . '/libs/Course.php';
+require_once __DIR__ . '/libs/Learner.php';
+require_once __DIR__ . '/libs/TimeLogs.php'; // to require before following lines
+require_once __DIR__ . '/libs/ExtraActivityLog.php';
+require_once __DIR__ . '/libs/ExtraActivityLogs.php';
+require_once __DIR__ . '/libs/Progresses.php';
+require_once __DIR__ . '/libs/ConditionsState.php';
