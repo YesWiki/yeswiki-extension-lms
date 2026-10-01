@@ -13,6 +13,9 @@ use YesWiki\Lms\Service\DateManager;
 use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\ConditionsChecker;
 
+/**
+ * @Field({"navigationactivite","activitynavigation"})
+ */
 #[Field(['navigationactivite','activitynavigation'])]
 class ActivityNavigationField extends LmsField
 {

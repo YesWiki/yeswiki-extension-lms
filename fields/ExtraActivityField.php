@@ -14,6 +14,9 @@ use YesWiki\Lms\Service\CourseManager;
 use YesWiki\Lms\Service\LearnerManager;
 use YesWiki\Lms\Service\ExtraActivityManager;
 
+/**
+ * @Field({"extraactivity"})
+ */
 #[Field(['extraactivity'])]
 class ExtraActivityField extends BazarField
 {

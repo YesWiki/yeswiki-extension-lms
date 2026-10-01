@@ -9,6 +9,9 @@ use YesWiki\Lms\ModuleStatus;
 use YesWiki\Lms\Controller\CourseController;
 use YesWiki\Lms\Service\CourseManager;
 
+/**
+ * @Field({"navigationmodule","modulenavigation"})
+ */
 #[Field(['navigationmodule','modulenavigation'])]
 class ModuleNavigationField extends LmsField
 {

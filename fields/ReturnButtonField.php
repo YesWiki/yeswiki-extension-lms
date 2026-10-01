@@ -7,6 +7,9 @@ use Field;
 use Psr\Container\ContainerInterface;
 use YesWiki\Lms\Service\CourseManager;
 
+/**
+ * @Field({"boutonretour","returnbutton"})
+ */
 #[Field(['boutonretour','returnbutton'])]
 class ReturnButtonField extends LmsField
 {
